@@ -3,12 +3,12 @@ import mongoose, { Schema, model, models } from "mongoose";
 const UserSchema = new Schema({
   name: { type: String },
   email: { type: String, unique: true, required: true },
-  password: { type: String, select: false }, // Hashed password
-  image: { type: String }, // Profile picture
+  password: { type: String, select: false }, // Hashed
+  image: { type: String },
 
-  // Auth & Security
+  // Email Verification Logic
   emailVerified: { type: Date, default: null },
-  verificationToken: { type: String }, // The code sent to email
+  verificationToken: { type: String },
   verificationTokenExpiry: { type: Date },
 
   resetPasswordToken: { type: String },

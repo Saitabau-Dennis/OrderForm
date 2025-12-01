@@ -3,42 +3,38 @@ import mongoose, { Schema, model, models } from "mongoose";
 const StoreSchema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
 
-  // Identity
+  // Identity & Branding
   name: { type: String, required: true },
-  slug: { type: String, required: true, unique: true },
+  slug: { type: String, required: true, unique: true }, // orderform.store/slug
   whatsappNumber: { type: String, required: true },
   currency: { type: String, default: "KES" },
-
-  // Branding
   logoUrl: { type: String },
-  brandColor: { type: String, default: "#30382F" }, // Hunter Green
+  brandColor: { type: String, default: "#30382F" }, // Default Hunter Green
 
-  // Delivery Zones (e.g. "CBD: 200")
+  // Logistics (OrderForm Feature)
   deliveryZones: [{
     name: { type: String, required: true },
     price: { type: Number, required: true }
   }],
 
-  // Subscription & Billing
-  subscription: {
-    plan: {
-      type: String,
-      enum: ["free", "pro"],
-      default: "free"
-    },
-    status: {
-      type: String,
-      enum: ["active", "past_due", "canceled", "trialing"],
-      default: "active"
-    },
-    startDate: { type: Date, default: Date.now },
-    endDate: { type: Date }, // When the Pro plan expires
-    stripeCustomerId: { type: String }, // Future-proofing for Stripe/Paystack
+  // Rewards Configuration (Future Feature - Ready to go)
+  rewardConfig: {
+    isEnabled: { type: Boolean, default: false },
+    couponCode: { type: String }, // e.g., "REVIEW10"
+    successMessage: { type: String, default: "Thanks! Here is your code:" }
   },
+
+  // Subscription & Business Logic
+  subscriptionPlan: {
+    type: String,
+    enum: ["free", "pro"],
+    default: "free"
+  },
+  isActive: { type: Boolean, default: true },
 
   // Analytics
   totalViews: { type: Number, default: 0 },
-  totalOrders: { type: Number, default: 0 },
+  whatsappClicks: { type: Number, default: 0 }
 
 }, { timestamps: true });
 

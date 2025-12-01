@@ -12,14 +12,16 @@ const ProductSchema = new Schema({
   // Inventory
   isAvailable: { type: Boolean, default: true },
 
-  // Analytics per product
-  views: { type: Number, default: 0 },
-
-  // Flexible Variants (e.g. Size: 42, 43 | Color: Red, Blue)
+  // Variants (MongoDB lets us store this as simple JSON)
+  // Example: [{ name: "Size", options: ["42", "43"] }]
   variants: [{
-    name: String, // e.g. "Size"
-    options: [String] // e.g. ["40", "41", "42"]
-  }]
+    name: String,
+    options: [String]
+  }],
+
+  // Social Proof
+  averageRating: { type: Number, default: 0 },
+  reviewCount: { type: Number, default: 0 }
 
 }, { timestamps: true });
 
