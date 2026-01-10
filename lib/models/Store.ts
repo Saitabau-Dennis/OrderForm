@@ -1,30 +1,28 @@
 import mongoose, { Schema, model, models } from "mongoose";
 
 const StoreSchema = new Schema({
+  // 1. Relationships
   userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
 
-  // Identity & Branding
+  // 2. Identity
   name: { type: String, required: true },
   slug: { type: String, required: true, unique: true }, // orderform.store/slug
-  whatsappNumber: { type: String, required: true },
+  description: { type: String },
+  whatsappNumber: { type: String },
   currency: { type: String, default: "KES" },
-  logoUrl: { type: String },
-  brandColor: { type: String, default: "#30382F" }, // Default Hunter Green
 
-  // Logistics (OrderForm Feature)
+  // 3. Branding
+  logoUrl: { type: String },
+  brandColor: { type: String, default: "#30382F" }, // Hunter Green
+  theme: { type: String, default: "Modern Minimalist" },
+
+  // 4. Logistics
   deliveryZones: [{
-    name: { type: String, required: true },
-    price: { type: Number, required: true }
+    name: { type: String, required: true }, // e.g., "Nairobi CBD"
+    price: { type: Number, required: true }  // e.g., 200
   }],
 
-  // Rewards Configuration (Future Feature - Ready to go)
-  rewardConfig: {
-    isEnabled: { type: Boolean, default: false },
-    couponCode: { type: String }, // e.g., "REVIEW10"
-    successMessage: { type: String, default: "Thanks! Here is your code:" }
-  },
-
-  // Subscription & Business Logic
+  // 5. Business Logic
   subscriptionPlan: {
     type: String,
     enum: ["free", "pro"],
@@ -32,7 +30,14 @@ const StoreSchema = new Schema({
   },
   isActive: { type: Boolean, default: true },
 
-  // Analytics
+  // 6. Rewards (Future)
+  rewardConfig: {
+    isEnabled: { type: Boolean, default: false },
+    couponCode: { type: String },
+    successMessage: { type: String, default: "Thanks! Here is your code:" }
+  },
+
+  // 7. Analytics
   totalViews: { type: Number, default: 0 },
   whatsappClicks: { type: Number, default: 0 }
 

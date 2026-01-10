@@ -38,7 +38,7 @@ export default function LoginPage() {
         router.refresh()
       }
     } catch (err) {
-      toast.error("Something went wrong")
+      toast.error("Something went wrong!!")
     } finally {
       setLoading(false)
     }
@@ -62,7 +62,7 @@ export default function LoginPage() {
 
         <div className="relative z-10">
           <p className="font-instrument-sans text-primary-foreground/50 text-sm">
-            © 2024 Orderform. All rights reserved.
+            © 2026 Orderform. All rights reserved.
           </p>
         </div>
 
@@ -130,7 +130,6 @@ export default function LoginPage() {
               {loading ? (
                 <span className="flex items-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Logging in...
                 </span>
               ) : (
                 "Log in"

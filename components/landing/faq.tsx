@@ -29,8 +29,8 @@ const faqs = [
 
 export function FAQ() {
   return (
-    <section id="faq" className="py-24 px-6">
-      <div className="max-w-3xl mx-auto">
+    <section id="faq" className="py-12 md:py-20 scroll-mt-28">
+      <div className="max-w-3xl mx-auto px-6">
         <ScrollAnimation className="text-center mb-16">
           <p className="font-heading uppercase tracking-[0.2em] text-sm text-muted-foreground mb-4">
             Support
@@ -40,14 +40,14 @@ export function FAQ() {
           </h2>
         </ScrollAnimation>
 
-        <Accordion type="single" collapsible className="w-full">
+        <Accordion type="single" collapsible className="w-full space-y-4">
           {faqs.map((faq, index) => (
             <ScrollAnimation key={index} delay={index * 0.1}>
-              <AccordionItem value={`item-${index}`} className="border-border">
-                <AccordionTrigger className="text-xl font-heading font-medium text-foreground hover:no-underline hover:text-muted-foreground text-left">
+              <AccordionItem value={`item-${index}`} className="border border-border/60 bg-background rounded-2xl px-2 shadow-sm hover:shadow-md transition-all duration-300">
+                <AccordionTrigger className="text-lg md:text-xl font-heading font-medium text-foreground hover:no-underline hover:text-primary px-4 py-6 text-left [&[data-state=open]]:text-primary transition-colors">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground font-sans font-normal text-lg leading-relaxed">
+                <AccordionContent className="text-muted-foreground font-sans font-normal text-base leading-relaxed px-4 pb-6">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>

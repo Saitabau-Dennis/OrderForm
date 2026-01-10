@@ -3,12 +3,14 @@
 import { Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ScrollAnimation } from "@/components/ui/scroll-animation"
+import { TextHighlight } from "@/components/ui/text-highlight"
+import { cn } from "@/lib/utils"
 
 const plans = [
   {
     name: "The Starter",
     price: "KES 0",
-    period: "/ month",
+    period: "forever",
     description: "Best for new sellers and side-hustles.",
     features: [
       "Up to 5 Products",
@@ -25,91 +27,116 @@ const plans = [
     description: "For serious brands ready to scale.",
     features: [
       "Unlimited Products",
-      "Analytics (See how many people viewed your store)",
+      "Analytics & Insights",
       "Priority WhatsApp Support",
-      "Multiple Delivery Zones (Auto-calculate delivery fees)"
+      "Multiple Delivery Zones"
     ],
     cta: "Get Started",
-    popular: true,
-    subPrice: "or KES 4,999 / year"
+    popular: true
   }
 ]
 
 export function Pricing() {
   return (
-    <section id="pricing" className="py-24 px-6">
-      <div className="max-w-7xl mx-auto">
-        <ScrollAnimation className="text-center mb-16">
-          <p className="font-heading uppercase tracking-[0.2em] text-sm text-muted-foreground mb-4">
+    <section id="pricing" className="py-12 md:py-24 scroll-mt-28">
+      <div className="max-w-7xl mx-auto px-6">
+        <ScrollAnimation className="text-center mb-20">
+          <p className="font-heading uppercase tracking-[0.2em] text-sm text-primary/80 mb-4 font-medium">
             Pricing
           </p>
-          <h2 className="text-4xl md:text-5xl font-heading font-bold text-foreground leading-[1.1]">
-            Simple, transparent pricing
+          <h2 className="text-4xl md:text-5xl font-heading font-medium text-foreground leading-[1.1] tracking-tight">
+            Simple, <TextHighlight color="blue" className="-rotate-1">transparent</TextHighlight> pricing
           </h2>
         </ScrollAnimation>
 
-        <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
           {plans.map((plan, index) => (
             <ScrollAnimation
               key={index}
               delay={index * 0.1}
-              className={`relative p-8 md:p-10 border rounded-3xl transition-all ${
+              className={cn(
+                "relative p-8 md:p-12 transition-all duration-300 group flex flex-col",
                 plan.popular
-                  ? "bg-foreground text-background border-foreground shadow-2xl scale-105"
-                  : "bg-card border-border shadow-sm hover:shadow-md hover:border-foreground/20"
-              }`}
+                  ? "bg-gradient-to-b from-primary to-primary/90 text-primary-foreground shadow-2xl scale-100 md:scale-105 z-10 rounded-[2rem] ring-1 ring-white/10"
+                  : "bg-background border border-border/60 shadow-sm hover:shadow-xl rounded-[2rem]"
+              )}
             >
               {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-background text-foreground px-4 py-1.5 text-xs font-sans font-medium border border-border shadow-sm rounded-full">
-                  Most Popular
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                   <div className="bg-white text-primary px-4 py-1.5 text-xs font-sans font-bold uppercase tracking-wider shadow-lg rounded-full flex items-center gap-1.5">
+                      <span className="text-[10px]">★</span> Most Popular
+                   </div>
                 </div>
               )}
 
               <div className="mb-8">
-                <h3 className={`text-xl font-heading font-bold mb-3 ${plan.popular ? "text-background" : "text-foreground"}`}>
+                <h3 className={cn(
+                    "text-xl font-heading font-medium mb-8",
+                    plan.popular ? "text-primary-foreground" : "text-foreground"
+                )}>
                   {plan.name}
                 </h3>
-                <div className="flex items-baseline gap-2 mb-2">
-                  <span className={`text-4xl md:text-5xl font-bold font-heading ${plan.popular ? "text-background" : "text-foreground"}`}>
-                    {plan.price}
+                
+                <div className="flex items-baseline gap-1.5 mb-2">
+                  {plan.price !== "KES 0" && (
+                    <span className={cn(
+                        "text-lg font-medium self-start mt-2",
+                         plan.popular ? "text-primary-foreground/80" : "text-muted-foreground"
+                    )}>KES</span>
+                  )}
+                  <span className={cn(
+                      "text-6xl md:text-7xl font-medium font-heading tracking-tighter",
+                      plan.popular ? "text-white" : "text-foreground"
+                  )}>
+                    {plan.price === "KES 0" ? "Free" : plan.price.replace("KES ", "")}
                   </span>
                   {plan.period && (
-                    <span className={`text-base font-sans ${plan.popular ? "text-background/60" : "text-muted-foreground"}`}>
+                    <span className={cn(
+                        "text-lg font-sans font-medium",
+                        plan.popular ? "text-primary-foreground/60" : "text-muted-foreground"
+                    )}>
                       {plan.period}
                     </span>
                   )}
                 </div>
-                {plan.subPrice && (
-                  <p className={`text-xs font-sans ${plan.popular ? "text-background/60" : "text-muted-foreground"}`}>
-                    {plan.subPrice}
-                  </p>
-                )}
-                <p className={`mt-4 text-sm font-sans leading-relaxed ${plan.popular ? "text-background/80" : "text-muted-foreground"}`}>
+
+
+                <p className={cn(
+                    "mt-8 text-lg font-sans font-normal leading-relaxed",
+                    plan.popular ? "text-primary-foreground/90" : "text-muted-foreground"
+                )}>
                   {plan.description}
                 </p>
               </div>
 
-              <div className={`h-[1px] w-full mb-6 ${plan.popular ? "bg-background/20" : "bg-border"}`} />
+              <div className={cn("h-px w-full my-8", plan.popular ? "bg-white/10" : "bg-border/60")} />
 
-              <ul className="space-y-4 mb-8">
+              <ul className="space-y-5 mb-10 flex-1">
                 {plan.features.map((feature, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <div className={`mt-0.5 flex-shrink-0 rounded-full p-1 ${plan.popular ? "bg-background/10" : "bg-muted"}`}>
-                      <Check className={`w-3 h-3 ${plan.popular ? "text-background" : "text-foreground"}`} />
+                    <li key={i} className="flex items-start gap-3">
+                    <div className={cn(
+                      "mt-1 flex-shrink-0",
+                      plan.popular ? "text-white" : "text-primary"
+                    )}>
+                      <Check className="w-5 h-5 stroke-[1.5]" />
                     </div>
-                    <span className={`text-sm font-sans leading-relaxed ${plan.popular ? "text-background/90" : "text-foreground/80"}`}>
+                    <span className={cn(
+                      "text-base font-sans font-medium",
+                      plan.popular ? "text-white/90" : "text-foreground/80"
+                    )}>
                       {feature}
                     </span>
-                  </li>
+                    </li>
                 ))}
               </ul>
 
               <Button
-                className={`w-full h-12 text-base font-sans font-medium rounded-xl transition-all ${
-                  plan.popular
-                    ? "bg-background text-foreground hover:bg-background/90 shadow-lg"
-                    : "bg-foreground text-background hover:bg-foreground/90 shadow-md"
-                }`}
+                className={cn(
+                    "w-full h-14 text-base font-medium rounded-xl transition-all shadow-none",
+                    plan.popular
+                        ? "bg-white text-primary hover:bg-white/90"
+                        : "bg-primary text-primary-foreground hover:bg-primary/90"
+                )}
               >
                 {plan.cta}
               </Button>

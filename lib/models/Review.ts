@@ -1,16 +1,17 @@
 import mongoose, { Schema, model, models } from "mongoose";
 
 const ReviewSchema = new Schema({
+  // 1. Relationships
   storeId: { type: Schema.Types.ObjectId, ref: "Store", required: true },
   productId: { type: Schema.Types.ObjectId, ref: "Product" },
 
-  // Customer Content
+  // 2. Content
   customerName: String,
   rating: { type: Number, required: true, min: 1, max: 5 },
-  imageUrl: { type: String },
   comment: String,
+  imageUrl: { type: String },
 
-  // Moderation (Crucial for safety)
+  // 3. Moderation
   isApproved: { type: Boolean, default: false },
 
 }, { timestamps: true });

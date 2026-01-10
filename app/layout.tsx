@@ -1,18 +1,21 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Inter, Raleway, Instrument_Serif, Instrument_Sans } from "next/font/google";
+import { Inter, Sora, Outfit, Signika, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 
-const bricolage = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-bricolage" });
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const raleway = Raleway({ subsets: ["latin"], variable: "--font-raleway" });
-const instrumentSerif = Instrument_Serif({ weight: "400", subsets: ["latin"], variable: "--font-instrument-serif" });
-const instrumentSans = Instrument_Sans({ subsets: ["latin"], variable: "--font-instrument-sans" });
+const sora = Sora({ subsets: ["latin"], variable: "--font-sora" });
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
+const signika = Signika({ subsets: ["latin"], variable: "--font-signika" });
+const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-dm-sans" });
+
 
 export const metadata: Metadata = {
   title: "OrderForm.store",
   description: "Turn Instagram Comments into WhatsApp Orders.",
 };
+
+import NextTopLoader from "nextjs-toploader";
 
 export default function RootLayout({
   children,
@@ -21,14 +24,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${bricolage.variable} ${inter.variable} ${raleway.variable} ${instrumentSerif.variable} ${instrumentSans.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${sora.variable} ${outfit.variable} ${signika.variable} ${dmSans.variable} font-sans antialiased`}>
+        <NextTopLoader color="#22c55e" showSpinner={false} />
         {children}
         <Toaster
           position="bottom-right"
           toastOptions={{
             classNames: {
-              success: 'bg-green-50 text-green-900 border-green-200',
-              error: 'bg-red-50 text-red-900 border-red-200',
+              success: 'bg-green-600 text-white border-green-600',
+              error: 'bg-red-600 text-white border-red-600',
             }
           }}
         />

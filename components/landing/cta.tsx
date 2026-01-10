@@ -3,34 +3,48 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ScrollAnimation } from "@/components/ui/scroll-animation"
+import { TextHighlight } from "@/components/ui/text-highlight"
+import { ArrowRight } from "lucide-react"
 
 export function CTA() {
   return (
-    <section className="py-24 px-6">
-      <div className="max-w-6xl mx-auto">
-        <ScrollAnimation className="bg-foreground rounded-[2rem] p-12 md:p-24 text-center relative overflow-hidden">
+    <section className="py-12 md:py-20">
+      <div className="max-w-7xl mx-auto px-6">
+        <ScrollAnimation className="bg-primary rounded-[2.5rem] p-12 md:p-24 text-center relative overflow-hidden shadow-2xl ring-4 ring-primary/20">
           {/* Decorative elements */}
-          <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-background/10 blur-[100px] rounded-full" />
+          <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none overflow-hidden">
+             <div className="absolute -top-[50%] -left-[50%] w-[200%] h-[200%] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/20 via-transparent to-transparent animate-spin-slow duration-[20s]" />
+             <div className="absolute top-0 left-0 w-full h-full bg-[url('/noise.png')] opacity-20 mix-blend-overlay"></div>
+          </div>
+          
+          <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+              <div className="absolute top-10 left-10 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
+              <div className="absolute bottom-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
           </div>
 
-          <div className="relative z-10">
-            <h2 className="text-4xl md:text-6xl font-heading font-bold text-background mb-6 leading-[1.1]">
-              Ready to streamline <br />
-              <span className="italic text-background/80">your sales?</span>
+          <div className="relative z-10 flex flex-col items-center">
+            <h2 className="text-4xl md:text-6xl font-heading font-medium text-primary-foreground mb-8 leading-[1.1] tracking-tight">
+              Ready to <span className="italic font-normal opacity-80">streamline</span> <br />
+              your <TextHighlight color="yellow" className="-rotate-2 text-primary">sales flow?</TextHighlight>
             </h2>
 
-            <p className="text-lg md:text-xl text-background/60 font-sans font-normal max-w-xl mx-auto mb-10 leading-relaxed">
-              Join thousands of sellers using OrderForm to grow their business on WhatsApp. No credit card required.
+            <p className="text-lg md:text-xl text-primary-foreground/80 font-sans font-light max-w-xl mx-auto mb-12 leading-relaxed">
+              Join thousands of sellers turning chaotic DMs into organized orders. 
+              Start for free today—no credit card required.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/register">
-                <Button className="h-14 px-8 rounded-full bg-background text-foreground hover:bg-background/90 text-lg font-medium transition-all hover:scale-105">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
+              <Link href="/register" className="w-full sm:w-auto">
+                <Button className="w-full sm:w-auto h-14 px-8 rounded-full bg-white text-primary hover:bg-white/90 text-lg font-bold transition-all hover:scale-105 shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center justify-center gap-2 group">
                   Create your store
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
             </div>
+            
+            <p className="mt-8 text-sm text-primary-foreground/50 font-sans">
+                Free for up to 5 products • Setup in 2 minutes
+            </p>
           </div>
         </ScrollAnimation>
       </div>

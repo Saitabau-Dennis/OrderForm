@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ArrowRight, ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react"
 import { toast } from "sonner"
-import { ResendButton } from "@/components/resend-button"
+
 
 export default function RegisterPage() {
   const [step, setStep] = useState(1)
@@ -62,8 +62,9 @@ export default function RegisterPage() {
         throw new Error(data.error || "Something went wrong")
       }
 
-      setSuccess(true)
-      toast.success("Registration successful! Please check your email.")
+      toast.success("Registration successful! Please verify your email.")
+      // Redirect to verification page
+      window.location.href = `/verify-email?email=${encodeURIComponent(formData.email)}`
     } catch (err: any) {
       toast.error(err.message)
     } finally {
@@ -113,7 +114,7 @@ export default function RegisterPage() {
             >
               Go to Login
             </Link>
-            <ResendButton email={formData.email} />
+
           </div>
         </div>
       </div>
@@ -263,7 +264,6 @@ export default function RegisterPage() {
                 {loading ? (
                   <span className="flex items-center gap-2">
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Creating account...
                   </span>
                 ) : step < 3 ? (
                   <span className="flex items-center gap-2">

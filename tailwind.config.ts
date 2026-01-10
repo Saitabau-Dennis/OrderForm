@@ -11,14 +11,16 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        primary: "#30382F", // Hunter Green
+        primary: "var(--primary)", // Powered by CSS variable
+        "primary-foreground": "var(--primary-foreground)",
         cream: "#FFFBDF", // Cream
-        "brand-beige": "#FFF7E6",
         "brand-pine": "#00311F",
       },
       fontFamily: {
         "instrument-serif": ["var(--font-instrument-serif)"],
         "instrument-sans": ["var(--font-instrument-sans)"],
+        "signika": ["var(--font-signika)"],
+        "dm-sans": ["var(--font-dm-sans)"],
       },
     },
   },

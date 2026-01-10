@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import { User } from "@/lib/models/User";
+import { Store } from "@/lib/models/Store";
 import bcrypt from "bcryptjs";
-import { sendVerificationEmail } from "@/lib/mail";
 import crypto from "crypto";
+import { sendVerificationCode } from "@/lib/actions/auth";
 
 export async function POST(req: Request) {
   try {
@@ -27,18 +28,29 @@ export async function POST(req: Request) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const verificationToken = crypto.randomUUID();
-    const verificationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
     const user = await User.create({
       name: storeName,
       email,
       password: hashedPassword,
-      verificationToken,
-      verificationTokenExpiry,
     });
 
-    await sendVerificationEmail(email, verificationToken);
+    // Create Store
+    const slug = storeName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)+/g, "");
+
+    await Store.create({
+      userId: user._id,
+      name: storeName,
+      slug: `${slug}-${crypto.randomBytes(3).toString("hex")}`, // Ensure uniqueness
+      whatsappNumber: "", // Optional now
+      deliveryZones: [],
+    });
+
+    // Send verification email
+    await sendVerificationCode(email);
 
     return NextResponse.json(
       { message: "User created successfully" },
