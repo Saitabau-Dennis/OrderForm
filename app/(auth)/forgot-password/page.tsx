@@ -35,15 +35,15 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="w-full max-w-4xl bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row min-h-[600px]">
+    <div className="w-full max-w-4xl bg-background rounded-[2.5rem] shadow-2xl ring-[12px] ring-primary/20 border border-black/5 overflow-hidden flex flex-col md:flex-row min-h-[600px]">
       {/* Left Side - Text */}
-      <div className="w-full md:w-1/2 bg-primary p-12 flex flex-col justify-between text-primary-foreground relative overflow-hidden">
+      <div className="w-full hidden md:flex md:w-1/2 bg-primary p-12 flex-col justify-between text-primary-foreground relative overflow-hidden">
         <div className="relative z-10">
           <Link href="/" className="font-instrument-serif text-2xl font-bold mb-12 block">
             Orderform
           </Link>
-          <h1 className="font-instrument-serif text-4xl md:text-5xl leading-tight mb-6">
-            Recover your account.
+                    <h1 className="font-instrument-serif text-3xl md:text-4xl leading-tight mb-6">
+            Reset your password.
           </h1>
           <p className="font-instrument-sans text-primary-foreground/70 text-lg">
             Don't worry, we'll help you get back to managing your store in no time.
@@ -64,6 +64,11 @@ export default function ForgotPasswordPage() {
       {/* Right Side - Form */}
       <div className="w-full md:w-1/2 p-12 flex flex-col justify-center bg-background">
         <div className="max-w-sm mx-auto w-full">
+          <div className="md:hidden mb-8 text-center">
+             <Link href="/" className="font-instrument-serif text-2xl font-bold text-primary">
+              Orderform
+            </Link>
+          </div>
           <Link
             href="/login"
             className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors"
@@ -72,7 +77,7 @@ export default function ForgotPasswordPage() {
             Back to login
           </Link>
 
-          <h2 className="font-instrument-serif text-3xl text-foreground mb-2">Forgot password?</h2>
+          <h2 className="font-instrument-serif text-2xl text-foreground mb-2">Forgot password?</h2>
           <p className="font-instrument-sans text-muted-foreground mb-8">
             Enter your email address and we'll send you a code to reset your password.
           </p>

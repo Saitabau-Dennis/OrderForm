@@ -14,7 +14,7 @@ export function Features() {
                     <p className="font-heading uppercase tracking-[0.2em] text-sm text-primary mb-4">
                         Features
                     </p>
-                    <h2 className="text-4xl md:text-5xl font-heading font-medium text-foreground leading-[1.1]">
+                    <h2 className="text-3xl md:text-4xl font-heading font-medium text-foreground leading-[1.1]">
                         Everything you need
                     </h2>
                 </div>

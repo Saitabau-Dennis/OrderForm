@@ -72,10 +72,10 @@ export function Navbar() {
             <Button 
                 variant="ghost" 
                 size="icon" 
-                className="md:hidden relative z-50"
+                className="md:hidden relative z-50 h-8 w-8"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
-                {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
         </div>
@@ -94,33 +94,33 @@ export function Navbar() {
             />
             
             <motion.div 
-                initial={{ y: "100%" }}
-                animate={{ y: 0 }}
-                exit={{ y: "100%" }}
+                initial={{ y: "120%", scale: 0.95, opacity: 0 }}
+                animate={{ y: 0, scale: 1, opacity: 1 }}
+                exit={{ y: "120%", scale: 0.95, opacity: 0 }}
                 transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border p-6 pb-8 rounded-t-[2rem] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] md:hidden flex flex-col gap-4"
+                className="fixed bottom-4 left-4 right-4 z-50 bg-background/80 backdrop-blur-2xl border border-white/20 p-4 rounded-[2rem] shadow-2xl md:hidden flex flex-col gap-2 ring-1 ring-black/5"
             >
-                <div className="flex justify-center mb-2">
-                    <div className="w-12 h-1.5 bg-muted rounded-full" />
+                <div className="flex justify-center mb-1">
+                    <div className="w-8 h-1 bg-muted/50 rounded-full" />
                 </div>
 
-                <div className="grid gap-2">
-                    <MobileNavLink href="#features" icon={<Sparkles className="w-5 h-5 text-primary" />} label="Features" onClick={() => setIsMobileMenuOpen(false)} />
-                    <MobileNavLink href="#pricing" icon={<CreditCard className="w-5 h-5 text-primary" />} label="Pricing" onClick={() => setIsMobileMenuOpen(false)} />
-                    <MobileNavLink href="#faq"icon={<HelpCircle className="w-5 h-5 text-primary" />} label="FAQ" onClick={() => setIsMobileMenuOpen(false)} />
+                <div className="grid gap-1">
+                    <MobileNavLink href="#features" icon={<Sparkles className="w-4 h-4 text-primary" />} label="Features" onClick={() => setIsMobileMenuOpen(false)} />
+                    <MobileNavLink href="#pricing" icon={<CreditCard className="w-4 h-4 text-primary" />} label="Pricing" onClick={() => setIsMobileMenuOpen(false)} />
+                    <MobileNavLink href="#faq"icon={<HelpCircle className="w-4 h-4 text-primary" />} label="FAQ" onClick={() => setIsMobileMenuOpen(false)} />
                 </div>
                 
-                <div className="h-px bg-border my-2" />
+                <div className="bg-border/50 my-1" />
                 
-                <div className="flex flex-col gap-3">
+                <div className="grid grid-cols-2 gap-3 mt-1">
                     <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                        <Button variant="outline" className="w-full h-12 rounded-xl text-base font-medium border-border hover:bg-muted">
+                        <Button variant="ghost" className="w-full h-11 rounded-xl text-sm font-medium hover:bg-muted/50">
                             Log in
                         </Button>
                     </Link>
                     <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                        <Button className="w-full h-12 rounded-xl bg-primary text-primary-foreground text-base font-bold shadow-lg flex items-center justify-center gap-2">
-                            Get Started <ArrowRight className="w-4 h-4" />
+                        <Button className="w-full h-11 rounded-xl bg-primary text-primary-foreground text-sm font-bold shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                            Get Started
                         </Button>
                     </Link>
                 </div>
@@ -134,11 +134,11 @@ export function Navbar() {
 
 function MobileNavLink({ href, label, icon, onClick }: { href: string, label: string, icon: React.ReactNode, onClick: () => void }) {
     return (
-        <Link href={href} onClick={onClick} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-muted/50 active:bg-muted transition-colors">
-            <div className="p-2.5 rounded-full bg-primary/10">
+        <Link href={href} onClick={onClick} className="flex items-center gap-3 p-3 rounded-2xl hover:bg-muted/50 active:bg-muted transition-colors group">
+            <div className="p-2 rounded-full bg-primary/5 group-hover:bg-primary/10 transition-colors">
                 {icon}
             </div>
-            <span className="text-lg font-medium font-heading text-foreground">{label}</span>
+            <span className="text-sm font-medium font-heading text-foreground/80 group-hover:text-foreground transition-colors">{label}</span>
         </Link>
     )
 }

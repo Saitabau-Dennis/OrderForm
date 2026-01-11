@@ -44,7 +44,7 @@ export function Pricing() {
           <p className="font-heading uppercase tracking-[0.2em] text-sm text-primary/80 mb-4 font-medium">
             Pricing
           </p>
-          <h2 className="text-4xl md:text-5xl font-heading font-medium text-foreground leading-[1.1] tracking-tight">
+          <h2 className="text-3xl md:text-4xl font-heading font-medium text-foreground leading-[1.1] tracking-tight">
             Simple, <TextHighlight color="blue" className="-rotate-1">transparent</TextHighlight> pricing
           </h2>
         </ScrollAnimation>
@@ -57,8 +57,8 @@ export function Pricing() {
               className={cn(
                 "relative p-8 md:p-12 transition-all duration-300 group flex flex-col",
                 plan.popular
-                  ? "bg-gradient-to-b from-primary to-primary/90 text-primary-foreground shadow-2xl scale-100 md:scale-105 z-10 rounded-[2rem] ring-1 ring-white/10"
-                  : "bg-background border border-border/60 shadow-sm hover:shadow-xl rounded-[2rem]"
+                  ? "bg-gradient-to-b from-primary to-primary/90 text-primary-foreground shadow-2xl scale-100 md:scale-105 z-10 rounded-[2.5rem] ring-4 ring-primary/20"
+                  : "bg-background border border-border/60 shadow-xl rounded-[2.5rem] hover:ring-4 hover:ring-primary/10 ring-4 ring-transparent"
               )}
             >
               {plan.popular && (
@@ -71,7 +71,7 @@ export function Pricing() {
 
               <div className="mb-8">
                 <h3 className={cn(
-                    "text-xl font-heading font-medium mb-8",
+                    "text-lg font-heading font-medium mb-8",
                     plan.popular ? "text-primary-foreground" : "text-foreground"
                 )}>
                   {plan.name}
@@ -85,7 +85,7 @@ export function Pricing() {
                     )}>KES</span>
                   )}
                   <span className={cn(
-                      "text-6xl md:text-7xl font-medium font-heading tracking-tighter",
+                      "text-5xl md:text-6xl font-medium font-heading tracking-tighter",
                       plan.popular ? "text-white" : "text-foreground"
                   )}>
                     {plan.price === "KES 0" ? "Free" : plan.price.replace("KES ", "")}

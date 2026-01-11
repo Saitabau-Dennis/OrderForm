@@ -29,7 +29,7 @@ export function HowItWorks() {
           <p className="font-heading uppercase tracking-[0.2em] text-sm text-primary mb-4">
             How it works
           </p>
-          <h2 className="text-3xl md:text-5xl font-heading font-medium text-foreground">
+          <h2 className="text-2xl md:text-4xl font-heading font-medium text-foreground">
             Start selling in <span className="italic">minutes</span>
           </h2>
         </ScrollAnimation>
@@ -44,7 +44,7 @@ export function HowItWorks() {
                 <div className="w-24 h-24 rounded-full bg-primary/5 border-[6px] border-background flex items-center justify-center mb-6 shadow-sm">
                    <step.icon className="w-10 h-10 text-primary" />
                 </div>
-                <h3 className="text-xl font-heading font-bold mb-3">{step.title}</h3>
+                <h3 className="text-lg font-heading font-bold mb-3">{step.title}</h3>
                 <p className="text-muted-foreground font-sans leading-relaxed">
                   {step.description}
                 </p>

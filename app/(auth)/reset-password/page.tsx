@@ -79,7 +79,7 @@ function ResetPasswordForm() {
         <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-green-100">
           <ShieldCheck className="w-10 h-10 text-green-600" />
         </div>
-        <h2 className="font-instrument-serif text-3xl font-bold text-foreground mb-4">
+        <h2 className="font-instrument-serif text-2xl font-bold text-foreground mb-4">
           Password Reset!
         </h2>
         <p className="font-instrument-sans text-muted-foreground text-lg mb-8 max-w-[300px] mx-auto">
@@ -100,7 +100,7 @@ function ResetPasswordForm() {
         <div className="w-12 h-12 bg-primary/5 rounded-xl flex items-center justify-center mb-6 text-primary">
           <LockKeyhole className="w-6 h-6" />
         </div>
-        <h2 className="font-instrument-serif text-3xl text-foreground mb-2">
+        <h2 className="font-instrument-serif text-2xl text-foreground mb-2">
           Reset Password
         </h2>
         <p className="font-instrument-sans text-muted-foreground">
@@ -191,9 +191,9 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="w-full max-w-4xl bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row min-h-[600px]">
+    <div className="w-full max-w-4xl bg-background rounded-[2.5rem] shadow-2xl ring-[12px] ring-primary/20 border border-black/5 overflow-hidden flex flex-col md:flex-row min-h-[600px]">
       {/* Left Side - Text */}
-      <div className="w-full md:w-1/2 bg-primary p-12 flex flex-col justify-between text-primary-foreground relative overflow-hidden">
+      <div className="w-full hidden md:flex md:w-1/2 bg-primary p-12 flex-col justify-between text-primary-foreground relative overflow-hidden">
         <div className="relative z-10">
           <Link
             href="/"
@@ -201,7 +201,7 @@ export default function ResetPasswordPage() {
           >
             Orderform
           </Link>
-          <h1 className="font-instrument-serif text-4xl md:text-5xl leading-tight mb-6">
+          <h1 className="font-instrument-serif text-3xl md:text-4xl leading-tight mb-6">
             Secure your account.
           </h1>
           <p className="font-instrument-sans text-primary-foreground/70 text-lg">
@@ -222,6 +222,11 @@ export default function ResetPasswordPage() {
 
       {/* Right Side - Form */}
       <div className="w-full md:w-1/2 p-12 flex flex-col justify-center bg-background">
+         <div className="md:hidden mb-8 text-center max-w-sm mx-auto w-full">
+             <Link href="/" className="font-instrument-serif text-2xl font-bold text-primary">
+              Orderform
+            </Link>
+          </div>
         <Suspense fallback={<div>Loading...</div>}>
           <ResetPasswordForm />
         </Suspense>

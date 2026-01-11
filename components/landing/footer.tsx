@@ -21,10 +21,10 @@ export function Footer() {
         <div className="grid md:grid-cols-2 gap-12 items-start mb-24 md:mb-32">
             {/* Brand Column */}
             <div className="space-y-6 pointer-events-auto">
-                <Link href="/" className="font-heading text-2xl font-medium tracking-tight text-foreground block w-fit">
+                <Link href="/" className="font-heading text-xl font-medium tracking-tight text-foreground block w-fit">
                     OrderForm
                 </Link>
-                <p className="text-muted-foreground max-w-sm font-sans font-normal leading-relaxed text-lg backdrop-blur-[2px] rounded-lg">
+                <p className="text-muted-foreground max-w-sm font-sans font-normal leading-relaxed text-base backdrop-blur-[2px] rounded-lg">
                     Simplifying commerce for the modern entrepreneur. Turn conversations into conversions.
                 </p>
             </div>
@@ -32,7 +32,7 @@ export function Footer() {
             {/* Navigation Column */}
             <div className="flex md:justify-end gap-12 md:gap-24 pointer-events-auto">
                 <div className="flex flex-col gap-4 text-left md:text-right">
-                    <h4 className="font-heading font-medium text-lg text-foreground">Contact</h4>
+                    <h4 className="font-heading font-medium text-base text-foreground">Contact</h4>
                      <Link 
                         href="mailto:dennisntete28@gmail.com" 
                         className="text-muted-foreground hover:text-primary transition-colors flex items-center md:justify-end gap-2 group w-fit md:ml-auto"

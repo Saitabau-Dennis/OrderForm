@@ -35,7 +35,7 @@ export function FAQ() {
           <p className="font-heading uppercase tracking-[0.2em] text-sm text-muted-foreground mb-4">
             Support
           </p>
-          <h2 className="text-4xl md:text-5xl font-heading font-bold text-foreground">
+          <h2 className="text-3xl md:text-4xl font-heading font-bold text-foreground">
             Frequently asked questions
           </h2>
         </ScrollAnimation>
@@ -44,7 +44,7 @@ export function FAQ() {
           {faqs.map((faq, index) => (
             <ScrollAnimation key={index} delay={index * 0.1}>
               <AccordionItem value={`item-${index}`} className="border border-border/60 bg-background rounded-2xl px-2 shadow-sm hover:shadow-md transition-all duration-300">
-                <AccordionTrigger className="text-lg md:text-xl font-heading font-medium text-foreground hover:no-underline hover:text-primary px-4 py-6 text-left [&[data-state=open]]:text-primary transition-colors">
+                <AccordionTrigger className="text-base md:text-lg font-heading font-medium text-foreground hover:no-underline hover:text-primary px-4 py-6 text-left [&[data-state=open]]:text-primary transition-colors">
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground font-sans font-normal text-base leading-relaxed px-4 pb-6">

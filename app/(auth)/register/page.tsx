@@ -100,7 +100,7 @@ export default function RegisterPage() {
             </svg>
           </div>
           <div className="space-y-2">
-            <h2 className="font-instrument-serif text-3xl font-bold text-foreground">Registration Successful!</h2>
+            <h2 className="font-instrument-serif text-2xl font-bold text-foreground">Registration Successful!</h2>
             <p className="font-instrument-sans text-muted-foreground text-lg leading-relaxed">
               We've sent a verification link to <strong className="text-foreground">{formData.email}</strong>.
               Please check your inbox to activate your account.
@@ -122,14 +122,14 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="w-full max-w-4xl bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row min-h-[600px]">
+    <div className="w-full max-w-4xl bg-background rounded-[2.5rem] shadow-2xl ring-[12px] ring-primary/20 border border-black/5 overflow-hidden flex flex-col md:flex-row min-h-[600px]">
       {/* Left Side - Text */}
-      <div className="w-full md:w-1/2 bg-primary p-12 flex flex-col justify-between text-primary-foreground relative overflow-hidden">
+      <div className="w-full hidden md:flex md:w-1/2 bg-primary p-12 flex-col justify-between text-primary-foreground relative overflow-hidden">
         <div className="relative z-10">
           <Link href="/" className="font-instrument-serif text-2xl font-bold mb-12 block">
             Orderform
           </Link>
-          <h1 className="font-instrument-serif text-4xl md:text-5xl leading-tight mb-6">
+          <h1 className="font-instrument-serif text-3xl md:text-4xl leading-tight mb-6">
             Start your journey with us.
           </h1>
           <p className="font-instrument-sans text-primary-foreground/70 text-lg">
@@ -159,6 +159,22 @@ export default function RegisterPage() {
       {/* Right Side - Form */}
       <div className="w-full md:w-1/2 p-12 flex flex-col justify-center bg-background">
         <div className="max-w-sm mx-auto w-full">
+          <div className="md:hidden mb-8 text-center">
+             <Link href="/" className="font-instrument-serif text-2xl font-bold text-primary">
+              Orderform
+            </Link>
+            <div className="flex gap-2 justify-center mt-4 mb-2">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className={`h-1 w-8 rounded-full transition-colors ${step >= i ? "bg-primary" : "bg-primary/20"}`}
+              />
+            ))}
+            </div>
+            <p className="font-instrument-sans text-muted-foreground text-xs">
+              Step {step} of 3
+            </p>
+          </div>
           <h2 className="font-instrument-serif text-3xl text-foreground mb-2">Create account</h2>
           <p className="font-instrument-sans text-muted-foreground mb-8">
             {getStepDescription()}

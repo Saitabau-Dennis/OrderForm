@@ -23,12 +23,12 @@ export function CTA() {
           </div>
 
           <div className="relative z-10 flex flex-col items-center">
-            <h2 className="text-4xl md:text-6xl font-heading font-medium text-primary-foreground mb-8 leading-[1.1] tracking-tight">
+            <h2 className="text-3xl md:text-5xl font-heading font-medium text-primary-foreground mb-8 leading-[1.1] tracking-tight">
               Ready to <span className="italic font-normal opacity-80">streamline</span> <br />
               your <TextHighlight color="yellow" className="-rotate-2 text-primary">sales flow?</TextHighlight>
             </h2>
 
-            <p className="text-lg md:text-xl text-primary-foreground/80 font-sans font-light max-w-xl mx-auto mb-12 leading-relaxed">
+            <p className="text-base md:text-lg text-primary-foreground/80 font-sans font-light max-w-xl mx-auto mb-12 leading-relaxed">
               Join thousands of sellers turning chaotic DMs into organized orders. 
               Start for free today—no credit card required.
             </p>
