@@ -45,7 +45,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="w-full max-w-4xl bg-background rounded-[2.5rem] shadow-2xl ring-[12px] ring-primary/20 border border-black/5 overflow-hidden flex flex-col md:flex-row min-h-[600px]">
+    <div className="w-full max-w-4xl bg-background rounded-3xl md:rounded-[2.5rem] shadow-2xl ring-4 md:ring-[12px] ring-primary/20 border border-black/5 overflow-hidden flex flex-col md:flex-row min-h-[400px] md:min-h-[600px]">
       {/* Left Side - Text */}
       <div className="w-full hidden md:flex md:w-1/2 bg-primary p-12 flex-col justify-between text-primary-foreground relative overflow-hidden">
         <div className="relative z-10">
@@ -72,9 +72,9 @@ export default function LoginPage() {
       </div>
 
       {/* Right Side - Form */}
-      <div className="w-full md:w-1/2 p-12 flex flex-col justify-center bg-background">
+      <div className="w-full md:w-1/2 p-6 md:p-12 flex flex-col justify-center bg-background">
         <div className="max-w-sm mx-auto w-full">
-          <div className="md:hidden mb-8 text-center">
+          <div className="md:hidden mb-6 text-center">
             <Link href="/" className="font-instrument-serif text-2xl font-bold text-primary">
               Orderform
             </Link>
