@@ -6,8 +6,10 @@ import { cn } from "@/lib/utils"
 import { useEffect, useState } from "react"
 import { Menu, X, ArrowRight, LayoutDashboard, HelpCircle, CreditCard, Sparkles } from "lucide-react"
 import { AnimatePresence, motion } from "motion/react"
+import { useSession } from "next-auth/react"
 
 export function Navbar() {
+  const { data: session } = useSession()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -59,14 +61,25 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center gap-4">
-            <Link href="/login" className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Log in
-            </Link>
-            <Link href="/register" className="hidden md:block">
-              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-6 h-10 font-medium shadow-lg hover:shadow-xl">
-                Get Started
-              </Button>
-            </Link>
+            {session ? (
+              <Link href="/dashboard" className="hidden md:block">
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-6 h-10 font-medium shadow-lg hover:shadow-xl flex items-center gap-2">
+                  <LayoutDashboard className="w-4 h-4" />
+                  Dashboard
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link href="/login" className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                  Log in
+                </Link>
+                <Link href="/register" className="hidden md:block">
+                  <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-6 h-10 font-medium shadow-lg hover:shadow-xl">
+                    Get Started
+                  </Button>
+                </Link>
+              </>
+            )}
             
             {/* Mobile Menu Toggle */}
             <Button 
@@ -112,17 +125,28 @@ export function Navbar() {
                 
                 <div className="bg-border/50 my-1" />
                 
-                <div className="grid grid-cols-2 gap-3 mt-1">
-                    <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                        <Button variant="ghost" className="w-full h-11 rounded-xl text-sm font-medium hover:bg-muted/50">
-                            Log in
-                        </Button>
-                    </Link>
-                    <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                        <Button className="w-full h-11 rounded-xl bg-primary text-primary-foreground text-sm font-bold shadow-md hover:shadow-lg flex items-center justify-center gap-2">
-                            Get Started
-                        </Button>
-                    </Link>
+                <div className="mt-1">
+                    {session ? (
+                      <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+                          <Button className="w-full h-11 rounded-xl bg-primary text-primary-foreground text-sm font-bold shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                              <LayoutDashboard className="w-4 h-4" />
+                              Go to Dashboard
+                          </Button>
+                      </Link>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-3">
+                        <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                            <Button variant="ghost" className="w-full h-11 rounded-xl text-sm font-medium hover:bg-muted/50">
+                                Log in
+                            </Button>
+                        </Link>
+                        <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
+                            <Button className="w-full h-11 rounded-xl bg-primary text-primary-foreground text-sm font-bold shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                                Get Started
+                            </Button>
+                        </Link>
+                      </div>
+                    )}
                 </div>
             </motion.div>
           </>

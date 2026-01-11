@@ -16,6 +16,7 @@ export const metadata: Metadata = {
 };
 
 import NextTopLoader from "nextjs-toploader";
+import { Providers } from "@/components/providers";
 
 export default function RootLayout({
   children,
@@ -26,7 +27,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} ${sora.variable} ${outfit.variable} ${signika.variable} ${dmSans.variable} font-sans antialiased`}>
         <NextTopLoader color="#22c55e" showSpinner={false} />
-        {children}
+        <Providers>
+          {children}
+        </Providers>
         <Toaster
           position="bottom-right"
           toastOptions={{
