@@ -30,7 +30,7 @@ export function CTA() {
 
             <p className="text-base md:text-lg text-primary-foreground/80 font-sans font-light max-w-xl mx-auto mb-12 leading-relaxed">
               Join thousands of sellers turning chaotic DMs into organized orders. 
-              Start for free today—no credit card required.
+              Start for free today no credit card required.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
@@ -41,10 +41,6 @@ export function CTA() {
                 </Button>
               </Link>
             </div>
-            
-            <p className="mt-8 text-sm text-primary-foreground/50 font-sans">
-                Free for up to 5 products • Setup in 2 minutes
-            </p>
           </div>
         </ScrollAnimation>
       </div>
