@@ -14,6 +14,8 @@ interface HeroProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> 
   badge?: React.ReactNode
   ctaText?: string
   ctaLink?: string
+  secondaryCtaText?: string
+  secondaryCtaLink?: string
   mockupImage?: {
     src: string
     alt: string
@@ -23,7 +25,22 @@ interface HeroProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> 
 }
 
 const Hero = React.forwardRef<HTMLDivElement, HeroProps>(
-  ({ className, title, subtitle, eyebrow, badge, ctaText, ctaLink, mockupImage, ...props }, ref) => {
+  (
+    {
+      className,
+      title,
+      subtitle,
+      eyebrow,
+      badge,
+      ctaText,
+      ctaLink,
+      secondaryCtaText,
+      secondaryCtaLink,
+      mockupImage,
+      ...props
+    },
+    ref
+  ) => {
     return (
       <div
         ref={ref}
@@ -58,23 +75,33 @@ const Hero = React.forwardRef<HTMLDivElement, HeroProps>(
           </p>
         )}
 
-        {ctaText && ctaLink && (
-          <Link href={ctaLink}>
-            <div
-              className="inline-flex items-center bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-colors font-medium h-12 px-8 animate-appear opacity-0 delay-500 shadow-lg hover:shadow-xl hover:scale-105 transform duration-200"
-            >
-              <div className="flex items-center justify-between w-full gap-2">
-                <span className="text-base md:text-lg whitespace-nowrap">{ctaText}</span>
-                <ArrowRight className="w-4 h-4" />
-              </div>
-            </div>
-          </Link>
-        )}
+        {(ctaText && ctaLink) || (secondaryCtaText && secondaryCtaLink) ? (
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-appear opacity-0 delay-500">
+            {ctaText && ctaLink && (
+              <Link href={ctaLink}>
+                <div className="inline-flex items-center bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-colors font-medium h-12 px-8 shadow-lg hover:shadow-xl hover:scale-105 transform duration-200">
+                  <div className="flex items-center justify-between w-full gap-2">
+                    <span className="text-base md:text-lg whitespace-nowrap">{ctaText}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
+                </div>
+              </Link>
+            )}
+
+            {secondaryCtaText && secondaryCtaLink && (
+              <Link href={secondaryCtaLink}>
+                <div className="inline-flex items-center border border-border bg-background text-foreground rounded-full hover:bg-muted transition-colors font-medium h-12 px-8 shadow-sm hover:shadow-md transform duration-200">
+                  <span className="text-base md:text-lg whitespace-nowrap">{secondaryCtaText}</span>
+                </div>
+              </Link>
+            )}
+          </div>
+        ) : null}
 
         {mockupImage && (
-          <div className="mt-16 w-full max-w-[90rem] mx-auto relative animate-appear opacity-0 delay-700 px-4 md:px-0">
-            <MockupFrame className="shadow-2xl rounded-[2.5rem] border border-black/5 bg-white/50 backdrop-blur-sm ring-[12px] ring-primary/20">
-              <Mockup type="responsive" className="rounded-[2.2rem]">
+          <div className="mt-16 w-full max-w-[90rem] mx-auto relative animate-appear opacity-0 delay-700 px-1 md:px-0">
+            <MockupFrame className="shadow-2xl rounded-[1rem] md:rounded-[2.5rem] border border-black/5 bg-white/50 backdrop-blur-sm ring-[6px] md:ring-[12px] ring-primary/20">
+              <Mockup type="responsive" className="rounded-[0.8rem] md:rounded-[2.2rem]">
                 <Image
                   src={mockupImage.src}
                   alt={mockupImage.alt}

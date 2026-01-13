@@ -41,7 +41,7 @@ export function Navbar() {
           isScrolled || isMobileMenuOpen ? "bg-background/95 backdrop-blur-md border-b border-border shadow-sm" : "bg-transparent"
         )}
       >
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+        <div className="w-full px-6 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 z-50 relative" onClick={() => setIsMobileMenuOpen(false)}>
              <span className="font-[family-name:var(--font-outfit)] text-2xl font-bold text-foreground tracking-tighter">
               Order<span className="text-primary">Form</span>

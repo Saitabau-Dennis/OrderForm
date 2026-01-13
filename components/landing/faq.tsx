@@ -10,20 +10,24 @@ import { ScrollAnimation } from "@/components/ui/scroll-animation"
 
 const faqs = [
   {
-    question: "How does the WhatsApp integration work?",
-    answer: "When a customer completes their order, the system automatically generates a pre-filled WhatsApp message with their order details. They simply hit send to confirm the order with you directly."
+    question: "Do customers pay on OrderForm?",
+    answer: "No. Customers browse your products on your store, then place their order through WhatsApp. You handle payment the same way you already do."
   },
   {
-    question: "Do customers need to download an app?",
-    answer: "No. Your customers don't need to download anything or create an account. They just click your link, browse, and order."
+    question: "Where do orders go?",
+    answer: "Orders are sent as pre-filled WhatsApp messages directly to your WhatsApp number."
   },
   {
-    question: "How do I accept payments?",
-    answer: "You continue to accept payments via M-Pesa or cash, just like you always have. OrderForm simply structures the order so you know exactly what to charge."
+    question: "Do customers need to create an account?",
+    answer: "No. Customers can place an order without signing up."
   },
   {
-    question: "Can I use this on TikTok and Facebook?",
-    answer: "Yes! OrderForm gives you a unique link that works perfectly in your Instagram bio, TikTok profile, Facebook posts, or anywhere else you share links."
+    question: "Can I use OrderForm with Instagram or TikTok?",
+    answer: "Yes. You can place your store link in any social media bio."
+  },
+  {
+    question: "Is OrderForm hard to set up?",
+    answer: "No. You can create your store and add products in just a few minutes."
   }
 ]
 

@@ -8,30 +8,30 @@ import { cn } from "@/lib/utils"
 
 const plans = [
   {
-    name: "The Starter",
-    price: "KES 0",
-    period: "forever",
-    description: "Best for new sellers and side-hustles.",
+    name: "Free",
+    price: "0",
+    period: "always available",
+    description: "This removes fear and drives adoption.",
     features: [
-      "Up to 5 Products",
-      "Unlimited Orders",
-      "Secure WhatsApp Checkout",
-      "Standard Support"
+      "1 store",
+      "Up to 5 products",
+      "WhatsApp checkout",
+      "Unlimited orders"
     ],
-    cta: "Start for free"
+    cta: "Create your store"
   },
   {
-    name: "The Pro",
-    price: "KES 499",
-    period: "/ month",
-    description: "For serious brands ready to scale.",
+    name: "Pro",
+    price: "990",
+    period: "per month",
+    description: "This is what serious sellers upgrade to.",
     features: [
-      "Unlimited Products",
-      "Analytics & Insights",
-      "Priority WhatsApp Support",
-      "Multiple Delivery Zones"
+      "Unlimited products",
+      "Customer photo uploads (UGC)",
+      "Discount codes",
+      "Priority support"
     ],
-    cta: "Get Started",
+    cta: "Upgrade to Pro",
     popular: true
   }
 ]
@@ -45,7 +45,11 @@ export function Pricing() {
             Pricing
           </p>
           <h2 className="text-3xl md:text-4xl font-heading font-medium text-foreground leading-[1.1] tracking-tight">
-            Simple, <TextHighlight color="blue" className="-rotate-1">transparent</TextHighlight> pricing
+            Simple,{" "}
+            <TextHighlight color="green" className="px-3 py-1 -rotate-2">
+              transparent
+            </TextHighlight>{" "}
+            pricing
           </h2>
         </ScrollAnimation>
 
@@ -57,7 +61,7 @@ export function Pricing() {
               className={cn(
                 "relative p-8 md:p-12 transition-all duration-300 group flex flex-col",
                 plan.popular
-                  ? "bg-gradient-to-b from-primary to-primary/90 text-primary-foreground shadow-2xl scale-100 md:scale-105 z-10 rounded-[2.5rem] ring-4 ring-primary/20"
+                  ? "bg-linear-to-b from-primary to-primary/90 text-primary-foreground shadow-2xl scale-100 md:scale-105 z-10 rounded-[2.5rem] ring-4 ring-primary/20"
                   : "bg-background border border-border/60 shadow-xl rounded-[2.5rem] hover:ring-4 hover:ring-primary/10 ring-4 ring-transparent"
               )}
             >
@@ -78,24 +82,18 @@ export function Pricing() {
                 </h3>
                 
                 <div className="flex items-baseline gap-1.5 mb-2">
-                  {plan.price !== "KES 0" && (
-                    <span className={cn(
-                        "text-lg font-medium self-start mt-2",
-                         plan.popular ? "text-primary-foreground/80" : "text-muted-foreground"
-                    )}>KES</span>
-                  )}
                   <span className={cn(
                       "text-5xl md:text-6xl font-medium font-heading tracking-tighter",
                       plan.popular ? "text-white" : "text-foreground"
                   )}>
-                    {plan.price === "KES 0" ? "Free" : plan.price.replace("KES ", "")}
+                    {plan.price === "0" ? "Free" : plan.price}
                   </span>
                   {plan.period && (
                     <span className={cn(
                         "text-lg font-sans font-medium",
                         plan.popular ? "text-primary-foreground/60" : "text-muted-foreground"
                     )}>
-                      {plan.period}
+                      {plan.price === "0" ? `(${plan.period})` : plan.period}
                     </span>
                   )}
                 </div>
@@ -115,7 +113,7 @@ export function Pricing() {
                 {plan.features.map((feature, i) => (
                     <li key={i} className="flex items-start gap-3">
                     <div className={cn(
-                      "mt-1 flex-shrink-0",
+                      "mt-1 shrink-0",
                       plan.popular ? "text-white" : "text-primary"
                     )}>
                       <Check className="w-5 h-5 stroke-[1.5]" />

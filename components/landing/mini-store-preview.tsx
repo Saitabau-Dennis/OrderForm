@@ -1,37 +1,36 @@
 "use client"
 
 import { ScrollAnimation } from "@/components/ui/scroll-animation"
-import { TextHighlight } from "@/components/ui/text-highlight"
 import { cn } from "@/lib/utils"
 
 const previews = [
   {
-    title: "Catalog home",
-    description: "A clean storefront with categories and product cards.",
+    title: "Products",
+    description: "All your products in one place. Customers browse items, view prices, select options, and add them to their cart.",
     src: "/images/dashboard.png",
     alt: "Mini store catalog page preview"
   },
   {
-    title: "Product details",
-    description: "Fast decisions with clear pricing and an add-to-cart button.",
+    title: "Cart",
+    description: "Customers review their selected items before checkout and confirm quantities and options.",
     src: "/images/dashboard.png",
     alt: "Mini store product details page preview"
   },
   {
-    title: "Checkout",
-    description: "Simple order summary ready to send to WhatsApp.",
+    title: "WhatsApp Checkout",
+    description: "Customers send a ready-made order message directly to your WhatsApp with all order details included.",
     src: "/images/dashboard.png",
     alt: "Mini store checkout page preview"
   },
   {
-    title: "UGC upload",
-    description: "Upload a photo proof after purchase to earn a discount code.",
+    title: "Share Your Photo",
+    description: "Customers upload photos using your products. Once approved, they receive a discount code for their next order.",
     src: "/images/dashboard.png",
     alt: "Mini store UGC upload page preview"
   },
   {
-    title: "Discount code",
-    description: "Get a reward code to use on the next order.",
+    title: "Discounts",
+    description: "Approved customers receive discount codes they can use on future purchases.",
     src: "/images/dashboard.png",
     alt: "Mini store discount code page preview"
   }
@@ -39,7 +38,7 @@ const previews = [
 
 export function MiniStorePreview() {
   return (
-    <section className="py-12 md:py-20 bg-background">
+    <section id="mini-store" className="py-12 md:py-20 bg-background scroll-mt-28">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-12 md:mb-16">
           <ScrollAnimation variant="fade-up">
@@ -47,13 +46,13 @@ export function MiniStorePreview() {
               Mini store
             </p>
             <h2 className="text-3xl md:text-4xl font-heading font-medium text-foreground leading-[1.1] tracking-tight">
-              A beautiful <TextHighlight color="green" className="rotate-1">mini-store</TextHighlight> your customers can browse
+              Your mini store pages
             </h2>
           </ScrollAnimation>
 
           <ScrollAnimation variant="fade-up" delay={0.1}>
             <p className="mt-6 text-base md:text-lg text-muted-foreground font-sans leading-relaxed max-w-3xl mx-auto">
-              Share one link. Customers browse, order via WhatsApp, then come back to upload photo proof (UGC) and earn a discount code for their next purchase.
+              Everything your customers need, in one simple link.
             </p>
           </ScrollAnimation>
         </div>

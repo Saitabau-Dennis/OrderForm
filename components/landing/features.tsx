@@ -3,7 +3,7 @@
 
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-import { MessageCircle, LucideIcon, Box, Truck, MousePointerClick } from 'lucide-react'
+import { Link2, LucideIcon, LayoutGrid, ShoppingCart, UserX, Camera } from 'lucide-react'
 import { ReactNode } from 'react'
 
 export function Features() {
@@ -23,9 +23,9 @@ export function Features() {
                     <FeatureCard>
                         <CardHeader className="pb-3">
                             <CardHeading
-                                icon={MessageCircle}
-                                title="Direct WhatsApp Checkout"
-                                description="Bypass complex carts. Orders land directly in your WhatsApp chat."
+                                icon={Link2}
+                                title="Store link for your bio"
+                                description="Create one simple link to place in your social media bio. Customers click it to view all your products in one place."
                             />
                         </CardHeader>
 
@@ -44,9 +44,9 @@ export function Features() {
                     <FeatureCard>
                         <CardHeader className="pb-3">
                             <CardHeading
-                                icon={Box}
-                                title="Real-Time Inventory"
-                                description="Mark items unavailable instantly. No more 'Sorry, sold out' texts."
+                                icon={LayoutGrid}
+                                title="Product catalog"
+                                description="Add products with photos, prices, and optional options like size or color. Update your products anytime."
                             />
                         </CardHeader>
 
@@ -66,9 +66,9 @@ export function Features() {
                     <FeatureCard>
                         <CardHeader className="pb-3">
                             <CardHeading
-                                icon={Truck}
-                                title="Auto-Calculated Delivery"
-                                description="Customers pick their zone, and the correct delivery fee is automatically added."
+                                icon={ShoppingCart}
+                                title="Cart & WhatsApp checkout"
+                                description="Customers add items to a cart and checkout via WhatsApp. A pre-filled message with the full order details is generated and sent to your WhatsApp."
                             />
                         </CardHeader>
 
@@ -88,9 +88,9 @@ export function Features() {
                     <FeatureCard>
                         <CardHeader className="pb-3">
                             <CardHeading
-                                icon={MousePointerClick}
-                                title="No Accounts Required"
-                                description="Remove barriers. Customers just click and order without needing passwords or apps."
+                                icon={UserX}
+                                title="No accounts or apps"
+                                description="Customers don’t need to sign up or install anything. Everything works instantly in the browser and on WhatsApp."
                             />
                         </CardHeader>
 
@@ -107,32 +107,25 @@ export function Features() {
                         </div>
                     </FeatureCard>
 
-                    <FeatureCard className="p-6 lg:col-span-2">
-                        <p className="mx-auto my-6 max-w-md text-balance text-center text-xl font-medium font-heading">
-                            Smart analytics to track your store's performance.
-                        </p>
-
-                        <div className="flex justify-center gap-6 overflow-hidden py-8">
-                            <CircularUI
-                                label="Visits"
-                                circles={[{ pattern: 'border' }, { pattern: 'border' }]}
+                    <FeatureCard className="lg:col-span-2">
+                        <CardHeader className="pb-3">
+                            <CardHeading
+                                icon={Camera}
+                                title="Customer photos & discounts"
+                                description="Customers can upload photos using your products. Once approved, they receive a discount code for their next order."
                             />
+                        </CardHeader>
 
-                            <CircularUI
-                                label="Orders"
-                                circles={[{ pattern: 'none' }, { pattern: 'primary' }]}
-                            />
-
-                            <CircularUI
-                                label="Revenue"
-                                circles={[{ pattern: 'blue' }, { pattern: 'none' }]}
-                            />
-
-                            <CircularUI
-                                label="Growth"
-                                circles={[{ pattern: 'primary' }, { pattern: 'none' }]}
-                                className="hidden sm:block"
-                            />
+                        <div className="mb-6 border-t border-dashed sm:mb-0 border-border pt-6">
+                            <div className="aspect-76/59">
+                                <DualModeImage
+                                    src="/images/dashboard.png"
+                                    alt="Customer photos and discounts"
+                                    width={1207}
+                                    height={929}
+                                    className="object-contain h-full w-full opacity-90"
+                                />
+                            </div>
                         </div>
                     </FeatureCard>
                 </div>
@@ -198,32 +191,4 @@ const DualModeImage = ({ src, alt, width, height, className }: DualModeImageProp
     />
 )
 
-interface CircleConfig {
-    pattern: 'none' | 'border' | 'primary' | 'blue'
-}
 
-interface CircularUIProps {
-    label: string
-    circles: CircleConfig[]
-    className?: string
-}
-
-const CircularUI = ({ label, circles, className }: CircularUIProps) => (
-    <div className={className}>
-        <div className="bg-linear-to-b from-border size-fit rounded-2xl to-transparent p-px">
-            <div className="bg-linear-to-b from-background to-muted/25 relative flex aspect-square w-fit items-center -space-x-4 rounded-[15px] p-4">
-                {circles.map((circle, i) => (
-                    <div
-                        key={i}
-                        className={cn('size-7 rounded-full border sm:size-8', {
-                            'border-primary': circle.pattern === 'none',
-                            'border-primary bg-[repeating-linear-gradient(-45deg,hsl(var(--border)),hsl(var(--border))_1px,transparent_1px,transparent_4px)]': circle.pattern === 'border',
-                            'border-primary bg-background bg-[repeating-linear-gradient(-45deg,hsl(var(--primary)),hsl(var(--primary))_1px,transparent_1px,transparent_4px)]': circle.pattern === 'primary',
-                            'bg-background z-1 border-primary bg-[repeating-linear-gradient(-45deg,var(--color-primary),var(--color-primary)_1px,transparent_1px,transparent_4px)]': circle.pattern === 'blue',
-                        })}></div>
-                ))}
-            </div>
-        </div>
-        <span className="text-muted-foreground mt-1.5 block text-center text-sm font-sans">{label}</span>
-    </div>
-)
