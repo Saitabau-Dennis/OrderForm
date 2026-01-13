@@ -4,6 +4,7 @@ import { TextHighlight } from "@/components/ui/text-highlight"
 import { Hero } from "@/components/ui/hero"
 import { WhatIsOrderform } from "@/components/landing/what-is-orderform"
 import { Features } from "@/components/landing/features"
+import { MiniStorePreview } from "@/components/landing/mini-store-preview"
 import { Pricing } from "@/components/landing/pricing"
 import { FAQ } from "@/components/landing/faq"
 import { CTA } from "@/components/landing/cta"
@@ -43,6 +44,7 @@ export default function Home() {
 
       <WhatIsOrderform />
       <Features />
+      <MiniStorePreview />
       <Pricing />
       <FAQ />
       <CTA />

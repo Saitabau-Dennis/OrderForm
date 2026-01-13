@@ -29,9 +29,8 @@ export function Features() {
                             />
                         </CardHeader>
 
-                        <div className="relative mb-6 border-t border-dashed sm:mb-0 border-border">
-                            <div className="absolute inset-0 [background:radial-gradient(125%_125%_at_50%_0%,transparent_40%,hsl(var(--muted)),white_125%)]"></div>
-                            <div className="aspect-[76/59]">
+                        <div className="mb-6 border-t border-dashed sm:mb-0 border-border pt-6">
+                            <div className="aspect-76/59">
                                 <DualModeImage
                                     src="/images/dashboard.png"
                                     alt="WhatsApp Checkout"
@@ -51,9 +50,8 @@ export function Features() {
                             />
                         </CardHeader>
 
-                        <div className="relative mb-6 border-t border-dashed sm:mb-0 border-border">
-                            <div className="absolute inset-0 [background:radial-gradient(125%_125%_at_50%_0%,transparent_40%,hsl(var(--muted)),white_125%)]"></div>
-                            <div className="aspect-[76/59]">
+                        <div className="mb-6 border-t border-dashed sm:mb-0 border-border pt-6">
+                            <div className="aspect-76/59">
                                 <DualModeImage
                                     src="/images/dashboard.png"
                                     alt="Inventory Management"
@@ -74,9 +72,8 @@ export function Features() {
                             />
                         </CardHeader>
 
-                        <div className="relative mb-6 border-t border-dashed sm:mb-0 border-border">
-                             <div className="absolute inset-0 [background:radial-gradient(125%_125%_at_50%_0%,transparent_40%,hsl(var(--muted)),white_125%)]"></div>
-                            <div className="aspect-[76/59]">
+                        <div className="mb-6 border-t border-dashed sm:mb-0 border-border pt-6">
+                            <div className="aspect-76/59">
                                 <DualModeImage
                                     src="/images/dashboard.png"
                                     alt="Delivery Zones"
@@ -97,9 +94,8 @@ export function Features() {
                             />
                         </CardHeader>
 
-                        <div className="relative mb-6 border-t border-dashed sm:mb-0 border-border">
-                            <div className="absolute inset-0 [background:radial-gradient(125%_125%_at_50%_0%,transparent_40%,hsl(var(--muted)),white_125%)]"></div>
-                            <div className="aspect-[76/59]">
+                        <div className="mb-6 border-t border-dashed sm:mb-0 border-border pt-6">
+                            <div className="aspect-76/59">
                                 <DualModeImage
                                     src="/images/dashboard.png"
                                     alt="Fast Checkout"
@@ -195,7 +191,7 @@ interface DualModeImageProps {
 const DualModeImage = ({ src, alt, width, height, className }: DualModeImageProps) => (
     <img
         src={src}
-        className={cn('block rounded-t-xl shadow-md border-t border-x border-border/50 w-full h-full object-contain object-top mask-gradient-b', className)}
+        className={cn('block w-full h-full object-contain object-top', className)}
         alt={alt}
         width={width}
         height={height}
@@ -214,8 +210,8 @@ interface CircularUIProps {
 
 const CircularUI = ({ label, circles, className }: CircularUIProps) => (
     <div className={className}>
-        <div className="bg-gradient-to-b from-border size-fit rounded-2xl to-transparent p-px">
-            <div className="bg-gradient-to-b from-background to-muted/25 relative flex aspect-square w-fit items-center -space-x-4 rounded-[15px] p-4">
+        <div className="bg-linear-to-b from-border size-fit rounded-2xl to-transparent p-px">
+            <div className="bg-linear-to-b from-background to-muted/25 relative flex aspect-square w-fit items-center -space-x-4 rounded-[15px] p-4">
                 {circles.map((circle, i) => (
                     <div
                         key={i}
@@ -223,7 +219,7 @@ const CircularUI = ({ label, circles, className }: CircularUIProps) => (
                             'border-primary': circle.pattern === 'none',
                             'border-primary bg-[repeating-linear-gradient(-45deg,hsl(var(--border)),hsl(var(--border))_1px,transparent_1px,transparent_4px)]': circle.pattern === 'border',
                             'border-primary bg-background bg-[repeating-linear-gradient(-45deg,hsl(var(--primary)),hsl(var(--primary))_1px,transparent_1px,transparent_4px)]': circle.pattern === 'primary',
-                            'bg-background z-1 border-primary bg-[repeating-linear-gradient(-45deg,theme(colors.primary.DEFAULT),theme(colors.primary.DEFAULT)_1px,transparent_1px,transparent_4px)]': circle.pattern === 'blue',
+                            'bg-background z-1 border-primary bg-[repeating-linear-gradient(-45deg,var(--color-primary),var(--color-primary)_1px,transparent_1px,transparent_4px)]': circle.pattern === 'blue',
                         })}></div>
                 ))}
             </div>
