@@ -21,7 +21,7 @@ export function Features() {
 
                 <div className="mx-auto grid gap-4 lg:grid-cols-2">
                     <FeatureCard>
-                        <CardHeader className="pb-3">
+                        <CardHeader className="pb-3 flex-1">
                             <CardHeading
                                 icon={Link2}
                                 title="Store link for your bio"
@@ -29,20 +29,19 @@ export function Features() {
                             />
                         </CardHeader>
 
-                        <div className="mb-6 border-t border-dashed sm:mb-0 border-border pt-6">
-                            <div className="aspect-76/59">
-                                <DualModeImage
-                                    src="/images/dashboard.png"
-                                    alt="WhatsApp Checkout"
-                                    width={1207}
-                                    height={929}
-                                />
-                            </div>
+                        <div className="border-t border-dashed border-border pt-6">
+                            <DualModeImage
+                                src="/images/dashboard.png"
+                                alt="Store link for your bio"
+                                width={1207}
+                                height={929}
+                                className="w-full h-auto"
+                            />
                         </div>
                     </FeatureCard>
 
                     <FeatureCard>
-                        <CardHeader className="pb-3">
+                        <CardHeader className="pb-3 flex-1">
                             <CardHeading
                                 icon={LayoutGrid}
                                 title="Product catalog"
@@ -50,21 +49,19 @@ export function Features() {
                             />
                         </CardHeader>
 
-                        <div className="mb-6 border-t border-dashed sm:mb-0 border-border pt-6">
-                            <div className="aspect-76/59">
-                                <DualModeImage
-                                    src="/images/dashboard.png"
-                                    alt="Inventory Management"
-                                    width={1207}
-                                    height={929}
-                                    className="object-contain h-full w-full opacity-90"
-                                />
-                            </div>
+                        <div className="border-t border-dashed border-border pt-6">
+                            <DualModeImage
+                                src="/images/dashboard.png"
+                                alt="Inventory Management"
+                                width={1207}
+                                height={929}
+                                className="w-full h-auto opacity-90"
+                            />
                         </div>
                     </FeatureCard>
 
                     <FeatureCard>
-                        <CardHeader className="pb-3">
+                        <CardHeader className="pb-3 flex-1">
                             <CardHeading
                                 icon={ShoppingCart}
                                 title="Cart & WhatsApp checkout"
@@ -72,21 +69,19 @@ export function Features() {
                             />
                         </CardHeader>
 
-                        <div className="mb-6 border-t border-dashed sm:mb-0 border-border pt-6">
-                            <div className="aspect-76/59">
-                                <DualModeImage
-                                    src="/images/dashboard.png"
-                                    alt="Delivery Zones"
-                                    width={1207}
-                                    height={929}
-                                    className="object-contain h-full w-full opacity-90"
-                                />
-                            </div>
+                        <div className="border-t border-dashed border-border pt-6">
+                            <DualModeImage
+                                src="/images/dashboard.png"
+                                alt="Delivery Zones"
+                                width={1207}
+                                height={929}
+                                className="w-full h-auto opacity-90"
+                            />
                         </div>
                     </FeatureCard>
 
                     <FeatureCard>
-                        <CardHeader className="pb-3">
+                        <CardHeader className="pb-3 flex-1">
                             <CardHeading
                                 icon={UserX}
                                 title="No accounts or apps"
@@ -94,21 +89,19 @@ export function Features() {
                             />
                         </CardHeader>
 
-                        <div className="mb-6 border-t border-dashed sm:mb-0 border-border pt-6">
-                            <div className="aspect-76/59">
-                                <DualModeImage
-                                    src="/images/dashboard.png"
-                                    alt="Fast Checkout"
-                                    width={1207}
-                                    height={929}
-                                    className="object-contain h-full w-full opacity-90"
-                                />
-                            </div>
+                        <div className="border-t border-dashed border-border pt-6">
+                            <DualModeImage
+                                src="/images/dashboard.png"
+                                alt="No accounts or apps"
+                                width={1207}
+                                height={929}
+                                className="w-full h-auto opacity-90"
+                            />
                         </div>
                     </FeatureCard>
 
                     <FeatureCard className="lg:col-span-2">
-                        <CardHeader className="pb-3">
+                        <CardHeader className="pb-3 flex-1">
                             <CardHeading
                                 icon={Camera}
                                 title="Customer photos & discounts"
@@ -116,16 +109,14 @@ export function Features() {
                             />
                         </CardHeader>
 
-                        <div className="mb-6 border-t border-dashed sm:mb-0 border-border pt-6">
-                            <div className="aspect-76/59">
-                                <DualModeImage
-                                    src="/images/dashboard.png"
-                                    alt="Customer photos and discounts"
-                                    width={1207}
-                                    height={929}
-                                    className="object-contain h-full w-full opacity-90"
-                                />
-                            </div>
+                        <div className="border-t border-dashed border-border pt-6">
+                            <DualModeImage
+                                src="/images/dashboard.png"
+                                alt="Customer photos and discounts"
+                                width={1207}
+                                height={929}
+                                className="w-full h-auto opacity-90"
+                            />
                         </div>
                     </FeatureCard>
                 </div>
@@ -140,7 +131,7 @@ interface FeatureCardProps {
 }
 
 const FeatureCard = ({ children, className }: FeatureCardProps) => (
-    <div className={cn('group relative shadow-sm border border-border bg-background overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1', className)}>
+    <div className={cn('group relative shadow-sm border border-border bg-background overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col h-full', className)}>
         {/* <CardDecorator /> Removed decorators for cleaner look */}
         {children}
     </div>
@@ -184,7 +175,7 @@ interface DualModeImageProps {
 const DualModeImage = ({ src, alt, width, height, className }: DualModeImageProps) => (
     <img
         src={src}
-        className={cn('block w-full h-full object-contain object-top', className)}
+        className={cn('block w-full h-full object-contain object-bottom', className)}
         alt={alt}
         width={width}
         height={height}

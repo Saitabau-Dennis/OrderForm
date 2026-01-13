@@ -71,7 +71,7 @@ export function MiniStorePreview() {
                 )}
               >
                 <div className="flex h-full flex-col">
-                <div className="p-6 pb-4">
+                <div className="p-6 pb-4 flex-1">
                   <div className="flex items-center justify-between gap-4 mb-3">
                     <h3 className="font-heading font-medium text-lg text-foreground">{item.title}</h3>
                     <span className="text-[10px] font-heading uppercase tracking-[0.2em] text-primary/70">
@@ -91,13 +91,13 @@ export function MiniStorePreview() {
                   </p>
                 </div>
 
-                <div className="mt-auto">
-                  <div className="relative border-t border-dashed border-border">
-                    <div className="aspect-76/59">
+                <div className="mt-4">
+                  <div className="relative border-t border-dashed border-border pt-6">
+                    <div>
                       <img
                         src={item.src}
                         alt={item.alt}
-                        className="w-full h-full block bg-background object-contain object-center"
+                        className="w-full h-auto block bg-background"
                         loading="lazy"
                       />
                     </div>
