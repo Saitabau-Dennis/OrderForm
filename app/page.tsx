@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/landing/navbar"
 import { TextHighlight } from "@/components/ui/text-highlight"
+import { HandwrittenUnderline } from "@/components/ui/handwritten-underline"
 import { Hero } from "@/components/ui/hero"
 import { WhatIsOrderform } from "@/components/landing/what-is-orderform"
 import { Features } from "@/components/landing/features"
@@ -24,9 +25,9 @@ export default function Home() {
               social media
             </TextHighlight>{" "}
             traffic into clean{" "}
-            <TextHighlight color="green" className="px-3 py-1 rotate-2">
+            <HandwrittenUnderline className="mx-1" underlineClassName="-bottom-3 md:-bottom-4 h-4 md:h-5">
               WhatsApp orders
-            </TextHighlight>
+            </HandwrittenUnderline>
           </span>
         }
         subtitle="Give your Instagram shop a simple store where customers browse products, add them to a cart, and send you a complete order on WhatsApp in one click."
