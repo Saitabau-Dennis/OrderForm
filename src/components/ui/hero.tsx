@@ -78,7 +78,7 @@ const Hero = React.forwardRef<HTMLDivElement, HeroProps>(
         {(ctaText && ctaLink) || (secondaryCtaText && secondaryCtaLink) ? (
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-appear opacity-0 delay-500">
             {ctaText && ctaLink && (
-              <Link href={ctaLink}>
+              <Link href={ctaLink} target="_blank" rel="noopener noreferrer">
                 <div className="inline-flex items-center bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-colors font-medium h-12 px-8 shadow-lg hover:shadow-xl hover:scale-105 transform duration-200">
                   <div className="flex items-center justify-between w-full gap-2">
                     <span className="text-base md:text-lg whitespace-nowrap">{ctaText}</span>

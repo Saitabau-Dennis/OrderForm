@@ -121,10 +121,15 @@ export function Navbar() {
             </Link>
             ) : (
             <>
-                <Link href="/login" className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3">
+                <Link 
+                    href="/login" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3"
+                >
                 Log in
                 </Link>
-                <Link href="/register" className="hidden md:block">
+                <Link href="/register" target="_blank" rel="noopener noreferrer" className="hidden md:block">
                     <Button 
                         size={isScrolled ? "sm" : "default"} 
                         className="rounded-full font-medium shadow-md hover:shadow-lg transition-all"
@@ -170,12 +175,12 @@ export function Navbar() {
                         </Link>
                     ) : (
                         <div className="flex flex-col gap-3">
-                        <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
+                        <Link href="/register" target="_blank" rel="noopener noreferrer" onClick={() => setIsMobileMenuOpen(false)}>
                             <Button className="w-full h-12 rounded-xl text-base font-semibold shadow-md">
                             Get Started
                             </Button>
                         </Link>
-                        <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                        <Link href="/login" target="_blank" rel="noopener noreferrer" onClick={() => setIsMobileMenuOpen(false)}>
                             <Button variant="outline" className="w-full h-12 rounded-xl text-base font-medium">
                             Log in
                             </Button>

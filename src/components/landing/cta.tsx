@@ -31,7 +31,7 @@ export function CTA() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
-              <Link href="/register" className="w-full sm:w-auto">
+              <Link href="/register" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
                 <Button className="w-full sm:w-auto h-14 px-8 rounded-full bg-white text-primary hover:bg-white/90 text-lg  transition-all hover:scale-105 shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center justify-center gap-2 group">
                   Create your store
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

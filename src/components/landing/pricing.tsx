@@ -127,17 +127,6 @@ export function Pricing() {
                     </li>
                 ))}
               </ul>
-
-              <Button
-                className={cn(
-                    "w-full h-14 text-base font-medium rounded-xl transition-all shadow-none",
-                    plan.popular
-                        ? "bg-white text-primary hover:bg-white/90"
-                        : "bg-primary text-primary-foreground hover:bg-primary/90"
-                )}
-              >
-                {plan.cta}
-              </Button>
             </ScrollAnimation>
           ))}
         </div>
