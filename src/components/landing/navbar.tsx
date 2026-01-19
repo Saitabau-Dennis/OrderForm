@@ -15,10 +15,13 @@ import { useEffect, useState } from "react"
 import { Menu, LayoutDashboard, ChevronRight } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { motion, useScroll, useMotionValueEvent } from "motion/react"
+import { usePathname, useRouter } from "next/navigation"
 
 export function Navbar() {
   const { data: session } = useSession()
   const { scrollY } = useScroll()
+  const pathname = usePathname()
+  const router = useRouter()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -37,6 +40,37 @@ export function Navbar() {
       document.body.style.overflow = "unset"
     }
   }, [isMobileMenuOpen])
+
+  const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    // If it's a hash link
+    if (href.startsWith('#')) {
+      // If we're not on the home page, let the link navigation handle it
+      // But we need to make sure the href includes the slash if we are not on home
+      if (pathname !== '/') {
+        e.preventDefault()
+        router.push(`/${href}`)
+        setIsMobileMenuOpen(false)
+        return
+      }
+
+      // If we are on home page, scroll smoothly
+      e.preventDefault()
+      const element = document.querySelector(href)
+      if (element) {
+        const offset = 80 // Height of navbar + some breathing room
+        const bodyRect = document.body.getBoundingClientRect().top
+        const elementRect = element.getBoundingClientRect().top
+        const elementPosition = elementRect - bodyRect
+        const offsetPosition = elementPosition - offset
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth"
+        })
+      }
+      setIsMobileMenuOpen(false)
+    }
+  }
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50 flex justify-center p-4">
@@ -66,9 +100,9 @@ export function Navbar() {
             "hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2 transition-all duration-300",
             isScrolled ? "opacity-100 visible" : "opacity-100"
         )}>
-            <NavLink href="#features">Features</NavLink>
-            <NavLink href="#pricing">Pricing</NavLink>
-            <NavLink href="#faq">FAQ</NavLink>
+            <NavLink href="#features" onClick={(e) => handleScroll(e, "#features")}>Features</NavLink>
+            <NavLink href="#pricing" onClick={(e) => handleScroll(e, "#pricing")}>Pricing</NavLink>
+            <NavLink href="#faq" onClick={(e) => handleScroll(e, "#faq")}>FAQ</NavLink>
         </div>
 
         {/* Right Actions */}
@@ -120,9 +154,9 @@ export function Navbar() {
 
                 <ScrollArea className="flex-1 px-4 py-4">
                 <div className="flex flex-col gap-2">
-                    <MobileNavLink href="#features" onClick={() => setIsMobileMenuOpen(false)}>Features</MobileNavLink>
-                    <MobileNavLink href="#pricing" onClick={() => setIsMobileMenuOpen(false)}>Pricing</MobileNavLink>
-                    <MobileNavLink href="#faq" onClick={() => setIsMobileMenuOpen(false)}>FAQ</MobileNavLink>
+                    <MobileNavLink href="#features" onClick={(e) => handleScroll(e, "#features")}>Features</MobileNavLink>
+                    <MobileNavLink href="#pricing" onClick={(e) => handleScroll(e, "#pricing")}>Pricing</MobileNavLink>
+                    <MobileNavLink href="#faq" onClick={(e) => handleScroll(e, "#faq")}>FAQ</MobileNavLink>
                 </div>
                 </ScrollArea>
 
@@ -158,26 +192,27 @@ export function Navbar() {
 }
 Navbar.displayName = "Navbar"
 
-function NavLink({ href, children }: { href: string, children: React.ReactNode }) {
+function NavLink({ href, onClick, children }: { href: string, onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void, children: React.ReactNode }) {
     return (
-        <Link 
-            href={href} 
-            className="relative px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted/50"
+        <a 
+            href={href}
+            onClick={onClick}
+            className="relative px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted/50 cursor-pointer"
         >
             {children}
-        </Link>
+        </a>
     )
 }
 
-function MobileNavLink({ href, onClick, children }: { href: string, onClick: () => void, children: React.ReactNode }) {
+function MobileNavLink({ href, onClick, children }: { href: string, onClick: (e: React.MouseEvent<HTMLAnchorElement>) => void, children: React.ReactNode }) {
     return (
-      <Link
+      <a
         href={href}
         onClick={onClick}
-        className="flex items-center justify-between p-4 rounded-xl hover:bg-muted/60 active:bg-muted transition-all group"
+        className="flex items-center justify-between p-4 rounded-xl hover:bg-muted/60 active:bg-muted transition-all group cursor-pointer"
       >
         <span className="text-base font-medium text-foreground/90 group-hover:text-primary transition-colors">{children}</span>
         <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-      </Link>
+      </a>
     )
   }
