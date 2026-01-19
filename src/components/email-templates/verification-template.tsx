@@ -23,9 +23,6 @@ export default function VerificationEmail({
 
       <CodePill code={validationCode} />
 
-      <Text className="m-0 text-[13px] leading-5 text-[#737373]">
-        Tip: You can copy and paste the code. If the code doesn’t work, request a new one.
-      </Text>
     </EmailLayout>
   );
 }
