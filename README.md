@@ -1,10 +1,10 @@
-# OrderForm.store
+# OrderForm
 
 **Turn Instagram Comments into WhatsApp Orders.**
 
-OrderForm.store is a specialized e-commerce platform designed for social media sellers. It transforms your social media bio link into a sleek, mini storefront where customers can browse products, manage their cart, and complete orders directly via WhatsApp.
+OrderForm is a specialized e-commerce platform designed for social media sellers. It transforms your social media bio link into a sleek, mini storefront where customers can browse products, manage their cart, and complete orders directly via WhatsApp.
 
-## 🚀 Features
+##  Features
 
 - **Mini Storefronts**: Create a beautiful, mobile-first store optimized for social media bio links.
 - **WhatsApp Checkout**: Seamlessly generates pre-filled WhatsApp messages with order details, connecting customers directly to you.
@@ -14,7 +14,7 @@ OrderForm.store is a specialized e-commerce platform designed for social media s
 - **High Performance**: Built with Next.js 16 and optimized for speed.
 - **Modern UI/UX**: Features smooth animations with Framer Motion and a polished design using Tailwind CSS.
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 - **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
@@ -27,6 +27,6 @@ OrderForm.store is a specialized e-commerce platform designed for social media s
 - **Email**: [Resend](https://resend.com/)
 
 
-## 📄 License
+##  License
 
 This project is licensed under the [MIT License](LICENSE).
