@@ -1,6 +1,6 @@
 import { Text } from "@react-email/components";
 import * as React from "react";
-import { CodePill, EmailLayout } from "@/components/emails/email-layout";
+import { CodePill, EmailLayout } from "@/components/email-templates/email-layout";
 
 interface PasswordResetEmailProps {
   validationCode?: string;
