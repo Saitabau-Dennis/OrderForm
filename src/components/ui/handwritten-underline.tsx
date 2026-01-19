@@ -25,3 +25,4 @@ export function HandwrittenUnderline({
     </span>
   )
 }
+HandwrittenUnderline.displayName = "HandwrittenUnderline"

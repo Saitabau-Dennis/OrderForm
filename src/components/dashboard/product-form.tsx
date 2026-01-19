@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { ImageUpload } from "@/components/image-upload";
+import { ImageUpload } from "@/components/ui/image-upload";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,8 +21,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { createProduct, updateProduct } from "@/lib/actions/products";
 
-// If Switch doesn't exist, I'll check first. But usually shadcn has it.
-// I'll assume standard shadcn components.
 
 const productSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -105,35 +103,6 @@ export function ProductForm({ initialData, onSuccess }: ProductFormProps) {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="description">Description</Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="h-7 text-xs gap-1 text-muted-foreground hover:text-primary"
-                    onClick={async () => {
-                      const name = form.getValues("name");
-                      const category = form.getValues("category");
-                      if (!name) {
-                        toast.error("Please enter a product name first");
-                        return;
-                      }
-
-                     // Dynamically import the action to avoid build issues if server actions aren't fully set up yet
-              const { generateDescription } = await import("@/lib/actions/ai");
-              const result = await generateDescription(`${name} ${category ? `(${category})` : ""}`, "product");
-
-                      toast.dismiss(toastId);
-
-                      if (result.error) {
-                        toast.error(result.error);
-                      } else if (result.description) {
-                        form.setValue("description", result.description);
-                        toast.success("Description generated!");
-                      }
-                    }}
-                  >
-                    <span>✨</span> Generate with AI
-                  </Button>
                 </div>
                 <Textarea
                   id="description"

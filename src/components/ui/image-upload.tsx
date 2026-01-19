@@ -110,3 +110,4 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
     </div>
   );
 }
+ImageUpload.displayName = "ImageUpload"

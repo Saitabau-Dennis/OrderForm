@@ -86,3 +86,4 @@ export function OTPInput({ length = 6, value, onChange, className }: OTPInputPro
     </div>
   );
 }
+OTPInput.displayName = "OTPInput"

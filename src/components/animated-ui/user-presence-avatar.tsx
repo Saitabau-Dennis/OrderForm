@@ -13,7 +13,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from '@/components/animate-ui/components/animate/tooltip';
+} from '@/components/animated-ui/tooltip';
 import { cn } from '@/lib/utils';
 
 const USERS = [
@@ -195,5 +195,6 @@ function UserPresenceAvatar() {
     </div>
   );
 }
+UserPresenceAvatar.displayName = "UserPresenceAvatar"
 
 export { UserPresenceAvatar };

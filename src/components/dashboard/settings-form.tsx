@@ -20,7 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 import { toast } from "sonner";
-import { ImageUpload } from "@/components/image-upload";
+import { ImageUpload } from "@/components/ui/image-upload";
 import {
   Select,
   SelectContent,
@@ -178,34 +178,6 @@ export function SettingsForm({ initialData }: SettingsFormProps) {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="description">Description</Label>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 text-xs text-muted-foreground hover:text-primary"
-                  onClick={async () => {
-                    const name = form.getValues("name");
-                    if (!name) {
-                      toast.error("Please enter a store name first");
-                      return;
-                    }
-
-                    const toastId = toast.loading("Generating description...");
-                    const { generateDescription } = await import("@/lib/actions/ai");
-                    const result = await generateDescription(name, "store");
-
-                    toast.dismiss(toastId);
-
-                    if (result.error) {
-                      toast.error(result.error);
-                    } else if (result.description) {
-                      form.setValue("description", result.description);
-                      toast.success("Description generated!");
-                    }
-                  }}
-                >
-                   ✨ Generate with AI
-                </Button>
               </div>
               <Textarea
                 id="description"

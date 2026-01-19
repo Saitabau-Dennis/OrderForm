@@ -25,3 +25,4 @@ export function TextHighlight({ children, className, color = "yellow" }: TextHig
     </span>
   )
 }
+TextHighlight.displayName = "TextHighlight"

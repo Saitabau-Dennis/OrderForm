@@ -67,3 +67,4 @@ export function ScrollAnimation({
     </MotionComponent>
   )
 }
+ScrollAnimation.displayName = "ScrollAnimation"

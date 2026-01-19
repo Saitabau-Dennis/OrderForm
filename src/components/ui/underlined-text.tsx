@@ -30,3 +30,4 @@ export function UnderlinedText({
     </span>
   )
 }
+UnderlinedText.displayName = "UnderlinedText"

@@ -11,7 +11,7 @@ import {
   type TooltipProps as TooltipPrimitiveProps,
   type TooltipTriggerProps as TooltipTriggerPrimitiveProps,
   type TooltipContentProps as TooltipContentPrimitiveProps,
-} from '@/components/animate-ui/primitives/animate/tooltip';
+} from '@/components/animated-ui/primitives/tooltip';
 import { cn } from '@/lib/utils';
 
 type TooltipProviderProps = TooltipProviderPrimitiveProps;
@@ -19,18 +19,21 @@ type TooltipProviderProps = TooltipProviderPrimitiveProps;
 function TooltipProvider({ openDelay = 0, ...props }: TooltipProviderProps) {
   return <TooltipProviderPrimitive openDelay={openDelay} {...props} />;
 }
+TooltipProvider.displayName = "TooltipProvider"
 
 type TooltipProps = TooltipPrimitiveProps;
 
 function Tooltip({ sideOffset = 10, ...props }: TooltipProps) {
   return <TooltipPrimitive sideOffset={sideOffset} {...props} />;
 }
+Tooltip.displayName = "Tooltip"
 
 type TooltipTriggerProps = TooltipTriggerPrimitiveProps;
 
 function TooltipTrigger({ ...props }: TooltipTriggerProps) {
   return <TooltipTriggerPrimitive {...props} />;
 }
+TooltipTrigger.displayName = "TooltipTrigger"
 
 type TooltipContentProps = Omit<TooltipContentPrimitiveProps, 'asChild'> & {
   children: React.ReactNode;
@@ -61,6 +64,7 @@ function TooltipContent({
     </TooltipContentPrimitive>
   );
 }
+TooltipContent.displayName = "TooltipContent"
 
 export {
   TooltipProvider,
