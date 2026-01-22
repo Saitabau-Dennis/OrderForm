@@ -12,22 +12,16 @@ import {
 } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
 import { useEffect, useState } from "react"
-import { Menu, LayoutDashboard, ChevronRight } from "lucide-react"
+import { Menu, LayoutDashboard, ChevronRight, ChevronDown, Store, ShoppingBag, MessageCircle, Smartphone } from "lucide-react"
 import { useSession } from "next-auth/react"
-import { motion, useScroll, useMotionValueEvent } from "motion/react"
+import { motion } from "motion/react"
 import { usePathname, useRouter } from "next/navigation"
 
 export function Navbar() {
   const { data: session } = useSession()
-  const { scrollY } = useScroll()
   const pathname = usePathname()
   const router = useRouter()
-  const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    setIsScrolled(latest > 50)
-  })
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -73,77 +67,90 @@ export function Navbar() {
   }
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 flex justify-center p-4">
-      <motion.nav
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, type: "spring", bounce: 0.25 }}
-        className={cn(
-          "flex items-center justify-between transition-all duration-500 ease-in-out w-full border",
-          isScrolled
-            ? "max-w-4xl rounded-full bg-background/80 backdrop-blur-lg border-border/50 shadow-lg py-2 pl-4 pr-2"
-            : "max-w-7xl rounded-none md:rounded-full bg-transparent border-transparent py-4 px-2 md:px-6"
-        )}
+    <div className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4 pt-0 pb-0">
+      <nav
+        className="flex items-center justify-between w-full max-w-5xl rounded-t-none rounded-b-xl bg-primary border border-t-0 border-primary/20 shadow-xl py-4 pl-5 pr-2.5"
       >
         <Link 
             href="/" 
             className="flex items-center gap-2 relative z-10 shrink-0" 
             onClick={() => setIsMobileMenuOpen(false)}
         >
-            <span className="font-(family-name:--font-outfit) text-xl md:text-2xl font-bold text-foreground tracking-tighter">
-            Order<span className="text-primary">Form</span>
+            <span className="font-(family-name:--font-outfit) text-xl font-bold text-primary-foreground tracking-tighter">
+            Order<span className="text-primary-foreground/80">Form</span>
             </span>
         </Link>
 
         {/* Desktop Navigation */}
-        <div className={cn(
-            "hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2 transition-all duration-300",
-            isScrolled ? "opacity-100 visible" : "opacity-100"
-        )}>
-            <NavLink href="#features" onClick={(e) => handleScroll(e, "#features")}>Features</NavLink>
+        <div className="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
+            <NavLink href="#about" onClick={(e) => handleScroll(e, "#about")}>About</NavLink>
+            
+            <div className="relative group">
+                <button 
+                    className="flex items-center gap-1 relative px-4 py-2 text-sm font-medium text-primary-foreground/80 hover:text-primary-foreground transition-colors rounded-full hover:bg-white/10 cursor-pointer outline-none"
+                    onClick={(e) => handleScroll(e as any, "#features")}
+                >
+                    Features
+                    <ChevronDown className="w-3 h-3 transition-transform duration-200 group-hover:rotate-180 opacity-70" />
+                </button>
+                
+                {/* Dropdown Content */}
+                <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 w-72 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top scale-95 group-hover:scale-100">
+                    <div className="bg-primary rounded-none shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-primary/20 overflow-hidden p-3">
+                        <FeatureItem 
+                            href="#features" 
+                            title="Store Link" 
+                            description="A professional link for your social bio."
+                            onClick={(e) => handleScroll(e, "#features")} 
+                        />
+                        <FeatureItem 
+                            href="#features" 
+                            title="Product Catalog" 
+                            description="Organize and showcase your items."
+                            onClick={(e) => handleScroll(e, "#features")} 
+                        />
+                        <FeatureItem 
+                            href="#features" 
+                            title="WhatsApp Checkout" 
+                            description="Receive structured orders in chat."
+                            onClick={(e) => handleScroll(e, "#features")} 
+                        />
+                        <FeatureItem 
+                            href="#mini-store" 
+                            title="Mini Store" 
+                            description="Mobile-first preview for customers."
+                            onClick={(e) => handleScroll(e, "#mini-store")} 
+                        />
+                    </div>
+                </div>
+            </div>
+
             <NavLink href="#pricing" onClick={(e) => handleScroll(e, "#pricing")}>Pricing</NavLink>
             <NavLink href="#faq" onClick={(e) => handleScroll(e, "#faq")}>FAQ</NavLink>
         </div>
 
         {/* Right Actions */}
         <div className="flex items-center gap-2 shrink-0">
-            {session ? (
-            <Link href="/dashboard" className="hidden md:block">
+            <Link 
+                href={session ? "/dashboard" : "/login"}
+                target="_blank"
+                className="hidden md:block text-sm font-medium text-primary-foreground/90 hover:text-primary-foreground transition-colors px-3"
+            >
+            Log in
+            </Link>
+            <Link href={session ? "/dashboard" : "/register"} target="_blank" className="hidden md:block">
                 <Button 
-                    className={cn(
-                        "rounded-full font-medium transition-all shadow-md hover:shadow-lg", 
-                        isScrolled ? "h-9 px-4 text-xs" : "h-10 px-6"
-                    )}
+                    size="sm"
+                    className="rounded-full font-medium shadow-md hover:shadow-lg transition-all h-9 px-5 bg-white text-primary hover:bg-white/90"
                 >
-                <LayoutDashboard className="w-3.5 h-3.5 mr-2" />
-                Dashboard
+                    Get Started
                 </Button>
             </Link>
-            ) : (
-            <>
-                <Link 
-                    href="/login" 
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3"
-                >
-                Log in
-                </Link>
-                <Link href="/register" target="_blank" rel="noopener noreferrer" className="hidden md:block">
-                    <Button 
-                        size={isScrolled ? "sm" : "default"} 
-                        className="rounded-full font-medium shadow-md hover:shadow-lg transition-all"
-                    >
-                        Get Started
-                    </Button>
-                </Link>
-            </>
-            )}
 
             {/* Mobile Menu */}
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden relative z-50 rounded-full">
+                <Button variant="ghost" size="icon" className="md:hidden relative z-50 rounded-full text-primary-foreground hover:bg-white/10">
                    <Menu className="h-5 w-5" />
                 </Button>
             </SheetTrigger>
@@ -159,6 +166,7 @@ export function Navbar() {
 
                 <ScrollArea className="flex-1 px-4 py-4">
                 <div className="flex flex-col gap-2">
+                    <MobileNavLink href="#about" onClick={(e) => handleScroll(e, "#about")}>About</MobileNavLink>
                     <MobileNavLink href="#features" onClick={(e) => handleScroll(e, "#features")}>Features</MobileNavLink>
                     <MobileNavLink href="#pricing" onClick={(e) => handleScroll(e, "#pricing")}>Pricing</MobileNavLink>
                     <MobileNavLink href="#faq" onClick={(e) => handleScroll(e, "#faq")}>FAQ</MobileNavLink>
@@ -166,32 +174,23 @@ export function Navbar() {
                 </ScrollArea>
 
                 <div className="p-6 mt-auto border-t border-border/10 bg-muted/20">
-                    {session ? (
-                        <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
-                        <Button className="w-full h-12 rounded-xl text-base font-semibold shadow-md flex items-center justify-center gap-2">
-                            <LayoutDashboard className="w-4 h-4" />
-                            Go to Dashboard
+                    <div className="flex flex-col gap-3">
+                    <Link href={session ? "/dashboard" : "/register"} target="_blank" onClick={() => setIsMobileMenuOpen(false)}>
+                        <Button className="w-full h-12 rounded-xl text-base font-semibold shadow-md">
+                        Get Started
                         </Button>
-                        </Link>
-                    ) : (
-                        <div className="flex flex-col gap-3">
-                        <Link href="/register" target="_blank" rel="noopener noreferrer" onClick={() => setIsMobileMenuOpen(false)}>
-                            <Button className="w-full h-12 rounded-xl text-base font-semibold shadow-md">
-                            Get Started
-                            </Button>
-                        </Link>
-                        <Link href="/login" target="_blank" rel="noopener noreferrer" onClick={() => setIsMobileMenuOpen(false)}>
-                            <Button variant="outline" className="w-full h-12 rounded-xl text-base font-medium">
-                            Log in
-                            </Button>
-                        </Link>
-                        </div>
-                    )}
+                    </Link>
+                    <Link href={session ? "/dashboard" : "/login"} target="_blank" onClick={() => setIsMobileMenuOpen(false)}>
+                        <Button variant="outline" className="w-full h-12 rounded-xl text-base font-medium">
+                        Log in
+                        </Button>
+                    </Link>
+                    </div>
                 </div>
             </SheetContent>
             </Sheet>
         </div>
-      </motion.nav>
+      </nav>
     </div>
   )
 }
@@ -202,7 +201,7 @@ function NavLink({ href, onClick, children }: { href: string, onClick?: (e: Reac
         <a 
             href={href}
             onClick={onClick}
-            className="relative px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted/50 cursor-pointer"
+            className="relative px-4 py-2 text-sm font-medium text-primary-foreground/80 hover:text-primary-foreground transition-colors rounded-full hover:bg-white/10 cursor-pointer"
         >
             {children}
         </a>
@@ -221,3 +220,16 @@ function MobileNavLink({ href, onClick, children }: { href: string, onClick: (e:
       </a>
     )
   }
+
+function FeatureItem({ href, title, description, onClick }: { href: string, title: string, description: string, onClick: (e: React.MouseEvent<HTMLAnchorElement>) => void }) {
+    return (
+        <a 
+            href={href}
+            onClick={onClick}
+            className="flex flex-col gap-0.5 p-3 rounded-none hover:bg-white/10 transition-all group/item"
+        >
+            <span className="text-sm font-semibold text-primary-foreground group-hover/item:text-primary-foreground transition-colors">{title}</span>
+            <span className="text-xs text-primary-foreground/70 leading-normal">{description}</span>
+        </a>
+    )
+}

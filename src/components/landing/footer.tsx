@@ -1,60 +1,68 @@
 "use client"
 
 import Link from "next/link"
-import { Mail } from "lucide-react"
-import { TextHoverEffect } from "@/components/ui/text-hover-effect"
+import { Mail, Instagram, Facebook, Twitter, ArrowRight } from "lucide-react"
 
 export function Footer() {
   return (
-    <footer className="bg-background relative border-t border-border overflow-hidden min-h-[500px] flex flex-col justify-center">
-      
-      {/* Background Text Layer */}
-      <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none overflow-hidden">
-          <div className="w-full h-full p-10 md:p-20 flex items-center justify-center opacity-20">
-             <TextHoverEffect text="ORDERFORM" />
-          </div>
-      </div>
-
-      {/* Foreground Content Layer */}
-      <div className="max-w-7xl w-full mx-auto px-6 py-12 md:py-20 relative z-10 pointer-events-none">
+    <footer className="bg-background border-t border-border pt-16 pb-8 md:pt-20 md:pb-10">
+      <div className="max-w-7xl mx-auto px-6">
         
-        <div className="grid md:grid-cols-2 gap-12 items-start mb-24 md:mb-32">
-            {/* Brand Column */}
-            <div className="space-y-6 pointer-events-auto">
-                <Link href="/" className="font-heading text-xl font-medium tracking-tight text-foreground block w-fit">
-                    OrderForm
+        <div className="flex flex-col lg:flex-row justify-between gap-12 mb-16">
+            
+            {/* Left Section: Brand & Tagline */}
+            <div className="flex flex-col items-start max-w-sm">
+                <Link href="/" className="font-heading text-3xl font-bold tracking-tight text-foreground mb-4">
+                    Order<span className="text-primary">Form</span>
                 </Link>
-                <p className="text-muted-foreground max-w-sm font-sans font-normal leading-relaxed text-base backdrop-blur-[2px] rounded-lg">
-                    Simplifying commerce for the modern entrepreneur. Turn conversations into conversions.
+                <p className="text-muted-foreground font-sans text-lg leading-relaxed text-left">
+                    Simplifying commerce for the modern entrepreneur. Turn social conversations into paid orders.
                 </p>
             </div>
 
-            {/* Navigation Column */}
-            <div className="flex md:justify-end gap-12 md:gap-24 pointer-events-auto">
-                <div className="flex flex-col gap-4 text-left md:text-right">
-                    <h4 className="font-heading font-medium text-base text-foreground">Contact</h4>
-                     <Link 
-                        href="mailto:dennisntete28@gmail.com" 
-                        className="text-muted-foreground hover:text-primary transition-colors flex items-center md:justify-end gap-2 group w-fit md:ml-auto"
-                     >
-                        <Mail className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                        dennisntete28@gmail.com
-                     </Link>
+            {/* Right Section: Links Grid (Horizontal) */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-16 lg:gap-24">
+                
+                {/* Column 1: Product */}
+                <div className="flex flex-col gap-4">
+                    <h4 className="font-heading font-medium text-foreground text-sm uppercase tracking-wider">Product</h4>
+                    <Link href="#features" className="text-muted-foreground hover:text-primary transition-colors text-sm">Features</Link>
+                    <Link href="#pricing" className="text-muted-foreground hover:text-primary transition-colors text-sm">Pricing</Link>
+                    <Link href="#how-it-works" className="text-muted-foreground hover:text-primary transition-colors text-sm">How it Works</Link>
+                    <Link href="#mini-store" className="text-muted-foreground hover:text-primary transition-colors text-sm">Mini Store</Link>
                 </div>
+
+                {/* Column 2: Support */}
+                <div className="flex flex-col gap-4">
+                    <h4 className="font-heading font-medium text-foreground text-sm uppercase tracking-wider">Support</h4>
+                    <Link href="#faq" className="text-muted-foreground hover:text-primary transition-colors text-sm">FAQ</Link>
+                    <Link href="mailto:dennisntete28@gmail.com" className="text-muted-foreground hover:text-primary transition-colors text-sm">Contact Us</Link>
+                </div>
+
+                {/* Column 3: Get Started */}
+                <div className="flex flex-col gap-4">
+                    <h4 className="font-heading font-medium text-foreground text-sm uppercase tracking-wider">Get Started</h4>
+                    <p className="text-sm text-muted-foreground mb-2">Ready to launch?</p>
+                    <Link href="/register" className="inline-flex items-center text-primary font-medium text-sm hover:underline group">
+                        Create free account
+                        <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                </div>
+
             </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-8 border-t border-border/50 pointer-events-auto backdrop-blur-[2px] rounded-t-lg">
-            <p className="text-sm text-muted-foreground font-sans order-2 md:order-1">
+        {/* Bottom Section: Copyright & Legal - Centered */}
+        <div className="flex flex-col items-center justify-center gap-4 pt-8 border-t border-border text-center">
+            <p className="text-sm text-muted-foreground">
                 © {new Date().getFullYear()} OrderForm Inc. All rights reserved.
             </p>
-
-            <div className="flex items-center gap-6 order-1 md:order-2">
-                 <Link href="/privacy" className="text-sm text-muted-foreground hover:text-primary transition-colors font-sans px-2">Privacy Policy</Link>
-                 <Link href="/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors font-sans px-2">Terms of Service</Link>
+            <div className="flex gap-6">
+                 <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Privacy Policy</Link>
+                 <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Terms of Service</Link>
             </div>
         </div>
+
       </div>
     </footer>
   )

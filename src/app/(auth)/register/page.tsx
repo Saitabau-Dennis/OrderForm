@@ -138,7 +138,7 @@ export default function RegisterPage() {
         </div>
 
         <div className="relative z-10">
-          <div className="flex gap-2 mb-4">
+          <div className="flex gap-2 mb-4" role="progressbar" aria-valuemin={1} aria-valuemax={3} aria-valuenow={step} aria-label={`Step ${step} of 3`}>
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
@@ -163,7 +163,7 @@ export default function RegisterPage() {
              <Link href="/" className="font-instrument-serif text-2xl font-bold text-primary">
               Orderform
             </Link>
-            <div className="flex gap-2 justify-center mt-4 mb-2">
+            <div className="flex gap-2 justify-center mt-4 mb-2" role="progressbar" aria-valuemin={1} aria-valuemax={3} aria-valuenow={step} aria-label={`Step ${step} of 3`}>
             {[1, 2, 3].map((i) => (
               <div
                 key={i}

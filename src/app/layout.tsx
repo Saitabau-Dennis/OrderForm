@@ -34,8 +34,8 @@ export default function RootLayout({
           position="bottom-right"
           toastOptions={{
             classNames: {
-              success: 'bg-green-600 text-white border-green-600',
-              error: 'bg-red-600 text-white border-red-600',
+              success: '!bg-green-600 !text-white !border-green-600',
+              error: '!bg-red-600 !text-white !border-red-600',
             }
           }}
         />

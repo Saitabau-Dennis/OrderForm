@@ -2,8 +2,10 @@ import { Navbar } from "@/components/landing/navbar"
 import { TextHighlight } from "@/components/ui/text-highlight"
 import { HandwrittenUnderline } from "@/components/ui/handwritten-underline"
 import { Hero } from "@/components/ui/hero"
+import { AboutUs } from "@/components/landing/about-us"
 import { WhatIsOrderform } from "@/components/landing/what-is-orderform"
 import { Features } from "@/components/landing/features"
+import { HowItWorks } from "@/components/landing/how-it-works"
 import { MiniStorePreview } from "@/components/landing/mini-store-preview"
 import { Pricing } from "@/components/landing/pricing"
 import { FAQ } from "@/components/landing/faq"
@@ -16,7 +18,7 @@ export default function Home() {
       <Navbar />
 
       <Hero
-        className="pt-32 pb-12 md:pb-20"
+        className="pt-32 pb-8 md:pb-12"
 
         title={
           <span>
@@ -33,6 +35,7 @@ export default function Home() {
         subtitle="Give your Instagram shop a simple store where customers browse products, add them to a cart, and send you a complete order on WhatsApp in one click."
         ctaText="Create your store"
         ctaLink="/register"
+        ctaTarget="_blank"
         mockupImage={{
           src: "/images/dashboard.png",
           alt: "OrderForm Dashboard Interface",
@@ -42,7 +45,9 @@ export default function Home() {
       />
 
       <WhatIsOrderform />
+      <AboutUs />
       <Features />
+      <HowItWorks />
       <MiniStorePreview />
       <Pricing />
       <FAQ />

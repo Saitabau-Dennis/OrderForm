@@ -7,7 +7,7 @@ import { ArrowRight } from "lucide-react"
 
 export function CTA() {
   return (
-    <section className="py-12 md:py-20">
+    <section className="py-8 md:py-12">
       <div className="max-w-7xl mx-auto px-6">
         <ScrollAnimation className="bg-primary rounded-[2.5rem] p-12 md:p-24 text-center relative overflow-hidden shadow-2xl ring-4 ring-primary/20">
           {/* Decorative elements */}

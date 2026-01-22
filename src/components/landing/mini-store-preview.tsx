@@ -5,32 +5,32 @@ import { cn } from "@/lib/utils"
 
 const previews = [
   {
-    title: "Products",
-    description: "All your products in one place. Customers browse items, view prices, select options, and add them to their cart.",
+    title: "Browse Products",
+    description: "A clean, mobile-first catalog. Customers can easily scroll through your items, view high-res photos, check prices, and select variants like size or color without any distractions.",
     src: "/images/dashboard.png",
     alt: "Mini store catalog page preview"
   },
   {
-    title: "Cart",
-    description: "Customers review their selected items before checkout and confirm quantities and options.",
+    title: "Review Cart",
+    description: "A transparent cart experience. Customers can double-check their selections, adjust quantities, and see their total cost instantly before they commit to buy.",
     src: "/images/dashboard.png",
     alt: "Mini store product details page preview"
   },
   {
-    title: "WhatsApp Checkout",
-    description: "Customers send a ready-made order message directly to your WhatsApp with all order details included.",
+    title: "One-Click Checkout",
+    description: "Frictionless ordering. No forms to fill out. One tap generates a complete order summary and opens WhatsApp to send it directly to you.",
     src: "/images/dashboard.png",
     alt: "Mini store checkout page preview"
   },
   {
-    title: "Share Your Photo",
-    description: "Customers upload photos using your products. Once approved, they receive a discount code for their next order.",
+    title: "Share & Earn",
+    description: "Turn customers into advocates. Shoppers can upload photos of their purchase. Once you approve it, they get rewarded, and you get authentic social proof.",
     src: "/images/dashboard.png",
     alt: "Mini store UGC upload page preview"
   },
   {
-    title: "Discounts",
-    description: "Approved customers receive discount codes they can use on future purchases.",
+    title: "Redeem Discounts",
+    description: "Drive repeat business. Approved photo uploads automatically send a unique discount code to the customer, incentivizing their next purchase.",
     src: "/images/dashboard.png",
     alt: "Mini store discount code page preview"
   }
@@ -38,80 +38,74 @@ const previews = [
 
 export function MiniStorePreview() {
   return (
-    <section id="mini-store" className="py-12 md:py-20 bg-background scroll-mt-28">
+    <section id="mini-store" className="py-8 md:py-12 bg-background scroll-mt-28">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-12 md:mb-16">
+        <div className="text-center mb-12 md:mb-16 max-w-4xl mx-auto">
           <ScrollAnimation variant="fade-up">
-            <p className="font-heading uppercase tracking-[0.2em] text-sm text-primary mb-4">
+            <p className="font-heading uppercase tracking-[0.2em] text-sm text-primary mb-4 font-medium">
               Mini store
             </p>
-            <h2 className="text-3xl md:text-4xl font-heading font-medium text-foreground leading-[1.1] tracking-tight">
-              Your mini store pages
+            <h2 className="text-3xl md:text-5xl font-heading font-medium text-foreground leading-[1.1] tracking-tight">
+              A checkout experience your <br className="hidden md:block" />
+               customers will <span className="text-primary">actually love.</span>
             </h2>
           </ScrollAnimation>
 
           <ScrollAnimation variant="fade-up" delay={0.1}>
-            <p className="mt-6 text-base md:text-lg text-muted-foreground font-sans leading-relaxed max-w-3xl mx-auto">
-              Everything your customers need, in one simple link.
+            <p className="mt-6 text-lg md:text-xl text-muted-foreground font-sans leading-relaxed">
+              Fast, visual, and incredibly simple. We've stripped away the clutter of traditional e-commerce to give your social media traffic exactly what they want: a direct path to purchase.
             </p>
           </ScrollAnimation>
         </div>
 
-        <div className="grid gap-4 items-stretch sm:grid-cols-2 lg:grid-cols-12">
-          {previews.map((item, index) => (
-            <ScrollAnimation
-              key={item.title}
-              delay={index * 0.1}
-              className={cn("h-full", index < 2 ? "lg:col-span-6" : "lg:col-span-4")}
-            >
+        <div className="border-2 border-dotted border-primary/20 overflow-hidden">
+          <div className="grid lg:grid-cols-2">
+            {previews.map((item, index) => (
               <div
+                key={item.title}
                 className={cn(
-                  "group h-full border border-border bg-background overflow-hidden rounded-none",
-                  "transition-all duration-300 hover:-translate-y-1"
+                  "h-full border-border/60 bg-background overflow-hidden",
+                  // Grid span logic
+                  index === 4 ? "lg:col-span-2" : "lg:col-span-1",
+                  
+                  // Border logic matching Features section exactly
+                  // Item 0 (Top Left)
+                  index === 0 ? "border-b lg:border-r" : "",
+                  // Item 1 (Top Right)
+                  index === 1 ? "border-b" : "",
+                  // Item 2 (Mid Left)
+                  index === 2 ? "border-b lg:border-b-0 lg:border-r" : "",
+                  // Item 3 (Mid Right)
+                  index === 3 ? "border-b lg:border-b-0" : "",
+                  // Item 4 (Bottom Full Width)
+                  index === 4 ? "border-t border-border/60" : ""
                 )}
               >
                 <div className="flex h-full flex-col">
-                <div className="p-6 pb-4 flex-1">
-                  <div className="flex items-center justify-between gap-4 mb-3">
-                    <h3 className="font-heading font-medium text-lg text-foreground">{item.title}</h3>
-                    <span className="text-[10px] font-heading uppercase tracking-[0.2em] text-primary/70">
-                      Preview
-                    </span>
+                  <div className="p-8 pb-4 flex-1">
+                    <h3 className="font-heading font-medium text-xl md:text-2xl text-foreground mb-4">
+                      {item.title.split(' ').map((word, i) => (
+                        <span key={i} className={i === 0 ? "text-primary" : ""}>{word}{' '}</span>
+                      ))}
+                    </h3>
+                    <p className="text-base text-muted-foreground font-sans leading-relaxed">
+                      {item.description}
+                    </p>
                   </div>
-                  <p
-                    className="text-sm md:text-base text-muted-foreground font-sans leading-relaxed min-h-13"
-                    style={{
-                      display: "-webkit-box",
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden"
-                    }}
-                  >
-                    {item.description}
-                  </p>
-                </div>
 
-                <div className="mt-4">
-                  <div className="relative border-t border-dashed border-border pt-6">
-                    <div>
-                      <img
+                  <div className="pt-6">
+                    <img
                         src={item.src}
                         alt={item.alt}
                         className="w-full h-auto block bg-background"
                         loading="lazy"
-                      />
-                    </div>
+                    />
                   </div>
                 </div>
-                </div>
               </div>
-            </ScrollAnimation>
-          ))}
+            ))}
+          </div>
         </div>
-
-        {/* <ScrollAnimation variant="fade-up" delay={0.15} className="mt-10 md:mt-12">
-          
-        </ScrollAnimation> */}
       </div>
     </section>
   )

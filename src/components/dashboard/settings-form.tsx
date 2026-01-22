@@ -65,11 +65,11 @@ const THEMES = [
 
 const settingsSchema = z.object({
   name: z.string().min(1, "Store name is required"),
-  description: z.string().optional(),
+  description: z.string().default(""),
   slug: z.string().min(1, "Slug is required"),
   whatsappNumber: z.string().min(1, "WhatsApp number is required"),
   currency: z.string().default("KES"),
-  logoUrl: z.string().optional(),
+  logoUrl: z.string().default(""),
   brandColor: z.string().default("#30382F"),
   theme: z.string().default("Modern Minimalist"),
   isActive: z.boolean().default(true),

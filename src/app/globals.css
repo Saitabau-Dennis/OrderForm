@@ -182,3 +182,48 @@ html {
 .delay-700 {
   animation-delay: 700ms;
 }
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.05); }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+
+@keyframes draw {
+  to { stroke-dashoffset: 0; }
+}
+
+.animate-draw {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: draw 2s ease-out forwards;
+}
+
+@keyframes shooting-star {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-shooting-star {
+  /* Dash of 20px, gap of 200px to ensure they follow each other closely */
+  stroke-dasharray: 20 200; 
+  /* Start offset at 0 so it begins visible on the path */
+  stroke-dashoffset: 220;
+  animation: shooting-star 3s linear infinite;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px #22C55E);
+}

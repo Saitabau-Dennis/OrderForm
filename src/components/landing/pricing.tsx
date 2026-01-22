@@ -1,125 +1,134 @@
 "use client"
 
-import { Check } from "lucide-react"
+import { Check, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ScrollAnimation } from "@/components/ui/scroll-animation"
 import { TextHighlight } from "@/components/ui/text-highlight"
 import { cn } from "@/lib/utils"
+import Link from "next/link"
 
 const plans = [
   {
-    name: "Free",
-    price: "0",
-    period: "always available",
-    description: "This removes fear and drives adoption.",
+    name: "Starter",
+    price: "Free",
+    period: "forever",
+    description: "Perfect for testing the waters. Launch your store in minutes and start receiving orders.",
     features: [
-      "1 store",
-      "Up to 5 products",
-      "WhatsApp checkout",
-      "Unlimited orders"
+      "1 Storefront",
+      "Up to 5 Products",
+      "WhatsApp Checkout",
+      "Unlimited Orders",
+      "0% Transaction Fees"
     ],
-    cta: "Create your store"
+    cta: "Start for free",
+    href: "/register",
+    variant: "outline"
   },
   {
-    name: "Pro",
-    price: "990",
-    period: "per month",
-    description: "This is what serious sellers upgrade to.",
+    name: "Business",
+    price: "KES 990",
+    period: "/ month",
+    description: "For growing businesses ready to scale. Unlock powerful features and remove limits.",
     features: [
-      "Unlimited products",
-      "Customer photo uploads (UGC)",
-      "Discount codes",
-      "Priority support"
+      "Everything in Starter",
+      "Unlimited Products",
+      "Customer Photo Uploads",
+      "Discount Codes",
+      "Priority Support"
     ],
-    cta: "Upgrade to Pro",
+    cta: "Get Business Plan",
+    href: "/register?plan=pro",
+    variant: "default",
     popular: true
   }
 ]
 
 export function Pricing() {
   return (
-    <section id="pricing" className="py-12 md:py-24 scroll-mt-28">
+    <section id="pricing" className="py-8 md:py-12 scroll-mt-28 bg-background relative">
       <div className="max-w-7xl mx-auto px-6">
         <ScrollAnimation className="text-center mb-20">
-          <p className="font-heading uppercase tracking-[0.2em] text-sm text-primary/80 mb-4 font-medium">
+          <p className="font-heading uppercase tracking-[0.2em] text-sm text-primary mb-4 font-medium">
             Pricing
           </p>
-          <h2 className="text-3xl md:text-4xl font-heading font-medium text-foreground leading-[1.1] tracking-tight">
-            Simple,{" "}
+          <h2 className="text-3xl md:text-5xl font-heading font-medium text-foreground leading-[1.1] tracking-tight">
+            Pick the plan that{" "}
             <TextHighlight color="green" className="px-3 py-1 -rotate-2">
-              transparent
-            </TextHighlight>{" "}
-            pricing
+              suits you best
+            </TextHighlight>
           </h2>
+          <p className="mt-6 text-xl text-muted-foreground font-sans max-w-2xl mx-auto leading-relaxed">
+            Choose the path that aligns with your unique business goals backed by transparent, 
+            honest pricing and the reliable support you need to scale with confidence.
+          </p>
         </ScrollAnimation>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
+        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto items-start">
           {plans.map((plan, index) => (
             <ScrollAnimation
               key={index}
               delay={index * 0.1}
               className={cn(
-                "relative p-8 md:p-12 transition-all duration-300 group flex flex-col",
+                "relative p-8 md:p-10 transition-all duration-300 group flex flex-col h-full",
                 plan.popular
-                  ? "bg-linear-to-b from-primary to-primary/90 text-primary-foreground shadow-2xl scale-100 md:scale-105 z-10 rounded-[2.5rem] ring-4 ring-primary/20"
-                  : "bg-background border border-border/60 shadow-xl rounded-[2.5rem] hover:ring-4 hover:ring-primary/10 ring-4 ring-transparent"
+                  ? "bg-primary text-primary-foreground shadow-2xl scale-100 md:scale-105 z-10 rounded-none border-2 border-dotted border-white/30"
+                  : "bg-background border-2 border-dotted border-primary/20 shadow-lg rounded-none hover:shadow-xl hover:border-primary/40"
               )}
             >
               {plan.popular && (
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                   <div className="bg-white text-primary px-4 py-1.5 text-xs font-sans font-bold uppercase tracking-wider shadow-lg rounded-full flex items-center gap-1.5">
-                      <span className="text-[10px]">★</span> Most Popular
+                   <div className="bg-white text-primary px-4 py-1.5 text-xs font-sans font-bold uppercase tracking-wider shadow-lg rounded-none flex items-center gap-1.5 border-2 border-dotted border-primary/20">
+                      <span className="text-amber-500">★</span> Best Value
                    </div>
                 </div>
               )}
 
               <div className="mb-8">
                 <h3 className={cn(
-                    "text-lg font-heading font-medium mb-8",
+                    "text-xl font-heading font-medium mb-2",
                     plan.popular ? "text-primary-foreground" : "text-foreground"
                 )}>
                   {plan.name}
                 </h3>
                 
-                <div className="flex items-baseline gap-1.5 mb-2">
+                <div className="flex items-baseline gap-1.5 mb-6">
                   <span className={cn(
-                      "text-5xl md:text-6xl font-medium font-heading tracking-tighter",
+                      "text-4xl md:text-5xl font-medium font-heading tracking-tight",
                       plan.popular ? "text-white" : "text-foreground"
                   )}>
-                    {plan.price === "0" ? "Free" : plan.price}
+                    {plan.price}
                   </span>
                   {plan.period && (
                     <span className={cn(
                         "text-lg font-sans font-medium",
-                        plan.popular ? "text-primary-foreground/60" : "text-muted-foreground"
+                        plan.popular ? "text-primary-foreground/70" : "text-muted-foreground"
                     )}>
-                      {plan.price === "0" ? `(${plan.period})` : plan.period}
+                      {plan.period}
                     </span>
                   )}
                 </div>
 
-
                 <p className={cn(
-                    "mt-8 text-lg font-sans font-normal leading-relaxed",
+                    "text-base font-sans font-normal leading-relaxed",
                     plan.popular ? "text-primary-foreground/90" : "text-muted-foreground"
                 )}>
                   {plan.description}
                 </p>
               </div>
 
-              <div className={cn("h-px w-full my-8", plan.popular ? "bg-white/10" : "bg-border/60")} />
+              <div className={cn("h-px w-full mb-8", plan.popular ? "bg-white/10" : "bg-border/60")} />
 
-              <ul className="space-y-5 mb-10 flex-1">
+              <ul className="space-y-4 mb-10 flex-1">
                 {plan.features.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-3">
+                    <li key={i} className="flex items-center gap-3">
                     <div className={cn(
-                      "mt-1 shrink-0",
-                      plan.popular ? "text-white" : "text-primary"
+                      "flex items-center justify-center w-6 h-6 rounded-full shrink-0",
+                      plan.popular ? "bg-white/20 text-white" : "bg-primary/10 text-primary"
                     )}>
-                      <Check className="w-5 h-5 stroke-[1.5]" />
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
                     </div>
                     <span className={cn(
-                      "text-base font-sans font-medium",
+                      "text-sm font-sans font-medium",
                       plan.popular ? "text-white/90" : "text-foreground/80"
                     )}>
                       {feature}
@@ -127,6 +136,20 @@ export function Pricing() {
                     </li>
                 ))}
               </ul>
+
+              <Link href={plan.href} target="_blank" rel="noopener noreferrer" className="mt-auto">
+                <Button 
+                    className={cn(
+                        "w-full h-12 rounded-xl text-base font-medium transition-all",
+                        plan.popular 
+                            ? "bg-white text-primary hover:bg-white/90 shadow-lg hover:shadow-xl hover:scale-[1.02]" 
+                            : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md hover:shadow-lg"
+                    )}
+                >
+                    {plan.cta}
+                    {plan.popular && <ArrowRight className="w-4 h-4 ml-2" />}
+                </Button>
+              </Link>
             </ScrollAnimation>
           ))}
         </div>

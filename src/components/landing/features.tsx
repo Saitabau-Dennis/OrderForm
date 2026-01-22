@@ -1,4 +1,3 @@
-
 "use client"
 
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -8,117 +7,118 @@ import { ReactNode } from 'react'
 
 export function Features() {
     return (
-        <section id="features" className="bg-background py-12 md:py-20 scroll-mt-28">
+        <section id="features" className="bg-background pt-8 md:pt-12 pb-8 md:pb-12 scroll-mt-28">
             <div className="mx-auto max-w-7xl px-6">
-                <div className="mb-16 text-center">
-                    <p className="font-heading uppercase tracking-[0.2em] text-sm text-primary mb-4">
+                <div className="mb-16 text-center max-w-3xl mx-auto">
+                    <p className="font-heading uppercase tracking-[0.2em] text-sm text-primary mb-4 font-medium">
                         Features
                     </p>
-                    <h2 className="text-3xl md:text-4xl font-heading font-medium text-foreground leading-[1.1]">
-                        Everything you need
+                    <h2 className="text-3xl md:text-5xl font-heading font-medium text-foreground leading-[1.1] tracking-tight mb-6">
+                        Everything you need <br className="hidden md:block" />
+                        to <span className="text-primary">run your store.</span>
                     </h2>
+                    <p className="text-lg md:text-xl text-muted-foreground font-sans leading-relaxed">
+                        OrderForm packs powerful e-commerce tools into a simple interface. From inventory management to automated customer updates, we handle the heavy lifting so you can focus on fulfilling orders.
+                    </p>
                 </div>
 
-                <div className="mx-auto grid gap-4 lg:grid-cols-2">
-                    <FeatureCard>
-                        <CardHeader className="pb-3 flex-1">
-                            <CardHeading
-                                icon={Link2}
-                                title="Store link for your bio"
-                                description="Create one simple link to place in your social media bio. Customers click it to view all your products in one place."
-                            />
-                        </CardHeader>
+                <div className="mx-auto border-2 border-dotted border-primary/20 overflow-hidden">
+                    <div className="grid lg:grid-cols-2">
+                        <FeatureCard className="border-b lg:border-r border-border/60">
+                            <CardHeader className="pb-3 flex-1">
+                                <CardHeading
+                                    title="Store link for your bio"
+                                    description="Ditch the messy DMs. Create one professional, shareable link that showcases your entire catalog. It’s perfect for Instagram, TikTok, and WhatsApp bios, giving your customers a seamless way to browse and shop 24/7."
+                                />
+                            </CardHeader>
 
-                        <div className="border-t border-dashed border-border pt-6">
-                            <DualModeImage
-                                src="/images/dashboard.png"
-                                alt="Store link for your bio"
-                                width={1207}
-                                height={929}
-                                className="w-full h-auto"
-                            />
-                        </div>
-                    </FeatureCard>
+                            <div className="pt-6">
+                                <DualModeImage
+                                    src="/images/dashboard.png"
+                                    alt="Store link for your bio"
+                                    width={1207}
+                                    height={929}
+                                    className="w-full h-auto"
+                                />
+                            </div>
+                        </FeatureCard>
 
-                    <FeatureCard>
-                        <CardHeader className="pb-3 flex-1">
-                            <CardHeading
-                                icon={LayoutGrid}
-                                title="Product catalog"
-                                description="Add products with photos, prices, and optional options like size or color. Update your products anytime."
-                            />
-                        </CardHeader>
+                        <FeatureCard className="border-b border-border/60">
+                            <CardHeader className="pb-3 flex-1">
+                                <CardHeading
+                                    title="Product catalog management"
+                                    description="Effortlessly organize your inventory. Add high-quality photos, set clear prices, manage stock levels, and offer product variations like size or color. Update everything instantly from your dashboard."
+                                />
+                            </CardHeader>
 
-                        <div className="border-t border-dashed border-border pt-6">
-                            <DualModeImage
-                                src="/images/dashboard.png"
-                                alt="Inventory Management"
-                                width={1207}
-                                height={929}
-                                className="w-full h-auto opacity-90"
-                            />
-                        </div>
-                    </FeatureCard>
+                            <div className="pt-6">
+                                <DualModeImage
+                                    src="/images/dashboard.png"
+                                    alt="Inventory Management"
+                                    width={1207}
+                                    height={929}
+                                    className="w-full h-auto opacity-90"
+                                />
+                            </div>
+                        </FeatureCard>
 
-                    <FeatureCard>
-                        <CardHeader className="pb-3 flex-1">
-                            <CardHeading
-                                icon={ShoppingCart}
-                                title="Cart & WhatsApp checkout"
-                                description="Customers add items to a cart and checkout via WhatsApp. A pre-filled message with the full order details is generated and sent to your WhatsApp."
-                            />
-                        </CardHeader>
+                        <FeatureCard className="border-b lg:border-b-0 lg:border-r border-border/60">
+                            <CardHeader className="pb-3 flex-1">
+                                <CardHeading
+                                    title="Cart & WhatsApp checkout"
+                                    description="Streamline the buying process. Customers build a cart with their favorite items and checkout instantly. OrderForm generates a structured WhatsApp message with all order details, ready for them to send to you."
+                                />
+                            </CardHeader>
 
-                        <div className="border-t border-dashed border-border pt-6">
-                            <DualModeImage
-                                src="/images/dashboard.png"
-                                alt="Delivery Zones"
-                                width={1207}
-                                height={929}
-                                className="w-full h-auto opacity-90"
-                            />
-                        </div>
-                    </FeatureCard>
+                            <div className="pt-6">
+                                <DualModeImage
+                                    src="/images/dashboard.png"
+                                    alt="Delivery Zones"
+                                    width={1207}
+                                    height={929}
+                                    className="w-full h-auto opacity-90"
+                                />
+                            </div>
+                        </FeatureCard>
 
-                    <FeatureCard>
-                        <CardHeader className="pb-3 flex-1">
-                            <CardHeading
-                                icon={UserX}
-                                title="No accounts or apps"
-                                description="Customers don’t need to sign up or install anything. Everything works instantly in the browser and on WhatsApp."
-                            />
-                        </CardHeader>
+                        <FeatureCard className="border-b lg:border-b-0 border-border/60">
+                            <CardHeader className="pb-3 flex-1">
+                                <CardHeading
+                                    title="No accounts or apps"
+                                    description="Remove friction from sales. Your customers don’t need to download another app or remember another password. The entire shopping experience happens directly in their browser and ends in the chat app they already use."
+                                />
+                            </CardHeader>
 
-                        <div className="border-t border-dashed border-border pt-6">
-                            <DualModeImage
-                                src="/images/dashboard.png"
-                                alt="No accounts or apps"
-                                width={1207}
-                                height={929}
-                                className="w-full h-auto opacity-90"
-                            />
-                        </div>
-                    </FeatureCard>
+                            <div className="pt-6">
+                                <DualModeImage
+                                    src="/images/dashboard.png"
+                                    alt="No accounts or apps"
+                                    width={1207}
+                                    height={929}
+                                    className="w-full h-auto opacity-90"
+                                />
+                            </div>
+                        </FeatureCard>
 
-                    <FeatureCard className="lg:col-span-2">
-                        <CardHeader className="pb-3 flex-1">
-                            <CardHeading
-                                icon={Camera}
-                                title="Customer photos & discounts"
-                                description="Customers can upload photos using your products. Once approved, they receive a discount code for their next order."
-                            />
-                        </CardHeader>
+                        <FeatureCard className="lg:col-span-2 border-t border-border/60">
+                            <CardHeader className="pb-3 flex-1">
+                                <CardHeading
+                                    title="Customer engagement & loyalty"
+                                    description="Turn one-time buyers into repeat customers. Allow satisfied shoppers to upload photos of their purchases. Approve their posts to build social proof and automatically reward them with discount codes for their next order."
+                                />
+                            </CardHeader>
 
-                        <div className="border-t border-dashed border-border pt-6">
-                            <DualModeImage
-                                src="/images/dashboard.png"
-                                alt="Customer photos and discounts"
-                                width={1207}
-                                height={929}
-                                className="w-full h-auto opacity-90"
-                            />
-                        </div>
-                    </FeatureCard>
+                            <div className="pt-6">
+                                <DualModeImage
+                                    src="/images/dashboard.png"
+                                    alt="Customer photos and discounts"
+                                    width={1207}
+                                    height={929}
+                                    className="w-full h-auto opacity-90"
+                                />
+                            </div>
+                        </FeatureCard>
+                    </div>
                 </div>
             </div>
         </section>
@@ -131,35 +131,23 @@ interface FeatureCardProps {
 }
 
 const FeatureCard = ({ children, className }: FeatureCardProps) => (
-    <div className={cn('group relative shadow-sm border border-border bg-background overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col h-full', className)}>
-        {/* <CardDecorator /> Removed decorators for cleaner look */}
+    <div className={cn('group relative bg-background overflow-hidden flex flex-col h-full', className)}>
         {children}
     </div>
 )
 
-const CardDecorator = () => (
-    <>
-        <span className="border-primary absolute -left-px -top-px block size-2 border-l-2 border-t-2"></span>
-        <span className="border-primary absolute -right-px -top-px block size-2 border-r-2 border-t-2"></span>
-        <span className="border-primary absolute -bottom-px -left-px block size-2 border-b-2 border-l-2"></span>
-        <span className="border-primary absolute -bottom-px -right-px block size-2 border-b-2 border-r-2"></span>
-    </>
-)
-
 interface CardHeadingProps {
-    icon: LucideIcon
     title: string
     description: string
 }
 
-const CardHeading = ({ icon: Icon, title, description }: CardHeadingProps) => (
+const CardHeading = ({ title, description }: CardHeadingProps) => (
     <div className="p-6">
-        <div className="flex items-center gap-3 text-foreground mb-4">
-             <div className="p-2.5 rounded-xl bg-primary/5 text-primary">
-                 <Icon className="size-5" />
-             </div>
-             <span className="font-heading font-medium text-lg">{title}</span>
-        </div>
+        <h3 className="font-heading font-medium text-xl md:text-2xl text-foreground mb-4">
+            {title.split(' ').map((word, i) => (
+                <span key={i} className={i === 0 ? "text-primary" : ""}>{word}{' '}</span>
+            ))}
+        </h3>
         <p className="text-base text-muted-foreground font-sans leading-relaxed">{description}</p>
     </div>
 )
@@ -181,5 +169,3 @@ const DualModeImage = ({ src, alt, width, height, className }: DualModeImageProp
         height={height}
     />
 )
-
-
