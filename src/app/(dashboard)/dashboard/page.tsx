@@ -7,10 +7,7 @@ import { authOptions } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OrdersClient } from "@/components/dashboard/orders-client";
 
-import dbConnect from "@/lib/db";
-import { Order } from "@/lib/models/Order";
-import { Product } from "@/lib/models/Product";
-import { Store } from "@/lib/models/Store";
+import db from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -24,8 +21,9 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  await dbConnect();
-  const store = await Store.findOne({ userId: session.user.id });
+  const store = await db.store.findFirst({
+      where: { userId: session.user.id }
+  });
 
   let stats = [
     { title: "Total Revenue", value: "KES 0", description: "No sales yet", icon: DollarSign },
@@ -37,25 +35,36 @@ export default async function DashboardPage() {
   let recentOrders: any[] = [];
 
   if (store) {
-    // Fetch data in parallel
-    const [orders, productsCount] = await Promise.all([
-      Order.find({ storeId: store._id }).sort({ createdAt: -1 }),
-      Product.countDocuments({ storeId: store._id })
+    const revenueAgg = await db.order.aggregate({
+        _sum: { totalAmount: true },
+        where: { storeId: store.id }
+    });
+
+    const [ordersCount, productsCount] = await Promise.all([
+      db.order.count({ where: { storeId: store.id } }),
+      db.product.count({ where: { storeId: store.id } })
     ]);
 
-    const totalRevenue = orders.reduce((acc, order) => acc + (order.totalAmount || 0), 0);
-    const totalOrders = orders.length;
+    const totalRevenue = revenueAgg._sum.totalAmount || 0;
+    
+    // Fetch recent orders
+    const orders = await db.order.findMany({
+        where: { storeId: store.id },
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+        include: { items: true }
+    });
 
     stats = [
       {
         title: "Total Revenue",
-        value: `KES ${totalRevenue.toLocaleString()}`,
+        value: `KES ${Number(totalRevenue).toLocaleString()}`,
         description: "Lifetime revenue",
         icon: DollarSign,
       },
       {
         title: "Orders",
-        value: totalOrders.toString(),
+        value: ordersCount.toString(),
         description: "Lifetime orders",
         icon: ShoppingBag,
       },
@@ -67,13 +76,13 @@ export default async function DashboardPage() {
       },
       {
         title: "Active Now",
-        value: "+1", // Placeholder for now as we don't have real-time tracking
+        value: "+1", 
         description: "You are online",
         icon: CreditCard,
       },
     ];
 
-    recentOrders = JSON.parse(JSON.stringify(orders.slice(0, 5)));
+    recentOrders = JSON.parse(JSON.stringify(orders));
   }
 
   return (
@@ -114,4 +123,3 @@ export default async function DashboardPage() {
     </div>
   );
 }
-

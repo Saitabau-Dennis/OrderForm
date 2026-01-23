@@ -8,9 +8,10 @@ interface OTPInputProps {
   value: string;
   onChange: (value: string) => void;
   className?: string;
+  disabled?: boolean;
 }
 
-export function OTPInput({ length = 6, value, onChange, className }: OTPInputProps) {
+export function OTPInput({ length = 6, value, onChange, className, disabled }: OTPInputProps) {
   const inputRefs = React.useRef<(HTMLInputElement | null)[]>([]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
@@ -68,19 +69,25 @@ export function OTPInput({ length = 6, value, onChange, className }: OTPInputPro
   };
 
   return (
-    <div className={cn("flex gap-2 justify-center", className)}>
+    <div className={cn("flex gap-3 justify-center", className)}>
       {Array.from({ length }).map((_, index) => (
         <input
           key={index}
           ref={(el) => { inputRefs.current[index] = el; }}
           type="text"
           inputMode="numeric"
-          maxLength={1} // Allow more for paste handling in handleChange but visually 1
+          maxLength={1}
           value={value[index] || ""}
           onChange={(e) => handleChange(e, index)}
           onKeyDown={(e) => handleKeyDown(e, index)}
           onPaste={handlePaste}
-          className="w-12 h-14 text-center text-2xl font-bold border rounded-xl bg-muted/50 focus:bg-background focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+          disabled={disabled}
+          className={cn(
+            "w-14 h-16 text-center text-3xl font-bold border-2 rounded-2xl bg-background shadow-sm transition-all duration-200 outline-none",
+            "border-muted focus:border-primary focus:ring-4 focus:ring-primary/10 focus:-translate-y-1",
+            "disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-muted disabled:focus:translate-y-0",
+             value[index] ? "border-primary/50 bg-primary/5" : "border-border"
+          )}
         />
       ))}
     </div>

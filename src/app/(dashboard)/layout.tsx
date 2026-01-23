@@ -1,8 +1,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
-import dbConnect from "@/lib/db";
-import { Store } from "@/lib/models/Store";
+import db from "@/lib/db";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 
 export default async function DashboardLayout({
@@ -16,8 +15,9 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  await dbConnect();
-  const store = await Store.findOne({ userId: session.user.id });
+  const store = await db.store.findFirst({
+      where: { userId: session.user.id }
+  });
 
   const storeData = store
     ? {

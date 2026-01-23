@@ -3,9 +3,7 @@
 import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
-import dbConnect from "@/lib/db";
-import { Order } from "@/lib/models/Order";
-import { Store } from "@/lib/models/Store";
+import db from "@/lib/db";
 
 export async function updateOrderStatus(id: string, status: string) {
   try {
@@ -15,28 +13,32 @@ export async function updateOrderStatus(id: string, status: string) {
       return { error: "Unauthorized" };
     }
 
-    await dbConnect();
-
-    const store = await Store.findOne({ userId: session.user.id });
+    const store = await db.store.findFirst({
+        where: { userId: session.user.id }
+    });
 
     if (!store) {
       return { error: "Store not found" };
     }
 
     // Ensure the order belongs to the user's store
-    const order = await Order.findOne({ _id: id, storeId: store._id });
+    const order = await db.order.findFirst({
+        where: { id: id, storeId: store.id }
+    });
 
     if (!order) {
       return { error: "Order not found" };
     }
 
-    order.status = status;
-    await order.save();
+    const updatedOrder = await db.order.update({
+        where: { id: id },
+        data: { status }
+    });
 
     revalidatePath("/orders");
     revalidatePath("/dashboard");
 
-    return { success: true, order: JSON.parse(JSON.stringify(order)) };
+    return { success: true, order: JSON.parse(JSON.stringify(updatedOrder)) };
   } catch (error) {
     console.error("Error updating order status:", error);
     return { error: "Something went wrong" };

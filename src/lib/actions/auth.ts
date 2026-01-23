@@ -1,15 +1,13 @@
 "use server";
 
-import { User } from "@/lib/models/User";
-import dbConnect from "@/lib/db";
+import db from "@/lib/db";
 import { sendVerificationEmail, sendPasswordResetEmail } from "@/lib/email";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
 export const sendVerificationCode = async (email: string) => {
   try {
-    await dbConnect();
-    const user = await User.findOne({ email });
+    const user = await db.user.findUnique({ where: { email } });
 
     if (!user) {
       return { error: "User not found" };
@@ -19,9 +17,13 @@ export const sendVerificationCode = async (email: string) => {
     const verificationTokenExpires = new Date(Date.now() + 10 * 60 * 1000);
     const hashedToken = await bcrypt.hash(verificationToken, 10);
 
-    user.verificationToken = hashedToken;
-    user.verificationTokenExpires = verificationTokenExpires;
-    await user.save();
+    await db.user.update({
+      where: { email },
+      data: {
+        verificationToken: hashedToken,
+        verificationTokenExpires
+      }
+    });
 
     await sendVerificationEmail(email, verificationToken);
 
@@ -34,14 +36,14 @@ export const sendVerificationCode = async (email: string) => {
 
 export const verifyEmail = async (email: string, code: string) => {
   try {
-    await dbConnect();
-    // Find user by email and check if token is not expired
-    const user = await User.findOne({
-      email,
-      verificationTokenExpires: { $gt: new Date() },
+    const user = await db.user.findFirst({
+      where: {
+        email,
+        verificationTokenExpires: { gt: new Date() }
+      }
     });
 
-    if (!user) {
+    if (!user || !user.verificationToken) {
       return { error: "Invalid or expired code" };
     }
 
@@ -52,10 +54,14 @@ export const verifyEmail = async (email: string, code: string) => {
       return { error: "Invalid or expired code" };
     }
 
-    user.emailVerified = new Date();
-    user.verificationToken = undefined;
-    user.verificationTokenExpires = undefined;
-    await user.save();
+    await db.user.update({
+      where: { id: user.id },
+      data: {
+        emailVerified: new Date(),
+        verificationToken: null,
+        verificationTokenExpires: null
+      }
+    });
 
     return { success: "Email verified successfully" };
   } catch (error) {
@@ -66,23 +72,25 @@ export const verifyEmail = async (email: string, code: string) => {
 
 export const sendPasswordResetCode = async (email: string) => {
   try {
-    await dbConnect();
-    const user = await User.findOne({ email });
+    const user = await db.user.findUnique({ where: { email } });
 
     if (!user) {
       return { error: "User not found" };
     }
 
-    const resetPasswordToken = crypto.randomInt(100000, 999999).toString();
-    const resetPasswordTokenExpires = new Date(Date.now() + 10 * 60 * 1000);
+    const resetToken = crypto.randomInt(100000, 999999).toString();
+    const resetTokenExpiry = new Date(Date.now() + 10 * 60 * 1000);
+    const hashedToken = await bcrypt.hash(resetToken, 10);
 
-    const hashedToken = await bcrypt.hash(resetPasswordToken, 10);
+    await db.user.update({
+      where: { email },
+      data: {
+        resetToken: hashedToken,
+        resetTokenExpiry
+      }
+    });
 
-    user.resetPasswordToken = hashedToken;
-    user.resetPasswordTokenExpires = resetPasswordTokenExpires;
-    await user.save();
-
-    await sendPasswordResetEmail(email, resetPasswordToken);
+    await sendPasswordResetEmail(email, resetToken);
 
     return { success: "Password reset code sent" };
   } catch (error) {
@@ -93,37 +101,34 @@ export const sendPasswordResetCode = async (email: string) => {
 
 export const resetPassword = async (email: string, code: string, newPassword: string) => {
   try {
-    await dbConnect();
-    // Find user by email and check if token is not expired
-    const user = await User.findOne({
-      email,
-      resetPasswordTokenExpires: { $gt: new Date() },
+    const user = await db.user.findFirst({
+      where: {
+        email,
+        resetTokenExpiry: { gt: new Date() }
+      }
     });
 
-    if (!user) {
+    if (!user || !user.resetToken) {
       return { error: "Invalid or expired code" };
     }
 
     // Verify the token
-    const isValid = await bcrypt.compare(code, user.resetPasswordToken);
+    const isValid = await bcrypt.compare(code, user.resetToken);
 
     if (!isValid) {
-      // Debugging
-      console.log("Debug Reset:", {
-        email,
-        code,
-        storedToken: user.resetPasswordToken,
-        isValid
-      });
       return { error: "Invalid or expired code" };
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    user.password = hashedPassword;
-    user.resetPasswordToken = undefined;
-    user.resetPasswordTokenExpires = undefined;
-    await user.save();
+    await db.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        resetToken: null,
+        resetTokenExpiry: null
+      }
+    });
 
     return { success: "Password reset successfully" };
   } catch (error) {

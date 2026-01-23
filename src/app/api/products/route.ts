@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import dbConnect from "@/lib/db";
-import { Product } from "@/lib/models/Product";
-import { Store } from "@/lib/models/Store";
-import { authOptions } from "@/lib/auth"; // Assuming authOptions is exported from lib/auth
+import db from "@/lib/db";
+import { authOptions } from "@/lib/auth";
 
 export async function GET(req: Request) {
   try {
@@ -13,15 +11,18 @@ export async function GET(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    await dbConnect();
-
-    const store = await Store.findOne({ userId: session.user.id });
+    const store = await db.store.findFirst({
+        where: { userId: session.user.id }
+    });
 
     if (!store) {
       return new NextResponse("Store not found", { status: 404 });
     }
 
-    const products = await Product.find({ storeId: store._id }).sort({ createdAt: -1 });
+    const products = await db.product.findMany({
+        where: { storeId: store.id },
+        orderBy: { createdAt: 'desc' }
+    });
 
     return NextResponse.json(products);
   } catch (error) {
@@ -39,28 +40,32 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { name, price, category, description, imageUrl, isAvailable } = body;
+    const { name, price, category, description, imageUrl, isAvailable, sizes, variants } = body;
 
     if (!name || !price) {
       return new NextResponse("Name and price are required", { status: 400 });
     }
 
-    await dbConnect();
-
-    const store = await Store.findOne({ userId: session.user.id });
+    const store = await db.store.findFirst({
+        where: { userId: session.user.id }
+    });
 
     if (!store) {
       return new NextResponse("Store not found", { status: 404 });
     }
 
-    const product = await Product.create({
-      storeId: store._id,
-      name,
-      price,
-      category,
-      description,
-      imageUrl,
-      isAvailable,
+    const product = await db.product.create({
+      data: {
+        storeId: store.id,
+        name,
+        price: parseFloat(price),
+        category,
+        description,
+        imageUrl,
+        isAvailable,
+        sizes,
+        variants: variants || []
+      }
     });
 
     return NextResponse.json(product);

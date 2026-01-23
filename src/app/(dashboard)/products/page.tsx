@@ -1,12 +1,9 @@
-
 import { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { ProductsClient } from "@/components/dashboard/products-client";
-import dbConnect from "@/lib/db";
-import { Product } from "@/lib/models/Product";
-import { Store } from "@/lib/models/Store";
+import db from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "Products",
@@ -20,13 +17,17 @@ export default async function ProductsPage() {
     redirect("/login");
   }
 
-  await dbConnect();
-  const store = await Store.findOne({ userId: session.user.id });
+  const store = await db.store.findFirst({
+      where: { userId: session.user.id }
+  });
 
   let productsData: any[] = [];
 
   if (store) {
-    const products = await Product.find({ storeId: store._id }).sort({ createdAt: -1 });
+    const products = await db.product.findMany({
+        where: { storeId: store.id },
+        orderBy: { createdAt: 'desc' }
+    });
     productsData = JSON.parse(JSON.stringify(products));
   }
 

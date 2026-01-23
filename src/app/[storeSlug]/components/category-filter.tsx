@@ -1,57 +1,49 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { useStore } from "./store-context";
 
 interface CategoryFilterProps {
   categories: string[];
   selectedCategory: string | null;
   onSelectCategory: (category: string | null) => void;
-  brandColor: string;
 }
 
 export function CategoryFilter({
   categories,
   selectedCategory,
   onSelectCategory,
-  brandColor,
 }: CategoryFilterProps) {
+  const { brandColor } = useStore();
+
   if (categories.length === 0) return null;
 
   return (
-    <div className="w-full mb-8">
-      <ScrollArea className="w-full whitespace-nowrap rounded-md">
-        <div className="flex w-max space-x-2 p-1">
-          <Button
-            variant="outline"
-            size="sm"
+    <div className="sticky top-[72px] z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100 py-4 mb-8">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center space-x-3 overflow-x-auto pb-1 scrollbar-hide">
+          <button
             onClick={() => onSelectCategory(null)}
             className={cn(
-              "rounded-full border-transparent px-4 font-medium transition-all",
+              "flex-shrink-0 rounded-full px-6 py-2.5 text-sm font-semibold transition-all duration-300",
               !selectedCategory
-                ? "text-white shadow-md"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                ? "text-white shadow-md transform scale-105"
+                : "bg-gray-100 text-gray-500 hover:bg-gray-200"
             )}
-            style={
-              !selectedCategory
-                ? { backgroundColor: brandColor }
-                : {}
-            }
+            style={!selectedCategory ? { backgroundColor: brandColor } : {}}
           >
-            All
-          </Button>
+            All Items
+          </button>
+          
           {categories.map((category) => (
-            <Button
+            <button
               key={category}
-              variant="outline"
-              size="sm"
               onClick={() => onSelectCategory(category)}
               className={cn(
-                "rounded-full border-transparent px-4 font-medium transition-all",
+                "flex-shrink-0 rounded-full px-6 py-2.5 text-sm font-semibold transition-all duration-300",
                 selectedCategory === category
-                  ? "text-white shadow-md"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  ? "text-white shadow-md transform scale-105"
+                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
               )}
               style={
                 selectedCategory === category
@@ -60,11 +52,10 @@ export function CategoryFilter({
               }
             >
               {category}
-            </Button>
+            </button>
           ))}
         </div>
-        <ScrollBar orientation="horizontal" className="invisible" />
-      </ScrollArea>
+      </div>
     </div>
   );
 }

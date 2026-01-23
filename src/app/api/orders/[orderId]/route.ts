@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import dbConnect from "@/lib/db";
-import { Order } from "@/lib/models/Order";
-import { Store } from "@/lib/models/Store";
+import db from "@/lib/db";
 import { authOptions } from "@/lib/auth";
 
 export async function GET(
@@ -16,18 +14,19 @@ export async function GET(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    await dbConnect();
     const { orderId } = await params;
 
-    const store = await Store.findOne({ userId: session.user.id });
+    const store = await db.store.findFirst({
+        where: { userId: session.user.id }
+    });
 
     if (!store) {
       return new NextResponse("Store not found", { status: 404 });
     }
 
-    const order = await Order.findOne({
-      _id: orderId,
-      storeId: store._id,
+    const order = await db.order.findFirst({
+        where: { id: orderId, storeId: store.id },
+        include: { items: true }
     });
 
     if (!order) {
@@ -56,26 +55,30 @@ export async function PATCH(
     const { status, paymentStatus } = body;
     const { orderId } = await params;
 
-    await dbConnect();
-
-    const store = await Store.findOne({ userId: session.user.id });
+    const store = await db.store.findFirst({
+        where: { userId: session.user.id }
+    });
 
     if (!store) {
       return new NextResponse("Store not found", { status: 404 });
     }
 
-    const order = await Order.findOneAndUpdate(
-      { _id: orderId, storeId: store._id },
-      {
+    // Verify ownership
+    const existingOrder = await db.order.findFirst({
+        where: { id: orderId, storeId: store.id }
+    });
+
+    if (!existingOrder) {
+        return new NextResponse("Order not found", { status: 404 });
+    }
+
+    const order = await db.order.update({
+      where: { id: orderId },
+      data: {
         ...(status && { status }),
         ...(paymentStatus && { paymentStatus }),
-      },
-      { new: true }
-    );
-
-    if (!order) {
-      return new NextResponse("Order not found", { status: 404 });
-    }
+      }
+    });
 
     return NextResponse.json(order);
   } catch (error) {

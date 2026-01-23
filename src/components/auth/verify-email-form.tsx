@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { verifyEmail, sendVerificationCode } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -20,8 +18,7 @@ export function VerifyEmailForm() {
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleVerify = useCallback(async (verificationCode: string) => {
     if (!email) {
       toast.error("Email is missing");
       return;
@@ -29,19 +26,27 @@ export function VerifyEmailForm() {
     setLoading(true);
 
     try {
-      const res = await verifyEmail(email, code);
+      const res = await verifyEmail(email, verificationCode);
       if (res.error) {
         toast.error(res.error);
+        setLoading(false); // Stop loading on error so they can try again
+        setCode(""); // Optionally clear code on error
       } else {
         toast.success("Email verified successfully");
         router.push("/login");
       }
     } catch (error) {
       toast.error("Something went wrong");
-    } finally {
       setLoading(false);
     }
-  };
+  }, [email, router]);
+
+  // Auto-submit when code is complete
+  useEffect(() => {
+    if (code.length === 6) {
+      handleVerify(code);
+    }
+  }, [code, handleVerify]);
 
   const handleResend = async () => {
     if (!email) {
@@ -75,40 +80,41 @@ export function VerifyEmailForm() {
   }
 
   return (
-    <div className="w-full max-w-md mx-auto space-y-6">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold">Verify your email</h1>
-        <p className="text-muted-foreground mt-2">
-          We sent a code to <span className="font-medium text-foreground">{email}</span>
+    <div className="w-full max-w-md mx-auto space-y-8">
+      <div className="text-center space-y-2">
+        <h2 className="font-instrument-serif text-3xl font-bold">Check your email</h2>
+        <p className="text-muted-foreground">
+          We sent a verification code to <span className="font-medium text-foreground">{email}</span>
         </p>
       </div>
 
-
-
-      <form onSubmit={handleSubmit} className="space-y-8">
-        <div className="space-y-2">
+      <div className="space-y-8">
+        <div className="flex justify-center">
           <OTPInput
             value={code}
             onChange={setCode}
             length={6}
+            disabled={loading}
           />
         </div>
 
-        <Button type="submit" className="w-full" disabled={loading || code.length < 6}>
-          {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-          Verify Email
-        </Button>
-      </form>
+        {loading && (
+            <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm animate-pulse">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Verifying...</span>
+            </div>
+        )}
+      </div>
 
       <div className="text-center text-sm">
         <p className="text-muted-foreground">
           Didn't receive the code?{" "}
           <button
             onClick={handleResend}
-            disabled={resending}
-            className="text-primary hover:underline font-medium disabled:opacity-50"
+            disabled={resending || loading}
+            className="text-primary hover:underline font-medium disabled:opacity-50 transition-colors"
           >
-            {resending ? "Resending..." : "Resend"}
+            {resending ? "Resending..." : "Click to resend"}
           </button>
         </p>
       </div>

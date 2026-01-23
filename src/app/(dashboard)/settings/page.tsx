@@ -3,8 +3,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
 import { authOptions } from "@/lib/auth";
-import dbConnect from "@/lib/db";
-import { Store } from "@/lib/models/Store";
+import db from "@/lib/db";
 import { SettingsForm } from "@/components/dashboard/settings-form";
 
 export const metadata: Metadata = {
@@ -19,10 +18,11 @@ export default async function SettingsPage() {
     redirect("/login");
   }
 
-  await dbConnect();
-
   // Find store for the current user
-  const store = await Store.findOne({ userId: session.user.id });
+  const store = await db.store.findFirst({
+      where: { userId: session.user.id },
+      include: { deliveryZones: true }
+  });
 
   // If no store exists, we pass null. The form should handle creating a new store.
   const storeData = store ? JSON.parse(JSON.stringify(store)) : null;

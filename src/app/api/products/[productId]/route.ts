@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import dbConnect from "@/lib/db";
-import { Product } from "@/lib/models/Product";
-import { Store } from "@/lib/models/Store";
+import db from "@/lib/db";
 import { authOptions } from "@/lib/auth";
 
 export async function GET(
@@ -16,18 +14,18 @@ export async function GET(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    await dbConnect();
     const { productId } = await params;
 
-    const store = await Store.findOne({ userId: session.user.id });
+    const store = await db.store.findFirst({
+        where: { userId: session.user.id }
+    });
 
     if (!store) {
       return new NextResponse("Store not found", { status: 404 });
     }
 
-    const product = await Product.findOne({
-      _id: productId,
-      storeId: store._id,
+    const product = await db.product.findFirst({
+        where: { id: productId, storeId: store.id }
     });
 
     if (!product) {
@@ -53,34 +51,39 @@ export async function PUT(
     }
 
     const body = await req.json();
-    const { name, price, category, description, imageUrl, isAvailable, variants } = body;
+    const { name, price, category, description, imageUrl, isAvailable, variants, sizes } = body;
     const { productId } = await params;
 
-    await dbConnect();
-
-    const store = await Store.findOne({ userId: session.user.id });
+    const store = await db.store.findFirst({
+        where: { userId: session.user.id }
+    });
 
     if (!store) {
       return new NextResponse("Store not found", { status: 404 });
     }
 
-    const product = await Product.findOneAndUpdate(
-      { _id: productId, storeId: store._id },
-      {
+    // Verify ownership
+    const existingProduct = await db.product.findFirst({
+        where: { id: productId, storeId: store.id }
+    });
+
+    if (!existingProduct) {
+        return new NextResponse("Product not found", { status: 404 });
+    }
+
+    const product = await db.product.update({
+      where: { id: productId },
+      data: {
         name,
-        price,
+        price: parseFloat(price),
         category,
         description,
         imageUrl,
         isAvailable,
-        variants,
-      },
-      { new: true }
-    );
-
-    if (!product) {
-      return new NextResponse("Product not found", { status: 404 });
-    }
+        variants: variants || [],
+        sizes
+      }
+    });
 
     return NextResponse.json(product);
   } catch (error) {
@@ -100,25 +103,28 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    await dbConnect();
     const { productId } = await params;
 
-    const store = await Store.findOne({ userId: session.user.id });
+    const store = await db.store.findFirst({
+        where: { userId: session.user.id }
+    });
 
     if (!store) {
       return new NextResponse("Store not found", { status: 404 });
     }
 
-    const product = await Product.findOneAndDelete({
-      _id: productId,
-      storeId: store._id,
+    const result = await db.product.deleteMany({
+      where: {
+        id: productId,
+        storeId: store.id,
+      }
     });
 
-    if (!product) {
+    if (result.count === 0) {
       return new NextResponse("Product not found", { status: 404 });
     }
 
-    return NextResponse.json(product);
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error("[PRODUCT_DELETE]", error);
     return new NextResponse("Internal Error", { status: 500 });

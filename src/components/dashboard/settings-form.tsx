@@ -91,7 +91,7 @@ export function SettingsForm({ initialData }: SettingsFormProps) {
   const [loading, setLoading] = useState(false);
 
   const form = useForm<SettingsValues>({
-    resolver: zodResolver(settingsSchema),
+    resolver: zodResolver(settingsSchema) as any,
     defaultValues: {
       name: initialData?.name || "",
       description: initialData?.description || "",
@@ -253,14 +253,8 @@ export function SettingsForm({ initialData }: SettingsFormProps) {
               <Label>Store Logo</Label>
               <ImageUpload
                 value={form.watch("logoUrl")}
-                onChange={(file) => {
-                  if (file) {
-                    const url = URL.createObjectURL(file);
-                    form.setValue("logoUrl", url);
-                  } else {
-                    form.setValue("logoUrl", "");
-                  }
-                }}
+                onChange={(url) => form.setValue("logoUrl", url)}
+                endpoint="imageUploader"
               />
             </div>
             <div className="space-y-4">

@@ -1,10 +1,8 @@
 import { NextAuthOptions } from "next-auth";
-import { MongoDBAdapter } from "@auth/mongodb-adapter";
-import clientPromise from "@/lib/mongodb";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import db from "@/lib/db";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { User } from "@/lib/models/User";
-import dbConnect from "@/lib/db";
 
 declare module "next-auth" {
   interface Session {
@@ -18,7 +16,7 @@ declare module "next-auth" {
 }
 
 export const authOptions: NextAuthOptions = {
-  adapter: MongoDBAdapter(clientPromise),
+  adapter: PrismaAdapter(db),
   session: {
     strategy: "jwt",
   },
@@ -37,11 +35,11 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        await dbConnect();
+        const user = await db.user.findUnique({
+          where: { email: credentials.email }
+        });
 
-        const user = await User.findOne({ email: credentials.email }).select("+password");
-
-        if (!user) {
+        if (!user || !user.password) {
           return null;
         }
 
@@ -55,7 +53,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         return {
-          id: user._id.toString(),
+          id: user.id,
           email: user.email,
           name: user.name,
           image: user.image,
@@ -81,4 +79,3 @@ export const authOptions: NextAuthOptions = {
     },
   },
 };
-

@@ -1,170 +1,159 @@
 "use client";
 
 import { useState } from "react";
-import { Package, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { StoreThemeProvider } from "./store-provider";
+import { Package, Search, ShieldCheck, Truck, Clock, Heart, X, MessageCircle, Camera, Sparkles } from "lucide-react";
 import { StoreHeader } from "./store-header";
 import { StoreHero } from "./store-hero";
 import { CategoryFilter } from "./category-filter";
 import { ProductCard } from "./product-card";
 import { StoreCart } from "./store-cart";
+import { StoreProvider, useStore } from "./store-context";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 
 interface StoreLayoutProps {
   store: any;
   products: any[];
 }
 
-export function StoreLayout({ store, products }: StoreLayoutProps) {
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [cart, setCart] = useState<{ [key: string]: number }>({});
-  const [searchQuery, setSearchQuery] = useState("");
+function StoreContent({ store, products }: StoreLayoutProps) {
+  const { searchQuery, setSearchQuery, brandColor } = useStore();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const params = useParams();
 
-  // Get unique categories from products
+  // Extract unique categories
   const categories = Array.from(new Set(products.map((p) => p.category).filter(Boolean)));
 
-  // Filter products based on search and category
+  // Filter products
   const filteredProducts = products.filter((product) => {
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const nameMatch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const descMatch = product.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = nameMatch || descMatch;
+    
     const matchesCategory = selectedCategory ? product.category === selectedCategory : true;
     return matchesSearch && matchesCategory;
   });
 
-  const addToCart = (productId: string) => {
-    setCart((prev) => ({ ...prev, [productId]: (prev[productId] || 0) + 1 }));
-    setIsCartOpen(true);
-  };
-
-  const updateQuantity = (productId: string, delta: number) => {
-    setCart((prev) => {
-      const newCart = { ...prev };
-      const newQty = (newCart[productId] || 0) + delta;
-
-      if (newQty <= 0) {
-        delete newCart[productId];
-      } else {
-        newCart[productId] = newQty;
-      }
-
-      return newCart;
-    });
-  };
-
-  const cartItems = Object.entries(cart).map(([id, qty]) => {
-    const product = products.find((p) => p._id === id || p.id === id);
-    return {
-      id,
-      name: product?.name || "Unknown Product",
-      price: product?.price || 0,
-      quantity: qty,
-      imageUrl: product?.imageUrl,
-    };
-  });
-
-  const cartCount = Object.values(cart).reduce((a, b) => a + b, 0);
-
-  const handleCheckout = () => {
-    const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const message = `Hi, I'd like to order from ${store.name}:\n\n${cartItems.map(item =>
-      `- ${item.name} x${item.quantity} (${store.currency} ${(item.price * item.quantity).toLocaleString()})`
-    ).join('\n')}\n\nTotal: ${store.currency} ${total.toLocaleString()}`;
-
-    const url = `https://wa.me/${store.whatsappNumber}?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
-  };
-
   return (
-    <StoreThemeProvider brandColor={store.brandColor || "#30382F"}>
-      <StoreHeader
-        name={store.name}
-        logoUrl={store.logoUrl}
-        cartCount={cartCount}
-        onOpenCart={() => setIsCartOpen(true)}
-      />
+    <div className="min-h-screen bg-white">
+      <StoreHeader name={store.name} logoUrl={store.logoUrl} />
+      
+      <main>
+        <StoreHero name={store.name} description={store.description} />
 
-      <main className="container mx-auto px-4 py-8 pb-24">
-        <StoreHero
-          name={store.name}
-          description={store.description}
-          brandColor={store.brandColor || "#30382F"}
-        />
+        {/* Stunning Share & Earn Banner */}
+        <div className="container mx-auto px-4 md:px-6 mb-16">
+            <Link href={`/${params.storeSlug}/share`}>
+                <div 
+                    className="group relative overflow-hidden rounded-[2rem] p-8 md:p-12 duration-500 border border-gray-100 shadow-sm"
+                    style={{ backgroundColor: `${brandColor}08` }}
+                >
+                    <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
+                        <div className="space-y-3 max-w-lg">
+                            <div className="flex items-center justify-center md:justify-start gap-2 text-[10px] font-black uppercase tracking-[0.3em]" style={{ color: brandColor }}>
+                                Share & Earn
+                            </div>
+                            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-sora tracking-tight leading-tight">
+                                Show off your <span className="italic" style={{ color: brandColor }}>style.</span>
+                            </h2>
+                            <p className="text-gray-500 font-light text-base">
+                                Upload a photo of your purchase and get featured in our gallery. {store.rewardConfig?.isEnabled && "Plus, get an exclusive discount for your next order."}
+                            </p>
+                        </div>
+                        <div 
+                            className="h-14 px-10 rounded-full text-sm font-bold uppercase tracking-widest text-white shadow-xl transition-all flex items-center justify-center gap-2"
+                            style={{ backgroundColor: brandColor }}
+                        >
+                            Upload Photo
+                            <Sparkles className="h-4 w-4" />
+                        </div>
+                    </div>
+                    
+                    {/* Decorative Elements */}
+                    <div className="absolute top-0 right-0 -mr-20 -mt-20 h-64 w-64 rounded-full opacity-[0.03] blur-3xl" style={{ backgroundColor: brandColor }} />
+                    <div className="absolute bottom-0 left-0 -ml-20 -mb-20 h-64 w-64 rounded-full opacity-[0.03] blur-3xl" style={{ backgroundColor: brandColor }} />
+                </div>
+            </Link>
+        </div>
 
-        <div className="mb-8 space-y-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-            <Input
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-12 rounded-full border-gray-200 bg-gray-50 focus:bg-white transition-all"
-            />
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-gray-100 pb-8">
+              <div className="space-y-1">
+                  <h2 className="text-[12px] font-black uppercase tracking-[0.3em] text-gray-400">Our Catalog</h2>
+                  <h3 className="text-4xl font-bold text-gray-900 font-sora">The Collection</h3>
+              </div>
+
+              <div className="relative group w-full md:w-72">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-gray-900 transition-colors" />
+                  <input
+                      placeholder="Search products..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full h-11 pl-10 pr-10 bg-gray-50 border border-gray-100 rounded-xl text-sm placeholder:text-gray-400 focus:outline-none focus:bg-white transition-all shadow-sm focus:shadow-md"
+                  />
+                  {searchQuery && (
+                      <button 
+                          onClick={() => setSearchQuery("")}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-900 transition-colors p-1"
+                      >
+                          <X className="h-4 w-4" />
+                      </button>
+                  )}
+              </div>
           </div>
 
           <CategoryFilter
-            categories={categories}
-            selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
-            brandColor={store.brandColor || "#30382F"}
+              categories={categories}
+              selectedCategory={selectedCategory}
+              onSelectCategory={setSelectedCategory}
           />
-        </div>
 
-        <div id="products-grid">
-          {filteredProducts.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="rounded-full bg-gray-100 p-6 mb-4">
-              <Package className="h-10 w-10 text-gray-400" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900">No products found</h3>
-            <p className="mt-2 text-gray-500 max-w-sm">
-              {searchQuery || selectedCategory
-                ? "Try adjusting your search or filter to find what you're looking for."
-                : "This store hasn't added any products yet. Please check back later."}
-            </p>
-            {(searchQuery || selectedCategory) && (
-              <Button
-                variant="link"
-                onClick={() => {
-                  setSearchQuery("");
-                  setSelectedCategory(null);
-                }}
-                className="mt-2"
-                style={{ color: store.brandColor || "#30382F" }}
-              >
-                Clear all filters
-              </Button>
-            )}
+          <div className="min-h-[40vh] pb-24 pt-4">
+              {filteredProducts.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-20 text-center">
+                      <div className="h-16 w-16 rounded-full bg-gray-50 flex items-center justify-center mb-4">
+                          <Package className="h-8 w-8 text-gray-200" />
+                      </div>
+                      <h3 className="text-lg font-bold text-gray-900">No items found</h3>
+                      <p className="text-sm text-gray-500 mt-1 max-w-xs font-light leading-relaxed">
+                          Try adjusting your filters or search terms.
+                      </p>
+                  </div>
+              ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                      {filteredProducts.map((product) => (
+                          <ProductCard
+                              key={product.id}
+                              product={product}
+                          />
+                      ))}
+                  </div>
+              )}
           </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {filteredProducts.map((product) => (
-              <ProductCard
-                key={product._id || product.id}
-                product={{
-                  id: product._id || product.id,
-                  name: product.name,
-                  price: product.price,
-                  imageUrl: product.imageUrl,
-                  description: product.description,
-                }}
-                currency={store.currency}
-                onAdd={addToCart}
-              />
-            ))}
-          </div>
-        )}
         </div>
       </main>
 
-      <StoreCart
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        cartItems={cartItems}
-        currency={store.currency}
-        onUpdateQuantity={updateQuantity}
-        onCheckout={handleCheckout}
-      />
-    </StoreThemeProvider>
+      <StoreCart storeName={store.name} whatsappNumber={store.whatsappNumber} />
+      
+      <footer className="py-12 border-t border-gray-100 bg-white">
+          <div className="container mx-auto px-4 text-center">
+              <h2 className="text-base font-bold text-gray-900 font-sora mb-2">{store.name}</h2>
+              <p className="text-[11px] text-gray-500 font-bold uppercase tracking-[0.2em]">
+                  Powered by OrderForm
+              </p>
+          </div>
+      </footer>
+    </div>
+  );
+}
+
+export function StoreLayout({ store, products }: StoreLayoutProps) {
+  return (
+    <StoreProvider 
+        currency={store.currency} 
+        brandColor={store.brandColor || "#000000"}
+    >
+      <StoreContent store={store} products={products} />
+    </StoreProvider>
   );
 }

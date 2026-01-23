@@ -4,9 +4,7 @@ import { redirect } from "next/navigation";
 
 import { authOptions } from "@/lib/auth";
 import { OrdersClient } from "@/components/dashboard/orders-client";
-import dbConnect from "@/lib/db";
-import { Order } from "@/lib/models/Order";
-import { Store } from "@/lib/models/Store";
+import db from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "Orders",
@@ -20,13 +18,18 @@ export default async function OrdersPage() {
     redirect("/login");
   }
 
-  await dbConnect();
-  const store = await Store.findOne({ userId: session.user.id });
+  const store = await db.store.findFirst({
+      where: { userId: session.user.id }
+  });
 
   let ordersData: any[] = [];
 
   if (store) {
-    const orders = await Order.find({ storeId: store._id }).sort({ createdAt: -1 });
+    const orders = await db.order.findMany({
+        where: { storeId: store.id },
+        orderBy: { createdAt: 'desc' },
+        include: { items: true }
+    });
     ordersData = JSON.parse(JSON.stringify(orders));
   }
 

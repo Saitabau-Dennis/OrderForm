@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import dbConnect from "@/lib/db";
-import { Store } from "@/lib/models/Store";
+import db from "@/lib/db";
 import { authOptions } from "@/lib/auth";
 
 export async function GET(req: Request) {
@@ -12,9 +11,10 @@ export async function GET(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    await dbConnect();
-
-    const store = await Store.findOne({ userId: session.user.id });
+    const store = await db.store.findFirst({
+        where: { userId: session.user.id },
+        include: { deliveryZones: true } // Include relation
+    });
 
     if (!store) {
       return new NextResponse("Store not found", { status: 404 });
@@ -49,11 +49,17 @@ export async function PUT(req: Request) {
       isActive,
     } = body;
 
-    await dbConnect();
+    const existingStore = await db.store.findFirst({
+        where: { userId: session.user.id }
+    });
 
-    const store = await Store.findOneAndUpdate(
-      { userId: session.user.id },
-      {
+    if (!existingStore) {
+        return new NextResponse("Store not found", { status: 404 });
+    }
+
+    const store = await db.store.update({
+      where: { id: existingStore.id },
+      data: {
         name,
         slug,
         whatsappNumber,
@@ -62,15 +68,14 @@ export async function PUT(req: Request) {
         brandColor,
         theme,
         description,
-        deliveryZones,
         isActive,
+        deliveryZones: {
+            deleteMany: {},
+            create: deliveryZones // Assumes [{name, price}]
+        }
       },
-      { new: true }
-    );
-
-    if (!store) {
-      return new NextResponse("Store not found", { status: 404 });
-    }
+      include: { deliveryZones: true }
+    });
 
     return NextResponse.json(store);
   } catch (error) {

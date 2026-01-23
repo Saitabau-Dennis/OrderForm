@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
-import dbConnect from "@/lib/db";
-import { User } from "@/lib/models/User";
-import { Store } from "@/lib/models/Store";
+import db from "@/lib/db";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { sendVerificationCode } from "@/lib/actions/auth";
@@ -17,9 +15,7 @@ export async function POST(req: Request) {
       );
     }
 
-    await dbConnect();
-
-    const existingUser = await User.findOne({ email });
+    const existingUser = await db.user.findUnique({ where: { email } });
     if (existingUser) {
       return NextResponse.json(
         { error: "Email already in use" },
@@ -29,10 +25,12 @@ export async function POST(req: Request) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({
-      name: storeName,
-      email,
-      password: hashedPassword,
+    const user = await db.user.create({
+      data: {
+        name: storeName,
+        email,
+        password: hashedPassword,
+      }
     });
 
     // Create Store
@@ -40,13 +38,17 @@ export async function POST(req: Request) {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)+/g, "");
+    
+    const uniqueSlug = `${slug}-${crypto.randomBytes(3).toString("hex")}`;
 
-    await Store.create({
-      userId: user._id,
-      name: storeName,
-      slug: `${slug}-${crypto.randomBytes(3).toString("hex")}`, // Ensure uniqueness
-      whatsappNumber: "", // Optional now
-      deliveryZones: [],
+    await db.store.create({
+      data: {
+        userId: user.id,
+        name: storeName,
+        slug: uniqueSlug, // Ensure uniqueness
+        whatsappNumber: "", // Optional now
+        // deliveryZones is a relation, no need to init if empty
+      }
     });
 
     // Send verification email

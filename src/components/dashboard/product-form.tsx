@@ -145,14 +145,8 @@ export function ProductForm({ initialData, onSuccess }: ProductFormProps) {
             <div className="p-6 pt-0">
               <ImageUpload
                 value={form.watch("imageUrl")}
-                onChange={(file) => {
-                  if (file) {
-                    const url = URL.createObjectURL(file);
-                    form.setValue("imageUrl", url);
-                  } else {
-                    form.setValue("imageUrl", "");
-                  }
-                }}
+                onChange={(url) => form.setValue("imageUrl", url)}
+                endpoint="productImage"
               />
             </div>
           </div>

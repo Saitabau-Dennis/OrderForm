@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import dbConnect from "@/lib/db";
-import { Order } from "@/lib/models/Order";
-import { Product } from "@/lib/models/Product";
-import { Store } from "@/lib/models/Store";
+import db from "@/lib/db";
 import { authOptions } from "@/lib/auth";
 
 export async function GET(req: Request) {
@@ -14,26 +11,35 @@ export async function GET(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    await dbConnect();
-
-    const store = await Store.findOne({ userId: session.user.id });
+    const store = await db.store.findFirst({
+        where: { userId: session.user.id }
+    });
 
     if (!store) {
       return new NextResponse("Store not found", { status: 404 });
     }
 
-    const orders = await Order.find({ storeId: store._id });
-    const products = await Product.find({ storeId: store._id });
+    // Efficient Aggregation
+    const revenueAggregation = await db.order.aggregate({
+        _sum: { totalAmount: true },
+        where: { storeId: store.id }
+    });
+    const totalRevenue = revenueAggregation._sum.totalAmount || 0;
 
-    const totalRevenue = orders.reduce((acc, order) => acc + order.totalAmount, 0);
-    const totalOrders = orders.length;
-    const totalProducts = products.length;
+    const totalOrders = await db.order.count({
+        where: { storeId: store.id }
+    });
 
-    // Calculate sales over time (e.g., last 7 days) - simplified for now
-    // In a real app, you'd aggregate this in MongoDB
-    const recentOrders = await Order.find({ storeId: store._id })
-      .sort({ createdAt: -1 })
-      .limit(5);
+    const totalProducts = await db.product.count({
+        where: { storeId: store.id }
+    });
+
+    const recentOrders = await db.order.findMany({
+        where: { storeId: store.id },
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+        include: { items: true }
+    });
 
     return NextResponse.json({
       totalRevenue,

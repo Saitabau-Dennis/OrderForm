@@ -1,17 +1,21 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { toast } from "sonner";
 
-interface CartItem {
+// --- Types ---
+export interface CartItem {
   id: string;
   name: string;
   price: number;
   quantity: number;
   imageUrl?: string;
   variant?: string;
+  maxQuantity?: number;
 }
 
-interface CartContextType {
+interface StoreContextType {
+  // Cart State
   cart: CartItem[];
   isCartOpen: boolean;
   openCart: () => void;
@@ -21,19 +25,35 @@ interface CartContextType {
   updateQuantity: (productId: string, delta: number, variant?: string) => void;
   cartCount: number;
   cartTotal: number;
-  clearCart: () => void;
+  
+  // Search State
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  
+  // Store Theme State
+  currency: string;
+  brandColor: string;
 }
 
-const CartContext = createContext<CartContextType | undefined>(undefined);
+const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
-export function CartProvider({ children }: { children: ReactNode }) {
+export function StoreProvider({ 
+  children, 
+  currency = "KES", 
+  brandColor = "#000000" 
+}: { 
+  children: ReactNode; 
+  currency?: string; 
+  brandColor?: string; 
+}) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Load cart from local storage
   useEffect(() => {
-    const savedCart = localStorage.getItem("store-cart");
+    const savedCart = localStorage.getItem("orderform-cart");
     if (savedCart) {
       try {
         setCart(JSON.parse(savedCart));
@@ -47,7 +67,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Save cart to local storage
   useEffect(() => {
     if (isLoaded) {
-      localStorage.setItem("store-cart", JSON.stringify(cart));
+      localStorage.setItem("orderform-cart", JSON.stringify(cart));
     }
   }, [cart, isLoaded]);
 
@@ -79,6 +99,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
     });
     setIsCartOpen(true);
+    toast.success("Added to bag");
   };
 
   const removeFromCart = (productId: string, variant?: string) => {
@@ -97,13 +118,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const clearCart = () => setCart([]);
-
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
   const cartTotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   return (
-    <CartContext.Provider
+    <StoreContext.Provider
       value={{
         cart,
         isCartOpen,
@@ -114,18 +133,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
         updateQuantity,
         cartCount,
         cartTotal,
-        clearCart,
+        searchQuery,
+        setSearchQuery,
+        currency,
+        brandColor,
       }}
     >
       {children}
-    </CartContext.Provider>
+    </StoreContext.Provider>
   );
 }
 
-export function useCart() {
-  const context = useContext(CartContext);
+export function useStore() {
+  const context = useContext(StoreContext);
   if (context === undefined) {
-    throw new Error("useCart must be used within a CartProvider");
+    throw new Error("useStore must be used within a StoreProvider");
   }
   return context;
 }

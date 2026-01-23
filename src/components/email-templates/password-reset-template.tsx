@@ -9,22 +9,21 @@ interface PasswordResetEmailProps {
 export default function PasswordResetEmail({
   validationCode = "123456",
 }: PasswordResetEmailProps) {
-  const previewText = `Your OrderForm password reset code: ${validationCode}`;
+  const previewText = `Your password reset code is ${validationCode}. Use this to securely reset your OrderForm password.`;
 
   return (
     <EmailLayout
       preview={previewText}
       title="Reset your password"
-      footerHint="This code expires in 10 minutes. If you didn’t request a password reset, you can ignore this email."
     >
-      <Text className="m-0 mt-3.5 text-[14px] leading-[22px] text-[#404040]">
-        We received a request to reset the password for your account. Enter the code below to continue.
+      <Text className="m-0 text-[16px] leading-[26px] text-black">
+        We received a request to reset your password. Use the code below to securely set a new password.
       </Text>
 
       <CodePill code={validationCode} />
 
-      <Text className="m-0 text-[13px] leading-5 text-[#737373]">
-        For your security, never share this code with anyone.
+      <Text className="m-0 text-[14px] leading-[24px] text-[#525252]">
+        This code will expire in 10 minutes.
       </Text>
     </EmailLayout>
   );
