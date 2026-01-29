@@ -12,23 +12,13 @@ export default async function OnboardingPage() {
     redirect("/login");
   }
 
+  let store;
+
   try {
-    const store = await db.store.findFirst({
+    store = await db.store.findFirst({
       where: { userId: session.user.id },
       include: { deliveryZones: true }
     });
-
-    if (store?.whatsappNumber) {
-      redirect("/dashboard");
-    }
-
-    const initialData = store ? JSON.parse(JSON.stringify(store)) : null;
-
-    return (
-      <div className="animate-in fade-in zoom-in-95 duration-500">
-        <OnboardingWizard initialData={initialData} />
-      </div>
-    );
   } catch (error) {
     console.error("Onboarding DB Error:", error);
     return (
@@ -51,4 +41,16 @@ export default async function OnboardingPage() {
       </div>
     );
   }
+
+  if (store?.whatsappNumber) {
+    redirect("/dashboard");
+  }
+
+  const initialData = store ? JSON.parse(JSON.stringify(store)) : null;
+
+  return (
+    <div className="animate-in fade-in zoom-in-95 duration-500">
+      <OnboardingWizard initialData={initialData} />
+    </div>
+  );
 }

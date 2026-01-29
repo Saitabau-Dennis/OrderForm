@@ -26,6 +26,7 @@ export default async function StoreRootLayout({
       brandColor={store.brandColor || "#000000"}
       storeName={store.name}
       whatsappNumber={store.whatsappNumber || ""}
+      storeId={store.id}
     >
       {children}
       <StoreCart

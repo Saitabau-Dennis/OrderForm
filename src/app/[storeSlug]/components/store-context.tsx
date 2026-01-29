@@ -36,6 +36,7 @@ interface StoreContextType {
   brandColor: string;
   storeName: string;
   whatsappNumber: string;
+  storeId: string;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -45,13 +46,15 @@ export function StoreProvider({
   currency = "KES",
   brandColor = "#000000",
   storeName,
-  whatsappNumber
+  whatsappNumber,
+  storeId
 }: {
   children: ReactNode;
   currency?: string;
   brandColor?: string;
   storeName: string;
   whatsappNumber: string;
+  storeId: string;
 }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -145,7 +148,8 @@ export function StoreProvider({
         currency,
         brandColor,
         storeName,
-        whatsappNumber
+        whatsappNumber,
+        storeId
       }}
     >
       {children}

@@ -71,7 +71,7 @@ export function CheckoutForm({ onSubmit, isLoading, totalAmount, currency, hideS
             {errors.name && <p className="text-xs text-red-500 font-medium">{errors.name.message}</p>}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
                <Label htmlFor="email" className="text-xs font-bold uppercase text-gray-500 tracking-wider">Email</Label>
                <Input

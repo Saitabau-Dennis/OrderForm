@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 export default function CheckoutPage() {
   const { storeSlug } = useParams();
   const router = useRouter();
-  const { cart, cartTotal, currency, brandColor, whatsappNumber } = useStore();
+  const { cart, cartTotal, currency, brandColor, whatsappNumber, storeId } = useStore();
   const [isLoading, setIsLoading] = useState(false);
 
   // If cart is empty, redirect or show empty state
@@ -43,7 +43,7 @@ export default function CheckoutPage() {
 
     try {
       const orderData = {
-        storeId: cart[0].storeId,
+        storeId,
         customerName: data.name,
         customerPhone: data.phone,
         deliveryAddress: data.address,
@@ -84,12 +84,26 @@ export default function CheckoutPage() {
             `*Total: ${currency} ${cartTotal.toLocaleString()}*\n\n` +
             `_Awaiting confirmation via WhatsApp_`;
 
-          const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-          window.open(url, '_blank');
+          // Clean the store's whatsapp number (remove spaces, dashes, etc.)
+          let cleanPhone = whatsappNumber.replace(/\D/g, '');
+          
+          // Handle Kenyan numbers starting with 0
+          if (cleanPhone.startsWith('0')) {
+              cleanPhone = '254' + cleanPhone.substring(1);
+          }
+
+          const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+          
+          // Try opening in new tab, fallback to same tab if blocked (common after async await)
+          const newWindow = window.open(url, '_blank');
+          if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+              window.location.href = url;
+          }
       }
 
     } catch (error) {
-      toast.error("Something went wrong");
+      console.error("Checkout Error:", error);
+      toast.error("Something went wrong. Please try again.");
     } finally {
         setIsLoading(false);
     }

@@ -42,33 +42,32 @@ export default async function DashboardPage() {
       const prevMonthStart = startOfMonth(subMonths(now, 1));
       const startOfToday = startOfDay(now);
 
-      // 1. Revenue Stats (Current vs Previous Month)
-      const currentMonthRevenueAgg = await db.order.aggregate({
+      // Batch 1: Revenue Stats (Max 3 concurrent connections)
+      const [currentMonthRevenueAgg, prevMonthRevenueAgg, totalRevenueAgg] = await Promise.all([
+        db.order.aggregate({
           _sum: { totalAmount: true },
           where: { 
             storeId: store.id,
             status: "completed",
             createdAt: { gte: currentMonthStart }
           }
-      });
-
-      const prevMonthRevenueAgg = await db.order.aggregate({
+        }),
+        db.order.aggregate({
           _sum: { totalAmount: true },
           where: { 
             storeId: store.id,
             status: "completed",
             createdAt: { gte: prevMonthStart, lt: currentMonthStart }
           }
-      });
-
-      // Total Revenue (All time)
-      const totalRevenueAgg = await db.order.aggregate({
+        }),
+        db.order.aggregate({
           _sum: { totalAmount: true },
           where: { 
             storeId: store.id,
             status: "completed"
           }
-      });
+        })
+      ]);
 
       const currentMonthRev = Number(currentMonthRevenueAgg._sum.totalAmount || 0);
       const prevMonthRev = Number(prevMonthRevenueAgg._sum.totalAmount || 0);
@@ -80,23 +79,20 @@ export default async function DashboardPage() {
           revenueChange = 100;
       }
 
-      // 2. Orders Stats
-      const [totalOrders, todayOrders] = await Promise.all([
+      // Batch 2: Counts (Max 4 concurrent connections)
+      const [totalOrders, todayOrders, totalProds, activeProds] = await Promise.all([
         db.order.count({ where: { storeId: store.id } }),
-        db.order.count({ where: { storeId: store.id, createdAt: { gte: startOfToday } } })
-      ]);
-      ordersCount = totalOrders;
-      ordersToday = todayOrders;
-
-      // 3. Products Stats
-      const [totalProds, activeProds] = await Promise.all([
+        db.order.count({ where: { storeId: store.id, createdAt: { gte: startOfToday } } }),
         db.product.count({ where: { storeId: store.id } }),
         db.product.count({ where: { storeId: store.id, isAvailable: true } })
       ]);
+      
+      ordersCount = totalOrders;
+      ordersToday = todayOrders;
       productsCount = totalProds;
       activeProductsCount = activeProds;
       
-      // Fetch recent orders
+      // Batch 3: Recent Data
       const orders = await db.order.findMany({
           where: { storeId: store.id },
           orderBy: { createdAt: 'desc' },
