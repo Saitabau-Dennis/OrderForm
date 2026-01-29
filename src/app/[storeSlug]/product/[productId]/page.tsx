@@ -1,9 +1,7 @@
 import { notFound } from "next/navigation";
 import db from "@/lib/db";
 import { ProductDetails } from "../../components/product-details";
-import { StoreProvider } from "../../components/store-context";
 import { StoreHeader } from "../../components/store-header";
-import { StoreCart } from "../../components/store-cart";
 
 export default async function ProductPage({
   params,
@@ -60,19 +58,13 @@ export default async function ProductPage({
   const serializedSimilar = JSON.parse(JSON.stringify(similarProducts));
 
   return (
-    <StoreProvider 
-        currency={store.currency} 
-        brandColor={store.brandColor || "#000000"}
-    >
-        <div className="min-h-screen bg-white">
-            <StoreHeader name={store.name} logoUrl={store.logoUrl} />
-            <ProductDetails
-                product={serializedProduct}
-                store={serializedStore}
-                similarProducts={serializedSimilar}
-            />
-            <StoreCart storeName={store.name} whatsappNumber={store.whatsappNumber} />
-        </div>
-    </StoreProvider>
+    <div className="min-h-screen bg-white">
+        <StoreHeader name={store.name} logoUrl={store.logoUrl || undefined} />
+        <ProductDetails
+            product={serializedProduct}
+            store={serializedStore}
+            similarProducts={serializedSimilar}
+        />
+    </div>
   );
 }

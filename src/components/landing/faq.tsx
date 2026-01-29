@@ -33,32 +33,31 @@ const faqs = [
 
 export function FAQ() {
   return (
-    <section id="faq" className="py-8 md:py-12 scroll-mt-28 bg-background">
-      <div className="max-w-3xl mx-auto px-6">
-        <ScrollAnimation className="text-center mb-16">
-          <p className="font-heading uppercase tracking-[0.2em] text-sm text-primary mb-4 font-medium">
+    <section id="faq" className="py-16 md:py-24 scroll-mt-28 bg-background relative overflow-hidden">
+      <div className="max-w-3xl mx-auto px-6 relative z-10">
+        <ScrollAnimation className="text-center mb-16 md:mb-20">
+          <p className="font-heading uppercase tracking-[0.2em] text-xs text-primary mb-4 font-medium">
             FAQ
           </p>
-          <h2 className="text-3xl md:text-5xl font-heading font-medium text-foreground mb-6 tracking-tight">
-            Need help? <br className="hidden md:block" />
-            <span className="text-primary">We&apos;ve got you covered.</span>
+          <h2 className="text-2xl md:text-4xl font-heading font-medium text-foreground mb-6 tracking-tight">
+            Need help? <span className="text-primary">We&apos;ve got you covered.</span>
           </h2>
-          <p className="text-lg text-muted-foreground font-sans max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base md:text-lg text-muted-foreground font-sans max-w-2xl mx-auto leading-relaxed">
             Explore answers to common queries and get the information you need to make the most of OrderForm.
           </p>
         </ScrollAnimation>
 
-        <Accordion type="single" collapsible className="w-full space-y-4">
+        <Accordion type="single" collapsible className="w-full">
           {faqs.map((faq, index) => (
-            <ScrollAnimation key={index} delay={index * 0.1}>
+            <ScrollAnimation key={index} delay={index * 0.05}>
               <AccordionItem 
                 value={`item-${index}`} 
-                className="border border-border bg-background rounded-xl px-2 shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-300"
+                className="border-b border-border/60 last:border-0"
               >
-                <AccordionTrigger className="text-base md:text-lg font-heading font-medium text-foreground hover:no-underline hover:text-primary px-4 py-5 text-left [&[data-state=open]]:text-primary transition-colors">
+                <AccordionTrigger className="text-base md:text-lg font-heading font-medium text-foreground hover:no-underline hover:text-primary py-6 text-left [&[data-state=open]]:text-primary transition-colors">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground font-sans font-normal text-base leading-relaxed px-4 pb-5">
+                <AccordionContent className="text-muted-foreground font-sans font-normal text-sm md:text-base leading-relaxed pb-6">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>

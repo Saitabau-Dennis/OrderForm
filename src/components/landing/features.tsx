@@ -10,14 +10,14 @@ export function Features() {
         <section id="features" className="bg-background pt-8 md:pt-12 pb-8 md:pb-12 scroll-mt-28">
             <div className="mx-auto max-w-7xl px-6">
                 <div className="mb-16 text-center max-w-3xl mx-auto">
-                    <p className="font-heading uppercase tracking-[0.2em] text-sm text-primary mb-4 font-medium">
+                    <p className="font-heading uppercase tracking-[0.2em] text-xs text-primary mb-4 font-medium">
                         Features
                     </p>
-                    <h2 className="text-3xl md:text-5xl font-heading font-medium text-foreground leading-[1.1] tracking-tight mb-6">
+                    <h2 className="text-2xl md:text-4xl font-heading font-medium text-foreground leading-[1.1] tracking-tight mb-6">
                         Everything you need <br className="hidden md:block" />
                         to <span className="text-primary">run your store.</span>
                     </h2>
-                    <p className="text-lg md:text-xl text-muted-foreground font-sans leading-relaxed">
+                    <p className="text-base md:text-lg text-muted-foreground font-sans leading-relaxed">
                         OrderForm packs powerful e-commerce tools into a simple interface. From inventory management to automated customer updates, we handle the heavy lifting so you can focus on fulfilling orders.
                     </p>
                 </div>
@@ -32,7 +32,7 @@ export function Features() {
                                 />
                             </CardHeader>
 
-                            <div className="pt-6">
+                            <div className="pt-6 px-6 pb-6">
                                 <DualModeImage
                                     src="/images/dashboard.png"
                                     alt="Store link for your bio"
@@ -51,7 +51,7 @@ export function Features() {
                                 />
                             </CardHeader>
 
-                            <div className="pt-6">
+                            <div className="pt-6 px-6 pb-6">
                                 <DualModeImage
                                     src="/images/dashboard.png"
                                     alt="Inventory Management"
@@ -70,7 +70,7 @@ export function Features() {
                                 />
                             </CardHeader>
 
-                            <div className="pt-6">
+                            <div className="pt-6 px-6 pb-6">
                                 <DualModeImage
                                     src="/images/dashboard.png"
                                     alt="Delivery Zones"
@@ -89,7 +89,7 @@ export function Features() {
                                 />
                             </CardHeader>
 
-                            <div className="pt-6">
+                            <div className="pt-6 px-6 pb-6">
                                 <DualModeImage
                                     src="/images/dashboard.png"
                                     alt="No accounts or apps"
@@ -108,7 +108,7 @@ export function Features() {
                                 />
                             </CardHeader>
 
-                            <div className="pt-6">
+                            <div className="pt-6 px-6 pb-6">
                                 <DualModeImage
                                     src="/images/dashboard.png"
                                     alt="Customer photos and discounts"
@@ -143,12 +143,12 @@ interface CardHeadingProps {
 
 const CardHeading = ({ title, description }: CardHeadingProps) => (
     <div className="p-6">
-        <h3 className="font-heading font-medium text-xl md:text-2xl text-foreground mb-4">
+        <h3 className="font-heading font-medium text-lg md:text-xl text-foreground mb-4">
             {title.split(' ').map((word, i) => (
                 <span key={i} className={i === 0 ? "text-primary" : ""}>{word}{' '}</span>
             ))}
         </h3>
-        <p className="text-base text-muted-foreground font-sans leading-relaxed">{description}</p>
+        <p className="text-sm text-muted-foreground font-sans leading-relaxed">{description}</p>
     </div>
 )
 
@@ -161,11 +161,15 @@ interface DualModeImageProps {
 }
 
 const DualModeImage = ({ src, alt, width, height, className }: DualModeImageProps) => (
-    <img
-        src={src}
-        className={cn('block w-full h-full object-contain object-bottom', className)}
-        alt={alt}
-        width={width}
-        height={height}
-    />
+    <div className="relative group/img overflow-hidden rounded-xl">
+        <img
+            src={src}
+            className={cn('block w-full h-full object-contain object-bottom', className)}
+            alt={alt}
+            width={width}
+            height={height}
+        />
+        {/* Bottom Fade/Blur Effect */}
+        <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-background via-background to-transparent pointer-events-none" />
+    </div>
 )

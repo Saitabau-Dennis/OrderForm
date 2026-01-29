@@ -42,17 +42,17 @@ export function MiniStorePreview() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-12 md:mb-16 max-w-4xl mx-auto">
           <ScrollAnimation variant="fade-up">
-            <p className="font-heading uppercase tracking-[0.2em] text-sm text-primary mb-4 font-medium">
+            <p className="font-heading uppercase tracking-[0.2em] text-xs text-primary mb-4 font-medium">
               Mini store
             </p>
-            <h2 className="text-3xl md:text-5xl font-heading font-medium text-foreground leading-[1.1] tracking-tight">
+            <h2 className="text-2xl md:text-4xl font-heading font-medium text-foreground leading-[1.1] tracking-tight">
               A checkout experience your <br className="hidden md:block" />
                customers will <span className="text-primary">actually love.</span>
             </h2>
           </ScrollAnimation>
 
           <ScrollAnimation variant="fade-up" delay={0.1}>
-            <p className="mt-6 text-lg md:text-xl text-muted-foreground font-sans leading-relaxed">
+            <p className="mt-6 text-base md:text-lg text-muted-foreground font-sans leading-relaxed">
               Fast, visual, and incredibly simple. We've stripped away the clutter of traditional e-commerce to give your social media traffic exactly what they want: a direct path to purchase.
             </p>
           </ScrollAnimation>
@@ -83,23 +83,27 @@ export function MiniStorePreview() {
               >
                 <div className="flex h-full flex-col">
                   <div className="p-8 pb-4 flex-1">
-                    <h3 className="font-heading font-medium text-xl md:text-2xl text-foreground mb-4">
+                    <h3 className="font-heading font-medium text-lg md:text-xl text-foreground mb-4">
                       {item.title.split(' ').map((word, i) => (
                         <span key={i} className={i === 0 ? "text-primary" : ""}>{word}{' '}</span>
                       ))}
                     </h3>
-                    <p className="text-base text-muted-foreground font-sans leading-relaxed">
+                    <p className="text-sm text-muted-foreground font-sans leading-relaxed">
                       {item.description}
                     </p>
                   </div>
 
-                  <div className="pt-6">
-                    <img
-                        src={item.src}
-                        alt={item.alt}
-                        className="w-full h-auto block bg-background"
-                        loading="lazy"
-                    />
+                  <div className="pt-6 px-6 pb-6">
+                    <div className="relative group/img overflow-hidden rounded-xl">
+                        <img
+                            src={item.src}
+                            alt={item.alt}
+                            className="block w-full h-full object-contain object-bottom"
+                            loading="lazy"
+                        />
+                        {/* Bottom Fade/Blur Effect */}
+                        <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-background via-background to-transparent pointer-events-none" />
+                    </div>
                   </div>
                 </div>
               </div>

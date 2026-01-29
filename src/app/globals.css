@@ -225,5 +225,5 @@ html {
   stroke-dashoffset: 220;
   animation: shooting-star 3s linear infinite;
   stroke-linecap: round;
-  filter: drop-shadow(0 0 6px #22C55E);
+  filter: drop-shadow(0 0 6px #00311F);
 }

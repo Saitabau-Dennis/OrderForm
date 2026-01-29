@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Eye, EyeOff, LockKeyhole, ShieldCheck, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
-import { resetPassword } from "@/lib/actions/auth";
+import { resetPassword, verifyResetCode } from "@/lib/actions/auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { OTPInput } from "@/components/ui/otp-input";
@@ -17,6 +17,7 @@ function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
 
+  const [step, setStep] = useState(1);
   const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -24,6 +25,33 @@ function ResetPasswordForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  const handleVerifyCode = useCallback(async (verificationCode: string) => {
+    if (!email) return;
+    setLoading(true);
+    try {
+      const res = await verifyResetCode(email, verificationCode);
+      if (res.error) {
+        toast.error(res.error);
+        setLoading(false);
+        setCode(""); // Clear invalid code
+      } else {
+        toast.success("Code verified");
+        setStep(2);
+        setLoading(false);
+      }
+    } catch (error) {
+      toast.error("Failed to verify code");
+      setLoading(false);
+    }
+  }, [email]);
+
+  // Auto-verify code when it reaches length 6
+  useEffect(() => {
+    if (code.length === 6 && step === 1) {
+      handleVerifyCode(code);
+    }
+  }, [code, step, handleVerifyCode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,19 +103,29 @@ function ResetPasswordForm() {
 
   if (success) {
     return (
-      <div className="text-center animate-in fade-in zoom-in-95 duration-500">
-        <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-green-100">
-          <ShieldCheck className="w-10 h-10 text-green-600" />
+      <div className="text-center animate-in fade-in zoom-in-95 duration-500 max-w-sm mx-auto">
+        <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8 shadow-[0_0_0_8px_rgba(34,197,94,0.1)] border-4 border-white">
+          <div className="w-full h-full rounded-full flex items-center justify-center animate-in zoom-in duration-300 delay-150">
+             <ShieldCheck className="w-12 h-12 text-green-600 stroke-[2.5]" />
+          </div>
         </div>
-        <h2 className="font-instrument-serif text-2xl font-bold text-foreground mb-4">
-          Password Reset!
+        
+        <h2 className="font-instrument-serif text-3xl font-bold text-foreground mb-4 tracking-tight">
+          All Secure!
         </h2>
-        <p className="font-instrument-sans text-muted-foreground text-lg mb-8 max-w-[300px] mx-auto">
-          Your account is now secure. You can log in with your new password.
-        </p>
+        
+        <div className="space-y-2 mb-10">
+            <p className="font-instrument-sans text-muted-foreground text-lg">
+            Your password has been successfully reset.
+            </p>
+            <p className="text-sm text-muted-foreground/80">
+                You can now log in with your new credentials.
+            </p>
+        </div>
+
         <Link href="/login">
-          <Button className="w-full h-12 text-base rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all">
-            Back to Login <ArrowRight className="w-4 h-4 ml-2" />
+          <Button className="w-full h-14 text-base font-medium rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all group">
+            Back to Login <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
         </Link>
       </div>
@@ -101,89 +139,108 @@ function ResetPasswordForm() {
           <LockKeyhole className="w-6 h-6" />
         </div>
         <h2 className="font-instrument-serif text-2xl text-foreground mb-2">
-          Reset Password
+          {step === 1 ? "Enter Code" : "Reset Password"}
         </h2>
         <p className="font-instrument-sans text-muted-foreground">
-          Enter the code sent to <span className="font-medium text-foreground">{email}</span> and your new password.
+          {step === 1 
+            ? <span>Enter the verification code sent to <span className="font-medium text-foreground">{email}</span></span>
+            : "Create a new strong password for your account."
+          }
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="space-y-2">
-          <Label htmlFor="code">Verification Code</Label>
-          <OTPInput value={code} onChange={setCode} length={6} />
-        </div>
-
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="password">New Password</Label>
-            <div className="relative group">
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="h-12 rounded-xl bg-muted/50 border-border focus:bg-background transition-all pr-10 group-hover:bg-muted/80"
-                required
+        {step === 1 && (
+          <div className="space-y-4">
+            <div className="flex justify-center">
+              <OTPInput 
+                value={code} 
+                onChange={setCode} 
+                length={6} 
+                disabled={loading}
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
-              >
-                {showPassword ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
-                  <Eye className="w-5 h-5" />
-                )}
-              </button>
             </div>
+            {loading && (
+              <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm animate-pulse">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Verifying code...</span>
+              </div>
+            )}
           </div>
+        )}
 
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm New Password</Label>
-            <div className="relative group">
-              <Input
-                id="confirmPassword"
-                type={showConfirmPassword ? "text" : "password"}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="••••••••"
-                className="h-12 rounded-xl bg-muted/50 border-border focus:bg-background transition-all pr-10 group-hover:bg-muted/80"
-                required
-              />
-              <button
-                type="button"
-                onClick={() =>
-                  setShowConfirmPassword(!showConfirmPassword)
-                }
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
-              >
-                {showConfirmPassword ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
-                  <Eye className="w-5 h-5" />
-                )}
-              </button>
+        {step === 2 && (
+          <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="space-y-2">
+              <Label htmlFor="password">New Password</Label>
+              <div className="relative group">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="********"
+                  className="h-12 rounded-xl bg-muted/50 border-border focus:bg-background transition-all pr-10 group-hover:bg-muted/80"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <Button
-          type="submit"
-          disabled={loading || code.length < 6 || !password}
-          className="w-full h-12 text-base rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
-        >
-          {loading ? (
-            <span className="flex items-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Resetting...
-            </span>
-          ) : (
-            "Reset Password"
-          )}
-        </Button>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm New Password</Label>
+              <div className="relative group">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="********"
+                  className="h-12 rounded-xl bg-muted/50 border-border focus:bg-background transition-all pr-10 group-hover:bg-muted/80"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowConfirmPassword(!showConfirmPassword)
+                  }
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              disabled={loading || !password}
+              className="w-full h-12 text-base rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+            >
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Resetting...
+                </span>
+              ) : (
+                "Reset Password"
+              )}
+            </Button>
+          </div>
+        )}
       </form>
     </div>
   );
@@ -211,7 +268,7 @@ export default function ResetPasswordPage() {
 
         <div className="relative z-10">
           <p className="font-instrument-sans text-primary-foreground/50 text-sm">
-            © 2026 Orderform. All rights reserved.
+            &copy; 2026 Orderform. All rights reserved.
           </p>
         </div>
 

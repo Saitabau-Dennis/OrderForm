@@ -62,7 +62,7 @@ export default function LoginPage() {
 
         <div className="relative z-10">
           <p className="font-instrument-sans text-primary-foreground/50 text-sm">
-            © 2026 Orderform. All rights reserved.
+            &copy; 2026 Orderform. All rights reserved.
           </p>
         </div>
 

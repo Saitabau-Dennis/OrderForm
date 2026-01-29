@@ -37,12 +37,12 @@ export default async function SharePage({
         brandColor={store.brandColor || "#000000"}
     >
         <div className="min-h-screen bg-white">
-            <StoreHeader name={store.name} logoUrl={store.logoUrl} />
+            <StoreHeader name={store.name} logoUrl={store.logoUrl || undefined} />
             <ShareClient
                 store={serializedStore}
                 products={serializedProducts}
             />
-            <StoreCart storeName={store.name} whatsappNumber={store.whatsappNumber} />
+            <StoreCart storeName={store.name} whatsappNumber={store.whatsappNumber || ""} storeId={store.id} />
         </div>
     </StoreProvider>
   );

@@ -17,6 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { formatOrderId } from "@/lib/utils";
 
 interface OrderDetailsProps {
   order: any;
@@ -46,6 +47,7 @@ export function OrderDetails({ order, onUpdateStatus }: OrderDetailsProps) {
       case "processing": return <Package className="h-4 w-4" />;
       case "shipped": return <Truck className="h-4 w-4" />;
       case "delivered": return <CheckCircle className="h-4 w-4" />;
+      case "completed": return <CheckCircle className="h-4 w-4 text-green-600" />;
       case "cancelled": return <XCircle className="h-4 w-4" />;
       default: return <Clock className="h-4 w-4" />;
     }
@@ -55,12 +57,12 @@ export function OrderDetails({ order, onUpdateStatus }: OrderDetailsProps) {
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between py-4">
         <div className="space-y-1">
-          <h3 className="font-semibold text-lg">Order #{order._id.substring(order._id.length - 6).toUpperCase()}</h3>
+          <h3 className="font-semibold text-lg">{order.displayId ?? formatOrderId(order.orderNumber ?? order.id)}</h3>
           <p className="text-sm text-muted-foreground">
             Placed on {format(new Date(order.createdAt), "PPP p")}
           </p>
         </div>
-        <Badge variant="outline" className="capitalize flex gap-2 items-center px-3 py-1">
+        <Badge variant={status === "completed" ? "default" : "outline"} className="capitalize flex gap-2 items-center px-3 py-1">
           {getStatusIcon(status)}
           {status}
         </Badge>
@@ -86,6 +88,7 @@ export function OrderDetails({ order, onUpdateStatus }: OrderDetailsProps) {
                 <SelectItem value="processing">Processing</SelectItem>
                 <SelectItem value="shipped">Shipped</SelectItem>
                 <SelectItem value="delivered">Delivered</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
                 <SelectItem value="cancelled">Cancelled</SelectItem>
               </SelectContent>
             </Select>
@@ -123,7 +126,7 @@ export function OrderDetails({ order, onUpdateStatus }: OrderDetailsProps) {
                       <p className="font-medium">{item.name}</p>
                       <p className="text-muted-foreground">
                         {item.quantity} x KES {item.price.toLocaleString()}
-                        {item.variant && ` • ${item.variant}`}
+                        {item.variant && ` - ${item.variant}`}
                       </p>
                     </div>
                     <p className="font-medium">
@@ -158,7 +161,11 @@ export function OrderDetails({ order, onUpdateStatus }: OrderDetailsProps) {
       </ScrollArea>
 
       <div className="pt-4 mt-auto border-t">
-        <Button className="w-full" variant="outline" onClick={() => window.print()}>
+        <Button 
+          className="w-full rounded-xl shadow-sm hover:shadow-md transition-all duration-200" 
+          variant="outline" 
+          onClick={() => window.print()}
+        >
           Print Invoice
         </Button>
       </div>

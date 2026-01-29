@@ -15,9 +15,9 @@ export default async function StorePage({ params }: { params: Promise<{ storeSlu
   }
 
   const products = await db.product.findMany({
-      where: { 
+      where: {
           storeId: store.id,
-          isAvailable: true 
+          isAvailable: true
       }
   });
 

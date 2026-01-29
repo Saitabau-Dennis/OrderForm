@@ -43,21 +43,21 @@ export function HowItWorks() {
           {/* Left Column - Content */}
           <div className="lg:sticky lg:top-32 self-start space-y-8 text-center lg:text-left">
             <div className="space-y-4">
-              <p className="font-heading uppercase tracking-[0.2em] text-sm text-primary mb-4 font-medium">
+              <p className="font-heading uppercase tracking-[0.2em] text-xs text-primary mb-4 font-medium">
                 How It Works
               </p>
-              <h2 className="text-3xl md:text-5xl font-medium tracking-tight font-heading leading-[1.1]">
+              <h2 className="text-2xl md:text-4xl font-medium tracking-tight font-heading leading-[1.1]">
                 From link to <br/>
                 <span className="text-primary">order in seconds.</span>
               </h2>
-              <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-md mx-auto lg:mx-0 font-sans">
+              <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-md mx-auto lg:mx-0 font-sans">
                 Stop going back and forth in DMs. Give your customers a professional shopping experience without the complexity of a full website.
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Link href="/register">
-                <Button size="lg" className="rounded-full px-8 h-12 text-base shadow-lg hover:shadow-xl transition-all font-sans w-full sm:w-auto">
+                <Button size="lg" className="rounded-full px-8 h-12 text-sm md:text-base shadow-lg hover:shadow-xl transition-all font-sans w-full sm:w-auto">
                   Start Selling Now
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
@@ -82,12 +82,12 @@ export function HowItWorks() {
                 }}
               >
                 <Card className={cn(
-                  "overflow-hidden border border-border/80 shadow-2xl transition-all hover:scale-[1.02] font-sans", 
+                  "overflow-hidden border border-border/80 shadow-2xl transition-all hover:scale-[1.02] font-sans p-2 md:p-4", 
                   "bg-background"
                 )}>
                   <CardHeader className="pb-4">
-                    <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center mb-4 border", step.color)}>
-                      <step.icon className="w-6 h-6" />
+                    <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center mb-6 border", step.color)}>
+                      <step.icon className="w-7 h-7" />
                     </div>
                     <CardTitle className="text-xl md:text-2xl font-medium font-heading">{step.title}</CardTitle>
                   </CardHeader>

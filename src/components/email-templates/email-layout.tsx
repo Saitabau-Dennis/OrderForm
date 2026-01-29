@@ -4,6 +4,7 @@ import {
   Head,
   Heading,
   Html,
+  Img,
   Preview,
   Section,
   Text,
@@ -35,14 +36,7 @@ export function EmailLayout({ preview, title, children }: EmailLayoutProps) {
       <Tailwind>
         <Body className="mx-auto font-sans antialiased" style={{ backgroundColor: EMAIL_THEME.colors.background }}>
           <Container className="mx-auto my-[40px] max-w-[465px] p-[20px]">
-            <Section className="mt-[32px]">
-              <Text
-                className="m-0 text-[24px] font-bold tracking-tight"
-                style={{ color: EMAIL_THEME.colors.foreground }}
-              >
-                OrderForm
-              </Text>
-            </Section>
+
             
             <Heading
               className="mx-0 my-[30px] p-0 text-[30px] font-semibold text-black tracking-tight"

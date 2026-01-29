@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { Mail, Instagram, Facebook, Twitter, ArrowRight } from "lucide-react"
 
 export function Footer() {
@@ -12,8 +13,18 @@ export function Footer() {
             
             {/* Left Section: Brand & Tagline */}
             <div className="flex flex-col items-start max-w-sm">
-                <Link href="/" className="font-heading text-3xl font-bold tracking-tight text-foreground mb-4">
-                    Order<span className="text-primary">Form</span>
+                <Link href="/" className="flex items-center gap-0.5 font-heading text-xl font-bold tracking-tight text-foreground mb-4">
+                    <div className="relative w-10 h-10 md:w-11 md:h-11">
+                        <Image 
+                            src="/images/logo.png" 
+                            alt="OrderForm Logo" 
+                            fill
+                            className="object-contain"
+                        />
+                    </div>
+                    <span className="font-(family-name:--font-instrument-serif) text-xl md:text-2xl font-normal text-primary tracking-tight italic">
+                        Order<span className="text-primary/80">Form</span>
+                    </span>
                 </Link>
                 <p className="text-muted-foreground font-sans text-lg leading-relaxed text-left">
                     Simplifying commerce for the modern entrepreneur. Turn social conversations into paid orders.
@@ -55,7 +66,7 @@ export function Footer() {
         {/* Bottom Section: Copyright & Legal - Centered */}
         <div className="flex flex-col items-center justify-center gap-4 pt-8 border-t border-border text-center">
             <p className="text-sm text-muted-foreground">
-                © {new Date().getFullYear()} OrderForm Inc. All rights reserved.
+                &copy; {new Date().getFullYear()} OrderForm Inc. All rights reserved.
             </p>
             <div className="flex gap-6">
                  <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Privacy Policy</Link>

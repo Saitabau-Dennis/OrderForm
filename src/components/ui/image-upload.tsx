@@ -4,15 +4,17 @@ import React, { useState, useRef, useEffect } from 'react';
 import { UploadCloud, X, Loader2 } from "lucide-react";
 import { useUploadThing } from "@/lib/uploadthing";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface ImageUploadProps {
   value?: string;
   onChange?: (value: string) => void;
   disabled?: boolean;
   endpoint?: "imageUploader" | "productImage";
+  className?: string;
 }
 
-export function ImageUpload({ value, onChange, disabled, endpoint = "imageUploader" }: ImageUploadProps) {
+export function ImageUpload({ value, onChange, disabled, endpoint = "imageUploader", className }: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(value || null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -82,7 +84,7 @@ export function ImageUpload({ value, onChange, disabled, endpoint = "imageUpload
   };
 
   return (
-    <div className="w-full">
+    <div className={cn("w-full h-full", className)}>
       <input
         id="image-upload"
         type="file"
@@ -94,25 +96,25 @@ export function ImageUpload({ value, onChange, disabled, endpoint = "imageUpload
       />
 
       {preview ? (
-        <div className="relative w-full h-48 rounded-lg overflow-hidden border border-border group">
+        <div className="relative w-full h-full overflow-hidden border border-primary group rounded-none">
           <img
             src={preview}
             alt="Preview"
             className={`w-full h-full object-cover transition-transform group-hover:scale-105 ${isUploading ? 'opacity-50' : ''}`}
           />
           {isUploading && (
-             <div className="absolute inset-0 flex items-center justify-center">
+             <div className="absolute inset-0 flex items-center justify-center bg-white/50">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
              </div>
           )}
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+          <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
             {!isUploading && (
              <button
               onClick={handleRemoveImage}
-              className="bg-destructive text-destructive-foreground rounded-full p-2 hover:bg-destructive/90 transition-colors"
+              className="bg-red-500 text-white p-2 hover:bg-red-600 transition-colors rounded-none"
               title="Remove image"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4" />
             </button>
             )}
           </div>
@@ -122,34 +124,33 @@ export function ImageUpload({ value, onChange, disabled, endpoint = "imageUpload
           onClick={() => !disabled && !isUploading && fileInputRef.current?.click()}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
-          className={`
-            flex flex-col items-center justify-center w-full h-48
-            border-2 border-dashed rounded-lg cursor-pointer
-            transition-all duration-200
-            ${(disabled || isUploading)
-              ? 'opacity-50 cursor-not-allowed border-muted-foreground/20 bg-muted/10'
-              : 'border-muted-foreground/25 hover:border-primary/50 hover:bg-primary/5'
-            }
-          `}
+          className={cn(
+            "flex flex-col items-center justify-center w-full h-full border border-dashed cursor-pointer transition-all duration-200 rounded-none bg-secondary/10",
+            (disabled || isUploading)
+              ? "opacity-50 cursor-not-allowed border-primary/20"
+              : "border-primary/40 hover:border-primary hover:bg-primary/5"
+          )}
         >
           {isUploading ? (
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
           ) : (
-            <>
-              <div className="p-4 rounded-full bg-background shadow-sm mb-3 group-hover:scale-110 transition-transform">
-                <UploadCloud className="h-6 w-6 text-muted-foreground" />
+            <div className="flex flex-col items-center gap-2 p-4 text-center">
+              <div className="p-3 bg-white border border-primary/10 shadow-sm group-hover:scale-110 transition-transform rounded-none">
+                <UploadCloud className="h-5 w-5 text-primary" />
               </div>
-              <p className="text-sm font-medium text-foreground">
-                Click to upload or drag and drop
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                SVG, PNG, JPG or GIF (max. 2MB)
-              </p>
-            </>
+              <div className="space-y-1">
+                <p className="text-xs font-bold uppercase tracking-wider text-primary">
+                  Upload Logo
+                </p>
+                <p className="text-[10px] text-muted-foreground hidden sm:block">
+                  Drag & drop or click
+                </p>
+              </div>
+            </div>
           )}
         </div>
       )}
     </div>
   );
 }
-ImageUpload.displayName = "ImageUpload"
+ImageUpload.displayName = "ImageUpload";

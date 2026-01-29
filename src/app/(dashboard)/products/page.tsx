@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ProductsPage() {
+  await new Promise((resolve) => setTimeout(resolve, 3000));
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -32,7 +33,7 @@ export default async function ProductsPage() {
   }
 
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
+    <div className="animate-appear">
       <ProductsClient initialProducts={productsData} />
     </div>
   );

@@ -19,8 +19,13 @@ export default async function DashboardLayout({
       where: { userId: session.user.id }
   });
 
+  if (store && !store.whatsappNumber) {
+    redirect("/onboarding");
+  }
+
   const storeData = store
     ? {
+        name: store.name,
         slug: store.slug,
         configured: !!store.whatsappNumber,
       }

@@ -52,7 +52,7 @@ export default function ForgotPasswordPage() {
 
         <div className="relative z-10">
           <p className="font-instrument-sans text-primary-foreground/50 text-sm">
-            © 2024 Orderform. All rights reserved.
+            &copy; 2024 Orderform. All rights reserved.
           </p>
         </div>
 

@@ -113,6 +113,7 @@ model Product {
 model Order {
   id              String   @id @default(cuid())
   orderNumber     Int      @default(autoincrement()) 
+  displayId       String?  @unique
   
   customerName    String
   customerPhone   String

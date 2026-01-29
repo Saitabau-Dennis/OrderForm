@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
@@ -67,17 +68,25 @@ export function Navbar() {
   }
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4 pt-0 pb-0">
+    <div className="w-full z-50 flex justify-center px-4 py-1.5 md:py-2 bg-white">
       <nav
-        className="flex items-center justify-between w-full max-w-5xl rounded-t-none rounded-b-xl bg-primary border border-t-0 border-primary/20 shadow-xl py-4 pl-5 pr-2.5"
+        className="flex items-center justify-between w-full max-w-7xl py-1 px-2"
       >
         <Link 
             href="/" 
-            className="flex items-center gap-2 relative z-10 shrink-0" 
+            className="flex items-center gap-0.5 relative z-10 shrink-0" 
             onClick={() => setIsMobileMenuOpen(false)}
         >
-            <span className="font-(family-name:--font-outfit) text-xl font-bold text-primary-foreground tracking-tighter">
-            Order<span className="text-primary-foreground/80">Form</span>
+            <div className="relative w-10 h-10 md:w-11 md:h-11">
+              <Image 
+                src="/images/logo.png" 
+                alt="OrderForm Logo" 
+                fill
+                className="object-contain"
+              />
+            </div>
+            <span className="font-(family-name:--font-instrument-serif) text-xl md:text-2xl font-normal text-primary tracking-tight italic">
+            Order<span className="text-primary/80">Form</span>
             </span>
         </Link>
 
@@ -87,7 +96,7 @@ export function Navbar() {
             
             <div className="relative group">
                 <button 
-                    className="flex items-center gap-1 relative px-4 py-2 text-sm font-medium text-primary-foreground/80 hover:text-primary-foreground transition-colors rounded-full hover:bg-white/10 cursor-pointer outline-none"
+                    className="flex items-center gap-1 relative px-4 py-2 text-sm font-medium text-foreground/70 hover:text-primary transition-colors rounded-full hover:bg-gray-50 cursor-pointer outline-none"
                     onClick={(e) => handleScroll(e as any, "#features")}
                 >
                     Features
@@ -96,7 +105,7 @@ export function Navbar() {
                 
                 {/* Dropdown Content */}
                 <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 w-72 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top scale-95 group-hover:scale-100">
-                    <div className="bg-primary rounded-none shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-primary/20 overflow-hidden p-3">
+                    <div className="bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden p-3 backdrop-blur-xl">
                         <FeatureItem 
                             href="#features" 
                             title="Store Link" 
@@ -134,14 +143,14 @@ export function Navbar() {
             <Link 
                 href={session ? "/dashboard" : "/login"}
                 target="_blank"
-                className="hidden md:block text-sm font-medium text-primary-foreground/90 hover:text-primary-foreground transition-colors px-3"
+                className="hidden md:block text-sm font-medium text-foreground/70 hover:text-primary transition-colors px-4"
             >
             Log in
             </Link>
             <Link href={session ? "/dashboard" : "/register"} target="_blank" className="hidden md:block">
                 <Button 
                     size="sm"
-                    className="rounded-full font-medium shadow-md hover:shadow-lg transition-all h-9 px-5 bg-white text-primary hover:bg-white/90"
+                    className="rounded-full font-semibold shadow-md hover:shadow-lg transition-all h-9 md:h-10 px-6 bg-primary text-white hover:bg-primary/90 border-0"
                 >
                     Get Started
                 </Button>
@@ -150,15 +159,25 @@ export function Navbar() {
             {/* Mobile Menu */}
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden relative z-50 rounded-full text-primary-foreground hover:bg-white/10">
+                <Button variant="ghost" size="icon" className="md:hidden relative z-50 rounded-full text-foreground hover:bg-gray-100">
                    <Menu className="h-5 w-5" />
                 </Button>
             </SheetTrigger>
             <SheetContent side="right" className=" w-[85vw] max-w-xs p-0 flex flex-col border-l border-border/50 bg-background/95 backdrop-blur-xl">
                 <SheetHeader className="px-6 pt-8 pb-4 text-left border-b border-border/10">
-                <SheetTitle className="font-(family-name:--font-outfit) tracking-tighter text-2xl">
-                    Order<span className="text-primary">Form</span>
-                </SheetTitle>
+                <div className="flex items-center gap-2 mb-2">
+                    <div className="relative w-12 h-12">
+                        <Image 
+                            src="/images/logo.png" 
+                            alt="OrderForm Logo" 
+                            fill
+                            className="object-contain"
+                        />
+                    </div>
+                    <SheetTitle className="font-(family-name:--font-outfit) tracking-tighter text-2xl mb-0">
+                        Order<span className="text-primary">Form</span>
+                    </SheetTitle>
+                </div>
                 <p className="text-sm text-muted-foreground mt-1">
                     Turn social traffic into clean WhatsApp orders.
                 </p>
@@ -201,7 +220,7 @@ function NavLink({ href, onClick, children }: { href: string, onClick?: (e: Reac
         <a 
             href={href}
             onClick={onClick}
-            className="relative px-4 py-2 text-sm font-medium text-primary-foreground/80 hover:text-primary-foreground transition-colors rounded-full hover:bg-white/10 cursor-pointer"
+            className="relative px-4 py-2 text-sm font-medium text-foreground/70 hover:text-primary transition-all rounded-full hover:bg-gray-50 cursor-pointer"
         >
             {children}
         </a>
@@ -213,7 +232,7 @@ function MobileNavLink({ href, onClick, children }: { href: string, onClick: (e:
       <a
         href={href}
         onClick={onClick}
-        className="flex items-center justify-between p-4 rounded-xl hover:bg-muted/60 active:bg-muted transition-all group cursor-pointer"
+        className="flex items-center justify-between p-4 rounded-2xl hover:bg-muted/60 active:bg-muted transition-all group cursor-pointer"
       >
         <span className="text-base font-medium text-foreground/90 group-hover:text-primary transition-colors">{children}</span>
         <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
@@ -226,10 +245,10 @@ function FeatureItem({ href, title, description, onClick }: { href: string, titl
         <a 
             href={href}
             onClick={onClick}
-            className="flex flex-col gap-0.5 p-3 rounded-none hover:bg-white/10 transition-all group/item"
+            className="flex flex-col gap-0.5 p-3 rounded-xl hover:bg-gray-50 transition-all group/item"
         >
-            <span className="text-sm font-semibold text-primary-foreground group-hover/item:text-primary-foreground transition-colors">{title}</span>
-            <span className="text-xs text-primary-foreground/70 leading-normal">{description}</span>
+            <span className="text-sm font-semibold text-foreground group-hover/item:text-primary transition-colors">{title}</span>
+            <span className="text-xs text-muted-foreground leading-normal">{description}</span>
         </a>
     )
 }

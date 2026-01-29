@@ -4,8 +4,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { ProductForm } from "@/components/dashboard/product-form";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { ProductWizard } from "@/components/dashboard/product-wizard";
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -16,17 +15,20 @@ export default function NewProductPage() {
   };
 
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
-      <div className="flex items-center space-x-4">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
+    <div className="max-w-7xl mx-auto space-y-6 animate-appear">
+      <div className="flex items-center gap-4 mb-6">
+        <Button 
+            variant="ghost" 
+            size="sm" 
+            className="gap-2 text-muted-foreground hover:text-primary" 
+            onClick={() => router.back()}
+        >
           <ArrowLeft className="h-4 w-4" />
+          Back to Products
         </Button>
-        <h2 className="text-3xl font-bold tracking-tight font-sans">Add New Product</h2>
       </div>
 
-      <div className="mt-4">
-        <ProductForm onSuccess={handleSuccess} />
-      </div>
+      <ProductWizard onSuccess={handleSuccess} />
     </div>
   );
 }

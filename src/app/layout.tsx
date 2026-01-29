@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Sora, Outfit, Signika, DM_Sans } from "next/font/google";
+import { Inter, Sora, Outfit, Signika, DM_Sans, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 
@@ -8,6 +8,12 @@ const sora = Sora({ subsets: ["latin"], variable: "--font-sora" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 const signika = Signika({ subsets: ["latin"], variable: "--font-signika" });
 const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-dm-sans" });
+const instrumentSerif = Instrument_Serif({ 
+  weight: "400", 
+  subsets: ["latin"], 
+  style: "italic",
+  variable: "--font-instrument-serif" 
+});
 
 
 export const metadata: Metadata = {
@@ -25,8 +31,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${sora.variable} ${outfit.variable} ${signika.variable} ${dmSans.variable} font-sans antialiased`}>
-        <NextTopLoader color="#22c55e" showSpinner={false} />
+      <body className={`${inter.variable} ${sora.variable} ${outfit.variable} ${signika.variable} ${dmSans.variable} ${instrumentSerif.variable} font-sans antialiased`}>
+        <NextTopLoader color="#00311F" showSpinner={false} height={4} shadow="0 0 10px #00311F,0 0 5px #00311F" />
         <Providers>
           {children}
         </Providers>

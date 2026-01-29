@@ -6,8 +6,7 @@ import { StoreHeader } from "./store-header";
 import { StoreHero } from "./store-hero";
 import { CategoryFilter } from "./category-filter";
 import { ProductCard } from "./product-card";
-import { StoreCart } from "./store-cart";
-import { StoreProvider, useStore } from "./store-context";
+import { useStore } from "./store-context";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
@@ -16,7 +15,7 @@ interface StoreLayoutProps {
   products: any[];
 }
 
-function StoreContent({ store, products }: StoreLayoutProps) {
+export function StoreContent({ store, products }: StoreLayoutProps) {
   const { searchQuery, setSearchQuery, brandColor } = useStore();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const params = useParams();
@@ -29,22 +28,22 @@ function StoreContent({ store, products }: StoreLayoutProps) {
     const nameMatch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
     const descMatch = product.description?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSearch = nameMatch || descMatch;
-    
+
     const matchesCategory = selectedCategory ? product.category === selectedCategory : true;
     return matchesSearch && matchesCategory;
   });
 
   return (
     <div className="min-h-screen bg-white">
-      <StoreHeader name={store.name} logoUrl={store.logoUrl} />
-      
+      <StoreHeader name={store.name} logoUrl={store.logoUrl || undefined} />
+
       <main>
         <StoreHero name={store.name} description={store.description} />
 
         {/* Stunning Share & Earn Banner */}
         <div className="container mx-auto px-4 md:px-6 mb-16">
             <Link href={`/${params.storeSlug}/share`}>
-                <div 
+                <div
                     className="group relative overflow-hidden rounded-[2rem] p-8 md:p-12 duration-500 border border-gray-100 shadow-sm"
                     style={{ backgroundColor: `${brandColor}08` }}
                 >
@@ -60,7 +59,7 @@ function StoreContent({ store, products }: StoreLayoutProps) {
                                 Upload a photo of your purchase and get featured in our gallery. {store.rewardConfig?.isEnabled && "Plus, get an exclusive discount for your next order."}
                             </p>
                         </div>
-                        <div 
+                        <div
                             className="h-14 px-10 rounded-full text-sm font-bold uppercase tracking-widest text-white shadow-xl transition-all flex items-center justify-center gap-2"
                             style={{ backgroundColor: brandColor }}
                         >
@@ -68,7 +67,7 @@ function StoreContent({ store, products }: StoreLayoutProps) {
                             <Sparkles className="h-4 w-4" />
                         </div>
                     </div>
-                    
+
                     {/* Decorative Elements */}
                     <div className="absolute top-0 right-0 -mr-20 -mt-20 h-64 w-64 rounded-full opacity-[0.03] blur-3xl" style={{ backgroundColor: brandColor }} />
                     <div className="absolute bottom-0 left-0 -ml-20 -mb-20 h-64 w-64 rounded-full opacity-[0.03] blur-3xl" style={{ backgroundColor: brandColor }} />
@@ -92,7 +91,7 @@ function StoreContent({ store, products }: StoreLayoutProps) {
                       className="w-full h-11 pl-10 pr-10 bg-gray-50 border border-gray-100 rounded-xl text-sm placeholder:text-gray-400 focus:outline-none focus:bg-white transition-all shadow-sm focus:shadow-md"
                   />
                   {searchQuery && (
-                      <button 
+                      <button
                           onClick={() => setSearchQuery("")}
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-900 transition-colors p-1"
                       >
@@ -133,8 +132,6 @@ function StoreContent({ store, products }: StoreLayoutProps) {
         </div>
       </main>
 
-      <StoreCart storeName={store.name} whatsappNumber={store.whatsappNumber} />
-      
       <footer className="py-12 border-t border-gray-100 bg-white">
           <div className="container mx-auto px-4 text-center">
               <h2 className="text-base font-bold text-gray-900 font-sora mb-2">{store.name}</h2>
@@ -149,11 +146,6 @@ function StoreContent({ store, products }: StoreLayoutProps) {
 
 export function StoreLayout({ store, products }: StoreLayoutProps) {
   return (
-    <StoreProvider 
-        currency={store.currency} 
-        brandColor={store.brandColor || "#000000"}
-    >
-      <StoreContent store={store} products={products} />
-    </StoreProvider>
+    <StoreContent store={store} products={products} />
   );
 }

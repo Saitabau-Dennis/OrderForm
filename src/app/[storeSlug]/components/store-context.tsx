@@ -25,26 +25,33 @@ interface StoreContextType {
   updateQuantity: (productId: string, delta: number, variant?: string) => void;
   cartCount: number;
   cartTotal: number;
-  
+
   // Search State
   searchQuery: string;
   setSearchQuery: (query: string) => void;
-  
+
+  // Store Theme State
   // Store Theme State
   currency: string;
   brandColor: string;
+  storeName: string;
+  whatsappNumber: string;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
-export function StoreProvider({ 
-  children, 
-  currency = "KES", 
-  brandColor = "#000000" 
-}: { 
-  children: ReactNode; 
-  currency?: string; 
-  brandColor?: string; 
+export function StoreProvider({
+  children,
+  currency = "KES",
+  brandColor = "#000000",
+  storeName,
+  whatsappNumber
+}: {
+  children: ReactNode;
+  currency?: string;
+  brandColor?: string;
+  storeName: string;
+  whatsappNumber: string;
 }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -137,6 +144,8 @@ export function StoreProvider({
         setSearchQuery,
         currency,
         brandColor,
+        storeName,
+        whatsappNumber
       }}
     >
       {children}

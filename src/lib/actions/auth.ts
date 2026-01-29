@@ -99,6 +99,33 @@ export const sendPasswordResetCode = async (email: string) => {
   }
 };
 
+export const verifyResetCode = async (email: string, code: string) => {
+  try {
+    const user = await db.user.findFirst({
+      where: {
+        email,
+        resetTokenExpiry: { gt: new Date() }
+      }
+    });
+
+    if (!user || !user.resetToken) {
+      return { error: "Invalid or expired code" };
+    }
+
+    // Verify the token
+    const isValid = await bcrypt.compare(code, user.resetToken);
+
+    if (!isValid) {
+      return { error: "Invalid or expired code" };
+    }
+
+    return { success: "Code verified" };
+  } catch (error) {
+    console.error("Error verifying reset code:", error);
+    return { error: "Failed to verify code" };
+  }
+};
+
 export const resetPassword = async (email: string, code: string, newPassword: string) => {
   try {
     const user = await db.user.findFirst({

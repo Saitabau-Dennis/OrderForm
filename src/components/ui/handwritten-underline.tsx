@@ -18,7 +18,7 @@ export function HandwrittenUnderline({
       <span
         aria-hidden
         className={cn(
-          "pointer-events-none absolute left-0 right-0 -bottom-2 h-4 bg-[url('/images/handwritten-underline.svg')] bg-no-repeat bg-size-[100%_100%]",
+          "pointer-events-none absolute left-0 right-0 -bottom-2 h-4 bg-[url('/images/handwritten-underline.svg')] bg-no-repeat bg-[length:100%_100%]",
           underlineClassName
         )}
       />

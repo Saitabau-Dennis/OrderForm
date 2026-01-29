@@ -3,21 +3,32 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Bell, Home, Package, Settings, ShoppingBag, LogOut, Menu, ExternalLink, User, ChevronRight, LifeBuoy, Sparkles, Plus, BarChart3 } from "lucide-react";
+import { 
+  Home, 
+  Package, 
+  Settings, 
+  ShoppingBag, 
+  LogOut, 
+  Menu, 
+  ExternalLink, 
+  ChevronRight, 
+  LifeBuoy, 
+  Sparkles, 
+  Plus, 
+  BarChart3,
+  Users 
+} from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { UpgradeModal } from "@/components/dashboard/upgrade-modal";
 import { SupportModal } from "@/components/dashboard/support-modal";
 import { signOut } from "next-auth/react";
 
@@ -29,159 +40,175 @@ interface DashboardShellProps {
     image?: string | null;
   };
   store: {
+    name: string;
     slug: string;
     configured: boolean;
   } | null;
 }
 
-export function DashboardShell({ children, user, store }: DashboardShellProps) {
+interface SidebarContentProps {
+  user: {
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+  };
+  store: {
+    name: string;
+    slug: string;
+    configured: boolean;
+  } | null;
+  setIsMobileMenuOpen: (open: boolean) => void;
+  setShowSupportModal: (open: boolean) => void;
+}
+
+const SidebarContent = ({ user, store, setIsMobileMenuOpen, setShowSupportModal }: SidebarContentProps) => {
   const pathname = usePathname();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [showSupportModal, setShowSupportModal] = useState(false);
-  const router = useRouter();
-
-  useEffect(() => {
-    if (store && !store.configured && pathname !== "/settings") {
-      router.push("/settings");
-    }
-  }, [pathname, router, store]);
-
+  
   const routes = [
-    {
-      label: "Overview",
-      icon: Home,
-      href: "/dashboard",
-      active: pathname === "/dashboard",
-    },
-    {
-      label: "Products",
-      icon: Package,
-      href: "/products",
-      active: pathname === "/products",
-    },
-    {
-      label: "Orders",
-      icon: ShoppingBag,
-      href: "/orders",
-      active: pathname === "/orders",
-    },
-    {
-      label: "Settings",
-      icon: Settings,
-      href: "/settings",
-      active: pathname === "/settings",
-    },
+    { label: "Overview", icon: Home, href: "/dashboard", active: pathname === "/dashboard" },
+    { label: "Products", icon: Package, href: "/products", active: pathname === "/products" },
+    { label: "Orders", icon: ShoppingBag, href: "/orders", active: pathname === "/orders" },
+    { label: "Customers", icon: Users, href: "/customers", active: pathname === "/customers" },
+    { label: "Analytics", icon: BarChart3, href: "#", active: false, comingSoon: true },
+    { label: "Settings", icon: Settings, href: "/settings", active: pathname === "/settings" },
   ];
 
-  const SidebarContent = () => (
-    <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
-      <div className="flex flex-col h-full p-6 pb-8">
-        <div className="mb-8">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <div className="flex items-center gap-3 rounded-xl bg-sidebar-accent/50 border border-sidebar-border p-3 hover:bg-sidebar-accent transition-colors cursor-pointer w-full group">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={user.image || ""} />
-                  <AvatarFallback className="bg-primary text-white text-xs">
-                    {user.name?.charAt(0).toUpperCase() || "S"}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 overflow-hidden text-left">
-                  <p className="truncate text-sm font-medium text-white group-hover:text-white/90 transition-colors font-raleway">
-                    {user.name || "Store Owner"}
-                  </p>
-                </div>
-                <ChevronRight className="h-4 w-4 text-zinc-500 rotate-90" />
+  return (
+    <div className="flex h-full flex-col text-white p-6 pb-8">
+      {/* Store Switcher */}
+      <div className="mb-8">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div className="flex items-center gap-4 rounded-xl bg-white/10 border border-white/10 p-4 hover:bg-white/20 transition-colors cursor-pointer w-full group">
+              <Avatar className="h-10 w-10 border-2 border-white/20">
+                <AvatarImage src={user.image || ""} />
+                <AvatarFallback className="bg-primary-foreground text-primary font-bold">
+                  {user.name?.charAt(0).toUpperCase() || "S"}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 overflow-hidden text-left">
+                <p className="truncate text-base font-semibold text-white group-hover:text-white/90 transition-colors font-raleway">
+                  {store?.name || user.name || "My Store"}
+                </p>
+                <p className="text-xs text-white/60 truncate">Store Management</p>
               </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-60 bg-sidebar border-sidebar-border text-sidebar-foreground">
-               <DropdownMenuSeparator className="bg-sidebar-border" />
-               <DropdownMenuItem className="focus:bg-sidebar-accent focus:text-sidebar-foreground cursor-pointer gap-2">
-                  <div className="h-6 w-6 rounded-full border border-sidebar-border flex items-center justify-center bg-sidebar-accent">
-                    <Plus className="h-4 w-4" />
-                  </div>
-                  <span className="font-raleway">Add store</span>
-               </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
-        <div className="space-y-1">
-             <nav className="space-y-1">
-                {routes.map((route) => (
-                <Link
-                    key={route.href}
-                    href={route.href}
-                    className={cn(
-                    "flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-200",
-                    route.active
-                        ? "bg-sidebar-accent text-sidebar-foreground shadow-sm"
-                        : "hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-                    )}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                >
-                    <route.icon className={cn("h-4 w-4", route.active ? "text-sidebar-foreground" : "text-sidebar-foreground/70 group-hover:text-sidebar-foreground")} />
-                    <span className="font-instrument-sans">{route.label}</span>
-                </Link>
-                ))}
-            </nav>
-        </div>
-
-        <div className="mt-auto space-y-4 px-6 pb-6">
-
-
-            {/* Profile Dropdown */}
-            <div className="border-t border-sidebar-border pt-4">
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <div className="flex items-center gap-3 rounded-lg bg-sidebar-accent/50 p-3 hover:bg-sidebar-accent transition-colors cursor-pointer w-full">
-                            <Avatar className="h-9 w-9 border border-sidebar-border">
-                                <AvatarImage src={user.image || ""} />
-                                <AvatarFallback className="bg-sidebar-accent text-sidebar-foreground text-lg">
-                                    {user.name?.charAt(0).toUpperCase() || "U"}
-                                </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1 overflow-hidden text-left">
-                                <p className="truncate text-sm font-medium text-sidebar-foreground">{user.name || "User"}</p>
-                                <p className="truncate text-xs text-sidebar-foreground/70">{user.email}</p>
-                            </div>
-                            <ChevronRight className="h-4 w-4 text-sidebar-foreground/50" />
-                        </div>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56 bg-sidebar border-sidebar-border text-sidebar-foreground">
-                        <DropdownMenuLabel className="text-sidebar-foreground/70">My Account</DropdownMenuLabel>
-                        <DropdownMenuSeparator className="bg-sidebar-border" />
-                        <DropdownMenuItem className="focus:bg-sidebar-accent focus:text-sidebar-foreground cursor-pointer" onSelect={() => setShowUpgradeModal(true)}>
-                            <Sparkles className="mr-2 h-4 w-4" />
-                            <span>Upgrade</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="focus:bg-sidebar-accent focus:text-sidebar-foreground cursor-pointer" onSelect={() => setShowSupportModal(true)}>
-                            <LifeBuoy className="mr-2 h-4 w-4" />
-                            <span>Support</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator className="bg-sidebar-border" />
-                        <DropdownMenuItem
-                            className="text-red-500 focus:bg-red-500/10 focus:text-red-500 cursor-pointer"
-                            onSelect={() => signOut({ callbackUrl: "/login" })}
-                        >
-                            <LogOut className="mr-2 h-4 w-4" />
-                            <span>Log out</span>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+              <ChevronRight className="h-5 w-5 text-white/60 rotate-90" />
             </div>
-        </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-72 bg-white border-none shadow-2xl rounded-xl p-2">
+             <div className="px-3 py-2">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Switch Store</p>
+                <div className="flex items-center gap-2 p-2 rounded-lg bg-primary/5 border border-primary/10">
+                  <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                  <span className="text-sm font-medium text-primary truncate flex-1">{store?.name || "My Store"}</span>
+                  <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded">Active</span>
+                </div>
+             </div>
+             <DropdownMenuSeparator className="bg-gray-100 my-1" />
+             <DropdownMenuItem className="focus:bg-primary/5 focus:text-primary cursor-pointer gap-3 p-3 rounded-lg mx-1">
+                <div className="h-8 w-8 rounded-full border border-dashed border-primary/30 flex items-center justify-center bg-white text-primary">
+                  <Plus className="h-4 w-4" />
+                </div>
+                <span className="font-medium">Create new store</span>
+             </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {/* Navigation */}
+      <nav className="space-y-2 flex-1">
+        {routes.map((route) => (
+          <Link
+            key={route.label}
+            href={route.href}
+            className={cn(
+              "flex items-center gap-4 rounded-xl px-4 py-3.5 text-base font-medium transition-all duration-200 group relative",
+              route.active
+                ? "bg-white text-primary shadow-lg font-semibold"
+                : "text-white/80 hover:bg-white/10 hover:text-white",
+              route.comingSoon && "opacity-70 cursor-not-allowed"
+            )}
+            onClick={(e) => {
+              if (route.comingSoon) e.preventDefault();
+              else setIsMobileMenuOpen(false);
+            }}
+          >
+            <route.icon className={cn("h-5 w-5", route.active ? "text-primary" : "text-white/80 group-hover:text-white")} />
+            <span className="font-instrument-sans tracking-wide">{route.label}</span>
+            {route.comingSoon && (
+              <span className="ml-auto text-[10px] uppercase font-bold bg-white/20 px-2 py-0.5 rounded">Soon</span>
+            )}
+          </Link>
+        ))}
+      </nav>
+
+      {/* Bottom Profile Section */}
+      <div className="mt-auto border-t border-white/10 pt-6">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div className="flex items-center gap-3 rounded-xl p-3 hover:bg-white/10 transition-colors cursor-pointer w-full group relative">
+              <Avatar className="h-10 w-10 border border-white/20 shadow-md">
+                <AvatarImage src={user.image || ""} />
+                <AvatarFallback className="bg-white/10 text-white font-medium">
+                  {user.name?.charAt(0).toUpperCase() || "U"}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 overflow-hidden text-left">
+                <p className="truncate text-sm font-medium text-white group-hover:text-white/90">{user.name || "User"}</p>
+                <p className="truncate text-xs text-white/50">{user.email}</p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-white/40 group-hover:text-white/70" />
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-72 bg-white border-none shadow-2xl rounded-2xl p-2 mb-2">
+            <div className="flex items-center gap-3 p-3 bg-primary/5 rounded-xl mb-2">
+              <Avatar className="h-10 w-10 border border-white shadow-sm">
+                <AvatarImage src={user.image || ""} />
+                <AvatarFallback className="bg-primary text-white">
+                  {user.name?.charAt(0).toUpperCase() || "U"}
+                </AvatarFallback>
+              </Avatar>
+              <div className="overflow-hidden">
+                <p className="font-semibold text-primary truncate text-sm">{user.name}</p>
+                <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+              </div>
+            </div>
+            <DropdownMenuSeparator className="bg-gray-100 my-1" />
+            <DropdownMenuItem className="focus:bg-primary/5 focus:text-primary cursor-pointer p-3 rounded-lg mx-1 my-0.5" onSelect={() => setShowSupportModal(true)}>
+              <LifeBuoy className="h-4 w-4 mr-3 text-teal-600" />
+              <div className="flex flex-col">
+                <span className="font-medium text-sm">Help & Support</span>
+                <span className="text-[10px] text-muted-foreground">Contact us</span>
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-gray-100 my-1" />
+            <DropdownMenuItem className="text-red-600 focus:bg-red-50 focus:text-red-700 cursor-pointer p-3 rounded-lg mx-1 my-0.5" onSelect={() => signOut({ callbackUrl: "/login" })}>
+              <LogOut className="h-4 w-4 mr-3" />
+              <span className="font-medium text-sm">Sign out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
+};
+
+export function DashboardShell({ children, user, store }: DashboardShellProps) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showSupportModal, setShowSupportModal] = useState(false);
+
+  useEffect(() => {
+    // Redirect logic removed to prepare for onboarding flow
+  }, [pathname, router, store]);
 
   const getBreadcrumb = () => {
     const path = pathname.split("/").filter(Boolean);
     return (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Link href="/dashboard" className="hover:text-foreground transition-colors">
-                Account
+            <Link href="/dashboard" className="hover:text-primary transition-colors font-medium">
+                Home
             </Link>
             {path.map((segment, index) => {
                 const isLast = index === path.length - 1;
@@ -189,15 +216,15 @@ export function DashboardShell({ children, user, store }: DashboardShellProps) {
 
                 return (
                     <div key={segment} className="flex items-center gap-2">
-                        <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
+                        <ChevronRight className="h-4 w-4 text-muted-foreground/40" />
                         {isLast ? (
-                            <span className="font-medium text-foreground capitalize">
+                            <span className="font-semibold text-primary capitalize">
                                 {segment}
                             </span>
                         ) : (
                             <Link
                                 href={href}
-                                className="hover:text-foreground transition-colors capitalize"
+                                className="hover:text-primary transition-colors capitalize font-medium"
                             >
                                 {segment}
                             </Link>
@@ -210,61 +237,45 @@ export function DashboardShell({ children, user, store }: DashboardShellProps) {
   };
 
   return (
-    <div className="flex min-h-screen bg-background font-raleway">
-      {/* Desktop Sidebar */}
-      <aside className="hidden w-72 border-r border-sidebar-border bg-sidebar md:block fixed inset-y-0 left-0 z-30">
-        <SidebarContent />
+    <div className="flex min-h-screen bg-primary/5 font-raleway">
+      <aside className="hidden w-80 border-r border-primary/10 bg-primary md:block fixed inset-y-0 left-0 z-30 shadow-xl">
+        <SidebarContent user={user} store={store} setIsMobileMenuOpen={setIsMobileMenuOpen} setShowSupportModal={setShowSupportModal} />
       </aside>
 
-      {/* Main Content */}
-      <div className="flex w-full flex-col md:pl-72">
-        {/* Top Bar */}
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="flex w-full flex-col md:pl-80 transition-all duration-300">
+        <header className="sticky top-0 z-20 flex h-20 items-center justify-between border-b border-primary/10 bg-primary/5 px-8 backdrop-blur-xl">
           <div className="flex items-center gap-4">
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden">
-                  <Menu className="h-5 w-5" />
+                <Button variant="ghost" size="icon" className="md:hidden text-primary hover:bg-primary/10">
+                  <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="p-0 w-72 border-r-sidebar-border bg-sidebar">
-                <SidebarContent />
+              <SheetContent side="left" className="p-0 w-80 border-r-0 bg-primary text-white">
+                <SidebarContent user={user} store={store} setIsMobileMenuOpen={setIsMobileMenuOpen} setShowSupportModal={setShowSupportModal} />
               </SheetContent>
             </Sheet>
-
-            <div className="flex items-center text-sm">
+            
+            <div className="flex items-center">
               {getBreadcrumb()}
             </div>
           </div>
 
           {store?.slug && (
-            <Button variant="outline" size="sm" className="gap-2" asChild>
+            <Button className="gap-2 rounded-xl bg-primary text-white hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-primary/20 h-11 px-6" asChild>
               <a href={`/${store.slug}`} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-4 w-4" />
-                View Live Store
+                <ExternalLink className="h-4 w-4 text-white" />
+                <span className="font-bold tracking-tight text-white">View Store</span>
               </a>
             </Button>
           )}
         </header>
 
-        {/* Page Content */}
-        <main className="flex-1 px-4 py-6 w-full">
-          {store && !store.configured && (
-            <div className="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-800">
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4" />
-                <span className="font-medium">Store not configured</span>
-              </div>
-              <p className="mt-1 text-yellow-700/90">
-                Please complete your store configuration in the settings to unlock all features.
-              </p>
-            </div>
-          )}
+        <main className="flex-1 w-full p-4 md:p-6 max-w-7xl mx-auto animate-appear">
           {children}
         </main>
       </div>
 
-      <UpgradeModal open={showUpgradeModal} onOpenChange={setShowUpgradeModal} />
       <SupportModal open={showSupportModal} onOpenChange={setShowSupportModal} />
     </div>
   );

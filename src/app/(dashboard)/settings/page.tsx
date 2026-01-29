@@ -28,11 +28,23 @@ export default async function SettingsPage() {
   const storeData = store ? JSON.parse(JSON.stringify(store)) : null;
 
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight font-sans">Store Settings</h2>
+    <div className="space-y-8 animate-appear pb-10">
+      {/* Gradient Header */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-[#004D31] to-[#00311F] text-primary-foreground shadow-xl">
+        <div className="absolute top-0 right-0 -mt-10 -mr-10 h-64 w-64 rounded-full bg-white/5 blur-3xl" />
+        <div className="absolute bottom-0 left-0 -mb-10 -ml-10 h-64 w-64 rounded-full bg-black/10 blur-3xl" />
+        
+        <div className="relative z-10 px-8 py-10 md:px-12 md:py-14">
+          <h2 className="font-instrument-serif text-4xl md:text-5xl font-medium tracking-tight">Store Settings</h2>
+          <p className="mt-2 text-lg text-primary-foreground/80 font-instrument-sans max-w-xl leading-relaxed">
+            Manage your store's identity, shipping configurations, and subscription details all in one place.
+          </p>
+        </div>
       </div>
-      <SettingsForm initialData={storeData} />
+
+      <div className="px-1">
+        <SettingsForm initialData={storeData} userData={session.user} />
+      </div>
     </div>
   );
 }

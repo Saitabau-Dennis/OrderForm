@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, Package, Image as ImageIcon, Layers, DollarSign, Ruler, AlertCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,28 +19,36 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { AlertModal } from "@/components/modals/alert-modal";
 import { createProduct, updateProduct } from "@/lib/actions/products";
+import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 
-const productSchema = z.object({
+export const productSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  description: z.string().optional(),
+  description: z.string().min(1, "Description is required"),
   price: z.coerce.number().min(0, "Price must be positive"),
-  category: z.string().optional(),
+  category: z.string().min(1, "Category is required"),
   isAvailable: z.boolean().default(true),
-  imageUrl: z.string().optional(),
-  sizes: z.string().optional(),
+  imageUrl: z.string().min(1, "Product image is required"),
+  sizes: z.string().min(1, "At least one size/variant is required"),
 });
 
-type ProductValues = z.infer<typeof productSchema>;
+export type ProductValues = z.infer<typeof productSchema>;
 
 interface ProductFormProps {
   initialData?: any;
   onSuccess: () => void;
+  layout?: "default" | "sheet";
 }
 
-export function ProductForm({ initialData, onSuccess }: ProductFormProps) {
+export function ProductForm({ initialData, onSuccess, layout = "default" }: ProductFormProps) {
   const [loading, setLoading] = useState(false);
+
+  // Confirmation State
+  const [pendingData, setPendingData] = useState<ProductValues | null>(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const form = useForm<ProductValues>({
     resolver: zodResolver(productSchema) as any,
@@ -55,15 +63,22 @@ export function ProductForm({ initialData, onSuccess }: ProductFormProps) {
     },
   });
 
-  const onSubmit = async (data: ProductValues) => {
+  const handleFormSubmit = async (data: ProductValues) => {
+    setPendingData(data);
+    setShowConfirmModal(true);
+  };
+
+  const performSave = async () => {
+    if (!pendingData) return;
+
     try {
       setLoading(true);
 
       let result;
       if (initialData) {
-        result = await updateProduct(initialData._id, data);
+        result = await updateProduct(initialData.id, pendingData);
       } else {
-        result = await createProduct(data);
+        result = await createProduct(pendingData);
       }
 
       if (result.error) {
@@ -72,6 +87,7 @@ export function ProductForm({ initialData, onSuccess }: ProductFormProps) {
       }
 
       toast.success(initialData ? "Product updated" : "Product created");
+      setShowConfirmModal(false);
       onSuccess();
     } catch (error) {
       toast.error("Something went wrong");
@@ -80,168 +96,261 @@ export function ProductForm({ initialData, onSuccess }: ProductFormProps) {
     }
   };
 
-  return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-
-        {/* Main Column: Details */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
-            <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="font-semibold leading-none tracking-tight">Product Details</h3>
-              <p className="text-sm text-muted-foreground">Product title, description and pricing.</p>
-            </div>
-            <div className="p-6 pt-0 space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Product Name</Label>
-                <Input id="name" placeholder="e.g. Vintage Denim Jacket" {...form.register("name")} />
-                {form.formState.errors.name && (
-                  <p className="text-sm text-red-500">{form.formState.errors.name.message}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="description">Description</Label>
+  const SectionWrapper = ({ children, title, description, icon: Icon }: { children: React.ReactNode; title: string; description?: string, icon?: any }) => {
+    if (layout === "sheet") {
+      return (
+        <div className="space-y-4">
+            <div className="flex items-start gap-3">
+                {Icon && <div className="p-2 bg-primary/5 rounded-lg text-primary"><Icon className="h-5 w-5" /></div>}
+                <div className="space-y-1">
+                    <h3 className="font-medium text-lg font-raleway text-foreground">{title}</h3>
+                    {description && <p className="text-sm text-muted-foreground font-instrument-sans">{description}</p>}
                 </div>
-                <Textarea
-                  id="description"
-                  placeholder="Describe your product..."
-                  className="min-h-[120px] resize-y"
-                  {...form.register("description")}
-                />
-              </div>
+            </div>
+            {children}
+            <div className="h-px w-full bg-border/60 my-8" />
+        </div>
+      );
+    }
 
-              <div className="space-y-2">
-                <Label htmlFor="price">Price (KES)</Label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span className="text-gray-500">KES</span>
+    return (
+      <div className="rounded-3xl border border-primary/5 bg-white shadow-xl shadow-primary/5 overflow-hidden transition-all hover:shadow-2xl hover:shadow-primary/10">
+        <div className="flex items-center gap-4 p-6 border-b border-primary/5 bg-primary/[0.02]">
+          {Icon && (
+            <div className="h-10 w-10 rounded-2xl bg-white border border-primary/10 flex items-center justify-center shadow-sm text-primary">
+                <Icon className="h-5 w-5" />
+            </div>
+          )}
+          <div className="flex flex-col space-y-0.5">
+            <h3 className="font-medium text-lg font-raleway text-primary">{title}</h3>
+            {description && <p className="text-xs text-muted-foreground font-instrument-sans uppercase tracking-wider">{description}</p>}
+          </div>
+        </div>
+        <div className="p-8 space-y-8">
+          {children}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
+        <div className={cn("grid gap-8", layout === "default" ? "grid-cols-1 lg:grid-cols-3" : "grid-cols-1")}>
+
+          {/* Main Column: Details */}
+          <div className={cn("space-y-8", layout === "default" ? "lg:col-span-2" : "")}>
+
+            <SectionWrapper title="Product Information" description="Essential details" icon={Package}>
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-sm font-medium">Product Name <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="name"
+                    placeholder="e.g. Vintage Denim Jacket"
+                    {...form.register("name")}
+                    className="h-10 rounded-xl border-primary/10 bg-gray-50/50 focus:bg-white focus:border-primary/30 transition-all font-normal text-sm placeholder:text-muted-foreground/50"
+                  />
+                  {form.formState.errors.name && (
+                    <p className="text-xs text-red-500 flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" />
+                        {form.formState.errors.name.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="description" className="text-sm font-medium">Description <span className="text-red-500">*</span></Label>
+                  </div>
+                  <Textarea
+                    id="description"
+                    placeholder="Tell your customers about this product..."
+                    className="min-h-[100px] rounded-xl border-primary/10 bg-gray-50/50 focus:bg-white focus:border-primary/30 transition-all resize-y p-3 font-instrument-sans leading-relaxed text-sm"
+                    {...form.register("description")}
+                  />
+                  {form.formState.errors.description && (
+                    <p className="text-xs text-red-500 flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" />
+                        {form.formState.errors.description.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="price" className="text-sm font-medium">Price <span className="text-red-500">*</span></Label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <span className="text-primary font-medium font-sora text-sm">KES</span>
+                    </div>
+                    <Input
+                      type="number"
+                      id="price"
+                      placeholder="0.00"
+                      className="pl-12 h-10 rounded-xl border-primary/10 bg-gray-50/50 focus:bg-white focus:border-primary/30 transition-all font-medium font-sora text-sm tabular-nums"
+                      {...form.register("price")}
+                    />
+                  </div>
+                  {form.formState.errors.price && (
+                    <p className="text-xs text-red-500 flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" />
+                        {form.formState.errors.price.message}
+                    </p>
+                  )}
+                </div>
+            </SectionWrapper>
+          </div>
+
+          {/* Side Column: Media & Organization */}
+          <div className="space-y-8">
+
+            <SectionWrapper title="Media" description="Product images" icon={ImageIcon}>
+                <div className="bg-gray-50/50 rounded-2xl p-2 border border-dashed border-primary/10">
+                    <ImageUpload
+                    value={form.watch("imageUrl")}
+                    onChange={(url) => form.setValue("imageUrl", url)}
+                    endpoint="productImage"
+                    />
+                </div>
+                {form.formState.errors.imageUrl && (
+                    <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
+                        <AlertCircle className="h-3 w-3" />
+                        {form.formState.errors.imageUrl.message}
+                    </p>
+                )}
+            </SectionWrapper>
+
+            <SectionWrapper title="Organization" description="Categorization & Stock" icon={Layers}>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Category</Label>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" className="w-full justify-between font-normal h-10 rounded-xl border-primary/20 bg-white hover:bg-gray-50 hover:border-primary/40 transition-all text-sm shadow-sm">
+                        {form.watch("category") ? (
+                          <span className="text-primary font-medium">{form.watch("category")}</span>
+                        ) : (
+                          <span className="text-muted-foreground">Select category</span>
+                        )}
+                        <Layers className="h-4 w-4 text-primary opacity-70" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-[280px] p-2 rounded-2xl border-none shadow-xl" align="start">
+                      {["Clothing", "Footwear", "Accessories", "Electronics", "Home", "Beauty"].map((cat) => (
+                        <DropdownMenuItem
+                          key={cat}
+                          onClick={() => form.setValue("category", cat)}
+                          className="rounded-lg p-2 cursor-pointer focus:bg-primary/5 focus:text-primary font-normal text-sm"
+                        >
+                          {cat}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  {form.formState.errors.category && (
+                    <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
+                        <AlertCircle className="h-3 w-3" />
+                        {form.formState.errors.category.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2 pt-1">
+                  <Label className="text-sm font-medium flex items-center gap-2">
+                      <Ruler className="h-3.5 w-3.5" />
+                      Sizes / Variants
+                  </Label>
+                  <div className="flex flex-wrap gap-1.5 mb-1.5">
+                    {["XS", "S", "M", "L", "XL"].map((size) => {
+                      const currentSizes = form.watch("sizes")?.split(",").map(s => s.trim()).filter(Boolean) || [];
+                      const isSelected = currentSizes.includes(size);
+
+                      return (
+                        <div
+                          key={size}
+                          onClick={() => {
+                            let newSizes;
+                            if (isSelected) {
+                              newSizes = currentSizes.filter(s => s !== size);
+                            } else {
+                              newSizes = [...currentSizes, size];
+                            }
+                            form.setValue("sizes", newSizes.join(", "));
+                          }}
+                          className={cn(
+                            "cursor-pointer w-8 h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-all border",
+                            isSelected
+                              ? "bg-primary text-white border-primary shadow-sm transform scale-105"
+                              : "bg-white text-muted-foreground border-primary/10 hover:border-primary/30 hover:bg-primary/5"
+                          )}
+                        >
+                          {size}
+                        </div>
+                      );
+                    })}
                   </div>
                   <Input
-                    type="number"
-                    id="price"
-                    placeholder="0.00"
-                    className="pl-12"
-                    {...form.register("price")}
+                    placeholder="Custom sizes (e.g. 40, 41, 42)"
+                    {...form.register("sizes")}
+                    className="h-10 rounded-xl border-primary/10 bg-gray-50/50 text-sm"
                   />
+                  {form.formState.errors.sizes && (
+                    <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
+                        <AlertCircle className="h-3 w-3" />
+                        {form.formState.errors.sizes.message}
+                    </p>
+                  )}
                 </div>
-                {form.formState.errors.price && (
-                  <p className="text-sm text-red-500">{form.formState.errors.price.message}</p>
-                )}
-              </div>
-            </div>
+
+                <div className="pt-3 mt-3 border-t border-primary/5">
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-primary/5 border border-primary/10">
+                        <div className="space-y-0.5">
+                            <Label htmlFor="isAvailable" className="text-sm font-medium text-primary">In Stock</Label>
+                            <p className="text-[10px] text-muted-foreground">Available for purchase</p>
+                        </div>
+                        <Switch
+                            id="isAvailable"
+                            checked={form.watch("isAvailable")}
+                            onCheckedChange={(checked) => form.setValue("isAvailable", checked)}
+                            className="scale-90 data-[state=checked]:bg-primary"
+                        />
+                    </div>
+                </div>
+            </SectionWrapper>
+
           </div>
         </div>
 
-        {/* Side Column: Media & Organization */}
-        <div className="space-y-6">
-
-          {/* Media Card */}
-          <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
-             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="font-semibold leading-none tracking-tight">Media</h3>
-            </div>
-            <div className="p-6 pt-0">
-              <ImageUpload
-                value={form.watch("imageUrl")}
-                onChange={(url) => form.setValue("imageUrl", url)}
-                endpoint="productImage"
-              />
-            </div>
-          </div>
-
-          {/* Organization Card */}
-          <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
-             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="font-semibold leading-none tracking-tight">Organization</h3>
-            </div>
-            <div className="p-6 pt-0 space-y-4">
-              <div className="space-y-2">
-                <Label>Category</Label>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="w-full justify-between font-normal">
-                      {form.watch("category") || "Select category"}
-                      <span className="opacity-50">▼</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-[200px]" align="start">
-                    {["Clothing", "Footwear", "Accessories", "Electronics", "Home", "Beauty"].map((cat) => (
-                      <DropdownMenuItem
-                        key={cat}
-                        onClick={() => form.setValue("category", cat)}
-                      >
-                        {cat}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-
-              <div className="space-y-3">
-                <Label>Sizes</Label>
-                <div className="flex flex-wrap gap-2">
-                  {["XS", "S", "M", "L", "XL"].map((size) => {
-                    const currentSizes = form.watch("sizes")?.split(",").map(s => s.trim()).filter(Boolean) || [];
-                    const isSelected = currentSizes.includes(size);
-
-                    return (
-                      <div
-                        key={size}
-                        onClick={() => {
-                          let newSizes;
-                          if (isSelected) {
-                            newSizes = currentSizes.filter(s => s !== size);
-                          } else {
-                            newSizes = [...currentSizes, size];
-                          }
-                          form.setValue("sizes", newSizes.join(", "));
-                        }}
-                        className={`
-                          cursor-pointer px-3 py-1.5 rounded-md text-xs font-medium transition-all border
-                          ${isSelected
-                            ? "bg-primary text-primary-foreground border-primary"
-                            : "bg-transparent text-muted-foreground hover:bg-muted"
-                          }
-                        `}
-                      >
-                        {size}
-                      </div>
-                    );
-                  })}
-                </div>
-                <Input
-                  placeholder="Custom sizes (e.g. 40, 41, 42)"
-                  {...form.register("sizes")}
-                  className="mt-2 text-sm"
-                />
-              </div>
-
-               <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
-                <div className="space-y-0.5">
-                  <Label htmlFor="isAvailable" className="text-sm font-medium">Availability</Label>
-                  <p className="text-xs text-muted-foreground">Is this product in stock?</p>
-                </div>
-                 <Switch
-                    id="isAvailable"
-                    checked={form.watch("isAvailable")}
-                    onCheckedChange={(checked) => form.setValue("isAvailable", checked)}
-                  />
-              </div>
-
-            </div>
-          </div>
-
+        <div className="flex items-center justify-end gap-3 pt-2 pb-8">
+            {layout === "sheet" && (
+                <Button variant="ghost" type="button" className="h-10 px-4 rounded-xl hover:bg-red-50 hover:text-red-600 text-sm">
+                    Cancel
+                </Button>
+            )}
+            <Button
+                size="default"
+                type="submit"
+                disabled={loading}
+                className="bg-primary text-white hover:bg-primary/90 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all rounded-xl px-6 h-10 font-medium text-sm w-full sm:w-auto"
+            >
+                {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {initialData ? "Save Changes" : "Create Product"}
+            </Button>
         </div>
-      </div>
+      </form>
 
-      <div className="flex justify-end pt-4">
-        <Button size="lg" type="submit" disabled={loading}>
-          {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {initialData ? "Save Changes" : "Create Product"}
-        </Button>
-      </div>
-    </form>
+      <AlertModal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={performSave}
+        loading={loading}
+        title={initialData ? "Save Changes?" : "Create Product?"}
+        description={initialData
+            ? "This will update the product details in your store immediately."
+            : "This item will be added to your inventory and visible to customers."
+        }
+        variant="success"
+        confirmText="Confirm"
+        cancelText="Edit"
+      />
+    </>
   );
 }
