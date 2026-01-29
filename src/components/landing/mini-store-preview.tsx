@@ -7,31 +7,31 @@ const previews = [
   {
     title: "Browse Products",
     description: "A clean, mobile-first catalog. Customers can easily scroll through your items, view high-res photos, check prices, and select variants like size or color without any distractions.",
-    src: "/images/dashboard.png",
+    src: "/images/dashboard-v2.png",
     alt: "Mini store catalog page preview"
   },
   {
     title: "Review Cart",
     description: "A transparent cart experience. Customers can double-check their selections, adjust quantities, and see their total cost instantly before they commit to buy.",
-    src: "/images/dashboard.png",
+    src: "/images/dashboard-v2.png",
     alt: "Mini store product details page preview"
   },
   {
     title: "One-Click Checkout",
     description: "Frictionless ordering. No forms to fill out. One tap generates a complete order summary and opens WhatsApp to send it directly to you.",
-    src: "/images/dashboard.png",
+    src: "/images/dashboard-v2.png",
     alt: "Mini store checkout page preview"
   },
   {
     title: "Share & Earn",
     description: "Turn customers into advocates. Shoppers can upload photos of their purchase. Once you approve it, they get rewarded, and you get authentic social proof.",
-    src: "/images/dashboard.png",
+    src: "/images/dashboard-v2.png",
     alt: "Mini store UGC upload page preview"
   },
   {
     title: "Redeem Discounts",
     description: "Drive repeat business. Approved photo uploads automatically send a unique discount code to the customer, incentivizing their next purchase.",
-    src: "/images/dashboard.png",
+    src: "/images/dashboard-v2.png",
     alt: "Mini store discount code page preview"
   }
 ]

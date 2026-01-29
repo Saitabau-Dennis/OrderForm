@@ -36,7 +36,7 @@ export default function Home() {
         secondaryCtaText="Features"
         secondaryCtaLink="#features"
         mockupImage={{
-          src: "/images/dashboard.png",
+          src: "/images/dashboard-v2.png",
           alt: "OrderForm Dashboard Interface",
           width: 1274,
           height: 1043

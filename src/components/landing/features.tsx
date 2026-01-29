@@ -34,7 +34,7 @@ export function Features() {
 
                             <div className="pt-6 px-6 pb-6">
                                 <DualModeImage
-                                    src="/images/dashboard.png"
+                                    src="/images/dashboard-v2.png"
                                     alt="Store link for your bio"
                                     width={1207}
                                     height={929}
@@ -53,7 +53,7 @@ export function Features() {
 
                             <div className="pt-6 px-6 pb-6">
                                 <DualModeImage
-                                    src="/images/dashboard.png"
+                                    src="/images/dashboard-v2.png"
                                     alt="Inventory Management"
                                     width={1207}
                                     height={929}
@@ -72,7 +72,7 @@ export function Features() {
 
                             <div className="pt-6 px-6 pb-6">
                                 <DualModeImage
-                                    src="/images/dashboard.png"
+                                    src="/images/dashboard-v2.png"
                                     alt="Delivery Zones"
                                     width={1207}
                                     height={929}
@@ -91,7 +91,7 @@ export function Features() {
 
                             <div className="pt-6 px-6 pb-6">
                                 <DualModeImage
-                                    src="/images/dashboard.png"
+                                    src="/images/dashboard-v2.png"
                                     alt="No accounts or apps"
                                     width={1207}
                                     height={929}
@@ -110,7 +110,7 @@ export function Features() {
 
                             <div className="pt-6 px-6 pb-6">
                                 <DualModeImage
-                                    src="/images/dashboard.png"
+                                    src="/images/dashboard-v2.png"
                                     alt="Customer photos and discounts"
                                     width={1207}
                                     height={929}
