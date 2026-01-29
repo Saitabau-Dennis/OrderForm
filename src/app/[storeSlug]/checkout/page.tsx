@@ -67,22 +67,19 @@ export default function CheckoutPage() {
       const orderId = result.orderId;
 
       if (data.paymentMethod === 'whatsapp') {
-          const message = `*New Order #${orderId}*\n` +
-            `--------------------------------\n\n` +
-            `*Customer Details:*\n` +
+          const message = `*NEW ORDER: ${useStore().storeName.toUpperCase()}*\n\n` +
+            `*Order ID:* #${orderId}\n\n` +
+            `*CUSTOMER DETAILS*\n` +
             `Name: ${data.name}\n` +
             `Phone: ${data.phone}\n` +
-            `Email: ${data.email}\n` +
             `Address: ${data.address}\n` +
             `${data.notes ? `Notes: ${data.notes}\n` : ''}\n` +
-            `*Order Summary:*\n` +
-            `--------------------------------\n` +
+            `*ORDER SUMMARY*\n` +
             `${cart.map(item =>
-              `- ${item.name} x${item.quantity}${item.variant ? ` (${item.variant})` : ''} - ${currency} ${(item.price * item.quantity).toLocaleString()}`
-            ).join('\n')}\n` +
-            `--------------------------------\n` +
-            `*Total: ${currency} ${cartTotal.toLocaleString()}*\n\n` +
-            `_Awaiting confirmation via WhatsApp_`;
+              `- ${item.name} x${item.quantity}${item.variant ? ` (${item.variant})` : ''} (${currency} ${(item.price * item.quantity).toLocaleString()})`
+            ).join('\n')}\n\n` +
+            `*TOTAL AMOUNT: ${currency} ${cartTotal.toLocaleString()}*\n\n` +
+            `_Please confirm my order_`;
 
           // Clean the store's whatsapp number (remove spaces, dashes, etc.)
           let cleanPhone = whatsappNumber.replace(/\D/g, '');
