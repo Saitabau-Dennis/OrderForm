@@ -115,10 +115,10 @@ export default function CheckoutPage() {
                     <ArrowLeft className="h-5 w-5" />
                     <span className="text-sm font-bold uppercase tracking-wider hidden md:block">Back to Store</span>
                 </Link>
-                <div className="flex items-center gap-2 text-green-700 bg-green-50 px-3 py-1.5 rounded-full border border-green-100">
+                {/* <div className="flex items-center gap-2 text-green-700 bg-green-50 px-3 py-1.5 rounded-full border border-green-100">
                     <ShieldCheck className="h-4 w-4" />
                     <span className="text-xs font-bold uppercase tracking-widest">Secure Checkout</span>
-                </div>
+                </div> */}
                 <div className="w-20" /> {/* Spacer for balance */}
             </div>
         </header>

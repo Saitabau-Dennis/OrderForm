@@ -5,7 +5,6 @@ import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import db from "@/lib/db";
 import { z } from "zod";
-import { sendSMS } from "@/lib/sms";
 
 const CreateOrderSchema = z.object({
   storeId: z.string(),
@@ -65,19 +64,6 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
         }
       }
     });
-
-    // Send SMS Notification (Fire and forget, or await safely)
-    if (store.whatsappNumber) {
-      const message = `You have a new order! Order ID: #${order.displayId || order.orderNumber}`;
-      
-      // We await this to ensure it runs before server action returns, 
-      // but catch error so it doesn't block success.
-      try {
-        await sendSMS(store.whatsappNumber, message);
-      } catch (smsError) {
-        console.error("Failed to send order SMS:", smsError);
-      }
-    }
 
     return { success: true, orderId: order.displayId || order.orderNumber, id: order.id };
   } catch (error) {
