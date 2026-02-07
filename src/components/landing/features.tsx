@@ -4,12 +4,14 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { Link2, LucideIcon, LayoutGrid, ShoppingCart, UserX, Camera } from 'lucide-react'
 import { ReactNode } from 'react'
+import { ScrollAnimation } from '@/components/ui/scroll-animation'
 
 export function Features() {
     return (
         <section id="features" className="bg-background pt-8 md:pt-12 pb-8 md:pb-12 scroll-mt-28">
             <div className="mx-auto max-w-7xl px-6">
-                <div className="mb-16 text-center max-w-3xl mx-auto">
+                <ScrollAnimation variant="fade-up">
+                    <div className="mb-16 text-center max-w-3xl mx-auto">
                     <p className="font-heading uppercase tracking-[0.2em] text-xs text-primary mb-4 font-medium">
                         Features
                     </p>
@@ -120,6 +122,7 @@ export function Features() {
                         </FeatureCard>
                     </div>
                 </div>
+                </ScrollAnimation>
             </div>
         </section>
     )
@@ -169,7 +172,6 @@ const DualModeImage = ({ src, alt, width, height, className }: DualModeImageProp
             width={width}
             height={height}
         />
-        {/* Bottom Fade/Blur Effect */}
-        <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-background via-background to-transparent pointer-events-none" />
+        <div className="absolute bottom-0 left-0 right-0 h-52 bg-gradient-to-t from-background via-background to-transparent pointer-events-none" />
     </div>
 )

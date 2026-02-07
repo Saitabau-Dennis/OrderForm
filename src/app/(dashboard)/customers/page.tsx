@@ -1,6 +1,5 @@
 import { Suspense } from "react";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import db from "@/lib/db";
 import { CustomersClient, CustomerColumn } from "@/components/dashboard/customers-client";
@@ -13,7 +12,7 @@ const formatter = new Intl.NumberFormat("en-US", {
 });
 
 export default async function CustomersPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session) {
     redirect("/login");

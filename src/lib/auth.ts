@@ -1,8 +1,8 @@
-import { NextAuthOptions } from "next-auth";
-import { PrismaAdapter } from "@auth/prisma-adapter";
+import NextAuth from "next-auth";
+import Credentials from "next-auth/providers/credentials";
 import db from "@/lib/db";
-import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import authConfig from "@/auth.config";
 
 declare module "next-auth" {
   interface Session {
@@ -15,19 +15,15 @@ declare module "next-auth" {
   }
 }
 
-export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(db),
+export const { auth, handlers, signIn, signOut } = NextAuth({
+  ...authConfig,
   session: {
     strategy: "jwt",
     maxAge: 1 * 60 * 60, // 1 hour
   },
-  pages: {
-    signIn: "/login",
-  },
-  // trustHost: true,
+  trustHost: true,
   providers: [
-    CredentialsProvider({
-      name: "Credentials",
+    Credentials({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
@@ -37,8 +33,11 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
+        const email = credentials.email as string;
+        const password = credentials.password as string;
+
         const user = await db.user.findUnique({
-          where: { email: credentials.email }
+          where: { email }
         });
 
         if (!user || !user.password) {
@@ -46,7 +45,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         const isPasswordValid = await bcrypt.compare(
-          credentials.password,
+          password,
           user.password
         );
 
@@ -80,4 +79,4 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
   },
-};
+});

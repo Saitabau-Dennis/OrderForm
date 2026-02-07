@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { ArrowRight, Store, ShoppingBag, Share2, MessageCircle } from "lucide-react"
 import Link from "next/link"
+import { ScrollAnimation } from "@/components/ui/scroll-animation"
 
 const steps = [
   {
@@ -41,11 +42,11 @@ export function HowItWorks() {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
           
           {/* Left Column - Content */}
-          <div className="lg:sticky lg:top-32 self-start space-y-8 text-center lg:text-left">
+          <ScrollAnimation variant="fade-up" className="lg:sticky lg:top-32 self-start space-y-8 text-center lg:text-left">
             <div className="space-y-4">
-              <p className="font-heading uppercase tracking-[0.2em] text-xs text-primary mb-4 font-medium">
+              <div className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-primary/20 text-primary text-[10px] font-medium mb-4 uppercase tracking-widest">
                 How It Works
-              </p>
+              </div>
               <h2 className="text-2xl md:text-4xl font-medium tracking-tight font-heading leading-[1.1]">
                 From link to <br/>
                 <span className="text-primary">order in seconds.</span>
@@ -57,7 +58,7 @@ export function HowItWorks() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Link href="/register">
-                <Button size="lg" className="rounded-full px-8 h-12 text-sm md:text-base shadow-lg hover:shadow-xl transition-all font-sans w-full sm:w-auto">
+                <Button size="lg" className="text-sm md:text-base transition-all font-sans w-full sm:w-auto">
                   Start Selling Now
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
@@ -68,7 +69,7 @@ export function HowItWorks() {
             <div className="hidden lg:block absolute -left-12 top-2/3 -z-10 opacity-10">
                <Store className="w-64 h-64 rotate-12" />
             </div>
-          </div>
+          </ScrollAnimation>
 
           {/* Right Column - Cards */}
           <div className="relative space-y-0 min-h-[100vh]">
@@ -82,16 +83,13 @@ export function HowItWorks() {
                 }}
               >
                 <Card className={cn(
-                  "overflow-hidden border border-border/80 shadow-2xl transition-all hover:scale-[1.02] font-sans p-2 md:p-4", 
-                  "bg-background"
+                  "overflow-hidden border border-primary/10 bg-card shadow-sm transition-all hover:scale-[1.02] font-sans p-6 md:p-8 rounded-xl", 
                 )}>
-                  <CardHeader className="pb-4">
-                    <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center mb-6 border", step.color)}>
-                      <step.icon className="w-7 h-7" />
-                    </div>
-                    <CardTitle className="text-xl md:text-2xl font-medium font-heading">{step.title}</CardTitle>
+                  <CardHeader className="p-0 pb-4">
+                    <step.icon className="w-14 h-14 text-primary mb-5 stroke-[1.25]" />
+                    <CardTitle className="text-xl md:text-2xl font-medium font-heading text-foreground">{step.title}</CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-0">
                     <CardDescription className="text-base leading-relaxed text-muted-foreground font-sans">
                       {step.description}
                     </CardDescription>

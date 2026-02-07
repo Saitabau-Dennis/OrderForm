@@ -26,8 +26,8 @@ const ToolbarButton = ({
     type="button"
     onClick={onClick}
     className={cn(
-      "p-2 hover:bg-primary hover:text-white transition-colors border-r border-primary last:border-r-0",
-      isActive ? "bg-primary text-white" : "bg-white text-primary"
+      "p-2 hover:bg-primary hover:text-primary-foreground transition-colors border-r border-primary last:border-r-0",
+      isActive ? "bg-primary text-primary-foreground" : "bg-card text-primary"
     )}
   >
     {children}
@@ -52,7 +52,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
     editorProps: {
       attributes: {
         class: cn(
-          "prose prose-sm sm:prose-base focus:outline-none min-h-[120px] px-4 py-3 font-instrument-sans",
+          "prose prose-sm sm:prose-base focus:outline-none min-h-[120px] px-4 py-3 font-poppins",
           className
         ),
       },
@@ -76,7 +76,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
   }
 
   return (
-    <div className="border border-primary flex flex-col w-full bg-white rounded-none">
+    <div className="border border-primary flex flex-col w-full bg-card rounded-none">
       <div className="flex border-b border-primary bg-secondary/50">
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBold().run()}

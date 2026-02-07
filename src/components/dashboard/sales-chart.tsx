@@ -3,13 +3,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
+import { TrendingUp } from "lucide-react";
 
 interface SalesChartProps {
   className?: string;
   data?: { label: string; value: number }[];
+  rangeLabel?: string;
 }
 
-export function SalesChart({ className, data: propData }: SalesChartProps) {
+export function SalesChart({ className, data: propData, rangeLabel = "Last 7 Days" }: SalesChartProps) {
   // Default empty/zero data if none provided
   const data = propData || [
     { label: "Sun", value: 0 },
@@ -21,41 +23,43 @@ export function SalesChart({ className, data: propData }: SalesChartProps) {
     { label: "Sat", value: 0 },
   ];
 
-  const maxValue = Math.max(...data.map((d) => d.value), 100); // Dynamic max value, min 100
-  const points = data.map((d, i) => {
-    const x = (i / (data.length - 1)) * 100;
-    const y = 100 - (d.value / maxValue) * 100;
-    return `${x},${y}`;
-  });
+  const maxValue = Math.max(...data.map((d) => d.value), 100);
+  const points = data.map((d, i) => ({
+    x: (i / (data.length - 1)) * 100,
+    y: 100 - (d.value / maxValue) * 100,
+  }));
 
-  const pathD = `M ${points.map((p, i) => {
-    const [x, y] = p.split(",");
-    return `${x} ${y}`;
-  }).join(" L ")}`;
+  // Function to create a smooth Bézier path from points
+  const getCurvePath = (pts: { x: number; y: number }[]) => {
+    if (pts.length < 2) return "";
+    let d = `M ${pts[0].x},${pts[0].y}`;
+    
+    for (let i = 0; i < pts.length - 1; i++) {
+      const curr = pts[i];
+      const next = pts[i + 1];
+      const cp1x = curr.x + (next.x - curr.x) / 2;
+      const cp1y = curr.y;
+      const cp2x = curr.x + (next.x - curr.x) / 2;
+      const cp2y = next.y;
+      
+      d += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${next.x},${next.y}`;
+    }
+    return d;
+  };
 
+  const pathD = getCurvePath(points);
   const areaD = `${pathD} L 100 100 L 0 100 Z`;
 
   return (
-    <Card className={cn("col-span-4", className)}>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle>Sales Overview</CardTitle>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <span className="h-2 w-2 rounded-full bg-emerald-500" />
-              This week
-            </div>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
+    <Card className={cn("col-span-4 border-none shadow-none bg-transparent", className)}>
+      <CardContent className="p-7">
         <div className="h-[300px] w-full pt-4 relative pl-12">
             {/* Y-axis labels */}
-            <div className="absolute inset-y-0 left-0 flex flex-col justify-between text-xs text-muted-foreground h-[85%] w-12 pr-2 text-right">
+            <div className="absolute inset-y-0 left-0 flex flex-col justify-between text-[10px] font-bold text-primary/20 h-[85%] w-12 pr-4 text-right">
                 <span>{maxValue}</span>
-                <span>{maxValue * 0.75}</span>
-                <span>{maxValue * 0.5}</span>
-                <span>{maxValue * 0.25}</span>
+                <span>{Math.round(maxValue * 0.75)}</span>
+                <span>{Math.round(maxValue * 0.5)}</span>
+                <span>{Math.round(maxValue * 0.25)}</span>
                 <span>0</span>
             </div>
 
@@ -64,7 +68,7 @@ export function SalesChart({ className, data: propData }: SalesChartProps) {
                 {/* Grid lines */}
                 <div className="absolute inset-0 flex flex-col justify-between h-[85%]">
                   {[...Array(5)].map((_, i) => (
-                    <div key={i} className="h-px w-full bg-border/50 border-dashed" />
+                    <div key={i} className="h-px w-full bg-primary/5 border-dashed" />
                   ))}
                 </div>
 
@@ -72,8 +76,8 @@ export function SalesChart({ className, data: propData }: SalesChartProps) {
                 <svg className="w-full h-[85%] overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
                     <defs>
                         <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stopColor="#10b981" stopOpacity="0.2" />
-                            <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+                            <stop offset="0%" stopColor="#00311F" stopOpacity="0.1" />
+                            <stop offset="100%" stopColor="#00311F" stopOpacity="0" />
                         </linearGradient>
                     </defs>
 
@@ -85,10 +89,23 @@ export function SalesChart({ className, data: propData }: SalesChartProps) {
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5 }}
                     />
+
+                    {/* Line */}
+                    <motion.path
+                        d={pathD}
+                        fill="none"
+                        stroke="#00311F"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: 1 }}
+                        transition={{ duration: 1, ease: "easeInOut" }}
+                    />
                 </svg>
 
                 {/* X-axis labels */}
-                <div className="flex justify-between mt-4 text-xs text-muted-foreground">
+                <div className="flex justify-between mt-6 text-[10px] font-bold text-primary/40 uppercase tracking-wider px-2">
                     {data.map((d) => (
                         <span key={d.label}>{d.label}</span>
                     ))}

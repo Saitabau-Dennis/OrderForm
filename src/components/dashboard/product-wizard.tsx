@@ -4,23 +4,24 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "motion/react";
-import { 
-  ArrowRight, 
-  ArrowLeft, 
-  Check, 
-  Package, 
-  ImageIcon, 
-  DollarSign, 
-  Layers, 
-  Info,
-  Sparkles,
+import {
+  ArrowRight,
+  ArrowLeft,
+  Check,
+  Package,
+  ImageIcon,
+  DollarSign,
+  Layers,
   Loader2,
   Ruler,
-  ShoppingBag
+  Tag,
+  Eye,
+  CircleDot,
+  AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/dashboard/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -42,35 +43,29 @@ interface ProductWizardProps {
 
 const steps = [
   {
-    id: "intro",
-    label: "Start",
-    title: "Introduction",
-    icon: Sparkles
-  },
-  {
     id: "details",
     label: "Details",
-    title: "Product Info",
-    icon: Package
+    description: "Name & description",
+    icon: Package,
   },
   {
     id: "pricing",
     label: "Pricing",
-    title: "Price & Stock",
-    icon: DollarSign
+    description: "Price & variants",
+    icon: DollarSign,
   },
   {
     id: "media",
     label: "Media",
-    title: "Images",
-    icon: ImageIcon
+    description: "Product image",
+    icon: ImageIcon,
   },
   {
     id: "review",
     label: "Review",
-    title: "Confirm",
-    icon: Check
-  }
+    description: "Confirm & publish",
+    icon: Eye,
+  },
 ];
 
 export function ProductWizard({ onSuccess }: ProductWizardProps) {
@@ -89,7 +84,7 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
       imageUrl: "",
       sizes: "",
     },
-    mode: "onChange"
+    mode: "onChange",
   });
 
   const { watch, trigger } = form;
@@ -98,11 +93,11 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
   const handleNext = async () => {
     let stepValid = true;
 
-    if (currentStep === 1) { // Details step
+    if (currentStep === 0) {
       stepValid = await trigger(["name", "description", "category"]);
-    } else if (currentStep === 2) { // Pricing step
+    } else if (currentStep === 1) {
       stepValid = await trigger(["price", "sizes", "isAvailable"]);
-    } else if (currentStep === 3) { // Media step
+    } else if (currentStep === 2) {
       stepValid = await trigger(["imageUrl"]);
     }
 
@@ -110,7 +105,7 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
       setDirection(1);
       setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
     } else {
-      toast.error("Please fill in all required fields to continue");
+      toast.error("Please fill in all required fields");
     }
   };
 
@@ -141,397 +136,505 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
 
   const variants = {
     enter: (direction: number) => ({
-      x: direction > 0 ? 20 : -20,
+      x: direction > 0 ? 16 : -16,
       opacity: 0,
-      filter: "blur(5px)"
     }),
     center: {
       x: 0,
       opacity: 1,
-      filter: "blur(0px)"
     },
     exit: (direction: number) => ({
-      x: direction < 0 ? 20 : -20,
+      x: direction < 0 ? 16 : -16,
       opacity: 0,
-      filter: "blur(5px)"
     }),
   };
 
+  const completedFields = () => {
+    let count = 0;
+    const total = 7;
+    if (formData.name) count++;
+    if (formData.description) count++;
+    if (formData.category) count++;
+    if (formData.price > 0) count++;
+    if (formData.sizes) count++;
+    if (formData.imageUrl) count++;
+    count++; // isAvailable always has a value
+    return { count, total, percent: Math.round((count / total) * 100) };
+  };
+
+  const progress = completedFields();
+
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      {/* Horizontal Stepper */}
-      <div className="mb-10">
-        <div className="relative flex justify-between items-center w-full px-2">
-            <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gray-100 -z-10 -translate-y-1/2 rounded-full" />
-            <div 
-                className="absolute top-1/2 left-0 h-0.5 bg-primary -z-10 -translate-y-1/2 rounded-full transition-all duration-500 ease-in-out" 
-                style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
-            />
+    <div className="w-full max-w-5xl mx-auto flex gap-8">
+      {/* Left Sidebar - Steps */}
+      <div className="hidden lg:flex flex-col w-56 shrink-0">
+        <div className="sticky top-8 space-y-1">
+          {steps.map((step, index) => {
+            const isActive = index === currentStep;
+            const isCompleted = index < currentStep;
+            const Icon = step.icon;
 
-            {steps.map((step, index) => {
-                const isActive = index === currentStep;
-                const isCompleted = index < currentStep;
-                const Icon = step.icon;
+            return (
+              <button
+                key={step.id}
+                type="button"
+                onClick={() => {
+                  if (index < currentStep) {
+                    setDirection(index < currentStep ? -1 : 1);
+                    setCurrentStep(index);
+                  }
+                }}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-200 group",
+                  isActive
+                    ? "bg-primary/5 text-foreground"
+                    : isCompleted
+                    ? "text-foreground hover:bg-muted/50 cursor-pointer"
+                    : "text-muted-foreground/60 cursor-default"
+                )}
+              >
+                <div
+                  className={cn(
+                    "flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200 shrink-0",
+                    isActive
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : isCompleted
+                      ? "bg-emerald-100 text-emerald-600"
+                      : "bg-muted text-muted-foreground/40"
+                  )}
+                >
+                  {isCompleted ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <Icon className="h-4 w-4" />
+                  )}
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span
+                    className={cn(
+                      "text-sm font-medium truncate",
+                      isActive ? "text-foreground" : isCompleted ? "text-foreground" : "text-muted-foreground/60"
+                    )}
+                  >
+                    {step.label}
+                  </span>
+                  <span className="text-[11px] text-muted-foreground truncate">{step.description}</span>
+                </div>
+              </button>
+            );
+          })}
 
-                return (
-                    <div key={step.id} className="flex flex-col items-center gap-2 relative group cursor-default">
-                        <div className={cn(
-                            "w-12 h-12 rounded-full flex items-center justify-center border-4 transition-all duration-300 bg-white",
-                            isActive 
-                                ? "border-primary text-primary shadow-lg scale-110" 
-                                : isCompleted 
-                                    ? "border-primary bg-primary text-white" 
-                                    : "border-gray-100 text-gray-300"
-                        )}>
-                            <Icon className={cn("w-5 h-5", isActive && "animate-pulse")} />
-                        </div>
-                        <span className={cn(
-                            "absolute -bottom-8 text-xs font-medium whitespace-nowrap transition-colors duration-300",
-                            isActive ? "text-primary" : isCompleted ? "text-primary/70" : "text-gray-300"
-                        )}>
-                            {step.label}
-                        </span>
-                    </div>
-                );
-            })}
+          {/* Progress indicator */}
+          <div className="mt-6 pt-6 border-t border-border">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium text-muted-foreground">Completion</span>
+              <span className="text-xs font-semibold text-foreground">{progress.percent}%</span>
+            </div>
+            <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+              <div
+                className="h-full bg-primary rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${progress.percent}%` }}
+              />
+            </div>
+            <p className="text-[11px] text-muted-foreground mt-2">
+              {progress.count} of {progress.total} fields completed
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Main Card */}
-      <div className="bg-white rounded-3xl shadow-xl shadow-primary/5 border border-primary/5 overflow-hidden min-h-[500px] flex flex-col relative">
-        
-        {/* Step Content */}
-        <div className="flex-1 p-8 sm:p-12">
-             <AnimatePresence mode="wait" custom={direction}>
-                <motion.div
-                    key={currentStep}
-                    custom={direction}
-                    variants={variants}
-                    initial="enter"
-                    animate="center"
-                    exit="exit"
-                    transition={{ type: "spring", stiffness: 200, damping: 25 }}
-                    className="h-full flex flex-col"
-                >
-                    {/* Header for each step */}
-                    <div className="mb-8 text-center space-y-2">
-                        <h2 className="text-3xl font-medium font-raleway text-primary tracking-tight">
-                            {steps[currentStep].title}
-                        </h2>
-                        {currentStep === 0 && <p className="text-muted-foreground font-instrument-sans">Follow the steps to add your item</p>}
-                        {currentStep === 1 && <p className="text-muted-foreground font-instrument-sans">Enter the basic details of your product</p>}
-                        {currentStep === 2 && <p className="text-muted-foreground font-instrument-sans">Set your price and stock status</p>}
-                        {currentStep === 3 && <p className="text-muted-foreground font-instrument-sans">Upload a photo to showcase your item</p>}
-                        {currentStep === 4 && <p className="text-muted-foreground font-instrument-sans">Verify your details before publishing</p>}
-                    </div>
-
-                    <div className="flex-1 max-w-xl mx-auto w-full">
-                        {/* Step 0: Intro */}
-                        {currentStep === 0 && (
-                            <div className="flex flex-col items-center justify-center space-y-8 py-4">
-                                <div className="relative">
-                                    <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent rounded-full blur-2xl opacity-60" />
-                                    <div className="bg-white p-6 rounded-3xl shadow-lg border border-primary/10 relative">
-                                        <ShoppingBag className="w-16 h-16 text-primary" />
-                                    </div>
-                                </div>
-                                
-                                <div className="space-y-4 text-center">
-                                    <p className="text-lg text-muted-foreground font-instrument-sans leading-relaxed max-w-md">
-                                        Add a new product to your catalog by following this step-by-step process.
-                                    </p>
-                                    
-                                    <div className="bg-blue-50 text-blue-700 p-4 rounded-2xl text-sm flex items-start gap-3 text-left border border-blue-100 max-w-md mx-auto mt-4">
-                                        <Info className="h-5 w-5 shrink-0 mt-0.5 text-blue-500" />
-                                        <p>Ensure your images are clear and your descriptions are detailed to help customers make decisions.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Step 1: Details */}
-                        {currentStep === 1 && (
-                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                <div className="space-y-2">
-                                    <Label htmlFor="name" className="text-base font-medium">Product Name <span className="text-red-500">*</span></Label>
-                                    <Input 
-                                        id="name" 
-                                        placeholder="e.g. Classic Leather Watch" 
-                                        {...form.register("name")} 
-                                        className="h-14 rounded-xl border-2 border-transparent bg-gray-50 focus:bg-white focus:border-primary/20 transition-all text-lg shadow-sm font-normal"
-                                    />
-                                    {form.formState.errors.name && (
-                                        <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-                                            <Info className="h-3 w-3" />
-                                            {form.formState.errors.name.message}
-                                        </p>
-                                    )}
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="description" className="text-base font-medium">Description <span className="text-red-500">*</span></Label>
-                                    <Textarea
-                                        id="description"
-                                        placeholder="Describe your product..."
-                                        className="min-h-[160px] rounded-xl border-2 border-transparent bg-gray-50 focus:bg-white focus:border-primary/20 transition-all resize-none shadow-sm p-4 text-base font-normal"
-                                        {...form.register("description")}
-                                    />
-                                    {form.formState.errors.description && (
-                                        <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-                                            <Info className="h-3 w-3" />
-                                            {form.formState.errors.description.message}
-                                        </p>
-                                    )}
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label className="text-base font-medium">Category <span className="text-red-500">*</span></Label>
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" className="w-full justify-between font-normal h-14 rounded-xl border-2 border-transparent bg-gray-50 hover:bg-white hover:border-primary/20 transition-all shadow-sm">
-                                            <span className={watch("category") ? "text-foreground" : "text-muted-foreground"}>
-                                                {watch("category") || "Select category"}
-                                            </span>
-                                            <Layers className="h-4 w-4 opacity-50" />
-                                        </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-[300px] p-2 rounded-xl border-none shadow-xl" align="start">
-                                        {["Clothing", "Footwear", "Accessories", "Electronics", "Home", "Beauty"].map((cat) => (
-                                            <DropdownMenuItem
-                                            key={cat}
-                                            onClick={() => form.setValue("category", cat, { shouldValidate: true })}
-                                            className="cursor-pointer py-3 px-4 rounded-lg focus:bg-primary/5 focus:text-primary text-base font-medium"
-                                            >
-                                            {cat}
-                                            </DropdownMenuItem>
-                                        ))}
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                    {form.formState.errors.category && (
-                                        <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-                                            <Info className="h-3 w-3" />
-                                            {form.formState.errors.category.message}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Step 2: Pricing */}
-                        {currentStep === 2 && (
-                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                <div className="space-y-3">
-                                    <Label htmlFor="price" className="text-base font-medium">Price (KES) <span className="text-red-500">*</span></Label>
-                                    <div className="relative group">
-                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm border border-gray-100 z-10">
-                                            <DollarSign className="h-5 w-5 text-primary" />
-                                        </div>
-                                        <Input
-                                            type="number"
-                                            id="price"
-                                            placeholder="0.00"
-                                            className="pl-20 h-16 rounded-2xl border-2 border-transparent bg-gray-50 focus:bg-white focus:border-primary/20 transition-all text-2xl font-medium font-sora shadow-sm"
-                                            {...form.register("price")}
-                                        />
-                                    </div>
-                                    {form.formState.errors.price && (
-                                        <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-                                            <Info className="h-3 w-3" />
-                                            {form.formState.errors.price.message}
-                                        </p>
-                                    )}
-                                </div>
-
-                                <div className="space-y-4">
-                                    <Label className="text-base font-medium flex items-center gap-2">
-                                        <Ruler className="h-4 w-4 text-primary" />
-                                        Available Sizes
-                                    </Label>
-                                    <div className="flex flex-wrap gap-3">
-                                        {["XS", "S", "M", "L", "XL", "XXL"].map((size) => {
-                                        const currentSizes = watch("sizes")?.split(",").map(s => s.trim()).filter(Boolean) || [];
-                                        const isSelected = currentSizes.includes(size);
-
-                                        return (
-                                            <button
-                                            key={size}
-                                            type="button"
-                                            onClick={() => {
-                                                let newSizes;
-                                                if (isSelected) {
-                                                newSizes = currentSizes.filter(s => s !== size);
-                                                } else {
-                                                newSizes = [...currentSizes, size];
-                                                }
-                                                form.setValue("sizes", newSizes.join(", "), { shouldValidate: true });
-                                            }}
-                                            className={cn(
-                                                "w-12 h-12 rounded-xl text-sm font-medium transition-all shadow-sm flex items-center justify-center",
-                                                isSelected
-                                                ? "bg-primary text-white shadow-primary/20 scale-105"
-                                                : "bg-white text-gray-500 border border-gray-100 hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
-                                            )}
-                                            >
-                                            {size}
-                                            </button>
-                                        );
-                                        })}
-                                    </div>
-                                    <Input
-                                        placeholder="Add custom sizes"
-                                        {...form.register("sizes")}
-                                        className="h-12 rounded-xl border-2 border-transparent bg-gray-50 focus:bg-white focus:border-primary/20 transition-all mt-2 font-normal"
-                                    />
-                                    {form.formState.errors.sizes && (
-                                        <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-                                            <Info className="h-3 w-3" />
-                                            {form.formState.errors.sizes.message}
-                                        </p>
-                                    )}
-                                </div>
-
-                                <div className="flex items-center justify-between p-5 rounded-2xl bg-gradient-to-r from-gray-50 to-white border border-gray-100 shadow-sm">
-                                    <div className="space-y-1">
-                                        <Label htmlFor="isAvailable" className="text-base font-medium text-foreground">In Stock</Label>
-                                        <p className="text-sm text-muted-foreground">Product is available for purchase</p>
-                                    </div>
-                                    <Switch
-                                        id="isAvailable"
-                                        checked={watch("isAvailable")}
-                                        onCheckedChange={(checked) => form.setValue("isAvailable", checked)}
-                                        className="data-[state=checked]:bg-primary scale-110"
-                                    />
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Step 3: Media */}
-                        {currentStep === 3 && (
-                            <div className="h-full flex flex-col justify-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                <div className="w-full bg-gray-50/50 rounded-3xl border-2 border-dashed border-primary/20 p-8 flex flex-col justify-center items-center hover:bg-primary/[0.02] transition-colors group">
-                                    <div className="w-full max-w-sm transform transition-all group-hover:scale-[1.02] duration-300">
-                                        <ImageUpload
-                                            value={watch("imageUrl")}
-                                            onChange={(url) => form.setValue("imageUrl", url, { shouldValidate: true })}
-                                            endpoint="productImage"
-                                        />
-                                    </div>
-                                    <p className="mt-6 text-sm text-muted-foreground text-center">
-                                        Upload a clear image of your product.
-                                    </p>
-                                </div>
-                                {form.formState.errors.imageUrl && (
-                                    <p className="text-xs text-red-500 flex items-center justify-center gap-1 mt-2">
-                                        <Info className="h-3 w-3" />
-                                        {form.formState.errors.imageUrl.message}
-                                    </p>
-                                )}
-                            </div>
-                        )}
-
-                        {/* Step 4: Review */}
-                        {currentStep === 4 && (
-                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                <div className="bg-white rounded-3xl p-6 shadow-xl shadow-gray-100 border border-gray-100 relative overflow-hidden">
-                                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-0" />
-                                    
-                                    <div className="flex flex-col sm:flex-row gap-6 relative z-10">
-                                        <div className="h-32 w-32 sm:h-40 sm:w-40 rounded-2xl bg-gray-100 border border-gray-200 overflow-hidden shrink-0 shadow-md">
-                                            {formData.imageUrl ? (
-                                                <img src={formData.imageUrl} alt="Preview" className="h-full w-full object-cover" />
-                                            ) : (
-                                                <div className="h-full w-full flex items-center justify-center">
-                                                    <ImageIcon className="h-10 w-10 text-gray-300" />
-                                                </div>
-                                            )}
-                                        </div>
-                                        
-                                        <div className="flex-1 space-y-4 py-1">
-                                            <div>
-                                                <div className="flex items-start justify-between">
-                                                    <div>
-                                                        <h3 className="font-medium text-2xl font-raleway text-foreground">{formData.name || "Untitled Product"}</h3>
-                                                        {formData.category && (
-                                                            <span className="inline-block mt-2 text-xs font-medium px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full uppercase tracking-wider">
-                                                                {formData.category}
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                    <span className="text-xl font-medium font-sora text-primary bg-primary/5 px-3 py-1 rounded-lg">
-                                                        KES {formData.price}
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                            <div className="space-y-1">
-                                                <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Description</h4>
-                                                <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
-                                                    {formData.description || "No description provided."}
-                                                </p>
-                                            </div>
-
-                                            <div className="flex items-center gap-6 pt-2">
-                                                <div>
-                                                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest block mb-1">Sizes</span>
-                                                    <span className="font-medium text-sm bg-gray-50 px-2 py-1 rounded-md border border-gray-100">{formData.sizes || "N/A"}</span>
-                                                </div>
-                                                <div>
-                                                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest block mb-1">Status</span>
-                                                    <div className={cn("flex items-center gap-1.5 font-medium text-sm px-2 py-1 rounded-md", formData.isAvailable ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700")}>
-                                                        <span className={cn("w-2 h-2 rounded-full", formData.isAvailable ? "bg-green-500 animate-pulse" : "bg-red-500")} />
-                                                        {formData.isAvailable ? "Active" : "Draft"}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div className="text-center">
-                                    <p className="text-sm text-muted-foreground">
-                                        Review your information before finalizing.
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </motion.div>
-             </AnimatePresence>
-        </div>
-
-        {/* Footer Actions */}
-        <div className="p-6 sm:px-12 bg-white border-t border-gray-50 flex items-center justify-between">
-            <Button
-                variant="ghost"
-                onClick={handleBack}
-                disabled={currentStep === 0 || loading}
+      {/* Mobile Step Indicator */}
+      <div className="lg:hidden w-full">
+        <div className="flex items-center gap-2 mb-6 px-1">
+          {steps.map((step, index) => (
+            <div key={step.id} className="flex items-center gap-2 flex-1">
+              <div
                 className={cn(
-                    "gap-2 text-muted-foreground hover:text-foreground hover:bg-gray-100 rounded-xl h-12 px-6", 
-                    currentStep === 0 && "opacity-0 pointer-events-none"
+                  "h-1.5 flex-1 rounded-full transition-all duration-300",
+                  index <= currentStep ? "bg-primary" : "bg-muted"
                 )}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 min-w-0">
+        <div className="bg-card rounded-xl border border-border overflow-hidden flex flex-col min-h-[560px]">
+          {/* Step Content */}
+          <div className="flex-1 p-6 sm:p-8">
+            <AnimatePresence mode="wait" custom={direction}>
+              <motion.div
+                key={currentStep}
+                custom={direction}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                className="h-full flex flex-col"
+              >
+                {/* Step Header */}
+                <div className="mb-6">
+                  <div className="flex items-center gap-2 text-xs font-medium text-primary uppercase tracking-wider mb-1">
+                    <span>Step {currentStep + 1} of {steps.length}</span>
+                  </div>
+                  <h2 className="text-xl font-semibold text-foreground font-poppins">
+                    {currentStep === 0 && "Product Details"}
+                    {currentStep === 1 && "Pricing & Variants"}
+                    {currentStep === 2 && "Product Image"}
+                    {currentStep === 3 && "Review & Publish"}
+                  </h2>
+                  <p className="text-sm text-muted-foreground mt-1 font-poppins">
+                    {currentStep === 0 && "Enter the basic information about your product."}
+                    {currentStep === 1 && "Set the price, sizes, and availability."}
+                    {currentStep === 2 && "Upload a clear photo to showcase your product."}
+                    {currentStep === 3 && "Review everything before publishing."}
+                  </p>
+                </div>
+
+                <div className="flex-1 max-w-lg">
+                  {/* Step 0: Details */}
+                  {currentStep === 0 && (
+                    <div className="space-y-5">
+                      <div className="space-y-2">
+                        <Label htmlFor="name" className="text-sm font-medium">
+                          Product Name <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="name"
+                          placeholder="e.g. Classic Leather Watch"
+                          {...form.register("name")}
+                          className="h-11 rounded-lg border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all text-sm"
+                        />
+                        {form.formState.errors.name && (
+                          <p className="text-xs text-red-500 flex items-center gap-1">
+                            <AlertCircle className="h-3 w-3" />
+                            {form.formState.errors.name.message}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="description" className="text-sm font-medium">
+                          Description <span className="text-red-500">*</span>
+                        </Label>
+                        <Textarea
+                          id="description"
+                          placeholder="Describe your product in detail..."
+                          className="min-h-[120px] rounded-lg border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all resize-none text-sm leading-relaxed"
+                          {...form.register("description")}
+                        />
+                        {form.formState.errors.description && (
+                          <p className="text-xs text-red-500 flex items-center gap-1">
+                            <AlertCircle className="h-3 w-3" />
+                            {form.formState.errors.description.message}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">
+                          Category <span className="text-red-500">*</span>
+                        </Label>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className="w-full justify-between font-normal h-11 rounded-lg border-border bg-background hover:bg-accent transition-all text-sm"
+                            >
+                              <span className={watch("category") ? "text-foreground" : "text-muted-foreground"}>
+                                {watch("category") || "Select a category"}
+                              </span>
+                              <Layers className="h-4 w-4 opacity-40" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            className="w-(--radix-dropdown-menu-trigger-width) p-1 rounded-xl border border-border shadow-lg"
+                            align="start"
+                          >
+                            {["Clothing", "Footwear", "Accessories", "Electronics", "Home", "Beauty"].map(
+                              (cat) => (
+                                <DropdownMenuItem
+                                  key={cat}
+                                  onClick={() => form.setValue("category", cat, { shouldValidate: true })}
+                                  className="cursor-pointer py-2.5 px-3 rounded-lg text-sm"
+                                >
+                                  {cat}
+                                </DropdownMenuItem>
+                              )
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                        {form.formState.errors.category && (
+                          <p className="text-xs text-red-500 flex items-center gap-1">
+                            <AlertCircle className="h-3 w-3" />
+                            {form.formState.errors.category.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 1: Pricing */}
+                  {currentStep === 1 && (
+                    <div className="space-y-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="price" className="text-sm font-medium">
+                          Price (KES) <span className="text-red-500">*</span>
+                        </Label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <span className="text-sm font-medium text-muted-foreground">KES</span>
+                          </div>
+                          <Input
+                            type="number"
+                            id="price"
+                            placeholder="0.00"
+                            className="pl-14 h-12 rounded-lg border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all text-lg font-medium font-poppins tabular-nums"
+                            {...form.register("price")}
+                          />
+                        </div>
+                        {form.formState.errors.price && (
+                          <p className="text-xs text-red-500 flex items-center gap-1">
+                            <AlertCircle className="h-3 w-3" />
+                            {form.formState.errors.price.message}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Available Sizes</Label>
+                        <div className="flex flex-wrap gap-2">
+                          {["XS", "S", "M", "L", "XL", "XXL"].map((size) => {
+                            const currentSizes =
+                              watch("sizes")
+                                ?.split(",")
+                                .map((s) => s.trim())
+                                .filter(Boolean) || [];
+                            const isSelected = currentSizes.includes(size);
+
+                            return (
+                              <button
+                                key={size}
+                                type="button"
+                                onClick={() => {
+                                  let newSizes;
+                                  if (isSelected) {
+                                    newSizes = currentSizes.filter((s) => s !== size);
+                                  } else {
+                                    newSizes = [...currentSizes, size];
+                                  }
+                                  form.setValue("sizes", newSizes.join(", "), { shouldValidate: true });
+                                }}
+                                className={cn(
+                                  "h-10 px-4 rounded-lg text-sm font-medium transition-all border",
+                                  isSelected
+                                    ? "bg-primary text-primary-foreground border-primary"
+                                    : "bg-background text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"
+                                )}
+                              >
+                                {size}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <Input
+                          placeholder="Or type custom sizes (e.g. 40, 41, 42)"
+                          {...form.register("sizes")}
+                          className="h-11 rounded-lg border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all text-sm"
+                        />
+                        {form.formState.errors.sizes && (
+                          <p className="text-xs text-red-500 flex items-center gap-1">
+                            <AlertCircle className="h-3 w-3" />
+                            {form.formState.errors.sizes.message}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 rounded-xl bg-muted/50 border border-border">
+                        <div className="space-y-0.5">
+                          <Label htmlFor="isAvailable" className="text-sm font-medium">
+                            Available for purchase
+                          </Label>
+                          <p className="text-xs text-muted-foreground">Customers can find and buy this product</p>
+                        </div>
+                        <Switch
+                          id="isAvailable"
+                          checked={watch("isAvailable")}
+                          onCheckedChange={(checked) => form.setValue("isAvailable", checked)}
+                          className="data-[state=checked]:bg-primary"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 2: Media */}
+                  {currentStep === 2 && (
+                    <div className="space-y-4">
+                      <div className="rounded-xl border border-dashed border-border p-6 bg-muted/20 hover:bg-muted/30 transition-colors">
+                        <div className="max-w-sm mx-auto">
+                          <ImageUpload
+                            value={watch("imageUrl")}
+                            onChange={(url) => form.setValue("imageUrl", url, { shouldValidate: true })}
+                            endpoint="productImage"
+                          />
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground text-center">
+                        Upload a high-quality image. Recommended size: 800x800px.
+                      </p>
+                      {form.formState.errors.imageUrl && (
+                        <p className="text-xs text-red-500 flex items-center justify-center gap-1">
+                          <AlertCircle className="h-3 w-3" />
+                          {form.formState.errors.imageUrl.message}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Step 3: Review */}
+                  {currentStep === 3 && (
+                    <div className="space-y-6">
+                      {/* Product Preview Card */}
+                      <div className="rounded-xl border border-border overflow-hidden bg-background">
+                        <div className="flex flex-col sm:flex-row">
+                          {/* Image */}
+                          <div className="sm:w-40 sm:h-auto h-48 bg-muted shrink-0 overflow-hidden">
+                            {formData.imageUrl ? (
+                              <img
+                                src={formData.imageUrl}
+                                alt="Preview"
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              <div className="h-full w-full flex items-center justify-center">
+                                <ImageIcon className="h-8 w-8 text-muted-foreground/30" />
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Info */}
+                          <div className="flex-1 p-5 space-y-3">
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+                                <h3 className="font-semibold text-lg text-foreground font-poppins leading-tight">
+                                  {formData.name || "Untitled Product"}
+                                </h3>
+                                {formData.category && (
+                                  <span className="inline-flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+                                    <Tag className="h-3 w-3" />
+                                    {formData.category}
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-base font-semibold text-foreground font-poppins tabular-nums whitespace-nowrap">
+                                KES {Number(formData.price).toLocaleString()}
+                              </span>
+                            </div>
+
+                            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
+                              {formData.description || "No description."}
+                            </p>
+
+                            <div className="flex items-center gap-4 pt-1">
+                              {formData.sizes && (
+                                <div className="flex items-center gap-1.5">
+                                  <Ruler className="h-3.5 w-3.5 text-muted-foreground" />
+                                  <span className="text-xs text-muted-foreground">{formData.sizes}</span>
+                                </div>
+                              )}
+                              <div className="flex items-center gap-1.5">
+                                <CircleDot
+                                  className={cn(
+                                    "h-3.5 w-3.5",
+                                    formData.isAvailable ? "text-emerald-500" : "text-muted-foreground"
+                                  )}
+                                />
+                                <span
+                                  className={cn(
+                                    "text-xs font-medium",
+                                    formData.isAvailable ? "text-emerald-600" : "text-muted-foreground"
+                                  )}
+                                >
+                                  {formData.isAvailable ? "Active" : "Draft"}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Field Summary */}
+                      <div className="rounded-xl border border-border divide-y divide-border">
+                        {[
+                          { label: "Name", value: formData.name },
+                          { label: "Description", value: formData.description, truncate: true },
+                          { label: "Category", value: formData.category },
+                          { label: "Price", value: formData.price ? `KES ${Number(formData.price).toLocaleString()}` : "" },
+                          { label: "Sizes", value: formData.sizes },
+                          { label: "Status", value: formData.isAvailable ? "Active" : "Draft" },
+                        ].map((item) => (
+                          <div key={item.label} className="flex items-center justify-between px-4 py-3">
+                            <span className="text-sm text-muted-foreground">{item.label}</span>
+                            <span
+                              className={cn(
+                                "text-sm font-medium text-right max-w-[60%]",
+                                item.value ? "text-foreground" : "text-muted-foreground/40 italic",
+                                item.truncate && "truncate"
+                              )}
+                            >
+                              {item.value || "Not set"}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Footer */}
+          <div className="px-6 sm:px-8 py-4 bg-muted/30 border-t border-border flex items-center justify-between">
+            <Button
+              variant="ghost"
+              onClick={handleBack}
+              disabled={currentStep === 0 || loading}
+              className={cn(
+                "gap-2 text-muted-foreground hover:text-foreground rounded-lg h-10 px-4 text-sm",
+                currentStep === 0 && "opacity-0 pointer-events-none"
+              )}
             >
-                <ArrowLeft className="h-4 w-4" />
-                Back
+              <ArrowLeft className="h-4 w-4" />
+              Back
             </Button>
 
             {currentStep === steps.length - 1 ? (
-                 <Button 
-                    onClick={handleSubmit} 
-                    disabled={loading}
-                    className="bg-primary text-white hover:bg-primary/90 shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all px-8 h-12 rounded-xl text-base font-medium min-w-[160px]"
-                >
-                    {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
-                    Confirm & Publish
-                </Button>
+              <Button
+                onClick={handleSubmit}
+                disabled={loading}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all px-6 h-10 rounded-lg text-sm font-medium min-w-[140px]"
+              >
+                {loading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Check className="mr-2 h-4 w-4" />
+                )}
+                Publish Product
+              </Button>
             ) : (
-                <Button 
-                    onClick={handleNext}
-                    className="bg-primary text-white hover:bg-primary/90 shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all px-8 h-12 rounded-xl text-base font-medium min-w-[140px]"
-                >
-                    Next Step
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+              <Button
+                onClick={handleNext}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all px-6 h-10 rounded-lg text-sm font-medium min-w-[120px]"
+              >
+                Continue
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
             )}
+          </div>
         </div>
       </div>
     </div>

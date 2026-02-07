@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader2, Package, Image as ImageIcon, Layers, DollarSign, Ruler, AlertCircle } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/dashboard/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -101,10 +101,10 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
       return (
         <div className="space-y-4">
             <div className="flex items-start gap-3">
-                {Icon && <div className="p-2 bg-primary/5 rounded-lg text-primary"><Icon className="h-5 w-5" /></div>}
+                {Icon && <div className="p-2 bg-primary/5 rounded-2xl text-primary"><Icon className="h-5 w-5" /></div>}
                 <div className="space-y-1">
-                    <h3 className="font-medium text-lg font-raleway text-foreground">{title}</h3>
-                    {description && <p className="text-sm text-muted-foreground font-instrument-sans">{description}</p>}
+                    <h3 className="font-medium text-lg font-poppins text-foreground">{title}</h3>
+                    {description && <p className="text-sm text-muted-foreground font-poppins">{description}</p>}
                 </div>
             </div>
             {children}
@@ -114,16 +114,16 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
     }
 
     return (
-      <div className="rounded-3xl border border-primary/5 bg-white shadow-xl shadow-primary/5 overflow-hidden transition-all hover:shadow-2xl hover:shadow-primary/10">
-        <div className="flex items-center gap-4 p-6 border-b border-primary/5 bg-primary/[0.02]">
+      <div className="rounded-3xl border border-border bg-card shadow-sm overflow-hidden transition-all hover:shadow-2xl hover:shadow-primary/10">
+        <div className="flex items-center gap-4 p-6 border-b border-border bg-primary/[0.02]">
           {Icon && (
-            <div className="h-10 w-10 rounded-2xl bg-white border border-primary/10 flex items-center justify-center shadow-sm text-primary">
+            <div className="h-10 w-10 rounded-3xl bg-card border border-border flex items-center justify-center shadow-sm text-primary">
                 <Icon className="h-5 w-5" />
             </div>
           )}
           <div className="flex flex-col space-y-0.5">
-            <h3 className="font-medium text-lg font-raleway text-primary">{title}</h3>
-            {description && <p className="text-xs text-muted-foreground font-instrument-sans uppercase tracking-wider">{description}</p>}
+            <h3 className="font-medium text-lg font-poppins text-primary">{title}</h3>
+            {description && <p className="text-xs text-muted-foreground font-poppins uppercase tracking-wider">{description}</p>}
           </div>
         </div>
         <div className="p-8 space-y-8">
@@ -148,7 +148,7 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                     id="name"
                     placeholder="e.g. Vintage Denim Jacket"
                     {...form.register("name")}
-                    className="h-10 rounded-xl border-primary/10 bg-gray-50/50 focus:bg-white focus:border-primary/30 transition-all font-normal text-sm placeholder:text-muted-foreground/50"
+                    className="h-10 rounded-3xl border-border bg-secondary/50 focus:bg-card focus:border-primary/30 transition-all font-normal text-sm placeholder:text-muted-foreground/50"
                   />
                   {form.formState.errors.name && (
                     <p className="text-xs text-red-500 flex items-center gap-1">
@@ -165,7 +165,7 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                   <Textarea
                     id="description"
                     placeholder="Tell your customers about this product..."
-                    className="min-h-[100px] rounded-xl border-primary/10 bg-gray-50/50 focus:bg-white focus:border-primary/30 transition-all resize-y p-3 font-instrument-sans leading-relaxed text-sm"
+                    className="min-h-[100px] rounded-3xl border-border bg-secondary/50 focus:bg-card focus:border-primary/30 transition-all resize-y p-3 font-poppins leading-relaxed text-sm"
                     {...form.register("description")}
                   />
                   {form.formState.errors.description && (
@@ -180,13 +180,13 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                   <Label htmlFor="price" className="text-sm font-medium">Price <span className="text-red-500">*</span></Label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <span className="text-primary font-medium font-sora text-sm">KES</span>
+                      <span className="text-primary font-medium font-poppins text-sm">KES</span>
                     </div>
                     <Input
                       type="number"
                       id="price"
                       placeholder="0.00"
-                      className="pl-12 h-10 rounded-xl border-primary/10 bg-gray-50/50 focus:bg-white focus:border-primary/30 transition-all font-medium font-sora text-sm tabular-nums"
+                      className="pl-12 h-10 rounded-3xl border-border bg-secondary/50 focus:bg-card focus:border-primary/30 transition-all font-medium font-poppins text-sm tabular-nums"
                       {...form.register("price")}
                     />
                   </div>
@@ -204,7 +204,7 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
           <div className="space-y-8">
 
             <SectionWrapper title="Media" description="Product images" icon={ImageIcon}>
-                <div className="bg-gray-50/50 rounded-2xl p-2 border border-dashed border-primary/10">
+                <div className="bg-secondary/50 rounded-3xl p-2 border border-dashed border-border">
                     <ImageUpload
                     value={form.watch("imageUrl")}
                     onChange={(url) => form.setValue("imageUrl", url)}
@@ -224,7 +224,7 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                   <Label className="text-sm font-medium">Category</Label>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" className="w-full justify-between font-normal h-10 rounded-xl border-primary/20 bg-white hover:bg-gray-50 hover:border-primary/40 transition-all text-sm shadow-sm">
+                      <Button variant="outline" className="w-full justify-between font-normal h-10 rounded-3xl border-primary/20 bg-card hover:bg-secondary hover:border-primary/40 transition-all text-sm shadow-sm">
                         {form.watch("category") ? (
                           <span className="text-primary font-medium">{form.watch("category")}</span>
                         ) : (
@@ -233,12 +233,12 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                         <Layers className="h-4 w-4 text-primary opacity-70" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-[280px] p-2 rounded-2xl border-none shadow-xl" align="start">
+                    <DropdownMenuContent className="w-[280px] p-2 rounded-3xl border-none shadow-xl" align="start">
                       {["Clothing", "Footwear", "Accessories", "Electronics", "Home", "Beauty"].map((cat) => (
                         <DropdownMenuItem
                           key={cat}
                           onClick={() => form.setValue("category", cat)}
-                          className="rounded-lg p-2 cursor-pointer focus:bg-primary/5 focus:text-primary font-normal text-sm"
+                          className="rounded-2xl p-2 cursor-pointer focus:bg-primary/5 focus:text-primary font-normal text-sm"
                         >
                           {cat}
                         </DropdownMenuItem>
@@ -276,10 +276,10 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                             form.setValue("sizes", newSizes.join(", "));
                           }}
                           className={cn(
-                            "cursor-pointer w-8 h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-all border",
+                            "cursor-pointer w-8 h-8 flex items-center justify-center rounded-2xl text-xs font-medium transition-all border",
                             isSelected
-                              ? "bg-primary text-white border-primary shadow-sm transform scale-105"
-                              : "bg-white text-muted-foreground border-primary/10 hover:border-primary/30 hover:bg-primary/5"
+                              ? "bg-primary text-primary-foreground border-primary shadow-sm transform scale-105"
+                              : "bg-card text-muted-foreground border-border hover:border-primary/30 hover:bg-primary/5"
                           )}
                         >
                           {size}
@@ -290,7 +290,7 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                   <Input
                     placeholder="Custom sizes (e.g. 40, 41, 42)"
                     {...form.register("sizes")}
-                    className="h-10 rounded-xl border-primary/10 bg-gray-50/50 text-sm"
+                    className="h-10 rounded-3xl border-border bg-secondary/50 text-sm"
                   />
                   {form.formState.errors.sizes && (
                     <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
@@ -300,8 +300,8 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                   )}
                 </div>
 
-                <div className="pt-3 mt-3 border-t border-primary/5">
-                    <div className="flex items-center justify-between p-3 rounded-xl bg-primary/5 border border-primary/10">
+                <div className="pt-3 mt-3 border-t border-border">
+                    <div className="flex items-center justify-between p-3 rounded-3xl bg-primary/5 border border-border">
                         <div className="space-y-0.5">
                             <Label htmlFor="isAvailable" className="text-sm font-medium text-primary">In Stock</Label>
                             <p className="text-[10px] text-muted-foreground">Available for purchase</p>
@@ -321,7 +321,7 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
 
         <div className="flex items-center justify-end gap-3 pt-2 pb-8">
             {layout === "sheet" && (
-                <Button variant="ghost" type="button" className="h-10 px-4 rounded-xl hover:bg-red-50 hover:text-red-600 text-sm">
+                <Button variant="ghost" type="button" className="h-10 px-4 rounded-3xl hover:bg-red-50 hover:text-red-600 text-sm">
                     Cancel
                 </Button>
             )}
@@ -329,7 +329,7 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                 size="default"
                 type="submit"
                 disabled={loading}
-                className="bg-primary text-white hover:bg-primary/90 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all rounded-xl px-6 h-10 font-medium text-sm w-full sm:w-auto"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all rounded-3xl px-6 h-10 font-medium text-sm w-full sm:w-auto"
             >
                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 {initialData ? "Save Changes" : "Create Product"}

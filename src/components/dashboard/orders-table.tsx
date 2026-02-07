@@ -4,7 +4,7 @@ import { Eye, MoreHorizontal, ShoppingBag } from "lucide-react";
 import { format } from "date-fns";
 import { ColumnDef } from "@tanstack/react-table";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/dashboard/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,18 +31,19 @@ interface Order {
 interface OrdersTableProps {
   orders: Order[];
   onView?: (order: Order) => void;
+  standalone?: boolean;
 }
 
-export function OrdersTable({ orders, onView }: OrdersTableProps) {
+export function OrdersTable({ orders, onView, standalone = true }: OrdersTableProps) {
   if (orders.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-[400px] space-y-4 bg-white/50 backdrop-blur-sm rounded-2xl border border-primary/5">
+      <div className="flex flex-col items-center justify-center h-[400px] space-y-4 bg-card/50 backdrop-blur-sm rounded-3xl border border-border">
         <div className="p-6 rounded-full bg-primary/5 ring-1 ring-primary/10">
           <ShoppingBag className="h-10 w-10 text-primary/40" />
         </div>
         <div className="text-center space-y-1">
-            <h3 className="text-lg font-medium text-foreground font-raleway">No orders yet</h3>
-            <p className="text-sm text-muted-foreground font-instrument-sans">
+            <h3 className="text-lg font-medium text-foreground font-poppins">No orders yet</h3>
+            <p className="text-sm text-muted-foreground font-poppins">
             When you receive orders, they will appear here.
             </p>
         </div>
@@ -63,7 +64,7 @@ export function OrdersTable({ orders, onView }: OrdersTableProps) {
       case "cancelled": 
         return "bg-red-100 text-red-800 border-red-200";
       default: 
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return "bg-gray-100 text-foreground border-border";
     }
   };
 
@@ -74,7 +75,7 @@ export function OrdersTable({ orders, onView }: OrdersTableProps) {
       cell: ({ row }) => {
         const order = row.original;
         return (
-            <span className="font-semibold text-foreground font-sora">
+            <span className="font-semibold text-foreground font-poppins">
                 {order.displayId ?? formatOrderId(order.orderNumber ?? order.id)}
             </span>
         );
@@ -114,7 +115,7 @@ export function OrdersTable({ orders, onView }: OrdersTableProps) {
       cell: ({ row }) => {
         const amount = parseFloat(row.getValue("totalAmount"));
         return (
-            <span className="font-medium font-sora text-foreground">
+            <span className="font-medium font-poppins text-foreground">
                 KES {amount.toLocaleString()}
             </span>
         );
@@ -162,6 +163,6 @@ export function OrdersTable({ orders, onView }: OrdersTableProps) {
   ];
 
   return (
-    <DataTable columns={columns} data={orders} searchKey="customerName" placeholder="Search customers..." />
+    <DataTable columns={columns} data={orders} searchKey="customerName" placeholder="Search customers..." standalone={standalone} />
   );
 }

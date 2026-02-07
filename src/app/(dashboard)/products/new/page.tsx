@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/dashboard/button";
 import { ProductWizard } from "@/components/dashboard/product-wizard";
 
 export default function NewProductPage() {
@@ -15,16 +15,17 @@ export default function NewProductPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 animate-appear">
-      <div className="flex items-center gap-4 mb-6">
-        <Button 
-            variant="ghost" 
-            size="sm" 
-            className="gap-2 text-muted-foreground hover:text-primary" 
-            onClick={() => router.back()}
+    <div className="min-h-[calc(100vh-4rem)] flex flex-col animate-appear">
+      {/* Top bar */}
+      <div className="flex items-center gap-4 mb-8">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="gap-2 text-muted-foreground hover:text-foreground rounded-lg h-9 px-3"
+          onClick={() => router.back()}
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Products
+          Back
         </Button>
       </div>
 

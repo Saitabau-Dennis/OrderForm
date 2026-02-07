@@ -16,7 +16,7 @@ interface StoreLayoutProps {
 }
 
 export function StoreContent({ store, products }: StoreLayoutProps) {
-  const { searchQuery, setSearchQuery, brandColor } = useStore();
+  const { searchQuery, setSearchQuery, brandColor, secondaryColor } = useStore();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const params = useParams();
 
@@ -45,7 +45,7 @@ export function StoreContent({ store, products }: StoreLayoutProps) {
             <Link href={`/${params.storeSlug}/share`}>
                 <div
                     className="group relative overflow-hidden rounded-[2rem] p-8 md:p-12 duration-500 border border-gray-100 shadow-sm"
-                    style={{ backgroundColor: `${brandColor}08` }}
+                    style={{ backgroundColor: secondaryColor + "20" }}
                 >
                     <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
                         <div className="space-y-3 max-w-lg">
@@ -69,8 +69,8 @@ export function StoreContent({ store, products }: StoreLayoutProps) {
                     </div>
 
                     {/* Decorative Elements */}
-                    <div className="absolute top-0 right-0 -mr-20 -mt-20 h-64 w-64 rounded-full opacity-[0.03] blur-3xl" style={{ backgroundColor: brandColor }} />
-                    <div className="absolute bottom-0 left-0 -ml-20 -mb-20 h-64 w-64 rounded-full opacity-[0.03] blur-3xl" style={{ backgroundColor: brandColor }} />
+                    <div className="absolute top-0 right-0 -mr-20 -mt-20 h-64 w-64 rounded-full opacity-30 blur-3xl" style={{ backgroundColor: secondaryColor }} />
+                    <div className="absolute bottom-0 left-0 -ml-20 -mb-20 h-64 w-64 rounded-full opacity-30 blur-3xl" style={{ backgroundColor: secondaryColor }} />
                 </div>
             </Link>
         </div>

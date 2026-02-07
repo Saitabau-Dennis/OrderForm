@@ -14,7 +14,7 @@ interface StoreHeaderProps {
 }
 
 export function StoreHeader({ name, logoUrl }: StoreHeaderProps) {
-  const { openCart, cartCount, brandColor, searchQuery, setSearchQuery } = useStore();
+  const { openCart, cartCount, brandColor, secondaryColor, searchQuery, setSearchQuery } = useStore();
   const [scrolled, setScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const params = useParams();
@@ -33,18 +33,18 @@ export function StoreHeader({ name, logoUrl }: StoreHeaderProps) {
     <header
       className={cn(
         "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500",
-        scrolled 
-          ? "bg-white/80 backdrop-blur-md border-b border-gray-100 py-3 shadow-sm" 
+        scrolled
+          ? "bg-white/80 backdrop-blur-md border-b border-gray-100 py-3 shadow-sm"
           : "bg-transparent py-5"
       )}
     >
       <div className="container mx-auto px-4 md:px-8">
         <div className="relative flex items-center justify-between gap-4">
-          
+
           {/* Left: Back Button or Search Trigger */}
           <div className="flex items-center min-w-[100px] flex-1">
             {isProductPage ? (
-                <button 
+                <button
                     onClick={() => router.back()}
                     className="flex items-center justify-center gap-2 text-gray-900 hover:text-gray-600 transition-colors group h-11 w-11 -ml-2 rounded-full hover:bg-black/5"
                 >
@@ -60,7 +60,7 @@ export function StoreHeader({ name, logoUrl }: StoreHeaderProps) {
                         "flex items-center w-full transition-all duration-500 rounded-full border border-transparent",
                         isSearchOpen && "bg-gray-50 border-gray-100 pl-3 pr-1 py-1"
                     )}>
-                        <button 
+                        <button
                             onClick={() => setIsSearchOpen(!isSearchOpen)}
                             className={cn(
                                 "transition-colors shrink-0 flex items-center justify-center",
@@ -69,10 +69,10 @@ export function StoreHeader({ name, logoUrl }: StoreHeaderProps) {
                         >
                             <Search className={cn("transition-all", isSearchOpen ? "h-3.5 w-3.5" : "h-4 w-4")} />
                         </button>
-                        
+
                         {isSearchOpen && (
                             <>
-                                <input 
+                                <input
                                     autoFocus
                                     placeholder="Search collection..."
                                     value={searchQuery}
@@ -80,7 +80,7 @@ export function StoreHeader({ name, logoUrl }: StoreHeaderProps) {
                                     className="bg-transparent border-none focus:ring-0 text-[13px] w-full px-2 h-7 placeholder:text-gray-400 text-gray-900 font-medium"
                                     onKeyDown={(e) => e.key === "Escape" && setIsSearchOpen(false)}
                                 />
-                                <button 
+                                <button
                                     onClick={() => {
                                         setSearchQuery("");
                                         setIsSearchOpen(false);
@@ -101,18 +101,18 @@ export function StoreHeader({ name, logoUrl }: StoreHeaderProps) {
             "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-500 z-10",
             isSearchOpen ? "hidden lg:flex opacity-0 lg:opacity-100" : "flex"
           )}>
-            <Link 
-                href={`/${params.storeSlug}`} 
+            <Link
+                href={`/${params.storeSlug}`}
                 className="flex items-center gap-2 md:gap-3 group"
             >
                 {logoUrl ? (
-                <img 
-                    src={logoUrl} 
-                    alt={name} 
+                <img
+                    src={logoUrl}
+                    alt={name}
                     className={cn(
                         "rounded-full object-cover border border-gray-100 transition-all duration-500",
                         scrolled ? "h-7 w-7" : "h-9 w-9 md:h-11 md:w-11"
-                    )} 
+                    )}
                 />
                 ) : (
                 <div

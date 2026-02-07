@@ -5,13 +5,16 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ArrowRight, ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react"
+import { ArrowRight, ArrowLeft, Eye, EyeOff } from "lucide-react"
+import { ButtonLoader } from "@/components/ui/button-loader"
+import { WaveLoader } from "@/components/ui/wave-loader"
 import { toast } from "sonner"
 
 
 export default function RegisterPage() {
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
+  const [redirecting, setRedirecting] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -35,8 +38,23 @@ export default function RegisterPage() {
     setStep(step - 1)
   }
 
+  const passwordRequirements = [
+    { label: "At least 8 characters", test: (p: string) => p.length >= 8 },
+    { label: "One uppercase letter", test: (p: string) => /[A-Z]/.test(p) },
+    { label: "One lowercase letter", test: (p: string) => /[a-z]/.test(p) },
+    { label: "One number", test: (p: string) => /[0-9]/.test(p) },
+    { label: "One special character (!@#$%^&*)", test: (p: string) => /[!@#$%^&*(),.?":{}|<>]/.test(p) },
+  ]
+
+  const isPasswordStrong = passwordRequirements.every(req => req.test(formData.password))
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!isPasswordStrong) {
+      toast.error("Please meet all password requirements")
+      return
+    }
 
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match")
@@ -63,11 +81,15 @@ export default function RegisterPage() {
       }
 
       toast.success("Registration successful! Please verify your email.")
-      // Redirect to verification page
-      window.location.href = `/verify-email?email=${encodeURIComponent(formData.email)}`
+      setLoading(false)
+      setRedirecting(true)
+
+      // Small delay before redirect for better UX
+      setTimeout(() => {
+        window.location.href = `/verify-email?email=${encodeURIComponent(formData.email)}`
+      }, 1500)
     } catch (err: any) {
       toast.error(err.message)
-    } finally {
       setLoading(false)
     }
   }
@@ -88,6 +110,23 @@ export default function RegisterPage() {
       case 3: return "Secure your account."
       default: return ""
     }
+  }
+
+  // Show redirecting loader after successful registration
+  if (redirecting) {
+    return (
+      <div className="fixed inset-0 flex flex-col items-center justify-center bg-background z-50 gap-6">
+        <div className="h-12 flex items-center justify-center">
+          <WaveLoader />
+        </div>
+        <div className="text-center space-y-2">
+          <h2 className="font-instrument-serif text-xl font-bold text-foreground">Account Created!</h2>
+          <p className="font-instrument-sans text-muted-foreground text-sm">
+            Redirecting you to verify your email...
+          </p>
+        </div>
+      </div>
+    )
   }
 
   if (success) {
@@ -122,9 +161,9 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="w-full max-w-4xl bg-background rounded-3xl md:rounded-[2.5rem] shadow-2xl ring-4 md:ring-[12px] ring-primary/20 border border-black/5 overflow-hidden flex flex-col md:flex-row min-h-[400px] md:min-h-[600px]">
+    <div className="w-full max-w-3xl bg-background rounded-3xl md:rounded-[2.5rem] shadow-2xl ring-4 md:ring-[12px] ring-primary/20 border border-black/5 overflow-hidden flex flex-col md:flex-row min-h-[360px] md:min-h-[480px]">
       {/* Left Side - Text */}
-      <div className="w-full hidden md:flex md:w-1/2 bg-primary p-12 flex-col justify-between text-primary-foreground relative overflow-hidden">
+      <div className="w-full hidden md:flex md:w-1/2 bg-primary p-10 flex-col justify-between text-primary-foreground relative overflow-hidden">
         <div className="relative z-10">
           <Link href="/" className="font-instrument-serif text-2xl font-bold mb-12 block">
             Orderform
@@ -157,7 +196,7 @@ export default function RegisterPage() {
       </div>
 
       {/* Right Side - Form */}
-      <div className="w-full md:w-1/2 p-6 md:p-12 flex flex-col justify-center bg-background">
+      <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col justify-center bg-background">
         <div className="max-w-sm mx-auto w-full">
           <div className="md:hidden mb-6 text-center">
              <Link href="/" className="font-instrument-serif text-2xl font-bold text-primary">
@@ -234,6 +273,12 @@ export default function RegisterPage() {
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
+                  {/* Password hint - simple message */}
+                  {formData.password && !isPasswordStrong && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Use 8+ characters with uppercase, lowercase, number & special character
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -266,7 +311,7 @@ export default function RegisterPage() {
                   variant="outline"
                   onClick={handleBack}
                   disabled={loading}
-                  className="h-12 px-6 rounded-xl border-border hover:bg-muted"
+                  className="h-12 px-6 rounded-xl"
                 >
                   <ArrowLeft className="w-4 h-4" />
                 </Button>
@@ -279,7 +324,7 @@ export default function RegisterPage() {
               >
                 {loading ? (
                   <span className="flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <ButtonLoader />
                   </span>
                 ) : step < 3 ? (
                   <span className="flex items-center gap-2">

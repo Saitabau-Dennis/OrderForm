@@ -1,8 +1,6 @@
 import { Metadata } from "next";
-import { getServerSession } from "next-auth";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-
-import { authOptions } from "@/lib/auth";
 import { OrdersClient } from "@/components/dashboard/orders-client";
 import db from "@/lib/db";
 
@@ -12,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function OrdersPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session) {
     redirect("/login");
@@ -35,7 +33,7 @@ export default async function OrdersPage() {
 
   return (
     <div className="animate-appear">
-      <div className="rounded-none overflow-hidden shadow-sm">
+      <div className="rounded-3xl overflow-hidden shadow-sm">
         <OrdersClient initialOrders={ordersData} />
       </div>
     </div>

@@ -1,7 +1,6 @@
 import { Metadata } from "next";
-import { getServerSession } from "next-auth";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth";
 import { ProductsClient } from "@/components/dashboard/products-client";
 import db from "@/lib/db";
 
@@ -11,8 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ProductsPage() {
-  await new Promise((resolve) => setTimeout(resolve, 3000));
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session) {
     redirect("/login");
@@ -27,7 +25,12 @@ export default async function ProductsPage() {
   if (store) {
     const products = await db.product.findMany({
         where: { storeId: store.id },
-        orderBy: { createdAt: 'desc' }
+        orderBy: { createdAt: 'desc' },
+        include: {
+          _count: {
+            select: { orderItems: true }
+          }
+        }
     });
     productsData = JSON.parse(JSON.stringify(products));
   }

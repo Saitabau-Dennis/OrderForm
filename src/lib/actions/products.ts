@@ -1,13 +1,12 @@
 "use server";
 
-import { getServerSession } from "next-auth";
+import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
-import { authOptions } from "@/lib/auth";
 import db from "@/lib/db";
 
 export async function createProduct(data: any) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session) {
       return { error: "Unauthorized" };
@@ -48,7 +47,7 @@ export async function createProduct(data: any) {
 
 export async function updateProduct(id: string, data: any) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session) {
       return { error: "Unauthorized" };
@@ -97,7 +96,7 @@ export async function updateProduct(id: string, data: any) {
 
 export async function deleteProduct(id: string) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session) {
       return { error: "Unauthorized" };

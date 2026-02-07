@@ -28,7 +28,7 @@ model User {
   password      String?
   image         String?
   emailVerified DateTime?
-  
+
   // Custom Auth Fields
   verificationToken        String?
   verificationTokenExpires DateTime?
@@ -47,12 +47,13 @@ model Store {
   description     String?
   whatsappNumber  String?
   currency        String    @default("KES")
-  
+
   // Branding
   logoUrl         String?
   brandColor      String    @default("#30382F")
+  secondaryColor  String    @default("#95D5B2")
   theme           String    @default("Modern Minimalist")
-  
+
   // Business Logic
   subscriptionPlan String   @default("free") // "free" | "pro"
   isActive        Boolean   @default(true)
@@ -93,7 +94,7 @@ model Product {
   category      String?
   sizes         String?  // Comma separated
   isAvailable   Boolean  @default(true)
-  
+
   // Variants (stored as JSON)
   variants      Json?    // [{ name: "Size", options: ["S", "M"] }]
 
@@ -112,18 +113,18 @@ model Product {
 
 model Order {
   id              String   @id @default(cuid())
-  orderNumber     Int      @default(autoincrement()) 
+  orderNumber     Int      @default(autoincrement())
   displayId       String?  @unique
-  
+
   customerName    String
   customerPhone   String
   deliveryAddress String
   deliveryZone    String?
-  
+
   subtotal        Decimal
   deliveryFee     Decimal  @default(0)
   totalAmount     Decimal
-  
+
   status          String   @default("pending") // pending, processing, shipped, delivered, cancelled
   paymentStatus   String   @default("pending") // pending, paid, failed
   notes           String?
@@ -142,10 +143,10 @@ model OrderItem {
   quantity  Int
   price     Decimal
   variant   String? // e.g., "Size: M"
-  
+
   orderId   String
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId String? 
+  productId String?
   product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
 }
 
@@ -156,11 +157,11 @@ model Review {
   comment      String?
   imageUrl     String?
   isApproved   Boolean  @default(false)
-  
+
   storeId      String
   store        Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
   productId    String?
   product      Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
-  
+
   createdAt    DateTime @default(now())
 }

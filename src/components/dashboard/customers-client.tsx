@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/ui/data-table";
 import { ArrowUpDown, Mail, Phone, MapPin } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/dashboard/button";
 
 export type CustomerColumn = {
   id: string;
@@ -99,8 +99,8 @@ export function CustomersClient({ data }: CustomersClientProps) {
   return (
     <div className="space-y-6">
         <div>
-            <h2 className="text-3xl font-bold tracking-tight font-sora">Customers</h2>
-            <p className="text-muted-foreground font-sans">
+            <h2 className="text-3xl font-bold tracking-tight font-poppins">Customers</h2>
+            <p className="text-muted-foreground font-poppins">
                 Manage and view details of your {data.length} unique customers.
             </p>
         </div>

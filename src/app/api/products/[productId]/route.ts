@@ -1,14 +1,13 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { auth } from "@/lib/auth";
 import db from "@/lib/db";
-import { authOptions } from "@/lib/auth";
 
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ productId: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session || !session.user) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -44,7 +43,7 @@ export async function PUT(
   { params }: { params: Promise<{ productId: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session || !session.user) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -97,7 +96,7 @@ export async function DELETE(
   { params }: { params: Promise<{ productId: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session || !session.user) {
       return new NextResponse("Unauthorized", { status: 401 });

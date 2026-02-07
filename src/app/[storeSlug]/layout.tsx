@@ -24,6 +24,7 @@ export default async function StoreRootLayout({
     <StoreProvider
       currency={store.currency}
       brandColor={store.brandColor || "#000000"}
+      secondaryColor={store.secondaryColor || "#95D5B2"}
       storeName={store.name}
       whatsappNumber={store.whatsappNumber || ""}
       storeId={store.id}

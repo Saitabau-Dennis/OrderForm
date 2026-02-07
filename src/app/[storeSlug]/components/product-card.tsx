@@ -16,7 +16,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const { currency, addToCart, brandColor } = useStore();
+  const { currency, addToCart, brandColor, secondaryColor } = useStore();
   const params = useParams();
 
   return (
@@ -33,9 +33,12 @@ export function ProductCard({ product }: ProductCardProps) {
             <span className="text-[10px] font-bold uppercase tracking-widest">No Image</span>
           </div>
         )}
-        
-        {/* Hover Overlay */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
+
+        {/* Hover Overlay with secondary color */}
+        <div
+          className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300"
+          style={{ backgroundColor: secondaryColor }}
+        />
       </Link>
 
       <div className="p-3 space-y-3">
@@ -45,7 +48,7 @@ export function ProductCard({ product }: ProductCardProps) {
               {product.name}
             </h3>
           </Link>
-          <p className="text-base font-bold text-gray-900">
+          <p className="text-base font-bold" style={{ color: brandColor }}>
             {currency} {product.price.toLocaleString()}
           </p>
         </div>
@@ -56,7 +59,7 @@ export function ProductCard({ product }: ProductCardProps) {
             e.stopPropagation();
             addToCart(product, 1);
           }}
-          className="w-full h-10 flex items-center justify-center gap-2 rounded-lg text-[12px] font-bold uppercase tracking-wider transition-all active:scale-95 text-white"
+          className="w-full h-10 flex items-center justify-center gap-2 rounded-lg text-[12px] font-bold uppercase tracking-wider transition-all active:scale-95 text-white hover:opacity-90"
           style={{ backgroundColor: brandColor }}
         >
           <Plus className="h-4 w-4" />

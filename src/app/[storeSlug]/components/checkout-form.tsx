@@ -32,7 +32,7 @@ interface CheckoutFormProps {
 }
 
 export function CheckoutForm({ onSubmit, isLoading, totalAmount, currency, hideSummary = false }: CheckoutFormProps) {
-  const { brandColor } = useStore();
+  const { brandColor, secondaryColor } = useStore();
 
   const form = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
@@ -141,28 +141,44 @@ export function CheckoutForm({ onSubmit, isLoading, totalAmount, currency, hideS
               htmlFor="whatsapp"
               className={cn(
                 "flex items-center justify-between px-4 py-3 rounded-xl border-2 cursor-pointer transition-all",
-                paymentMethod === "whatsapp" ? "border-green-500 bg-green-50" : "border-gray-100 bg-white hover:border-gray-200"
+                paymentMethod === "whatsapp" ? "" : "border-gray-100 bg-white hover:border-gray-200"
               )}
+              style={paymentMethod === "whatsapp" ? {
+                borderColor: brandColor,
+                backgroundColor: secondaryColor + "40" // 25% opacity
+              } : {}}
             >
                 <div className="flex items-center gap-3">
-                    <RadioGroupItem value="whatsapp" id="whatsapp" className="border-gray-300 text-green-600" />
+                    <RadioGroupItem
+                      value="whatsapp"
+                      id="whatsapp"
+                      className="border-gray-300"
+                      style={paymentMethod === "whatsapp" ? { color: brandColor } : {}}
+                    />
                     <div className="flex flex-col">
                         <span className="font-bold text-gray-900">Pay via WhatsApp</span>
                         <span className="text-xs text-gray-500">Complete order with agent</span>
                     </div>
                 </div>
-                <MessageCircle className="h-5 w-5 text-green-600" />
+                <MessageCircle
+                  className="h-5 w-5"
+                  style={{ color: paymentMethod === "whatsapp" ? brandColor : "#9CA3AF" }}
+                />
             </Label>
 
             <Label
               htmlFor="mpesa"
               className={cn(
                 "flex items-center justify-between px-4 py-3 rounded-xl border-2 transition-all relative overflow-hidden grayscale opacity-60 cursor-not-allowed",
-                paymentMethod === "mpesa" ? "border-green-600 bg-green-50" : "border-gray-100 bg-gray-50"
+                paymentMethod === "mpesa" ? "" : "border-gray-100 bg-gray-50"
               )}
+              style={paymentMethod === "mpesa" ? {
+                borderColor: brandColor,
+                backgroundColor: secondaryColor + "40"
+              } : {}}
             >
                 <div className="flex items-center gap-3">
-                    <RadioGroupItem value="mpesa" id="mpesa" disabled className="border-gray-300 text-green-600" />
+                    <RadioGroupItem value="mpesa" id="mpesa" disabled className="border-gray-300" />
                     <div className="flex flex-col">
                         <div className="flex items-center gap-2">
                             <span className="font-bold text-gray-900">M-Pesa</span>

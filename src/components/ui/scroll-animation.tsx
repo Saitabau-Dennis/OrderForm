@@ -18,7 +18,7 @@ interface ScrollAnimationProps {
 
 const variants: Record<AnimationVariant, { hidden: Variant; visible: Variant }> = {
   "fade-up": {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0 },
   },
   "fade-in": {
@@ -26,11 +26,11 @@ const variants: Record<AnimationVariant, { hidden: Variant; visible: Variant }> 
     visible: { opacity: 1 },
   },
   "fade-left": {
-    hidden: { opacity: 0, x: -20 },
+    hidden: { opacity: 0, x: -30 },
     visible: { opacity: 1, x: 0 },
   },
   "fade-right": {
-    hidden: { opacity: 0, x: 20 },
+    hidden: { opacity: 0, x: 30 },
     visible: { opacity: 1, x: 0 },
   },
   "scale-up": {
@@ -44,8 +44,8 @@ export function ScrollAnimation({
   className,
   variant = "fade-up",
   delay = 0,
-  duration = 0.5,
-  viewport = { once: true, margin: "-50px" },
+  duration = 0.6,
+  viewport = { once: true, margin: "-80px" },
   as: Component = "div",
 }: ScrollAnimationProps) {
   const MotionComponent = useMemo(() => motion(Component as any), [Component])

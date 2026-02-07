@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { Loader2, Package, Truck, CheckCircle, XCircle, Clock } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/dashboard/button";
 import {
   Select,
   SelectContent,
@@ -162,7 +162,7 @@ export function OrderDetails({ order, onUpdateStatus }: OrderDetailsProps) {
 
       <div className="pt-4 mt-auto border-t">
         <Button 
-          className="w-full rounded-xl shadow-sm hover:shadow-md transition-all duration-200" 
+          className="w-full rounded-3xl shadow-sm hover:shadow-md transition-all duration-200" 
           variant="outline" 
           onClick={() => window.print()}
         >

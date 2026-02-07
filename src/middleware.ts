@@ -1,10 +1,17 @@
-import { withAuth } from "next-auth/middleware"
+import NextAuth from "next-auth";
+import authConfig from "@/auth.config";
 
-export default withAuth({
-  pages: {
-    signIn: "/login",
-  },
-})
+const { auth } = NextAuth(authConfig);
+
+export default auth((req) => {
+  const isLoggedIn = !!req.auth;
+
+  if (!isLoggedIn) {
+    const loginUrl = new URL("/login", req.url);
+    loginUrl.searchParams.set("callbackUrl", req.nextUrl.pathname);
+    return Response.redirect(loginUrl);
+  }
+});
 
 export const config = {
   matcher: [
@@ -14,4 +21,4 @@ export const config = {
     "/orders/:path*",
     "/onboarding/:path*",
   ]
-}
+};

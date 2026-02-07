@@ -1,12 +1,11 @@
-import { getServerSession } from "next-auth";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth";
 import db from "@/lib/db";
 import { OnboardingWizard } from "@/components/onboarding/onboarding-wizard";
 import { Store } from "lucide-react";
 
 export default async function OnboardingPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session) {
     redirect("/login");
@@ -26,7 +25,7 @@ export default async function OnboardingPage() {
         <div className="h-24 w-24 bg-[#00311F]/5 rounded-full flex items-center justify-center mb-6">
           <Store className="w-10 h-10 text-[#00311F] opacity-20" />
         </div>
-        <h2 className="text-2xl md:text-3xl font-bold text-[#00311F] font-sora tracking-tight mb-3">
+        <h2 className="text-2xl md:text-3xl font-bold text-[#00311F] font-poppins tracking-tight mb-3">
           We're getting things ready for you.
         </h2>
         <p className="text-gray-500 max-w-md mx-auto text-lg leading-relaxed mb-8">

@@ -9,7 +9,7 @@ import { Pricing } from "@/components/landing/pricing"
 import { FAQ } from "@/components/landing/faq"
 import { CTA } from "@/components/landing/cta"
 import { Footer } from "@/components/landing/footer"
-import { Sparkles, ArrowRight } from "lucide-react"
+import { ChevronRight } from "lucide-react"
 
 export default function Home() {
   return (
@@ -17,19 +17,27 @@ export default function Home() {
       <Navbar />
 
       <Hero
-        className="pt-16 pb-8 md:pb-12"
+        className="pt-28 pb-8 md:pt-32 md:pb-12"
         badge={
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-[11px] md:text-xs font-medium hover:bg-primary/10 transition-colors cursor-default shadow-sm shadow-primary/5">
-            <Sparkles className="h-3 w-3 fill-current animate-pulse" />
-            <span className="tracking-wide">Introducing OrderForm</span>
+          <div className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border text-sm font-medium hover:border-primary/30 transition-all duration-300 cursor-default">
+            <span className="text-sm">🛍️</span>
+            <span className="text-muted-foreground">Introducing OrderForm</span>
+            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 transition-all duration-300" />
           </div>
         }
         title={
-          <span className="font-normal">
-            Turn social media traffic into clean <span className="italic font-light">WhatsApp orders</span>
-          </span>
+          <>
+            Turn social media traffic into{" "}
+            clean <span className="font-[family-name:var(--font-instrument-serif)] italic font-normal">WhatsApp orders</span>
+          </>
         }
-        subtitle="Organize your social media sales with a professional one-click store that sends orders directly to your WhatsApp."
+        subtitle={
+          <>
+            Organize your social media sales with a{" "}
+            <span className="text-foreground font-medium">professional one-click store</span>{" "}
+            that sends orders directly to your WhatsApp.
+          </>
+        }
         ctaText="Create your store"
         ctaLink="/register"
         ctaTarget="_blank"

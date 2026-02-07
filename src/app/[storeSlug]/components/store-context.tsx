@@ -34,6 +34,7 @@ interface StoreContextType {
   // Store Theme State
   currency: string;
   brandColor: string;
+  secondaryColor: string;
   storeName: string;
   whatsappNumber: string;
   storeId: string;
@@ -45,6 +46,7 @@ export function StoreProvider({
   children,
   currency = "KES",
   brandColor = "#000000",
+  secondaryColor = "#95D5B2",
   storeName,
   whatsappNumber,
   storeId
@@ -52,6 +54,7 @@ export function StoreProvider({
   children: ReactNode;
   currency?: string;
   brandColor?: string;
+  secondaryColor?: string;
   storeName: string;
   whatsappNumber: string;
   storeId: string;
@@ -147,6 +150,7 @@ export function StoreProvider({
         setSearchQuery,
         currency,
         brandColor,
+        secondaryColor,
         storeName,
         whatsappNumber,
         storeId

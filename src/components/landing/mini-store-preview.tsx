@@ -42,9 +42,9 @@ export function MiniStorePreview() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-12 md:mb-16 max-w-4xl mx-auto">
           <ScrollAnimation variant="fade-up">
-            <p className="font-heading uppercase tracking-[0.2em] text-xs text-primary mb-4 font-medium">
+            <div className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-primary/20 text-primary text-[10px] font-medium mb-4 uppercase tracking-widest">
               Mini store
-            </p>
+            </div>
             <h2 className="text-2xl md:text-4xl font-heading font-medium text-foreground leading-[1.1] tracking-tight">
               A checkout experience your <br className="hidden md:block" />
                customers will <span className="text-primary">actually love.</span>
@@ -100,9 +100,8 @@ export function MiniStorePreview() {
                             alt={item.alt}
                             className="block w-full h-full object-contain object-bottom"
                             loading="lazy"
+                            style={{ maskImage: 'linear-gradient(to bottom, black 70%, transparent)', WebkitMaskImage: 'linear-gradient(to bottom, black 70%, transparent)' }}
                         />
-                        {/* Bottom Fade/Blur Effect */}
-                        <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-background via-background to-transparent pointer-events-none" />
                     </div>
                   </div>
                 </div>

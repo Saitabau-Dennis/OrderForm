@@ -1,13 +1,25 @@
 "use server";
 
-import { getServerSession } from "next-auth";
+import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
-import { authOptions } from "@/lib/auth";
 import db from "@/lib/db";
 
-export async function updateStoreSettings(data: any) {
+interface StoreSettingsData {
+  name: string;
+  description?: string;
+  slug: string;
+  whatsappNumber: string;
+  currency: string;
+  logoUrl?: string;
+  brandColor: string;
+  secondaryColor?: string;
+  theme: string;
+  deliveryZones: { name: string; price: number }[];
+}
+
+export async function updateStoreSettings(data: StoreSettingsData) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session) {
       return { error: "Unauthorized" };
@@ -28,9 +40,10 @@ export async function updateStoreSettings(data: any) {
           currency: data.currency,
           logoUrl: data.logoUrl,
           brandColor: data.brandColor,
+          secondaryColor: data.secondaryColor || "#95D5B2", // Default fallback
           theme: data.theme,
           deliveryZones: {
-            create: data.deliveryZones // Assumes data.deliveryZones is [{name, price}]
+            create: data.deliveryZones || []
           }
         }
       });
@@ -45,20 +58,22 @@ export async function updateStoreSettings(data: any) {
           currency: data.currency,
           logoUrl: data.logoUrl,
           brandColor: data.brandColor,
+          secondaryColor: data.secondaryColor || "#95D5B2", // Default fallback
           theme: data.theme,
           deliveryZones: {
             deleteMany: {}, // Remove all old zones
-            create: data.deliveryZones // Add new ones
+            create: data.deliveryZones || []
           }
         }
       });
     }
 
     revalidatePath("/settings");
-    if (existingStore?.slug) {
-        revalidatePath(`/${existingStore.slug}`);
-    } else if (data.slug) {
-        revalidatePath(`/${data.slug}`);
+
+    // Revalidate store page
+    const slugToRevalidate = existingStore?.slug || data.slug;
+    if (slugToRevalidate) {
+      revalidatePath(`/${slugToRevalidate}`);
     }
 
     return { success: true };
@@ -70,7 +85,7 @@ export async function updateStoreSettings(data: any) {
 
 export async function getStoreStatus() {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session) {
       return { error: "Unauthorized" };

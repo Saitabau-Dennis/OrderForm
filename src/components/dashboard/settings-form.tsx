@@ -7,7 +7,7 @@ import { z } from "zod";
 import { Loader2, Check, Trash2, ExternalLink, Plus, Zap, Store, User, Upload, Globe, MapPin, Palette, Phone, CreditCard, Sparkles, BarChart3, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/dashboard/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -126,17 +126,17 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
   return (
     <div className="w-full max-w-6xl mx-auto">
       <Tabs defaultValue="store" className="w-full space-y-8">
-        <TabsList className="w-full justify-start border-b border-gray-200 bg-transparent h-auto p-0 gap-8 rounded-none">
+        <TabsList className="w-full justify-start border-b border-border bg-transparent h-auto p-0 gap-8 rounded-3xl">
           <TabsTrigger 
             value="store" 
-            className="rounded-none border-b-2 border-transparent px-1 pb-4 pt-2 text-sm font-medium text-muted-foreground hover:text-primary data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:bg-transparent transition-all shadow-none"
+            className="rounded-3xl border-b-2 border-transparent px-1 pb-4 pt-2 text-sm font-medium text-muted-foreground hover:text-primary data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:bg-transparent transition-all shadow-none"
           >
             <Store className="w-4 h-4 mr-2" />
             General Configuration
           </TabsTrigger>
           <TabsTrigger 
             value="account" 
-            className="rounded-none border-b-2 border-transparent px-1 pb-4 pt-2 text-sm font-medium text-muted-foreground hover:text-primary data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:bg-transparent transition-all shadow-none"
+            className="rounded-3xl border-b-2 border-transparent px-1 pb-4 pt-2 text-sm font-medium text-muted-foreground hover:text-primary data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:bg-transparent transition-all shadow-none"
           >
             <User className="w-4 h-4 mr-2" />
             Account & Plan
@@ -160,7 +160,7 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
                   <div className="flex flex-col sm:flex-row gap-8 items-start">
                      <div className="space-y-3">
                         <Label className="text-sm font-medium text-foreground">Brand Logo</Label>
-                        <div className="h-32 w-32 rounded-xl border-2 border-dashed border-border flex items-center justify-center relative overflow-hidden group hover:border-primary/50 transition-all bg-muted/20">
+                        <div className="h-32 w-32 rounded-3xl border-2 border-dashed border-border flex items-center justify-center relative overflow-hidden group hover:border-border0 transition-all bg-muted/20">
                            <ImageUpload 
                               value={form.watch("logoUrl")} 
                               onChange={(url) => form.setValue("logoUrl", url)} 
@@ -305,14 +305,14 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
                         form.setValue("brandColor", theme.primary); 
                       }}
                       className={cn(
-                        "group cursor-pointer rounded-xl border-2 p-1 transition-all duration-200 relative overflow-hidden",
+                        "group cursor-pointer rounded-3xl border-2 p-1 transition-all duration-200 relative overflow-hidden",
                         isActive 
                           ? "border-primary bg-primary/5 shadow-md" 
                           : "border-border/50 bg-card hover:border-primary/30 hover:shadow-sm"
                       )}
                     >
                       <div className="p-4 flex flex-col gap-4 h-full">
-                        <div className="h-16 w-full rounded-lg flex overflow-hidden border border-border/10 shadow-sm shrink-0">
+                        <div className="h-16 w-full rounded-2xl flex overflow-hidden border border-border/10 shadow-sm shrink-0">
                           <div className="flex-1" style={{ backgroundColor: theme.primary }} />
                           <div className="flex-1" style={{ backgroundColor: theme.secondary }} />
                         </div>

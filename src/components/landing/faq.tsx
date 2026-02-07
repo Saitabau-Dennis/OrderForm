@@ -36,9 +36,9 @@ export function FAQ() {
     <section id="faq" className="py-16 md:py-24 scroll-mt-28 bg-background relative overflow-hidden">
       <div className="max-w-3xl mx-auto px-6 relative z-10">
         <ScrollAnimation className="text-center mb-16 md:mb-20">
-          <p className="font-heading uppercase tracking-[0.2em] text-xs text-primary mb-4 font-medium">
+          <div className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-primary/20 text-primary text-[10px] font-medium mb-4 uppercase tracking-widest">
             FAQ
-          </p>
+          </div>
           <h2 className="text-2xl md:text-4xl font-heading font-medium text-foreground mb-6 tracking-tight">
             Need help? <span className="text-primary">We&apos;ve got you covered.</span>
           </h2>

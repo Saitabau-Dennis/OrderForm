@@ -1,8 +1,7 @@
 "use server";
 
-import { getServerSession } from "next-auth";
+import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
-import { authOptions } from "@/lib/auth";
 import db from "@/lib/db";
 import { z } from "zod";
 
@@ -74,7 +73,7 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
 
 export async function updateOrderStatus(id: string, status: string) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session) {
       return { error: "Unauthorized" };

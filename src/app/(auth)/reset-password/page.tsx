@@ -109,11 +109,11 @@ function ResetPasswordForm() {
              <ShieldCheck className="w-12 h-12 text-green-600 stroke-[2.5]" />
           </div>
         </div>
-        
+
         <h2 className="font-instrument-serif text-3xl font-bold text-foreground mb-4 tracking-tight">
           All Secure!
         </h2>
-        
+
         <div className="space-y-2 mb-10">
             <p className="font-instrument-sans text-muted-foreground text-lg">
             Your password has been successfully reset.
@@ -142,7 +142,7 @@ function ResetPasswordForm() {
           {step === 1 ? "Enter Code" : "Reset Password"}
         </h2>
         <p className="font-instrument-sans text-muted-foreground">
-          {step === 1 
+          {step === 1
             ? <span>Enter the verification code sent to <span className="font-medium text-foreground">{email}</span></span>
             : "Create a new strong password for your account."
           }
@@ -153,10 +153,10 @@ function ResetPasswordForm() {
         {step === 1 && (
           <div className="space-y-4">
             <div className="flex justify-center">
-              <OTPInput 
-                value={code} 
-                onChange={setCode} 
-                length={6} 
+              <OTPInput
+                value={code}
+                onChange={setCode}
+                length={6}
                 disabled={loading}
               />
             </div>
@@ -248,9 +248,9 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="w-full max-w-4xl bg-background rounded-3xl md:rounded-[2.5rem] shadow-2xl ring-4 md:ring-[12px] ring-primary/20 border border-black/5 overflow-hidden flex flex-col md:flex-row min-h-[400px] md:min-h-[600px]">
+    <div className="w-full max-w-3xl bg-background rounded-3xl md:rounded-[2.5rem] shadow-2xl ring-4 md:ring-[12px] ring-primary/20 border border-black/5 overflow-hidden flex flex-col md:flex-row min-h-[360px] md:min-h-[480px]">
       {/* Left Side - Text */}
-      <div className="w-full hidden md:flex md:w-1/2 bg-primary p-12 flex-col justify-between text-primary-foreground relative overflow-hidden">
+      <div className="w-full hidden md:flex md:w-1/2 bg-primary p-10 flex-col justify-between text-primary-foreground relative overflow-hidden">
         <div className="relative z-10">
           <Link
             href="/"
@@ -278,7 +278,7 @@ export default function ResetPasswordPage() {
       </div>
 
       {/* Right Side - Form */}
-      <div className="w-full md:w-1/2 p-6 md:p-12 flex flex-col justify-center bg-background">
+      <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col justify-center bg-background">
          <div className="md:hidden mb-6 text-center max-w-sm mx-auto w-full">
              <Link href="/" className="font-instrument-serif text-2xl font-bold text-primary">
               Orderform

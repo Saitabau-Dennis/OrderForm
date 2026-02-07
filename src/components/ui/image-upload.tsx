@@ -103,7 +103,7 @@ export function ImageUpload({ value, onChange, disabled, endpoint = "imageUpload
             className={`w-full h-full object-cover transition-transform group-hover:scale-105 ${isUploading ? 'opacity-50' : ''}`}
           />
           {isUploading && (
-             <div className="absolute inset-0 flex items-center justify-center bg-white/50">
+             <div className="absolute inset-0 flex items-center justify-center bg-card/50">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
              </div>
           )}
@@ -111,7 +111,7 @@ export function ImageUpload({ value, onChange, disabled, endpoint = "imageUpload
             {!isUploading && (
              <button
               onClick={handleRemoveImage}
-              className="bg-red-500 text-white p-2 hover:bg-red-600 transition-colors rounded-none"
+              className="bg-red-500 text-primary-foreground p-2 hover:bg-red-600 transition-colors rounded-none"
               title="Remove image"
             >
               <X className="h-4 w-4" />
@@ -135,7 +135,7 @@ export function ImageUpload({ value, onChange, disabled, endpoint = "imageUpload
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
           ) : (
             <div className="flex flex-col items-center gap-2 p-4 text-center">
-              <div className="p-3 bg-white border border-primary/10 shadow-sm group-hover:scale-110 transition-transform rounded-none">
+              <div className="p-3 bg-card border border-border shadow-sm group-hover:scale-110 transition-transform rounded-none">
                 <UploadCloud className="h-5 w-5 text-primary" />
               </div>
               <div className="space-y-1">

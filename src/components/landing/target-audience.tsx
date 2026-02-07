@@ -56,9 +56,9 @@ export function TargetAudience() {
         
         <div className="text-center mb-16 max-w-3xl mx-auto">
           <ScrollAnimation variant="fade-up">
-            <p className="font-heading uppercase tracking-[0.2em] text-xs text-primary mb-4 font-medium">
+            <div className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-primary/20 text-primary text-[10px] font-medium mb-4 uppercase tracking-widest">
               Who is it for?
-            </p>
+            </div>
             <h2 className="text-2xl md:text-4xl font-heading font-medium text-foreground mb-6 leading-[1.1] tracking-tight">
               Built for every kind of <span className="text-primary italic font-serif">social seller.</span>
             </h2>

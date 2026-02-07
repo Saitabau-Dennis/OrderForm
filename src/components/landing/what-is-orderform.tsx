@@ -8,9 +8,9 @@ export function WhatIsOrderform() {
     <section className="py-16 md:py-24 bg-background overflow-hidden">
       <div className="max-w-4xl mx-auto px-6 text-center">
         <ScrollAnimation variant="fade-up">
-          <p className="font-heading uppercase tracking-[0.2em] text-xs text-primary mb-6 font-medium">
+          <div className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-primary/20 text-primary text-[10px] font-medium mb-6 uppercase tracking-widest">
             What is OrderForm?
-          </p>
+          </div>
           <h2 className="text-2xl md:text-4xl font-heading font-medium text-foreground mb-8 leading-[1.1] tracking-tight">
             The missing bridge between <span className="text-muted-foreground">social traffic</span> and <span className="text-primary">paid orders.</span>
           </h2>

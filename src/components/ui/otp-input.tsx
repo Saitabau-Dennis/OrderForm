@@ -23,7 +23,6 @@ export function OTPInput({ length = 6, value, onChange, className, disabled }: O
     if (newValue.length > 1) {
        const pastedValue = newValue.slice(0, length);
        onChange(pastedValue);
-       // Focus last filled input or the next empty one
        const nextIndex = Math.min(pastedValue.length, length - 1);
        inputRefs.current[nextIndex]?.focus();
        return;
@@ -33,7 +32,6 @@ export function OTPInput({ length = 6, value, onChange, className, disabled }: O
     const finalValue = newOtp.join("").slice(0, length);
     onChange(finalValue);
 
-    // Move to next input if value is entered
     if (newValue && index < length - 1) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -42,10 +40,9 @@ export function OTPInput({ length = 6, value, onChange, className, disabled }: O
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
     if (e.key === "Backspace") {
       if (!value[index] && index > 0) {
-        // Move to previous input if current is empty
         inputRefs.current[index - 1]?.focus();
         const newOtp = value.split("");
-        newOtp[index - 1] = ""; // Clear previous value too? Usually yes for backspace navigation
+        newOtp[index - 1] = "";
         onChange(newOtp.join(""));
       } else {
          const newOtp = value.split("");
@@ -69,26 +66,35 @@ export function OTPInput({ length = 6, value, onChange, className, disabled }: O
   };
 
   return (
-    <div className={cn("flex gap-3 justify-center", className)}>
+    <div className={cn("flex items-center gap-2", className)}>
       {Array.from({ length }).map((_, index) => (
-        <input
-          key={index}
-          ref={(el) => { inputRefs.current[index] = el; }}
-          type="text"
-          inputMode="numeric"
-          maxLength={1}
-          value={value[index] || ""}
-          onChange={(e) => handleChange(e, index)}
-          onKeyDown={(e) => handleKeyDown(e, index)}
-          onPaste={handlePaste}
-          disabled={disabled}
-          className={cn(
-            "w-14 h-16 text-center text-3xl font-bold border-2 rounded-2xl bg-background shadow-sm transition-all duration-200 outline-none",
-            "border-muted focus:border-primary focus:ring-4 focus:ring-primary/10 focus:-translate-y-1",
-            "disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-muted disabled:focus:translate-y-0",
-             value[index] ? "border-primary/50 bg-primary/5" : "border-border"
+        <React.Fragment key={index}>
+          <input
+            ref={(el) => { inputRefs.current[index] = el; }}
+            type="text"
+            inputMode="numeric"
+            maxLength={1}
+            value={value[index] || ""}
+            onChange={(e) => handleChange(e, index)}
+            onKeyDown={(e) => handleKeyDown(e, index)}
+            onPaste={handlePaste}
+            disabled={disabled}
+            className={cn(
+              "w-11 h-12 text-center text-xl font-semibold rounded-3xl transition-all duration-150 outline-none",
+              "bg-muted/40 border border-border/60",
+              "focus:border-primary focus:ring-2 focus:ring-primary/20 focus:bg-background",
+              "hover:border-primary/40 hover:bg-muted/60",
+              "disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-muted/40",
+              value[index]
+                ? "border-primary/60 bg-primary/5 text-primary shadow-sm"
+                : "text-foreground"
+            )}
+          />
+          {/* Separator dash after the 3rd digit */}
+          {index === 2 && (
+            <span className="text-muted-foreground/40 font-medium text-lg px-0.5">–</span>
           )}
-        />
+        </React.Fragment>
       ))}
     </div>
   );

@@ -35,6 +35,9 @@ export default async function SharePage({
     <StoreProvider 
         currency={store.currency} 
         brandColor={store.brandColor || "#000000"}
+        storeName={store.name}
+        whatsappNumber={store.whatsappNumber || ""}
+        storeId={store.id}
     >
         <div className="min-h-screen bg-white">
             <StoreHeader name={store.name} logoUrl={store.logoUrl || undefined} />

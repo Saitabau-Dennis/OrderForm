@@ -16,9 +16,10 @@ import { useRouter } from "next/navigation";
 
 interface OrdersClientProps {
   initialOrders: any[];
+  standalone?: boolean;
 }
 
-export function OrdersClient({ initialOrders }: OrdersClientProps) {
+export function OrdersClient({ initialOrders, standalone = true }: OrdersClientProps) {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
 
@@ -55,13 +56,13 @@ export function OrdersClient({ initialOrders }: OrdersClientProps) {
 
   return (
     <>
-      <OrdersTable orders={initialOrders} onView={handleViewOrder} />
+      <OrdersTable orders={initialOrders} onView={handleViewOrder} standalone={standalone} />
 
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-        <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto p-0 border-l border-primary/10">
-          <div className="bg-primary/5 px-6 py-5 border-b border-primary/10 sticky top-0 z-10 backdrop-blur-md">
+        <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto p-0 border-l border-border">
+          <div className="bg-primary/5 px-6 py-5 border-b border-border sticky top-0 z-10 backdrop-blur-md">
             <SheetHeader>
-                <SheetTitle className="text-xl font-medium font-raleway text-primary">Order Details</SheetTitle>
+                <SheetTitle className="text-xl font-medium font-poppins text-primary">Order Details</SheetTitle>
             </SheetHeader>
           </div>
           

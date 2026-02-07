@@ -16,7 +16,7 @@ export function TextHighlight({ children, className, color = "yellow" }: TextHig
     orange: "bg-[#FFC480] text-black",
     pink: "bg-[#FFC4D6] text-black",
     teal: "bg-[#99F6E4] text-black",
-    white: "bg-white text-black",
+    white: "bg-card text-black",
     primary: "bg-primary text-primary-foreground",
   }
 

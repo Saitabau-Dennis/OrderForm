@@ -15,7 +15,7 @@ import {
 } from "@tanstack/react-table"
 import { ArrowUpDown, ChevronDown, Search, ChevronLeft, ChevronRight } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/dashboard/button"
 import { Input } from "@/components/ui/input"
 import {
   Table,
@@ -25,18 +25,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import {
+import { 
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { cn } from "@/lib/utils"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   searchKey?: string
   placeholder?: string
+  standalone?: boolean
+  title?: string
 }
 
 export function DataTable<TData, TValue>({
@@ -44,6 +47,8 @@ export function DataTable<TData, TValue>({
   data,
   searchKey,
   placeholder = "Search...",
+  standalone = true,
+  title,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
@@ -70,58 +75,40 @@ export function DataTable<TData, TValue>({
   })
 
   return (
-    <div className="w-full space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        {searchKey && (
-            <div className="relative w-full max-w-sm">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+    <div className="w-full space-y-3">
+      {/* Table */}
+      <div className={cn(
+        "overflow-hidden",
+        standalone && "rounded-xl border border-border bg-card"
+      )}>
+        {/* Title bar with search */}
+        {(title || searchKey) && (
+          <div className="flex items-center justify-between px-5 py-4">
+            {title && (
+              <h3 className="text-base font-semibold text-foreground font-poppins">{title}</h3>
+            )}
+            {searchKey && (
+              <div className="relative w-full max-w-[220px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50" />
                 <Input
-                placeholder={placeholder}
-                value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
-                onChange={(event) =>
+                  placeholder={placeholder}
+                  value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
+                  onChange={(event) =>
                     table.getColumn(searchKey)?.setFilterValue(event.target.value)
-                }
-                className="pl-9 h-10 rounded-none bg-white border-primary/20 focus:border-primary transition-colors focus:ring-0"
+                  }
+                  className="pl-9 h-8 rounded-lg bg-background border-border text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
                 />
-            </div>
+              </div>
+            )}
+          </div>
         )}
-        
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button className="ml-auto rounded-none h-10 bg-primary text-white hover:bg-primary/90 shadow-md border-none px-6">
-              Columns <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="rounded-none border border-primary/10 shadow-xl bg-white">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize cursor-pointer rounded-none focus:bg-primary/5"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                )
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      
-      <div className="rounded-none border border-primary/10 bg-white shadow-lg overflow-hidden">
         <Table>
-          <TableHeader className="bg-primary/5">
+          <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="hover:bg-transparent border-primary/10">
+              <TableRow key={headerGroup.id} className="hover:bg-transparent border-b border-border">
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} className="h-14 font-bold text-primary">
+                    <TableHead key={header.id} className="h-10 text-xs font-medium text-muted-foreground px-5">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -140,10 +127,10 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="hover:bg-primary/[0.02] border-primary/5 transition-colors"
+                  className="hover:bg-muted/30 border-b border-border/50 transition-colors last:border-0"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="font-medium text-foreground py-4">
+                    <TableCell key={cell.id} className="py-3.5 px-5 text-sm">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -156,7 +143,7 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center text-muted-foreground font-instrument-sans"
+                  className="h-24 text-center text-sm text-muted-foreground font-poppins"
                 >
                   No results found.
                 </TableCell>
@@ -166,29 +153,31 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
 
-      <div className="flex items-center justify-between py-2 px-1">
-        <div className="text-sm text-muted-foreground font-instrument-sans">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
+      {/* Pagination */}
+      <div className="flex items-center justify-between px-1 pt-1">
+        <p className="text-xs text-muted-foreground">
+          Showing {table.getRowModel().rows.length} of {table.getFilteredRowModel().rows.length} result{table.getFilteredRowModel().rows.length !== 1 ? "s" : ""}
+        </p>
         <div className="flex items-center gap-2">
           <Button
+            variant="outline"
             size="sm"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
-            className="rounded-none h-10 bg-primary text-white hover:bg-primary/90 disabled:opacity-50 transition-all px-4"
+            className="rounded-lg h-8 px-3 text-xs border-border hover:bg-accent disabled:opacity-40 transition-all"
           >
-            <ChevronLeft className="h-4 w-4 mr-1" />
+            <ChevronLeft className="h-3.5 w-3.5 mr-1" />
             Previous
           </Button>
           <Button
+            variant="outline"
             size="sm"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
-            className="rounded-none h-10 bg-primary text-white hover:bg-primary/90 disabled:opacity-50 transition-all px-4"
+            className="rounded-lg h-8 px-3 text-xs border-border hover:bg-accent disabled:opacity-40 transition-all"
           >
             Next
-            <ChevronRight className="h-4 w-4 ml-1" />
+            <ChevronRight className="h-3.5 w-3.5 ml-1" />
           </Button>
         </div>
       </div>

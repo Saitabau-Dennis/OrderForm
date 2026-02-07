@@ -68,7 +68,7 @@ export function Navbar() {
   }
 
   return (
-    <div className="w-full z-50 flex justify-center px-4 py-1.5 md:py-2 bg-white">
+    <div className="fixed top-0 left-0 w-full z-50 flex justify-center px-4 py-1.5 md:py-2 bg-white/70 backdrop-blur-lg">
       <nav
         className="flex items-center justify-between w-full max-w-7xl py-1 px-2"
       >
@@ -77,16 +77,8 @@ export function Navbar() {
             className="flex items-center gap-0.5 relative z-10 shrink-0" 
             onClick={() => setIsMobileMenuOpen(false)}
         >
-            <div className="relative w-10 h-10 md:w-11 md:h-11">
-              <Image 
-                src="/images/logo.png" 
-                alt="OrderForm Logo" 
-                fill
-                className="object-contain"
-              />
-            </div>
-            <span className="font-(family-name:--font-instrument-serif) text-xl md:text-2xl font-normal text-primary tracking-tight italic">
-            Order<span className="text-primary/80">Form</span>
+            <span className="font-(family-name:--font-geist-sans) text-base md:text-lg font-semibold text-foreground tracking-tight">
+            OrderForm
             </span>
         </Link>
 
@@ -149,8 +141,8 @@ export function Navbar() {
             </Link>
             <Link href={session ? "/dashboard" : "/register"} target="_blank" className="hidden md:block">
                 <Button 
-                    size="sm"
-                    className="rounded-full font-semibold shadow-md hover:shadow-lg transition-all h-9 md:h-10 px-6 bg-primary text-white hover:bg-primary/90 border-0"
+                    size="default"
+                    className="font-semibold px-6"
                 >
                     Get Started
                 </Button>
@@ -159,23 +151,15 @@ export function Navbar() {
             {/* Mobile Menu */}
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden relative z-50 rounded-full text-foreground hover:bg-gray-100">
+                <Button variant="ghost" size="icon" className="md:hidden relative z-50 text-foreground hover:bg-gray-100">
                    <Menu className="h-5 w-5" />
                 </Button>
             </SheetTrigger>
             <SheetContent side="right" className=" w-[85vw] max-w-xs p-0 flex flex-col border-l border-border/50 bg-background/95 backdrop-blur-xl">
                 <SheetHeader className="px-6 pt-8 pb-4 text-left border-b border-border/10">
                 <div className="flex items-center gap-2 mb-2">
-                    <div className="relative w-12 h-12">
-                        <Image 
-                            src="/images/logo.png" 
-                            alt="OrderForm Logo" 
-                            fill
-                            className="object-contain"
-                        />
-                    </div>
-                    <SheetTitle className="font-(family-name:--font-outfit) tracking-tighter text-2xl mb-0">
-                        Order<span className="text-primary">Form</span>
+                    <SheetTitle className="font-(family-name:--font-geist-sans) tracking-tight text-lg mb-0 font-semibold text-foreground">
+                        OrderForm
                     </SheetTitle>
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">
@@ -195,12 +179,12 @@ export function Navbar() {
                 <div className="p-6 mt-auto border-t border-border/10 bg-muted/20">
                     <div className="flex flex-col gap-3">
                     <Link href={session ? "/dashboard" : "/register"} target="_blank" onClick={() => setIsMobileMenuOpen(false)}>
-                        <Button className="w-full h-12 rounded-xl text-base font-semibold shadow-md">
+                        <Button size="lg" className="w-full text-base font-semibold">
                         Get Started
                         </Button>
                     </Link>
                     <Link href={session ? "/dashboard" : "/login"} target="_blank" onClick={() => setIsMobileMenuOpen(false)}>
-                        <Button variant="outline" className="w-full h-12 rounded-xl text-base font-medium">
+                        <Button variant="outline" size="lg" className="w-full text-base font-medium">
                         Log in
                         </Button>
                     </Link>

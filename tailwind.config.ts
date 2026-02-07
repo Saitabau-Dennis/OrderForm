@@ -13,7 +13,6 @@ const config: Config = {
         foreground: "var(--foreground)",
         primary: "var(--primary)", // Powered by CSS variable
         "primary-foreground": "var(--primary-foreground)",
-        cream: "#FFFBDF", // Cream
         "brand-pine": "#00311F",
       },
       fontFamily: {
@@ -21,6 +20,7 @@ const config: Config = {
         "instrument-sans": ["var(--font-instrument-sans)"],
         "signika": ["var(--font-signika)"],
         "dm-sans": ["var(--font-dm-sans)"],
+        "poppins": ["var(--font-poppins)"],
       },
     },
   },

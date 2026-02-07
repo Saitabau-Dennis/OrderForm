@@ -1,12 +1,18 @@
 import { Metadata } from "next";
-import { getServerSession } from "next-auth";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { DollarSign, Package, ShoppingBag, TrendingUp, Users } from "lucide-react";
-import { startOfMonth, subMonths, startOfDay } from "date-fns";
-
-import { authOptions } from "@/lib/auth";
-import { Card, CardContent } from "@/components/ui/card";
+import { DollarSign, Package, ShoppingBag, TrendingUp, Users, ArrowUpRight, Calendar, ChevronDown } from "lucide-react";
+import { startOfMonth, subMonths, startOfDay, subDays, format } from "date-fns";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OrdersClient } from "@/components/dashboard/orders-client";
+import { SalesChart } from "@/components/dashboard/sales-chart";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import Link from "next/link";
 
 import db from "@/lib/db";
 
@@ -15,21 +21,35 @@ export const metadata: Metadata = {
   description: "Store overview",
 };
 
-export default async function DashboardPage() {
-  const session = await getServerSession(authOptions);
+interface DashboardPageProps {
+  searchParams: Promise<{ range?: string }>;
+}
+
+export default async function DashboardPage({ searchParams }: DashboardPageProps) {
+  const session = await auth();
+  const { range = "7d" } = await searchParams;
 
   if (!session) {
     redirect("/login");
   }
 
-  let store = null;
+  let store: { id: string; name: string; slug: string; [key: string]: any } | null = null;
   let totalRevenue = 0;
   let revenueChange = 0;
   let ordersCount = 0;
   let ordersToday = 0;
   let productsCount = 0;
   let activeProductsCount = 0;
+  let customersCount = 0;
   let recentOrders: any[] = [];
+  let salesData: { label: string; value: number }[] = [];
+  let topProducts: any[] = [];
+
+  const rangeLabels: Record<string, string> = {
+    "7d": "Last 7 Days",
+    "30d": "Last 30 Days",
+    "1y": "Last Year"
+  };
 
   try {
     store = await db.store.findFirst({
@@ -42,7 +62,7 @@ export default async function DashboardPage() {
       const prevMonthStart = startOfMonth(subMonths(now, 1));
       const startOfToday = startOfDay(now);
 
-      // Batch 1: Revenue Stats (Max 3 concurrent connections)
+      // Batch 1: Revenue Stats
       const [currentMonthRevenueAgg, prevMonthRevenueAgg, totalRevenueAgg] = await Promise.all([
         db.order.aggregate({
           _sum: { totalAmount: true },
@@ -79,7 +99,7 @@ export default async function DashboardPage() {
           revenueChange = 100;
       }
 
-      // Batch 2: Counts (Max 4 concurrent connections)
+      // Batch 2: Counts
       const [totalOrders, todayOrders, totalProds, activeProds] = await Promise.all([
         db.order.count({ where: { storeId: store.id } }),
         db.order.count({ where: { storeId: store.id, createdAt: { gte: startOfToday } } }),
@@ -91,6 +111,78 @@ export default async function DashboardPage() {
       ordersToday = todayOrders;
       productsCount = totalProds;
       activeProductsCount = activeProds;
+
+      // Calculate unique customers
+      const uniqueCustomers = await db.order.groupBy({
+        by: ['customerPhone'],
+        where: { storeId: store.id },
+      });
+      customersCount = uniqueCustomers.length;
+
+      // 4. Chart Data based on range
+      let periods: { start: Date; end: Date; label: string }[] = [];
+
+      if (range === "30d") {
+        periods = [...Array(30)].map((_, i) => {
+          const date = subDays(now, i);
+          return {
+            start: startOfDay(date),
+            end: new Date(date.setHours(23, 59, 59, 999)),
+            label: format(date, "MMM d")
+          };
+        }).reverse();
+      } else if (range === "1y") {
+        periods = [...Array(12)].map((_, i) => {
+          const date = subMonths(now, i);
+          return {
+            start: startOfMonth(date),
+            end: new Date(new Date(date.getFullYear(), date.getMonth() + 1, 0).setHours(23, 59, 59, 999)),
+            label: format(date, "MMM")
+          };
+        }).reverse();
+      } else {
+        // Default 7d
+        periods = [...Array(7)].map((_, i) => {
+          const date = subDays(now, i);
+          return {
+            start: startOfDay(date),
+            end: new Date(date.setHours(23, 59, 59, 999)),
+            label: format(date, "EEE")
+          };
+        }).reverse();
+      }
+
+      const chartDailyAggs = await Promise.all(periods.map(period => 
+          db.order.aggregate({
+              _sum: { totalAmount: true },
+              where: {
+                  storeId: store!.id,
+                  status: "completed",
+                  createdAt: { gte: period.start, lte: period.end }
+              }
+          })
+      ));
+
+      salesData = periods.map((period, i) => ({
+          label: period.label,
+          value: Number(chartDailyAggs[i]._sum.totalAmount || 0)
+      }));
+
+      // 5. Top Selling Products
+      const topSellingItems = await db.orderItem.groupBy({
+          by: ['productId', 'name'],
+          where: {
+              order: { storeId: store.id, status: "completed" }
+          },
+          _sum: { quantity: true },
+          orderBy: { _sum: { quantity: 'desc' } },
+          take: 5
+      });
+      
+      topProducts = topSellingItems.map(item => ({
+          name: item.name,
+          sales: item._sum.quantity || 0
+      }));
       
       // Batch 3: Recent Data
       const orders = await db.order.findMany({
@@ -105,18 +197,18 @@ export default async function DashboardPage() {
     console.error("Dashboard DB Error:", error);
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4 animate-in fade-in duration-500">
-        <div className="h-24 w-24 bg-primary/5 rounded-full flex items-center justify-center mb-6">
+        <div className="h-24 w-24 bg-primary/5 rounded-3xl flex items-center justify-center mb-6 border-2 border-primary/10">
           <ShoppingBag className="w-10 h-10 text-primary opacity-20" />
         </div>
-        <h2 className="text-2xl md:text-3xl font-bold text-primary font-sora tracking-tight mb-3">
+        <h2 className="text-2xl md:text-3xl font-bold text-primary font-poppins tracking-tight mb-3">
           We're having trouble reaching your store.
         </h2>
-        <p className="text-gray-500 max-w-md mx-auto text-lg leading-relaxed mb-8 font-dm-sans">
+        <p className="text-muted-foreground max-w-md mx-auto text-lg leading-relaxed mb-8 font-poppins">
           Our systems are currently taking a moment to catch up. Your data is safe—please try refreshing the page in a few seconds.
         </p>
         <a 
           href="/dashboard" 
-          className="bg-primary text-white px-8 py-3 rounded-xl font-bold uppercase tracking-widest text-xs shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+          className="bg-primary text-primary-foreground px-8 py-3 rounded-3xl font-bold uppercase tracking-widest text-xs shadow-none transition-all hover:scale-[1.02] active:scale-[0.98]"
         >
           Refresh Page
         </a>
@@ -135,7 +227,7 @@ export default async function DashboardPage() {
       value: `KES ${totalRevenue.toLocaleString()}`,
       description: "Lifetime earnings",
       icon: DollarSign,
-      color: "bg-[#00311F] text-white", // Brand Pine
+      color: "bg-[#00311F] text-primary-foreground",
       trend: formatTrend(revenueChange),
     },
     {
@@ -143,7 +235,7 @@ export default async function DashboardPage() {
       value: ordersCount.toString(),
       description: "Lifetime orders",
       icon: ShoppingBag,
-      color: "bg-[#004D31] text-white", // Deep Sage
+      color: "bg-[#004D31] text-primary-foreground",
       trend: `+${ordersToday} new today`,
     },
     {
@@ -151,68 +243,120 @@ export default async function DashboardPage() {
       value: productsCount.toString(),
       description: "Total inventory",
       icon: Package,
-      color: "bg-[#006641] text-white", // Medium Pine
+      color: "bg-[#006641] text-primary-foreground",
       trend: `${activeProductsCount} active`,
     },
     {
       title: "Customers",
-      value: "Coming Soon",
-      description: "Customer insights",
+      value: customersCount.toString(),
+      description: "Total unique customers",
       icon: Users,
-      color: "bg-[#008052] text-white", // Light Pine
-      trend: "Feature locked",
-      opacity: "opacity-75",
+      color: "bg-[#008052] text-primary-foreground",
+      trend: `${customersCount > 0 ? "+"+customersCount : "0"} total`,
     },
   ];
 
   return (
-    <div className="space-y-6 animate-appear">
+    <div className="space-y-8 animate-appear">
+      {/* Stats Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, i) => (
-          <Card key={stat.title} className={`overflow-hidden border-none shadow-lg hover:shadow-xl transition-all duration-300 group rounded-2xl relative ${stat.opacity || ""}`}>
-            <div className={`absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-110 duration-500`}>
-                <stat.icon className="w-24 h-24 text-current" />
-            </div>
-            
-            <CardContent className="p-6 relative z-10">
-              <div className="flex items-center justify-between mb-4">
-                <div className={`p-3 rounded-xl shadow-md ${stat.color} bg-opacity-90 backdrop-blur-sm`}>
+          <Card key={stat.title} className="overflow-hidden border-2 border-border shadow-none rounded-3xl bg-card relative">
+            <CardContent className="p-7 relative z-10 flex flex-col h-full">
+              <div className="flex items-start justify-between mb-6">
+                <div className={`w-12 h-12 flex items-center justify-center rounded-2xl bg-primary/5 border border-primary/10 text-primary`}>
                   <stat.icon className="h-6 w-6" />
                 </div>
                 {stat.trend && (
-                    <span className="flex items-center text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full border border-green-100">
-                        <TrendingUp className="w-3 h-3 mr-1" />
+                    <span className="flex items-center text-[10px] font-bold text-primary/70 bg-primary/5 px-2.5 py-1 rounded-full border border-primary/10 uppercase tracking-wider">
+                        <TrendingUp className="w-3 h-3 mr-1 text-green-600" />
                         {stat.trend}
                     </span>
                 )}
               </div>
-              <div className="space-y-1">
-                <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide font-instrument-sans">
+              
+              <div className="space-y-1.5">
+                <p className="text-[10px] font-semibold text-primary/40 uppercase tracking-[0.2em]">
                     {stat.title}
-                </h3>
-                <div className="text-3xl font-medium font-sora text-foreground tracking-tight">
+                </p>
+                <div className="text-4xl font-semibold text-primary tracking-tighter">
                     {stat.value}
                 </div>
-                <p className="text-xs text-muted-foreground/80 font-instrument-sans">
-                  {stat.description}
-                </p>
               </div>
             </CardContent>
-            {/* Bottom accent line */}
-            <div className={`h-1 w-full ${stat.color.split(" ")[0]}`} />
           </Card>
         ))}
       </div>
 
-      <div className="grid gap-6 grid-cols-1">
-        <div className="space-y-4">
-            <div className="flex items-center justify-between">
-                <h3 className="text-xl font-medium tracking-tight text-primary font-raleway">Recent Orders</h3>
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-6">
+        {/* Sales Chart */}
+        <div className="lg:col-span-4">
+            <div className="rounded-3xl border-2 border-border bg-card overflow-hidden h-full">
+                <div className="px-7 pt-7 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-medium text-primary">Sales Overview</h3>
+                  </div>
+                  
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-primary/5 border border-primary/10 text-[9px] font-bold uppercase tracking-widest text-primary/60 hover:bg-primary/10 transition-colors">
+                        {rangeLabels[range]}
+                        <ChevronDown className="h-2.5 w-2.5 opacity-50" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48 rounded-2xl bg-card border border-border shadow-xl">
+                      <DropdownMenuItem asChild className="focus:bg-primary/5 focus:text-primary cursor-pointer rounded-xl m-1 px-3 py-2">
+                        <Link href="?range=7d" scroll={false} className="w-full text-xs font-bold uppercase tracking-wider">Last 7 Days</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild className="focus:bg-primary/5 focus:text-primary cursor-pointer rounded-xl m-1 px-3 py-2">
+                        <Link href="?range=30d" scroll={false} className="w-full text-xs font-bold uppercase tracking-wider">Last 30 Days</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild className="focus:bg-primary/5 focus:text-primary cursor-pointer rounded-xl m-1 px-3 py-2">
+                        <Link href="?range=1y" scroll={false} className="w-full text-xs font-bold uppercase tracking-wider">Last Year</Link>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+                <SalesChart data={salesData} className="border-none shadow-none" rangeLabel={rangeLabels[range]} />
             </div>
-            
-            <div className="rounded-none border border-primary/5 bg-white shadow-xl overflow-hidden">
-                 <OrdersClient initialOrders={recentOrders} />
-            </div>
+        </div>
+
+        {/* Top Selling Products */}
+        <div className="lg:col-span-2">
+            <Card className="h-full border-2 border-border shadow-none rounded-3xl bg-card overflow-hidden">
+                <CardHeader className="p-7 pb-2">
+                    <CardTitle className="text-lg font-medium flex items-center gap-2">
+                        Best Sellers
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="p-7">
+                    <div className="space-y-6 mt-2">
+                        {topProducts.length > 0 ? topProducts.map((product, i) => (
+                            <div key={i} className="flex items-center justify-between group">
+                                <div className="flex items-center gap-4">
+                                    <div className="h-10 w-10 rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                                        {i + 1}
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="font-semibold text-sm text-primary truncate max-w-[120px]">
+                                            {product.name}
+                                        </span>
+                                        <span className="text-[10px] text-primary/40 uppercase tracking-wider font-bold">
+                                            {product.sales} sold
+                                        </span>
+                                    </div>
+                                </div>
+                                <ArrowUpRight className="h-4 w-4 text-primary/20 group-hover:text-primary transition-colors" />
+                            </div>
+                        )) : (
+                            <div className="flex flex-col items-center justify-center py-10 text-center opacity-40">
+                                <Package className="h-10 w-10 mb-2" />
+                                <p className="text-xs font-medium uppercase tracking-widest">No sales yet</p>
+                            </div>
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
         </div>
       </div>
     </div>
