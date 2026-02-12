@@ -36,7 +36,7 @@ export default async function ProductsPage() {
   }
 
   return (
-    <div className="animate-appear">
+    <div className="flex-1 space-y-4 p-8 pt-0 animate-appear">
       <ProductsClient initialProducts={productsData} />
     </div>
   );

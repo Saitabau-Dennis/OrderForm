@@ -1,173 +1,167 @@
 "use client";
 
-import { useState } from "react";
 import { format } from "date-fns";
-import { Loader2, Package, Truck, CheckCircle, XCircle, Clock } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/dashboard/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
-import { formatOrderId } from "@/lib/utils";
-
-interface OrderDetailsProps {
+export function OrderDetails({
+  order,
+  storeName,
+  onUpdateStatus,
+  onClose,
+}: {
   order: any;
-  onUpdateStatus: (status: string) => Promise<void>;
-}
-
-export function OrderDetails({ order, onUpdateStatus }: OrderDetailsProps) {
-  const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState(order.status);
-
-  const handleStatusChange = async (newStatus: string) => {
-    try {
-      setLoading(true);
-      await onUpdateStatus(newStatus);
-      setStatus(newStatus);
-      toast.success(`Order status updated to ${newStatus}`);
-    } catch (error) {
-      toast.error("Failed to update status");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "pending": return <Clock className="h-4 w-4" />;
-      case "processing": return <Package className="h-4 w-4" />;
-      case "shipped": return <Truck className="h-4 w-4" />;
-      case "delivered": return <CheckCircle className="h-4 w-4" />;
-      case "completed": return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case "cancelled": return <XCircle className="h-4 w-4" />;
-      default: return <Clock className="h-4 w-4" />;
-    }
-  };
-
+  storeName: string;
+  onUpdateStatus: (orderId: string, status: string) => void;
+  onClose?: () => void;
+}) {
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between py-4">
-        <div className="space-y-1">
-          <h3 className="font-semibold text-lg">{order.displayId ?? formatOrderId(order.orderNumber ?? order.id)}</h3>
-          <p className="text-sm text-muted-foreground">
-            Placed on {format(new Date(order.createdAt), "PPP p")}
-          </p>
-        </div>
-        <Badge variant={status === "completed" ? "default" : "outline"} className="capitalize flex gap-2 items-center px-3 py-1">
-          {getStatusIcon(status)}
-          {status}
-        </Badge>
+    <div className="flex flex-col print-area">
+      {/* Receipt Header */}
+      <div className="px-6 pt-6 pb-4 text-center">
+        <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">{storeName}</p>
+        <h2 className="text-base font-medium text-foreground">
+          Order ID: {order.displayId || order.orderNumber}
+        </h2>
+        <p className="text-xs text-muted-foreground mt-1">
+          {format(new Date(order.createdAt), "MMM d, yyyy · h:mm a")}
+        </p>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="absolute right-4 top-4 w-7 h-7 rounded-md flex items-center justify-center hover:bg-muted transition-colors no-print"
+          >
+            <svg className="w-4 h-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
       </div>
 
-      <Separator />
+      {/* Dashed divider */}
+      <div className="mx-5 border-t border-dashed" />
 
-      <ScrollArea className="flex-1 -mx-6 px-6">
-        <div className="space-y-6 py-6">
-          {/* Status Control */}
-          <div className="space-y-2">
-            <Label>Update Status</Label>
-            <Select
-              value={status}
-              onValueChange={handleStatusChange}
-              disabled={loading}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="processing">Processing</SelectItem>
-                <SelectItem value="shipped">Shipped</SelectItem>
-                <SelectItem value="delivered">Delivered</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Customer Details */}
-          <div className="space-y-3">
-            <h4 className="font-medium">Customer Details</h4>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-muted-foreground">Name</p>
-                <p className="font-medium">{order.customerName}</p>
+      {/* Order Items */}
+      <div className="px-6 py-4">
+        <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">Order Details</p>
+        <div className="space-y-2.5">
+          {order.items?.map((item: any, i: number) => (
+            <div key={i} className="flex justify-between items-start gap-4">
+              <div className="min-w-0">
+                <p className="text-sm text-foreground">
+                  {item.name}
+                  {item.variant && <span className="text-muted-foreground"> ({item.variant})</span>}
+                </p>
+                <p className="text-[11px] text-muted-foreground">Qty: {item.quantity} × Ksh {Number(item.price).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
               </div>
-              <div>
-                <p className="text-muted-foreground">Phone</p>
-                <p className="font-medium">{order.customerPhone}</p>
-              </div>
-              <div className="col-span-2">
-                <p className="text-muted-foreground">Delivery Address</p>
-                <p className="font-medium">{order.deliveryAddress || "N/A"}</p>
-              </div>
+              <span className="text-sm text-foreground shrink-0">
+                Ksh {Number(item.price * item.quantity).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              </span>
             </div>
-          </div>
-
-          <Separator />
-
-          {/* Order Items */}
-          <div className="space-y-3">
-            <h4 className="font-medium">Items</h4>
-            <div className="space-y-3">
-              {order.items && order.items.length > 0 ? (
-                order.items.map((item: any, i: number) => (
-                  <div key={i} className="flex justify-between text-sm">
-                    <div>
-                      <p className="font-medium">{item.name}</p>
-                      <p className="text-muted-foreground">
-                        {item.quantity} x KES {item.price.toLocaleString()}
-                        {item.variant && ` - ${item.variant}`}
-                      </p>
-                    </div>
-                    <p className="font-medium">
-                      KES {(item.quantity * item.price).toLocaleString()}
-                    </p>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-muted-foreground italic">No items (Mock Data)</p>
-              )}
-            </div>
-          </div>
-
-          <Separator />
-
-          {/* Financials */}
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span>KES {order.totalAmount.toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Delivery</span>
-              <span>KES 0</span>
-            </div>
-            <div className="flex justify-between font-medium text-lg pt-2">
-              <span>Total</span>
-              <span>KES {order.totalAmount.toLocaleString()}</span>
-            </div>
-          </div>
+          ))}
         </div>
-      </ScrollArea>
+      </div>
 
-      <div className="pt-4 mt-auto border-t">
-        <Button 
-          className="w-full rounded-3xl shadow-sm hover:shadow-md transition-all duration-200" 
-          variant="outline" 
+      {/* Dashed divider */}
+      <div className="mx-5 border-t border-dashed" />
+
+      {/* Totals */}
+      <div className="px-6 py-4 space-y-1.5">
+        <div className="flex justify-between text-sm">
+          <span className="text-muted-foreground">Subtotal</span>
+          <span className="text-foreground">Ksh {Number(order.subtotal || order.totalAmount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+        </div>
+        {Number(order.deliveryFee) > 0 && (
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Delivery</span>
+            <span className="text-foreground">Ksh {Number(order.deliveryFee).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+          </div>
+        )}
+        <div className="flex justify-between text-sm">
+          <span className="text-muted-foreground">Tax</span>
+          <span className="text-foreground">Ksh 0.00</span>
+        </div>
+      </div>
+
+      {/* Dashed divider */}
+      <div className="mx-5 border-t border-dashed" />
+
+      {/* Grand Total */}
+      <div className="px-6 py-4">
+        <div className="flex justify-between text-base">
+          <span className="font-medium text-foreground">Total</span>
+          <span className="font-medium text-foreground">Ksh {Number(order.totalAmount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+        </div>
+      </div>
+
+      {/* Dashed divider */}
+      <div className="mx-5 border-t border-dashed" />
+
+      {/* Customer Info */}
+      <div className="px-6 py-4 space-y-1.5">
+        <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Customer Information</p>
+        <div className="flex justify-between text-sm">
+          <span className="text-muted-foreground">Customer</span>
+          <span className="text-foreground">{order.customerName}</span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-muted-foreground">Phone</span>
+          <span className="text-foreground">{order.customerPhone}</span>
+        </div>
+        {order.deliveryAddress && (
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground shrink-0">Address</span>
+            <span className="text-foreground text-right max-w-[200px]">{order.deliveryAddress}</span>
+          </div>
+        )}
+        {order.deliveryZone && (
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Zone</span>
+            <span className="text-foreground">{order.deliveryZone}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Notes */}
+      {order.notes && (
+        <>
+          <div className="mx-5 border-t border-dashed" />
+          <div className="px-6 py-4">
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Notes</p>
+            <p className="text-sm text-muted-foreground italic">&ldquo;{order.notes}&rdquo;</p>
+          </div>
+        </>
+      )}
+
+      {/* Dashed divider */}
+      <div className="mx-5 border-t border-dashed" />
+
+      {/* Footer */}
+      <div className="px-6 py-4 text-center">
+        <p className="text-[10px] text-muted-foreground">Thank you for your order!</p>
+      </div>
+
+      {/* Actions bar — hidden on print */}
+      <div className="border-t p-4 flex items-center gap-2 no-print">
+        <Select defaultValue={order.status} onValueChange={(val) => onUpdateStatus(order.id, val)}>
+          <SelectTrigger className="h-8 flex-1 text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="processing">Processing</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
+          </SelectContent>
+        </Select>
+        <button
           onClick={() => window.print()}
+          className="h-8 px-3 text-xs font-normal border rounded-md hover:bg-muted/50 transition-colors flex items-center gap-1.5 shrink-0"
         >
-          Print Invoice
-        </Button>
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+          </svg>
+          Print
+        </button>
       </div>
     </div>
   );

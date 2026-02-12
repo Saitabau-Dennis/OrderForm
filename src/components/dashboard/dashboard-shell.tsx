@@ -3,37 +3,38 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { 
-  Home, 
-  Package, 
-  Settings, 
-  ShoppingBag, 
-  LogOut, 
-  Menu, 
-  ExternalLink, 
-  ChevronRight, 
-  ChevronDown, 
-  LifeBuoy, 
-  Plus, 
+import {
+  Home,
+  Package,
+  Settings,
+  ShoppingBag,
+  LogOut,
+  Menu,
+  ChevronRight,
+  ChevronDown,
+  ChevronUp,
+  LifeBuoy,
+  Plus,
   BarChart3,
   Users,
   Store,
   MoreHorizontal,
-  Check 
+  Check
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/dashboard/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { SupportModal } from "@/components/dashboard/support-modal";
 import { signOut } from "next-auth/react";
+import BoringAvatar from "boring-avatars";
 
 interface DashboardShellProps {
   children: React.ReactNode;
@@ -66,7 +67,7 @@ interface SidebarContentProps {
 
 const SidebarContent = ({ user, store, setIsMobileMenuOpen, setShowSupportModal }: SidebarContentProps) => {
   const pathname = usePathname();
-  
+
   const routes = [
     { label: "Overview", icon: Home, href: "/dashboard", active: pathname === "/dashboard" },
     { label: "Products", icon: Package, href: "/products", active: pathname === "/products" },
@@ -77,56 +78,66 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen, setShowSupportModal 
   ];
 
   return (
-    <div className="flex h-full flex-col text-foreground p-5 pb-6">
+    <div className="flex h-full flex-col text-foreground p-4 pb-5">
       {/* Store Header */}
-      <div className="mb-6">
+      <div className="mb-3">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-3 w-full rounded-xl p-3 hover:bg-foreground/[0.04] transition-all duration-150 cursor-pointer group focus:outline-none">
-              <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center shrink-0">
-                <Store className="h-4.5 w-4.5 text-primary-foreground" />
+            <button className="flex items-center gap-3 w-full rounded-lg border p-2.5 hover:bg-foreground/[0.03] transition-all duration-150 cursor-pointer group focus:outline-none">
+              <div className="shrink-0">
+                <BoringAvatar
+                  size={28}
+                  name={store?.name || "My Store"}
+                  variant="marble"
+                  colors={["#264653", "#2a9d8f", "#e9c46a", "#f4a261", "#e76f51"]}
+                />
               </div>
-              <div className="flex-1 overflow-hidden text-left">
-                <p className="truncate text-sm font-semibold text-foreground leading-tight">
-                  {store?.name || "My Store"}
-                </p>
-                <p className="text-[11px] text-muted-foreground truncate leading-tight mt-0.5">{store?.slug ? `orderform.co/${store.slug}` : "Free plan"}</p>
+              <span className="truncate text-sm font-normal text-foreground flex-1 text-left">
+                {store?.name || "My Store"}
+              </span>
+              <div className="flex flex-col shrink-0 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors">
+                <ChevronUp className="h-3 w-3 -mb-0.5" />
+                <ChevronDown className="h-3 w-3 -mt-0.5" />
               </div>
-              <ChevronDown className="h-4 w-4 text-muted-foreground/60 group-hover:text-muted-foreground transition-colors shrink-0" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" sideOffset={4} className="w-[260px] bg-white rounded-xl border border-black/[0.06] shadow-[0_8px_30px_rgba(0,0,0,0.08)] p-1 font-poppins">
-             <div className="px-2.5 py-2">
-                <p className="text-[11px] font-semibold text-foreground/40 uppercase tracking-wider">Stores</p>
+          <DropdownMenuContent align="start" sideOffset={4} className="w-[240px] bg-white rounded-lg border shadow-md p-1.5 font-poppins">
+             <div className="px-2 py-1.5">
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Stores</p>
              </div>
-             <DropdownMenuItem className="focus:bg-foreground/[0.03] cursor-pointer gap-2.5 px-2.5 py-2 rounded-lg">
-                <div className="h-7 w-7 rounded-md bg-primary flex items-center justify-center shrink-0">
-                  <Store className="h-3.5 w-3.5 text-primary-foreground" />
+             <DropdownMenuItem className="focus:bg-muted/50 cursor-pointer gap-2.5 px-2.5 py-2.5 rounded-md">
+                <div className="shrink-0">
+                  <BoringAvatar
+                    size={22}
+                    name={store?.name || "My Store"}
+                    variant="marble"
+                    colors={["#264653", "#2a9d8f", "#e9c46a", "#f4a261", "#e76f51"]}
+                  />
                 </div>
-                <span className="text-sm font-semibold text-foreground truncate flex-1">{store?.name || "My Store"}</span>
-                <Check className="h-3.5 w-3.5 text-foreground/40 shrink-0" />
+                <span className="text-sm font-normal text-foreground truncate flex-1">{store?.name || "My Store"}</span>
+                <Check className="h-3.5 w-3.5 text-primary shrink-0" />
              </DropdownMenuItem>
-             <DropdownMenuSeparator className="bg-black/[0.04] my-1 mx-1" />
-             <DropdownMenuItem className="focus:bg-foreground/[0.03] cursor-pointer gap-2.5 px-2.5 py-2 rounded-lg text-foreground/50 hover:text-foreground">
-                <div className="h-7 w-7 rounded-md border border-dashed border-black/10 flex items-center justify-center">
-                  <Plus className="h-3.5 w-3.5" />
+             <DropdownMenuSeparator className="bg-border/60 my-1" />
+             <DropdownMenuItem className="focus:bg-muted/50 cursor-pointer gap-2.5 px-2.5 py-2.5 rounded-md text-muted-foreground hover:text-foreground">
+                <div className="h-[22px] w-[22px] rounded-full border border-dashed border-muted-foreground/30 flex items-center justify-center">
+                  <Plus className="h-3 w-3" />
                 </div>
-                <span className="text-sm font-semibold">New store</span>
+                <span className="text-sm font-normal">New store</span>
              </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
 
       {/* Navigation */}
-      <nav className="space-y-2 flex-1">
+      <nav className="space-y-1.5 flex-1">
         {routes.map((route) => (
           <Link
             key={route.label}
             href={route.href}
             className={cn(
-              "flex items-center gap-4 rounded-3xl px-4 py-3.5 text-base font-medium transition-all duration-200 group relative",
+              "flex items-center gap-3 rounded-md px-3.5 py-2.5 text-sm font-normal transition-all duration-200 group relative",
               route.active
-                ? "bg-primary text-primary-foreground shadow-lg font-semibold"
+                ? "bg-primary text-primary-foreground shadow-sm font-medium"
                 : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground",
               route.comingSoon && "opacity-70 cursor-not-allowed"
             )}
@@ -135,7 +146,7 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen, setShowSupportModal 
               else setIsMobileMenuOpen(false);
             }}
           >
-            <route.icon className={cn("h-5 w-5", route.active ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground")} />
+            <route.icon className={cn("h-[22px] w-[22px]", route.active ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground")} />
             <span className="font-poppins tracking-wide">{route.label}</span>
             {route.comingSoon && (
               <span className="ml-auto text-[10px] uppercase font-bold bg-foreground/10 px-2 py-0.5 rounded">Soon</span>
@@ -148,7 +159,7 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen, setShowSupportModal 
       <div className="mt-auto border-t border-border/60 pt-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-3 rounded-xl p-2.5 hover:bg-foreground/[0.04] transition-all duration-150 cursor-pointer w-full group focus:outline-none">
+            <button className="flex items-center gap-3 rounded-md p-2.5 hover:bg-foreground/[0.04] transition-all duration-150 cursor-pointer w-full group focus:outline-none">
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.image || ""} className="rounded-lg" />
                 <AvatarFallback className="bg-foreground/10 text-foreground text-xs font-semibold rounded-lg">
@@ -194,8 +205,8 @@ export function DashboardShell({ children, user, store }: DashboardShellProps) {
   const getBreadcrumb = () => {
     const path = pathname.split("/").filter(Boolean);
     return (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Link href="/dashboard" className="hover:text-primary transition-colors font-medium">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground font-light">
+            <Link href="/dashboard" className="hover:text-primary transition-colors font-normal">
                 Home
             </Link>
             {path.map((segment, index) => {
@@ -206,13 +217,13 @@ export function DashboardShell({ children, user, store }: DashboardShellProps) {
                     <div key={segment} className="flex items-center gap-2">
                         <ChevronRight className="h-4 w-4 text-muted-foreground/40" />
                         {isLast ? (
-                            <span className="font-semibold text-primary capitalize">
+                            <span className="font-normal text-foreground capitalize">
                                 {segment}
                             </span>
                         ) : (
                             <Link
                                 href={href}
-                                className="hover:text-primary transition-colors capitalize font-medium"
+                                className="hover:text-primary transition-colors capitalize font-normal"
                             >
                                 {segment}
                             </Link>
@@ -226,40 +237,56 @@ export function DashboardShell({ children, user, store }: DashboardShellProps) {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground font-poppins">
-      <aside className="hidden w-80 border-r border-sidebar-border bg-sidebar md:block fixed inset-y-0 left-0 z-30">
+      <aside className="hidden w-72 border-r border-sidebar-border bg-white md:block fixed inset-y-0 left-0 z-30">
         <SidebarContent user={user} store={store} setIsMobileMenuOpen={setIsMobileMenuOpen} setShowSupportModal={setShowSupportModal} />
       </aside>
 
-      <div className="flex w-full flex-col md:pl-80 transition-all duration-300">
-        <header className="sticky top-0 z-20 flex h-24 items-center justify-between bg-background/80 px-6 md:px-10 backdrop-blur-xl">
-          <div className="flex items-center gap-6">
+      <div className="flex w-full flex-col md:pl-72 transition-all duration-300">
+        <header className="sticky top-0 z-20 flex h-16 items-center justify-between bg-white px-6 md:px-8">
+          {/* Left — Breadcrumb + mobile menu */}
+          <div className="flex items-center gap-4">
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden text-foreground hover:bg-foreground/10 rounded-2xl">
-                  <Menu className="h-6 w-6" />
+                <Button variant="ghost" size="icon" className="md:hidden text-foreground hover:bg-foreground/10 rounded-md">
+                  <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="p-0 w-80 border-r-0 bg-sidebar text-foreground">
+              <SheetContent side="left" className="p-0 w-72 border-r-0 bg-background text-foreground">
                 <SidebarContent user={user} store={store} setIsMobileMenuOpen={setIsMobileMenuOpen} setShowSupportModal={setShowSupportModal} />
               </SheetContent>
             </Sheet>
-            
+
             <div className="flex items-center">
               {getBreadcrumb()}
             </div>
           </div>
 
-          {store?.slug && (
-            <Button className="gap-2 rounded-3xl bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-none h-12 px-8" asChild>
-              <a href={`/${store.slug}`} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-4 w-4 text-primary-foreground" />
-                <span className="font-bold tracking-tight text-primary-foreground">View Store</span>
-              </a>
-            </Button>
-          )}
+          {/* Right — Search + View Store */}
+          <div className="flex items-center gap-3">
+            <div className="hidden md:block relative">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search..."
+                className="w-[260px] h-9 pl-9 pr-3 text-sm font-normal border rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary/30 transition-all placeholder:text-muted-foreground/40"
+              />
+            </div>
+
+            <a
+              href={`/${store?.slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 h-9 px-4 text-sm font-normal border rounded-md hover:bg-muted/50 transition-colors text-foreground"
+            >
+              View Store
+              <Store className="h-4 w-4 text-muted-foreground" />
+            </a>
+          </div>
         </header>
 
-        <main className="flex-1 w-full p-4 md:px-10 md:py-8 mx-auto animate-appear">
+        <main className="flex-1 w-full p-4 md:px-10 md:py-3 mx-auto animate-appear">
           {children}
         </main>
       </div>

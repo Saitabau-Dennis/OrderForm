@@ -33,7 +33,7 @@ export function SalesChart({ className, data: propData, rangeLabel = "Last 7 Day
   const getCurvePath = (pts: { x: number; y: number }[]) => {
     if (pts.length < 2) return "";
     let d = `M ${pts[0].x},${pts[0].y}`;
-    
+
     for (let i = 0; i < pts.length - 1; i++) {
       const curr = pts[i];
       const next = pts[i + 1];
@@ -41,7 +41,7 @@ export function SalesChart({ className, data: propData, rangeLabel = "Last 7 Day
       const cp1y = curr.y;
       const cp2x = curr.x + (next.x - curr.x) / 2;
       const cp2y = next.y;
-      
+
       d += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${next.x},${next.y}`;
     }
     return d;
@@ -55,7 +55,7 @@ export function SalesChart({ className, data: propData, rangeLabel = "Last 7 Day
       <CardContent className="p-7">
         <div className="h-[300px] w-full pt-4 relative pl-12">
             {/* Y-axis labels */}
-            <div className="absolute inset-y-0 left-0 flex flex-col justify-between text-[10px] font-bold text-primary/20 h-[85%] w-12 pr-4 text-right">
+            <div className="absolute inset-y-0 left-0 flex flex-col justify-between text-[10px] font-medium text-primary/20 h-[85%] w-12 pr-4 text-right">
                 <span>{maxValue}</span>
                 <span>{Math.round(maxValue * 0.75)}</span>
                 <span>{Math.round(maxValue * 0.5)}</span>
@@ -76,8 +76,8 @@ export function SalesChart({ className, data: propData, rangeLabel = "Last 7 Day
                 <svg className="w-full h-[85%] overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
                     <defs>
                         <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stopColor="#00311F" stopOpacity="0.1" />
-                            <stop offset="100%" stopColor="#00311F" stopOpacity="0" />
+                            <stop offset="0%" stopColor="#00311F" stopOpacity="0.8" />
+                            <stop offset="100%" stopColor="#00311F" stopOpacity="0.2" />
                         </linearGradient>
                     </defs>
 
@@ -95,7 +95,7 @@ export function SalesChart({ className, data: propData, rangeLabel = "Last 7 Day
                         d={pathD}
                         fill="none"
                         stroke="#00311F"
-                        strokeWidth="2"
+                        strokeWidth="0"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         initial={{ pathLength: 0 }}
@@ -105,7 +105,7 @@ export function SalesChart({ className, data: propData, rangeLabel = "Last 7 Day
                 </svg>
 
                 {/* X-axis labels */}
-                <div className="flex justify-between mt-6 text-[10px] font-bold text-primary/40 uppercase tracking-wider px-2">
+                <div className="flex justify-between mt-6 text-[10px] font-medium text-primary/40 uppercase tracking-wider px-2">
                     {data.map((d) => (
                         <span key={d.label}>{d.label}</span>
                     ))}

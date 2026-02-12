@@ -18,7 +18,8 @@ const CreateOrderSchema = z.object({
     price: z.number(),
     variant: z.string().optional()
   })),
-  totalAmount: z.number()
+  totalAmount: z.number(),
+  notes: z.string().optional()
 });
 
 export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
@@ -37,10 +38,18 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
     // Generate Display ID (e.g., NIK-4821)
     const prefix = store.name.substring(0, 3).toUpperCase().replace(/[^A-Z]/g, "ORD");
     const randomNum = Math.floor(1000 + Math.random() * 9000); // 1000-9999
-    const displayId = `${prefix}-${randomNum}`;
+    const displayId = `${prefix}${randomNum}`;
 
     // Note: In a high-volume prod app, we'd handle collisions with a retry loop here.
     // For now, the probability is low enough for this scale.
+
+    // Verify products exist to prevent foreign key errors
+    const productIds = validatedData.items.map(i => i.productId);
+    const existingProducts = await db.product.findMany({
+      where: { id: { in: productIds } },
+      select: { id: true }
+    });
+    const existingProductIds = new Set(existingProducts.map(p => p.id));
 
     const order = await db.order.create({
       data: {
@@ -51,10 +60,11 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
         deliveryAddress: validatedData.deliveryAddress,
         deliveryZone: validatedData.deliveryZone,
         totalAmount: validatedData.totalAmount,
-        subtotal: validatedData.totalAmount, 
+        subtotal: validatedData.totalAmount,
+        notes: validatedData.notes,
         items: {
           create: validatedData.items.map(item => ({
-            productId: item.productId,
+            productId: existingProductIds.has(item.productId) ? item.productId : null, // Set to null if product doesn't exist
             name: item.name,
             quantity: item.quantity,
             price: item.price,
@@ -80,7 +90,7 @@ export async function updateOrderStatus(id: string, status: string) {
     }
 
     const store = await db.store.findFirst({
-        where: { userId: session.user.id }
+      where: { userId: session.user.id }
     });
 
     if (!store) {
@@ -89,7 +99,7 @@ export async function updateOrderStatus(id: string, status: string) {
 
     // Ensure the order belongs to the user's store
     const order = await db.order.findFirst({
-        where: { id: id, storeId: store.id }
+      where: { id: id, storeId: store.id }
     });
 
     if (!order) {
@@ -97,8 +107,8 @@ export async function updateOrderStatus(id: string, status: string) {
     }
 
     const updatedOrder = await db.order.update({
-        where: { id: id },
-        data: { status }
+      where: { id: id },
+      data: { status }
     });
 
     revalidatePath("/orders");

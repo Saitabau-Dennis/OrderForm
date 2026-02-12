@@ -10,6 +10,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -60,14 +61,14 @@ export function ProductsTable({ products, onEdit, onDelete }: ProductsTableProps
       cell: ({ row }) => {
         const product = row.original;
         return (
-          <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10 rounded-lg border border-border/60 shrink-0">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-24 w-24 rounded-xl border border-border/60 shrink-0">
               <AvatarImage src={product.imageUrl} alt={product.name} className="object-cover" />
-              <AvatarFallback className="rounded-lg bg-muted text-muted-foreground text-xs font-medium">
-                {product.imageUrl ? <ImageOff className="h-3.5 w-3.5 opacity-40" /> : product.name.substring(0, 2).toUpperCase()}
+              <AvatarFallback className="rounded-xl bg-muted text-muted-foreground text-sm font-medium">
+                {product.imageUrl ? <ImageOff className="h-6 w-6 opacity-40" /> : product.name.substring(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <span className="font-medium text-foreground text-sm">
+            <span className="font-normal text-foreground text-base">
               {product.name}
             </span>
           </div>
@@ -91,27 +92,7 @@ export function ProductsTable({ products, onEdit, onDelete }: ProductsTableProps
         );
       },
     },
-    {
-      accessorKey: "sizes",
-      header: "Sizes",
-      cell: ({ row }) => {
-        const sizes = row.getValue("sizes") as string | undefined;
-        if (!sizes) return <span className="text-sm text-muted-foreground">—</span>;
-        const sizeList = sizes.split(",").map((s) => s.trim()).filter(Boolean);
-        return (
-          <div className="flex items-center gap-1 flex-wrap">
-            {sizeList.map((size) => (
-              <span
-                key={size}
-                className="inline-flex items-center justify-center min-w-7 h-6 px-1.5 rounded-md bg-muted text-xs font-medium text-foreground tabular-nums"
-              >
-                {size}
-              </span>
-            ))}
-          </div>
-        );
-      },
-    },
+
     {
       accessorKey: "price",
       header: "Price",
@@ -161,19 +142,20 @@ export function ProductsTable({ products, onEdit, onDelete }: ProductsTableProps
                   <span className="sr-only">Open menu</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40 rounded-xl border border-border/60 shadow-lg bg-card p-1">
+              <DropdownMenuContent align="end" className="w-40 rounded-xl border-2 border-border shadow-lg bg-white p-1.5">
+                <DropdownMenuLabel className="font-normal text-xs text-muted-foreground px-3 py-1.5">
+                  Actions
+                </DropdownMenuLabel>
                 <DropdownMenuItem
                   onClick={() => onEdit ? onEdit(product) : router.push(`/products/${product.id}`)}
-                  className="cursor-pointer rounded-lg text-sm gap-2 py-2"
+                  className="cursor-pointer rounded-lg text-sm font-normal py-2 px-3 text-foreground hover:bg-muted/60 transition-colors"
                 >
-                  <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
                   Edit
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className="cursor-pointer rounded-lg text-sm gap-2 py-2 text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950/50"
+                  className="cursor-pointer rounded-lg text-sm font-normal py-2 px-3 text-foreground hover:bg-muted/60 transition-colors"
                   onClick={() => onDelete?.(product)}
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
                   Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -185,6 +167,14 @@ export function ProductsTable({ products, onEdit, onDelete }: ProductsTableProps
   ];
 
   return (
-    <DataTable columns={columns} data={products} searchKey="name" placeholder="Search products..." title="Products" />
+    <DataTable
+        columns={columns}
+        data={products}
+        searchKey="name"
+        placeholder="Search products..."
+        title="Products"
+        disableHover
+        titleClassName="text-3xl font-medium"
+    />
   );
 }

@@ -103,18 +103,18 @@ export async function deleteProduct(id: string) {
     }
 
     const store = await db.store.findFirst({
-        where: { userId: session.user.id }
+      where: { userId: session.user.id }
     });
 
     if (!store) {
-        return { error: "Store not found" };
+      return { error: "Store not found" };
     }
 
     // Delete using deleteMany to ensure storeId matches (safeguard)
     const result = await db.product.deleteMany({
-      where: { 
+      where: {
         id: id,
-        storeId: store.id 
+        storeId: store.id
       }
     });
 

@@ -3,14 +3,13 @@
 import { Loader2 } from "lucide-react";
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/dashboard/button";
 import { cn } from "@/lib/utils";
 
 interface AlertModalProps {
@@ -42,36 +41,41 @@ export const AlertModal: React.FC<AlertModalProps> = ({
 
   const isDestructive = variant === "destructive";
 
+  const handleConfirm = async () => {
+    await onConfirm();
+  };
+
   return (
     <AlertDialog open={isOpen} onOpenChange={onChange}>
-      <AlertDialogContent className="rounded-2xl border border-border shadow-xl sm:max-w-[420px] p-6 gap-0 bg-card">
+      <AlertDialogContent className="rounded-2xl border-2 border-zinc-200 shadow-xl sm:max-w-[420px] p-6 gap-0 bg-card">
         <AlertDialogHeader className="space-y-2 pb-4">
-          <AlertDialogTitle className="text-lg font-semibold tracking-tight text-foreground font-poppins">
+          <AlertDialogTitle className="text-lg font-normal tracking-tight text-foreground">
             {title}
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-sm text-muted-foreground font-poppins leading-relaxed">
+          <AlertDialogDescription className="text-sm font-normal text-muted-foreground leading-relaxed">
             {description}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
         <AlertDialogFooter className="flex-row justify-end gap-3 pt-2 sm:space-x-0">
-          <AlertDialogCancel
+          <Button
+            type="button"
+            variant="outline"
             disabled={loading}
-            className="rounded-lg h-9 px-4 border border-border bg-background hover:bg-accent text-foreground text-sm font-medium mt-0 transition-colors"
+            onClick={onClose}
+            className="rounded-lg h-9 px-4 border-2 border-zinc-300 bg-background hover:bg-zinc-100 text-foreground text-sm font-medium transition-colors"
           >
             {cancelText}
-          </AlertDialogCancel>
-          <AlertDialogAction
-            onClick={(e) => {
-              e.preventDefault();
-              onConfirm();
-            }}
+          </Button>
+          <Button
+            type="button"
             disabled={loading}
+            onClick={handleConfirm}
             className={cn(
-              "rounded-lg h-9 px-4 text-sm font-medium shadow-none transition-colors",
+              "rounded-lg h-9 px-4 text-sm font-medium shadow-none transition-colors border-2",
               isDestructive
-                ? "bg-pink-500 hover:bg-pink-600 text-white border-none"
-                : "bg-primary hover:bg-primary/90 text-primary-foreground"
+                ? "bg-red-600 hover:bg-red-700 text-white border-red-600"
+                : "bg-primary hover:bg-primary/90 text-primary-foreground border-primary"
             )}
           >
             {loading ? (
@@ -80,7 +84,7 @@ export const AlertModal: React.FC<AlertModalProps> = ({
                 Processing...
               </>
             ) : confirmText}
-          </AlertDialogAction>
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

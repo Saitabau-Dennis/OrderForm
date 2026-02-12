@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2, Package, Image as ImageIcon, Layers, DollarSign, Ruler, AlertCircle } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/dashboard/button";
 import { Input } from "@/components/ui/input";
@@ -19,10 +19,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { AlertModal } from "@/components/modals/alert-modal";
 import { createProduct, updateProduct } from "@/lib/actions/products";
 import { cn } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 
 export const productSchema = z.object({
@@ -46,10 +44,6 @@ interface ProductFormProps {
 export function ProductForm({ initialData, onSuccess, layout = "default" }: ProductFormProps) {
   const [loading, setLoading] = useState(false);
 
-  // Confirmation State
-  const [pendingData, setPendingData] = useState<ProductValues | null>(null);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-
   const form = useForm<ProductValues>({
     resolver: zodResolver(productSchema) as any,
     defaultValues: {
@@ -63,22 +57,15 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
     },
   });
 
-  const handleFormSubmit = async (data: ProductValues) => {
-    setPendingData(data);
-    setShowConfirmModal(true);
-  };
-
-  const performSave = async () => {
-    if (!pendingData) return;
-
+  const onSubmit = async (data: ProductValues) => {
     try {
       setLoading(true);
 
       let result;
       if (initialData) {
-        result = await updateProduct(initialData.id, pendingData);
+        result = await updateProduct(initialData.id, data);
       } else {
-        result = await createProduct(pendingData);
+        result = await createProduct(data);
       }
 
       if (result.error) {
@@ -87,7 +74,6 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
       }
 
       toast.success(initialData ? "Product updated" : "Product created");
-      setShowConfirmModal(false);
       onSuccess();
     } catch (error) {
       toast.error("Something went wrong");
@@ -96,34 +82,29 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
     }
   };
 
-  const SectionWrapper = ({ children, title, description, icon: Icon }: { children: React.ReactNode; title: string; description?: string, icon?: any }) => {
+  const SectionWrapper = ({ children, title, description }: { children: React.ReactNode; title: string; description?: string }) => {
     if (layout === "sheet") {
       return (
-        <div className="space-y-4">
-            <div className="flex items-start gap-3">
-                {Icon && <div className="p-2 bg-primary/5 rounded-2xl text-primary"><Icon className="h-5 w-5" /></div>}
-                <div className="space-y-1">
-                    <h3 className="font-medium text-lg font-poppins text-foreground">{title}</h3>
-                    {description && <p className="text-sm text-muted-foreground font-poppins">{description}</p>}
+        <div className="rounded-2xl border-2 border-border bg-white overflow-hidden">
+            <div className="flex items-center gap-3 p-5 border-b border-border">
+                <div className="space-y-0.5">
+                    <h3 className="font-medium text-base text-foreground">{title}</h3>
+                    {description && <p className="text-xs text-muted-foreground">{description}</p>}
                 </div>
             </div>
-            {children}
-            <div className="h-px w-full bg-border/60 my-8" />
+            <div className="p-5 space-y-5">
+              {children}
+            </div>
         </div>
       );
     }
 
     return (
-      <div className="rounded-3xl border border-border bg-card shadow-sm overflow-hidden transition-all hover:shadow-2xl hover:shadow-primary/10">
-        <div className="flex items-center gap-4 p-6 border-b border-border bg-primary/[0.02]">
-          {Icon && (
-            <div className="h-10 w-10 rounded-3xl bg-card border border-border flex items-center justify-center shadow-sm text-primary">
-                <Icon className="h-5 w-5" />
-            </div>
-          )}
+      <div className="rounded-2xl border-2 border-border bg-white overflow-hidden">
+        <div className="flex items-center gap-4 p-6 border-b border-border">
           <div className="flex flex-col space-y-0.5">
-            <h3 className="font-medium text-lg font-poppins text-primary">{title}</h3>
-            {description && <p className="text-xs text-muted-foreground font-poppins uppercase tracking-wider">{description}</p>}
+            <h3 className="font-medium text-lg text-foreground">{title}</h3>
+            {description && <p className="text-xs text-muted-foreground">{description}</p>}
           </div>
         </div>
         <div className="p-8 space-y-8">
@@ -134,16 +115,15 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
   };
 
   return (
-    <>
-      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
-        <div className={cn("grid gap-8", layout === "default" ? "grid-cols-1 lg:grid-cols-3" : "grid-cols-1")}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className={cn("space-y-8", layout === "sheet" && "space-y-6")}>
+        <div className={cn("grid gap-8", layout === "default" ? "grid-cols-1 lg:grid-cols-3" : "grid-cols-1 gap-6")}>
 
           {/* Main Column: Details */}
           <div className={cn("space-y-8", layout === "default" ? "lg:col-span-2" : "")}>
 
-            <SectionWrapper title="Product Information" description="Essential details" icon={Package}>
+            <SectionWrapper title="Product Information" description="Essential details">
                 <div className="space-y-2">
-                  <Label htmlFor="name" className="text-sm font-medium">Product Name <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="name" className="text-sm font-normal text-muted-foreground">Product Name <span className="text-red-500">*</span></Label>
                   <Input
                     id="name"
                     placeholder="e.g. Vintage Denim Jacket"
@@ -151,8 +131,7 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                     className="h-10 rounded-3xl border-border bg-secondary/50 focus:bg-card focus:border-primary/30 transition-all font-normal text-sm placeholder:text-muted-foreground/50"
                   />
                   {form.formState.errors.name && (
-                    <p className="text-xs text-red-500 flex items-center gap-1">
-                        <AlertCircle className="h-3 w-3" />
+                    <p className="text-xs text-red-500">
                         {form.formState.errors.name.message}
                     </p>
                   )}
@@ -160,7 +139,7 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="description" className="text-sm font-medium">Description <span className="text-red-500">*</span></Label>
+                    <Label htmlFor="description" className="text-sm font-normal text-muted-foreground">Description <span className="text-red-500">*</span></Label>
                   </div>
                   <Textarea
                     id="description"
@@ -169,15 +148,14 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                     {...form.register("description")}
                   />
                   {form.formState.errors.description && (
-                    <p className="text-xs text-red-500 flex items-center gap-1">
-                        <AlertCircle className="h-3 w-3" />
+                    <p className="text-xs text-red-500">
                         {form.formState.errors.description.message}
                     </p>
                   )}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="price" className="text-sm font-medium">Price <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="price" className="text-sm font-normal text-muted-foreground">Price <span className="text-red-500">*</span></Label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <span className="text-primary font-medium font-poppins text-sm">KES</span>
@@ -191,8 +169,7 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                     />
                   </div>
                   {form.formState.errors.price && (
-                    <p className="text-xs text-red-500 flex items-center gap-1">
-                        <AlertCircle className="h-3 w-3" />
+                    <p className="text-xs text-red-500">
                         {form.formState.errors.price.message}
                     </p>
                   )}
@@ -203,25 +180,24 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
           {/* Side Column: Media & Organization */}
           <div className="space-y-8">
 
-            <SectionWrapper title="Media" description="Product images" icon={ImageIcon}>
+            <SectionWrapper title="Media" description="Product images">
                 <div className="bg-secondary/50 rounded-3xl p-2 border border-dashed border-border">
                     <ImageUpload
                     value={form.watch("imageUrl")}
-                    onChange={(url) => form.setValue("imageUrl", url)}
+                    onChange={(url) => form.setValue("imageUrl", url, { shouldDirty: true })}
                     endpoint="productImage"
                     />
                 </div>
                 {form.formState.errors.imageUrl && (
-                    <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-                        <AlertCircle className="h-3 w-3" />
+                    <p className="text-xs text-red-500 mt-1">
                         {form.formState.errors.imageUrl.message}
                     </p>
                 )}
             </SectionWrapper>
 
-            <SectionWrapper title="Organization" description="Categorization & Stock" icon={Layers}>
+            <SectionWrapper title="Organization" description="Categorization & Stock">
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Category</Label>
+                  <Label className="text-sm font-normal text-muted-foreground">Category</Label>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="outline" className="w-full justify-between font-normal h-10 rounded-3xl border-primary/20 bg-card hover:bg-secondary hover:border-primary/40 transition-all text-sm shadow-sm">
@@ -230,14 +206,14 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                         ) : (
                           <span className="text-muted-foreground">Select category</span>
                         )}
-                        <Layers className="h-4 w-4 text-primary opacity-70" />
+                        <svg className="h-4 w-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-[280px] p-2 rounded-3xl border-none shadow-xl" align="start">
                       {["Clothing", "Footwear", "Accessories", "Electronics", "Home", "Beauty"].map((cat) => (
                         <DropdownMenuItem
                           key={cat}
-                          onClick={() => form.setValue("category", cat)}
+                          onClick={() => form.setValue("category", cat, { shouldDirty: true })}
                           className="rounded-2xl p-2 cursor-pointer focus:bg-primary/5 focus:text-primary font-normal text-sm"
                         >
                           {cat}
@@ -246,16 +222,14 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                     </DropdownMenuContent>
                   </DropdownMenu>
                   {form.formState.errors.category && (
-                    <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-                        <AlertCircle className="h-3 w-3" />
+                    <p className="text-xs text-red-500 mt-1">
                         {form.formState.errors.category.message}
                     </p>
                   )}
                 </div>
 
                 <div className="space-y-2 pt-1">
-                  <Label className="text-sm font-medium flex items-center gap-2">
-                      <Ruler className="h-3.5 w-3.5" />
+                  <Label className="text-sm font-normal text-muted-foreground">
                       Sizes / Variants
                   </Label>
                   <div className="flex flex-wrap gap-1.5 mb-1.5">
@@ -273,7 +247,7 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                             } else {
                               newSizes = [...currentSizes, size];
                             }
-                            form.setValue("sizes", newSizes.join(", "));
+                            form.setValue("sizes", newSizes.join(", "), { shouldDirty: true });
                           }}
                           className={cn(
                             "cursor-pointer w-8 h-8 flex items-center justify-center rounded-2xl text-xs font-medium transition-all border",
@@ -293,8 +267,7 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                     className="h-10 rounded-3xl border-border bg-secondary/50 text-sm"
                   />
                   {form.formState.errors.sizes && (
-                    <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-                        <AlertCircle className="h-3 w-3" />
+                    <p className="text-xs text-red-500 mt-1">
                         {form.formState.errors.sizes.message}
                     </p>
                   )}
@@ -309,7 +282,7 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                         <Switch
                             id="isAvailable"
                             checked={form.watch("isAvailable")}
-                            onCheckedChange={(checked) => form.setValue("isAvailable", checked)}
+                            onCheckedChange={(checked) => form.setValue("isAvailable", checked, { shouldDirty: true })}
                             className="scale-90 data-[state=checked]:bg-primary"
                         />
                     </div>
@@ -321,7 +294,7 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
 
         <div className="flex items-center justify-end gap-3 pt-2 pb-8">
             {layout === "sheet" && (
-                <Button variant="ghost" type="button" className="h-10 px-4 rounded-3xl hover:bg-red-50 hover:text-red-600 text-sm">
+                <Button variant="outline" type="button" onClick={() => onSuccess()} className="h-10 px-6 rounded-2xl border-border/60 hover:bg-muted text-sm font-medium transition-all">
                     Cancel
                 </Button>
             )}
@@ -336,21 +309,5 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
             </Button>
         </div>
       </form>
-
-      <AlertModal
-        isOpen={showConfirmModal}
-        onClose={() => setShowConfirmModal(false)}
-        onConfirm={performSave}
-        loading={loading}
-        title={initialData ? "Save Changes?" : "Create Product?"}
-        description={initialData
-            ? "This will update the product details in your store immediately."
-            : "This item will be added to your inventory and visible to customers."
-        }
-        variant="success"
-        confirmText="Confirm"
-        cancelText="Edit"
-      />
-    </>
   );
 }

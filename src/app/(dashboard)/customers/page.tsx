@@ -60,13 +60,13 @@ export default async function CustomersPage() {
     }
 
     const customer = customersMap.get(phoneKey)!;
-    
+
     // Increment stats
     customer.totalOrders += 1;
-    
+
     // Parse current totalSpent, add new amount, then re-format (simplified approach)
     // A better way is to store raw value and format only at the end.
-    // Let's use a temporary object for calculation if we want precision, 
+    // Let's use a temporary object for calculation if we want precision,
     // but for this MVP, we can just re-calculate below.
   });
 
@@ -91,9 +91,9 @@ export default async function CustomersPage() {
 
   // Sort by most recent order (or could be total spent)
   // Since we processed orders desc, the list is roughly in order of appearance
-  
+
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
+    <div className="flex-1 space-y-4 p-8 pt-0">
       <CustomersClient data={aggregatedData} />
     </div>
   );

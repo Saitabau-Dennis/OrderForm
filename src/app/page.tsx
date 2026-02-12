@@ -10,6 +10,7 @@ import { FAQ } from "@/components/landing/faq"
 import { CTA } from "@/components/landing/cta"
 import { Footer } from "@/components/landing/footer"
 import { ChevronRight } from "lucide-react"
+import { AnimatedBadge } from "@/components/ui/animated-badge"
 
 export default function Home() {
   return (
@@ -19,11 +20,7 @@ export default function Home() {
       <Hero
         className="pt-28 pb-8 md:pt-32 md:pb-12"
         badge={
-          <div className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border text-sm font-medium hover:border-primary/30 transition-all duration-300 cursor-default">
-            <span className="text-sm">🛍️</span>
-            <span className="text-muted-foreground">Introducing OrderForm</span>
-            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 transition-all duration-300" />
-          </div>
+          <AnimatedBadge text="Introducing OrderForm" />
         }
         title={
           <>

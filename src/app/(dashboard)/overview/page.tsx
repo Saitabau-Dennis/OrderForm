@@ -87,7 +87,7 @@ export default async function OverviewPage() {
         where: { storeId: store.id },
     });
     customersCount = uniqueCustomers.length;
-    
+
     // 4. Chart Data (Last 7 Days)
     const last7Days = [...Array(7)].map((_, i) => {
         const date = subDays(now, i);
@@ -98,7 +98,7 @@ export default async function OverviewPage() {
         };
     }).reverse();
 
-    const chartDailyAggs = await Promise.all(last7Days.map(day => 
+    const chartDailyAggs = await Promise.all(last7Days.map(day =>
         db.order.aggregate({
             _sum: { totalAmount: true },
             where: {
@@ -124,7 +124,7 @@ export default async function OverviewPage() {
         orderBy: { _sum: { quantity: 'desc' } },
         take: 5
     });
-    
+
     topProducts = topSellingItems.map(item => ({
         name: item.name,
         sales: item._sum.quantity || 0
@@ -198,7 +198,7 @@ export default async function OverviewPage() {
                     </span>
                 )}
               </div>
-              
+
               <div className="space-y-1.5">
                 <p className="text-[10px] font-bold text-primary/40 uppercase tracking-[0.2em]">
                     {stat.title}
@@ -265,9 +265,9 @@ export default async function OverviewPage() {
           <div className="flex items-center justify-between">
               <h3 className="text-xl font-medium tracking-tight text-primary font-poppins">Recent Orders</h3>
           </div>
-          
+
           <div className="rounded-3xl border-2 border-border bg-card overflow-hidden">
-               <OrdersClient initialOrders={recentOrders} />
+               <OrdersClient initialOrders={recentOrders} standalone={false} />
           </div>
       </div>
     </div>

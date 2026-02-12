@@ -6,11 +6,11 @@ import { startOfMonth, subMonths, startOfDay, subDays, format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OrdersClient } from "@/components/dashboard/orders-client";
 import { SalesChart } from "@/components/dashboard/sales-chart";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 
@@ -66,7 +66,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       const [currentMonthRevenueAgg, prevMonthRevenueAgg, totalRevenueAgg] = await Promise.all([
         db.order.aggregate({
           _sum: { totalAmount: true },
-          where: { 
+          where: {
             storeId: store.id,
             status: "completed",
             createdAt: { gte: currentMonthStart }
@@ -74,7 +74,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         }),
         db.order.aggregate({
           _sum: { totalAmount: true },
-          where: { 
+          where: {
             storeId: store.id,
             status: "completed",
             createdAt: { gte: prevMonthStart, lt: currentMonthStart }
@@ -82,7 +82,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         }),
         db.order.aggregate({
           _sum: { totalAmount: true },
-          where: { 
+          where: {
             storeId: store.id,
             status: "completed"
           }
@@ -106,7 +106,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         db.product.count({ where: { storeId: store.id } }),
         db.product.count({ where: { storeId: store.id, isAvailable: true } })
       ]);
-      
+
       ordersCount = totalOrders;
       ordersToday = todayOrders;
       productsCount = totalProds;
@@ -152,7 +152,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         }).reverse();
       }
 
-      const chartDailyAggs = await Promise.all(periods.map(period => 
+      const chartDailyAggs = await Promise.all(periods.map(period =>
           db.order.aggregate({
               _sum: { totalAmount: true },
               where: {
@@ -178,12 +178,12 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           orderBy: { _sum: { quantity: 'desc' } },
           take: 5
       });
-      
+
       topProducts = topSellingItems.map(item => ({
           name: item.name,
           sales: item._sum.quantity || 0
       }));
-      
+
       // Batch 3: Recent Data
       const orders = await db.order.findMany({
           where: { storeId: store.id },
@@ -206,8 +206,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <p className="text-muted-foreground max-w-md mx-auto text-lg leading-relaxed mb-8 font-poppins">
           Our systems are currently taking a moment to catch up. Your data is safe—please try refreshing the page in a few seconds.
         </p>
-        <a 
-          href="/dashboard" 
+        <a
+          href="/dashboard"
           className="bg-primary text-primary-foreground px-8 py-3 rounded-3xl font-bold uppercase tracking-widest text-xs shadow-none transition-all hover:scale-[1.02] active:scale-[0.98]"
         >
           Refresh Page
@@ -257,9 +257,20 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   ];
 
   return (
-    <div className="space-y-8 animate-appear">
+    <div className="flex-1 space-y-4 p-8 pt-0 animate-appear">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="space-y-1">
+          <h2 className="text-3xl font-medium tracking-tight text-foreground font-poppins">
+            Dashboard
+          </h2>
+          <p className="text-sm text-muted-foreground font-poppins">
+            Overview of your store's performance.
+          </p>
+        </div>
+      </div>
+
       {/* Stats Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 pt-4">
         {stats.map((stat, i) => (
           <Card key={stat.title} className="overflow-hidden border-2 border-border shadow-none rounded-3xl bg-card relative">
             <CardContent className="p-7 relative z-10 flex flex-col h-full">
@@ -268,18 +279,18 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                   <stat.icon className="h-6 w-6" />
                 </div>
                 {stat.trend && (
-                    <span className="flex items-center text-[10px] font-bold text-primary/70 bg-primary/5 px-2.5 py-1 rounded-full border border-primary/10 uppercase tracking-wider">
+                    <span className="flex items-center text-[10px] font-medium text-primary/70 bg-primary/5 px-2.5 py-1 rounded-full border border-primary/10 uppercase tracking-wider">
                         <TrendingUp className="w-3 h-3 mr-1 text-green-600" />
                         {stat.trend}
                     </span>
                 )}
               </div>
-              
+
               <div className="space-y-1.5">
-                <p className="text-[10px] font-semibold text-primary/40 uppercase tracking-[0.2em]">
+                <p className="text-[10px] font-medium text-primary/40 uppercase tracking-[0.2em]">
                     {stat.title}
                 </p>
-                <div className="text-4xl font-semibold text-primary tracking-tighter">
+                <div className="text-4xl font-medium text-primary tracking-tighter">
                     {stat.value}
                 </div>
               </div>
@@ -296,23 +307,23 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                   <div className="flex items-center gap-2">
                     <h3 className="text-lg font-medium text-primary">Sales Overview</h3>
                   </div>
-                  
+
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-primary/5 border border-primary/10 text-[9px] font-bold uppercase tracking-widest text-primary/60 hover:bg-primary/10 transition-colors">
+                      <button className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-primary/5 border border-primary/10 text-[9px] font-medium uppercase tracking-widest text-primary/60 hover:bg-primary/10 transition-colors">
                         {rangeLabels[range]}
                         <ChevronDown className="h-2.5 w-2.5 opacity-50" />
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48 rounded-2xl bg-card border border-border shadow-xl">
                       <DropdownMenuItem asChild className="focus:bg-primary/5 focus:text-primary cursor-pointer rounded-xl m-1 px-3 py-2">
-                        <Link href="?range=7d" scroll={false} className="w-full text-xs font-bold uppercase tracking-wider">Last 7 Days</Link>
+                        <Link href="?range=7d" scroll={false} className="w-full text-xs font-medium uppercase tracking-wider">Last 7 Days</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild className="focus:bg-primary/5 focus:text-primary cursor-pointer rounded-xl m-1 px-3 py-2">
-                        <Link href="?range=30d" scroll={false} className="w-full text-xs font-bold uppercase tracking-wider">Last 30 Days</Link>
+                        <Link href="?range=30d" scroll={false} className="w-full text-xs font-medium uppercase tracking-wider">Last 30 Days</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild className="focus:bg-primary/5 focus:text-primary cursor-pointer rounded-xl m-1 px-3 py-2">
-                        <Link href="?range=1y" scroll={false} className="w-full text-xs font-bold uppercase tracking-wider">Last Year</Link>
+                        <Link href="?range=1y" scroll={false} className="w-full text-xs font-medium uppercase tracking-wider">Last Year</Link>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -334,14 +345,14 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                         {topProducts.length > 0 ? topProducts.map((product, i) => (
                             <div key={i} className="flex items-center justify-between group">
                                 <div className="flex items-center gap-4">
-                                    <div className="h-10 w-10 rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                                    <div className="h-10 w-10 rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-center text-primary font-medium text-xs">
                                         {i + 1}
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="font-semibold text-sm text-primary truncate max-w-[120px]">
+                                        <span className="font-medium text-sm text-primary truncate max-w-[120px]">
                                             {product.name}
                                         </span>
-                                        <span className="text-[10px] text-primary/40 uppercase tracking-wider font-bold">
+                                        <span className="text-[10px] text-primary/40 uppercase tracking-wider font-medium">
                                             {product.sales} sold
                                         </span>
                                     </div>

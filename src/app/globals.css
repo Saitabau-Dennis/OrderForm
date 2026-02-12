@@ -7,6 +7,14 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+html::-webkit-scrollbar {
+  display: none;
 }
 
 * {
@@ -64,7 +72,7 @@ html {
   --font-poppins: "Poppins", sans-serif;
   --radius: 0.625rem;
   --pine: #00311F;
-  --background: #FFFFFF;
+  --background: #FCFCFC;
   --foreground: var(--pine);
   --card: #FFFFFF;
   --card-foreground: var(--pine);
@@ -198,9 +206,17 @@ html {
 }
 
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
 }
 
 .animate-float {
@@ -208,8 +224,15 @@ html {
 }
 
 @keyframes pulse-slow {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.85; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.85;
+  }
 }
 
 .animate-pulse-slow {
@@ -218,7 +241,9 @@ html {
 }
 
 @keyframes draw {
-  to { stroke-dashoffset: 0; }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
 .animate-draw {
@@ -235,10 +260,70 @@ html {
 
 .animate-shooting-star {
   /* Dash of 20px, gap of 200px to ensure they follow each other closely */
-  stroke-dasharray: 20 200; 
+  stroke-dasharray: 20 200;
   /* Start offset at 0 so it begins visible on the path */
   stroke-dashoffset: 220;
   animation: shooting-star 3s linear infinite;
   stroke-linecap: round;
   will-change: stroke-dashoffset;
+}
+
+@media print {
+  @page {
+    margin: 0;
+    size: auto;
+  }
+
+  html,
+  body {
+    height: auto;
+    width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible;
+    background-color: white;
+  }
+
+  /* Hide everything by default using visibility to maintain layout if needed, though display:none is often cleaner for print */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Only show the print-specific area */
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+
+  .print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    max-width: 80mm; /* Standard thermal receipt width */
+    margin: 0 auto; /* Center on page */
+    padding: 0;
+    background: white;
+    color: black !important;
+    z-index: 9999;
+  }
+
+  /* Center the print area on the page */
+  body {
+    display: flex;
+    justify-content: center;
+  }
+
+  /* Force black text for thermal printers */
+  .print-area p,
+  .print-area span,
+  .print-area h2,
+  .print-area div {
+    color: black !important;
+  }
+
+  /* Hide elements that shouldn't print */
+  .no-print {
+    display: none !important;
+  }
 }

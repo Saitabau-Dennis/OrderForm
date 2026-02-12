@@ -8,7 +8,7 @@ export function Footer() {
   return (
     <footer className="bg-background border-t border-border py-12">
       <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between gap-10">
-        
+
         {/* Brand Section */}
         <div className="flex flex-col gap-4 max-w-xs">
             <div className="flex items-center gap-1">

@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 export default function CheckoutPage() {
   const { storeSlug } = useParams();
   const router = useRouter();
-  const { cart, cartTotal, currency, brandColor, whatsappNumber, storeId } = useStore();
+  const { cart, cartTotal, currency, brandColor, whatsappNumber, storeId, storeName } = useStore();
   const [isLoading, setIsLoading] = useState(false);
 
   // If cart is empty, redirect or show empty state
@@ -48,6 +48,7 @@ export default function CheckoutPage() {
         customerPhone: data.phone,
         deliveryAddress: data.address,
         totalAmount: cartTotal,
+        notes: data.notes,
         items: cart.map(item => ({
           productId: item.id,
           name: item.name,
@@ -67,7 +68,7 @@ export default function CheckoutPage() {
       const orderId = result.orderId;
 
       if (data.paymentMethod === 'whatsapp') {
-          const message = `*NEW ORDER: ${useStore().storeName.toUpperCase()}*\n\n` +
+          const message = `*NEW ORDER: ${storeName.toUpperCase()}*\n\n` +
             `*Order ID:* #${orderId}\n\n` +
             `*CUSTOMER DETAILS*\n` +
             `Name: ${data.name}\n` +
@@ -83,14 +84,14 @@ export default function CheckoutPage() {
 
           // Clean the store's whatsapp number (remove spaces, dashes, etc.)
           let cleanPhone = whatsappNumber.replace(/\D/g, '');
-          
+
           // Handle Kenyan numbers starting with 0
           if (cleanPhone.startsWith('0')) {
               cleanPhone = '254' + cleanPhone.substring(1);
           }
 
           const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
-          
+
           // Try opening in new tab, fallback to same tab if blocked (common after async await)
           const newWindow = window.open(url, '_blank');
           if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
