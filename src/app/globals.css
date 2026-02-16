@@ -164,6 +164,12 @@ html::-webkit-scrollbar {
   --accent-foreground: #000000;
 }
 
+.theme-dashboard {
+  font-family: var(--font-poppins), sans-serif;
+  --font-sans: var(--font-poppins);
+  --font-heading: var(--font-poppins);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

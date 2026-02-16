@@ -43,6 +43,7 @@ interface ProductFormProps {
 
 export function ProductForm({ initialData, onSuccess, layout = "default" }: ProductFormProps) {
   const [loading, setLoading] = useState(false);
+  const isSheet = layout === "sheet";
 
   const form = useForm<ProductValues>({
     resolver: zodResolver(productSchema) as any,
@@ -83,19 +84,15 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
   };
 
   const SectionWrapper = ({ children, title, description }: { children: React.ReactNode; title: string; description?: string }) => {
-    if (layout === "sheet") {
+    if (isSheet) {
       return (
-        <div className="rounded-2xl border-2 border-border bg-white overflow-hidden">
-            <div className="flex items-center gap-3 p-5 border-b border-border">
-                <div className="space-y-0.5">
-                    <h3 className="font-medium text-base text-foreground">{title}</h3>
-                    {description && <p className="text-xs text-muted-foreground">{description}</p>}
-                </div>
-            </div>
-            <div className="p-5 space-y-5">
-              {children}
-            </div>
-        </div>
+        <section className="py-6 border-b border-border/70 first:pt-0 last:border-b-0">
+          <div className="mb-4 space-y-1">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</h3>
+            {description && <p className="text-sm text-muted-foreground">{description}</p>}
+          </div>
+          <div className="space-y-5">{children}</div>
+        </section>
       );
     }
 
@@ -115,11 +112,11 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
   };
 
   return (
-      <form onSubmit={form.handleSubmit(onSubmit)} className={cn("space-y-8", layout === "sheet" && "space-y-6")}>
-        <div className={cn("grid gap-8", layout === "default" ? "grid-cols-1 lg:grid-cols-3" : "grid-cols-1 gap-6")}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className={cn(isSheet ? "space-y-0" : "space-y-8")}>
+        <div className={cn("grid", layout === "default" ? "grid-cols-1 gap-8 lg:grid-cols-3" : "grid-cols-1 gap-0")}>
 
           {/* Main Column: Details */}
-          <div className={cn("space-y-8", layout === "default" ? "lg:col-span-2" : "")}>
+          <div className={cn(layout === "default" ? "space-y-8 lg:col-span-2" : "space-y-0")}>
 
             <SectionWrapper title="Product Information" description="Essential details">
                 <div className="space-y-2">
@@ -128,7 +125,12 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                     id="name"
                     placeholder="e.g. Vintage Denim Jacket"
                     {...form.register("name")}
-                    className="h-10 rounded-3xl border-border bg-secondary/50 focus:bg-card focus:border-primary/30 transition-all font-normal text-sm placeholder:text-muted-foreground/50"
+                    className={cn(
+                      "h-10 transition-all font-normal text-sm",
+                      isSheet
+                        ? "rounded-md border-border bg-background focus:bg-background focus:border-primary/30"
+                        : "rounded-3xl border-border bg-secondary/50 focus:bg-card focus:border-primary/30 placeholder:text-muted-foreground/50"
+                    )}
                   />
                   {form.formState.errors.name && (
                     <p className="text-xs text-red-500">
@@ -144,7 +146,12 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                   <Textarea
                     id="description"
                     placeholder="Tell your customers about this product..."
-                    className="min-h-[100px] rounded-3xl border-border bg-secondary/50 focus:bg-card focus:border-primary/30 transition-all resize-y p-3 font-poppins leading-relaxed text-sm"
+                    className={cn(
+                      "min-h-[100px] transition-all resize-y p-3 font-poppins leading-relaxed text-sm",
+                      isSheet
+                        ? "rounded-md border-border bg-background focus:bg-background focus:border-primary/30"
+                        : "rounded-3xl border-border bg-secondary/50 focus:bg-card focus:border-primary/30"
+                    )}
                     {...form.register("description")}
                   />
                   {form.formState.errors.description && (
@@ -164,7 +171,12 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                       type="number"
                       id="price"
                       placeholder="0.00"
-                      className="pl-12 h-10 rounded-3xl border-border bg-secondary/50 focus:bg-card focus:border-primary/30 transition-all font-medium font-poppins text-sm tabular-nums"
+                      className={cn(
+                        "pl-12 h-10 transition-all font-medium font-poppins text-sm tabular-nums",
+                        isSheet
+                          ? "rounded-md border-border bg-background focus:bg-background focus:border-primary/30"
+                          : "rounded-3xl border-border bg-secondary/50 focus:bg-card focus:border-primary/30"
+                      )}
                       {...form.register("price")}
                     />
                   </div>
@@ -178,14 +190,19 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
           </div>
 
           {/* Side Column: Media & Organization */}
-          <div className="space-y-8">
+          <div className={cn(layout === "default" ? "space-y-8" : "space-y-0")}>
 
             <SectionWrapper title="Media" description="Product images">
-                <div className="bg-secondary/50 rounded-3xl p-2 border border-dashed border-border">
+                <div className={cn(
+                  "p-2 border border-dashed border-border",
+                  isSheet ? "rounded-md bg-muted/20" : "rounded-3xl bg-secondary/50"
+                )}>
                     <ImageUpload
                     value={form.watch("imageUrl")}
                     onChange={(url) => form.setValue("imageUrl", url, { shouldDirty: true })}
                     endpoint="productImage"
+                    label="Upload product image"
+                    helperText="PNG, JPG up to 4MB"
                     />
                 </div>
                 {form.formState.errors.imageUrl && (
@@ -200,7 +217,12 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                   <Label className="text-sm font-normal text-muted-foreground">Category</Label>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" className="w-full justify-between font-normal h-10 rounded-3xl border-primary/20 bg-card hover:bg-secondary hover:border-primary/40 transition-all text-sm shadow-sm">
+                      <Button variant="outline" className={cn(
+                        "w-full justify-between font-normal h-10 transition-all text-sm",
+                        isSheet
+                          ? "rounded-md border-border bg-background hover:bg-muted"
+                          : "rounded-3xl border-primary/20 bg-card hover:bg-secondary hover:border-primary/40 shadow-sm"
+                      )}>
                         {form.watch("category") ? (
                           <span className="text-primary font-medium">{form.watch("category")}</span>
                         ) : (
@@ -264,7 +286,10 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                   <Input
                     placeholder="Custom sizes (e.g. 40, 41, 42)"
                     {...form.register("sizes")}
-                    className="h-10 rounded-3xl border-border bg-secondary/50 text-sm"
+                    className={cn(
+                      "h-10 border-border text-sm",
+                      isSheet ? "rounded-md bg-background" : "rounded-3xl bg-secondary/50"
+                    )}
                   />
                   {form.formState.errors.sizes && (
                     <p className="text-xs text-red-500 mt-1">
@@ -274,9 +299,12 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                 </div>
 
                 <div className="pt-3 mt-3 border-t border-border">
-                    <div className="flex items-center justify-between p-3 rounded-3xl bg-primary/5 border border-border">
+                    <div className={cn(
+                      "flex items-center justify-between p-3 border border-border",
+                      isSheet ? "rounded-md bg-muted/20" : "rounded-3xl bg-primary/5"
+                    )}>
                         <div className="space-y-0.5">
-                            <Label htmlFor="isAvailable" className="text-sm font-medium text-primary">In Stock</Label>
+                            <Label htmlFor="isAvailable" className={cn("text-sm font-medium", isSheet ? "text-foreground" : "text-primary")}>In Stock</Label>
                             <p className="text-[10px] text-muted-foreground">Available for purchase</p>
                         </div>
                         <Switch
@@ -292,9 +320,12 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3 pt-2 pb-8">
-            {layout === "sheet" && (
-                <Button variant="outline" type="button" onClick={() => onSuccess()} className="h-10 px-6 rounded-2xl border-border/60 hover:bg-muted text-sm font-medium transition-all">
+        <div className={cn(
+          "flex items-center justify-end gap-3",
+          isSheet ? "pt-6 mt-6 border-t border-border/70" : "pt-2 pb-8"
+        )}>
+            {isSheet && (
+                <Button variant="outline" type="button" onClick={() => onSuccess()} className="h-9 px-4 rounded-md border-border hover:bg-muted text-sm font-medium transition-all">
                     Cancel
                 </Button>
             )}
@@ -302,7 +333,12 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                 size="default"
                 type="submit"
                 disabled={loading}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all rounded-3xl px-6 h-10 font-medium text-sm w-full sm:w-auto"
+                className={cn(
+                  "bg-primary text-primary-foreground hover:bg-primary/90 transition-all h-9 font-medium text-sm",
+                  isSheet
+                    ? "rounded-md px-4 shadow-none hover:translate-y-0"
+                    : "rounded-3xl px-6 shadow-md hover:shadow-lg hover:-translate-y-0.5 w-full sm:w-auto"
+                )}
             >
                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 {initialData ? "Save Changes" : "Create Product"}

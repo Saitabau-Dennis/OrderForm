@@ -1,80 +1,73 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { motion, AnimatePresence } from "motion/react";
-import {
-  ArrowRight,
-  ArrowLeft,
-  Check,
-  Package,
-  ImageIcon,
-  DollarSign,
-  Layers,
-  Loader2,
-  Ruler,
-  Tag,
-  Eye,
-  CircleDot,
-  AlertCircle,
-} from "lucide-react";
+import { z } from "zod";
 import { toast } from "sonner";
 
-import { Button } from "@/components/dashboard/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { ImageUpload } from "@/components/ui/image-upload";
+import { productSchema } from "@/components/dashboard/product-form";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+import { ImageUpload } from "@/components/ui/image-upload";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { createProduct } from "@/lib/actions/products";
-import { productSchema, ProductValues } from "@/components/dashboard/product-form";
+import { cn } from "@/lib/utils";
 
 interface ProductWizardProps {
   onSuccess: () => void;
 }
 
-const steps = [
+const CATEGORY_OPTIONS = ["Clothing", "Footwear", "Accessories", "Electronics", "Home", "Beauty"];
+const SIZE_PRESETS = ["XS", "S", "M", "L", "XL", "XXL"];
+const wizardSchema = productSchema.extend({
+  // Allow creating product first, image can be uploaded later.
+  imageUrl: z.string().optional().default(""),
+});
+type WizardFormInput = z.input<typeof wizardSchema>;
+type WizardFormValues = z.output<typeof wizardSchema>;
+
+const STEPS = [
   {
     id: "details",
-    label: "Details",
-    description: "Name & description",
-    icon: Package,
+    label: "Product Details",
+    description: "Enter the product basics",
+    fields: ["name", "description", "category"] as Array<keyof WizardFormValues>,
   },
   {
     id: "pricing",
-    label: "Pricing",
-    description: "Price & variants",
-    icon: DollarSign,
+    label: "Pricing Setup",
+    description: "Set prices and variants",
+    fields: ["price", "sizes", "isAvailable"] as Array<keyof WizardFormValues>,
   },
   {
     id: "media",
-    label: "Media",
-    description: "Product image",
-    icon: ImageIcon,
+    label: "Product Media",
+    description: "Upload one product image",
+    fields: ["imageUrl"] as Array<keyof WizardFormValues>,
   },
   {
     id: "review",
-    label: "Review",
-    description: "Confirm & publish",
-    icon: Eye,
+    label: "Summary",
+    description: "Review and confirm",
+    fields: [] as Array<keyof WizardFormValues>,
   },
-];
+] as const;
 
 export function ProductWizard({ onSuccess }: ProductWizardProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [direction, setDirection] = useState(0);
 
-  const form = useForm<ProductValues>({
-    resolver: zodResolver(productSchema),
+  const form = useForm<WizardFormInput, unknown, WizardFormValues>({
+    resolver: zodResolver(wizardSchema),
     defaultValues: {
       name: "",
       description: "",
@@ -87,37 +80,39 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
     mode: "onChange",
   });
 
-  const { watch, trigger } = form;
-  const formData = watch();
+  const formData = form.watch();
+  const selectedSizes = (formData.sizes || "")
+    .split(",")
+    .map((size) => size.trim())
+    .filter(Boolean);
 
-  const handleNext = async () => {
-    let stepValid = true;
+  const goToStep = async (nextStep: number) => {
+    if (nextStep === currentStep) return;
 
-    if (currentStep === 0) {
-      stepValid = await trigger(["name", "description", "category"]);
-    } else if (currentStep === 1) {
-      stepValid = await trigger(["price", "sizes", "isAvailable"]);
-    } else if (currentStep === 2) {
-      stepValid = await trigger(["imageUrl"]);
+    if (nextStep < currentStep) {
+      setCurrentStep(nextStep);
+      return;
     }
 
-    if (stepValid) {
-      setDirection(1);
-      setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
-    } else {
-      toast.error("Please fill in all required fields");
+    const valid = await form.trigger(STEPS[currentStep].fields);
+    if (!valid) {
+      toast.error("Please complete required fields first.");
+      return;
     }
+
+    setCurrentStep(nextStep);
   };
 
-  const handleBack = () => {
-    setDirection(-1);
-    setCurrentStep((prev) => Math.max(prev - 1, 0));
-  };
+  const onSubmit = async (data: WizardFormValues) => {
+    if (currentStep !== STEPS.length - 1) {
+      setCurrentStep(STEPS.length - 1);
+      toast.error("Please review the summary before creating the product.");
+      return;
+    }
 
-  const handleSubmit = async () => {
     try {
       setLoading(true);
-      const result = await createProduct(formData);
+      const result = await createProduct(data);
 
       if (result.error) {
         toast.error(result.error);
@@ -127,515 +122,340 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
       toast.success("Product created successfully!");
       onSuccess();
     } catch (error) {
-      toast.error("Something went wrong");
       console.error(error);
+      toast.error("Something went wrong");
     } finally {
       setLoading(false);
     }
   };
-
-  const variants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? 16 : -16,
-      opacity: 0,
-    }),
-    center: {
-      x: 0,
-      opacity: 1,
-    },
-    exit: (direction: number) => ({
-      x: direction < 0 ? 16 : -16,
-      opacity: 0,
-    }),
-  };
-
-  const completedFields = () => {
-    let count = 0;
-    const total = 7;
-    if (formData.name) count++;
-    if (formData.description) count++;
-    if (formData.category) count++;
-    if (formData.price > 0) count++;
-    if (formData.sizes) count++;
-    if (formData.imageUrl) count++;
-    count++; // isAvailable always has a value
-    return { count, total, percent: Math.round((count / total) * 100) };
-  };
-
-  const progress = completedFields();
+  const handleCreateClick = form.handleSubmit(onSubmit);
 
   return (
-    <div className="w-full max-w-5xl mx-auto flex gap-8">
-      {/* Left Sidebar - Steps */}
-      <div className="hidden lg:flex flex-col w-56 shrink-0">
-        <div className="sticky top-8 space-y-1">
-          {steps.map((step, index) => {
-            const isActive = index === currentStep;
-            const isCompleted = index < currentStep;
-            const Icon = step.icon;
+    <div className="mx-auto max-w-[1200px] min-h-[540px] rounded-xl border border-border bg-card p-6 sm:p-8">
+      <div>
+        <p className="text-base font-medium text-foreground">New Product Steps</p>
+        <p className="text-sm text-muted-foreground mt-1">
+          Follow the simple 4 steps to complete product setup.
+        </p>
+      </div>
 
-            return (
-              <button
-                key={step.id}
-                type="button"
-                onClick={() => {
-                  if (index < currentStep) {
-                    setDirection(index < currentStep ? -1 : 1);
-                    setCurrentStep(index);
-                  }
-                }}
-                className={cn(
-                  "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-200 group",
-                  isActive
-                    ? "bg-primary/5 text-foreground"
-                    : isCompleted
-                    ? "text-foreground hover:bg-muted/50 cursor-pointer"
-                    : "text-muted-foreground/60 cursor-default"
-                )}
-              >
-                <div
-                  className={cn(
-                    "flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200 shrink-0",
-                    isActive
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : isCompleted
-                      ? "bg-emerald-100 text-emerald-600"
-                      : "bg-muted text-muted-foreground/40"
-                  )}
+      <div className="mt-10 grid min-h-[430px] gap-8 lg:grid-cols-[260px_minmax(0,1fr)]">
+        <aside className="h-full">
+          <div className="relative h-full flex flex-col justify-between">
+            <div className="absolute right-3 top-4 bottom-4 w-px bg-border" />
+
+            {STEPS.map((step, index) => {
+              const isDone = index < currentStep;
+              const isActive = index === currentStep;
+
+              return (
+                <button
+                  key={step.id}
+                  type="button"
+                  onClick={() => goToStep(index)}
+                  className="w-full py-4 text-left flex items-start justify-between gap-3"
                 >
-                  {isCompleted ? (
-                    <Check className="h-4 w-4" />
-                  ) : (
-                    <Icon className="h-4 w-4" />
-                  )}
-                </div>
-                <div className="flex flex-col min-w-0">
+                  <div className="pr-2">
+                    <p className={cn("text-sm font-medium", isActive ? "text-foreground" : "text-muted-foreground")}>
+                      {step.label}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{step.description}</p>
+                  </div>
+
                   <span
                     className={cn(
-                      "text-sm font-medium truncate",
-                      isActive ? "text-foreground" : isCompleted ? "text-foreground" : "text-muted-foreground/60"
+                      "relative z-10 mt-0.5 flex h-5 w-5 items-center justify-center rounded-full border text-[11px] font-medium bg-card",
+                      isDone
+                        ? "border-primary text-primary"
+                        : isActive
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border text-muted-foreground",
                     )}
                   >
-                    {step.label}
+                    {isDone ? "✓" : index + 1}
                   </span>
-                  <span className="text-[11px] text-muted-foreground truncate">{step.description}</span>
-                </div>
-              </button>
-            );
-          })}
-
-          {/* Progress indicator */}
-          <div className="mt-6 pt-6 border-t border-border">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-muted-foreground">Completion</span>
-              <span className="text-xs font-semibold text-foreground">{progress.percent}%</span>
-            </div>
-            <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
-              <div
-                className="h-full bg-primary rounded-full transition-all duration-500 ease-out"
-                style={{ width: `${progress.percent}%` }}
-              />
-            </div>
-            <p className="text-[11px] text-muted-foreground mt-2">
-              {progress.count} of {progress.total} fields completed
-            </p>
+                </button>
+              );
+            })}
           </div>
-        </div>
-      </div>
+        </aside>
 
-      {/* Mobile Step Indicator */}
-      <div className="lg:hidden w-full">
-        <div className="flex items-center gap-2 mb-6 px-1">
-          {steps.map((step, index) => (
-            <div key={step.id} className="flex items-center gap-2 flex-1">
-              <div
-                className={cn(
-                  "h-1.5 flex-1 rounded-full transition-all duration-300",
-                  index <= currentStep ? "bg-primary" : "bg-muted"
-                )}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 min-w-0">
-        <div className="bg-card rounded-xl border border-border overflow-hidden flex flex-col min-h-[560px]">
-          {/* Step Content */}
-          <div className="flex-1 p-6 sm:p-8">
-            <AnimatePresence mode="wait" custom={direction}>
-              <motion.div
-                key={currentStep}
-                custom={direction}
-                variants={variants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.2, ease: "easeOut" }}
-                className="h-full flex flex-col"
-              >
-                {/* Step Header */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-2 text-xs font-medium text-primary uppercase tracking-wider mb-1">
-                    <span>Step {currentStep + 1} of {steps.length}</span>
-                  </div>
-                  <h2 className="text-xl font-semibold text-foreground font-poppins">
-                    {currentStep === 0 && "Product Details"}
-                    {currentStep === 1 && "Pricing & Variants"}
-                    {currentStep === 2 && "Product Image"}
-                    {currentStep === 3 && "Review & Publish"}
-                  </h2>
-                  <p className="text-sm text-muted-foreground mt-1 font-poppins">
-                    {currentStep === 0 && "Enter the basic information about your product."}
-                    {currentStep === 1 && "Set the price, sizes, and availability."}
-                    {currentStep === 2 && "Upload a clear photo to showcase your product."}
-                    {currentStep === 3 && "Review everything before publishing."}
-                  </p>
+        <form
+          onSubmit={(event) => event.preventDefault()}
+          className="min-w-0 h-full flex flex-col"
+        >
+          <div className="max-w-3xl flex-1">
+            {currentStep === 0 && (
+              <div className="grid gap-5 md:grid-cols-2">
+                <div className="space-y-1.5">
+                  <Label htmlFor="name" className="text-sm text-muted-foreground">Product Name</Label>
+                  <Input id="name" placeholder="e.g. Classic Leather Watch" className="h-10 rounded-md" {...form.register("name")} />
+                  {form.formState.errors.name && <p className="text-xs text-red-500">{form.formState.errors.name.message}</p>}
                 </div>
 
-                <div className="flex-1 max-w-lg">
-                  {/* Step 0: Details */}
-                  {currentStep === 0 && (
-                    <div className="space-y-5">
-                      <div className="space-y-2">
-                        <Label htmlFor="name" className="text-sm font-medium">
-                          Product Name <span className="text-red-500">*</span>
-                        </Label>
-                        <Input
-                          id="name"
-                          placeholder="e.g. Classic Leather Watch"
-                          {...form.register("name")}
-                          className="h-11 rounded-lg border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all text-sm"
-                        />
-                        {form.formState.errors.name && (
-                          <p className="text-xs text-red-500 flex items-center gap-1">
-                            <AlertCircle className="h-3 w-3" />
-                            {form.formState.errors.name.message}
-                          </p>
-                        )}
-                      </div>
+                <div className="space-y-1.5">
+                  <Label className="text-sm text-muted-foreground">Category</Label>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        type="button"
+                        className="h-10 w-full rounded-md border border-border bg-background px-3 text-left text-sm text-foreground"
+                      >
+                        {formData.category || "Select category"}
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width) p-1 rounded-md" align="start">
+                      {CATEGORY_OPTIONS.map((cat) => (
+                        <DropdownMenuItem
+                          key={cat}
+                          onClick={() => form.setValue("category", cat, { shouldValidate: true })}
+                          className="cursor-pointer rounded-sm py-2 text-sm"
+                        >
+                          {cat}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  {form.formState.errors.category && <p className="text-xs text-red-500">{form.formState.errors.category.message}</p>}
+                </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor="description" className="text-sm font-medium">
-                          Description <span className="text-red-500">*</span>
-                        </Label>
-                        <Textarea
-                          id="description"
-                          placeholder="Describe your product in detail..."
-                          className="min-h-[120px] rounded-lg border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all resize-none text-sm leading-relaxed"
-                          {...form.register("description")}
-                        />
-                        {form.formState.errors.description && (
-                          <p className="text-xs text-red-500 flex items-center gap-1">
-                            <AlertCircle className="h-3 w-3" />
-                            {form.formState.errors.description.message}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">
-                          Category <span className="text-red-500">*</span>
-                        </Label>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className="w-full justify-between font-normal h-11 rounded-lg border-border bg-background hover:bg-accent transition-all text-sm"
-                            >
-                              <span className={watch("category") ? "text-foreground" : "text-muted-foreground"}>
-                                {watch("category") || "Select a category"}
-                              </span>
-                              <Layers className="h-4 w-4 opacity-40" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent
-                            className="w-(--radix-dropdown-menu-trigger-width) p-1 rounded-xl border border-border shadow-lg"
-                            align="start"
-                          >
-                            {["Clothing", "Footwear", "Accessories", "Electronics", "Home", "Beauty"].map(
-                              (cat) => (
-                                <DropdownMenuItem
-                                  key={cat}
-                                  onClick={() => form.setValue("category", cat, { shouldValidate: true })}
-                                  className="cursor-pointer py-2.5 px-3 rounded-lg text-sm"
-                                >
-                                  {cat}
-                                </DropdownMenuItem>
-                              )
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                        {form.formState.errors.category && (
-                          <p className="text-xs text-red-500 flex items-center gap-1">
-                            <AlertCircle className="h-3 w-3" />
-                            {form.formState.errors.category.message}
-                          </p>
-                        )}
-                      </div>
-                    </div>
+                <div className="space-y-1.5 md:col-span-2">
+                  <Label htmlFor="description" className="text-sm text-muted-foreground">Description</Label>
+                  <Textarea
+                    id="description"
+                    placeholder="Describe your product..."
+                    className="min-h-[155px] rounded-md resize-none"
+                    {...form.register("description")}
+                  />
+                  {form.formState.errors.description && (
+                    <p className="text-xs text-red-500">{form.formState.errors.description.message}</p>
                   )}
+                </div>
+              </div>
+            )}
 
-                  {/* Step 1: Pricing */}
-                  {currentStep === 1 && (
-                    <div className="space-y-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="price" className="text-sm font-medium">
-                          Price (KES) <span className="text-red-500">*</span>
-                        </Label>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <span className="text-sm font-medium text-muted-foreground">KES</span>
-                          </div>
-                          <Input
-                            type="number"
-                            id="price"
-                            placeholder="0.00"
-                            className="pl-14 h-12 rounded-lg border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all text-lg font-medium font-poppins tabular-nums"
-                            {...form.register("price")}
-                          />
-                        </div>
-                        {form.formState.errors.price && (
-                          <p className="text-xs text-red-500 flex items-center gap-1">
-                            <AlertCircle className="h-3 w-3" />
-                            {form.formState.errors.price.message}
-                          </p>
+            {currentStep === 1 && (
+              <div className="grid gap-5 md:grid-cols-2">
+                <div className="space-y-1.5">
+                  <Label htmlFor="price" className="text-sm text-muted-foreground">Price</Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">KES</span>
+                    <Input id="price" type="number" placeholder="0.00" className="h-10 rounded-md pl-12" {...form.register("price")} />
+                  </div>
+                  {form.formState.errors.price && <p className="text-xs text-red-500">{form.formState.errors.price.message}</p>}
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="sizes" className="text-sm text-muted-foreground">Sizes / Variants</Label>
+                  <Input id="sizes" placeholder="e.g. XS, S, M" className="h-10 rounded-md" {...form.register("sizes")} />
+                  {form.formState.errors.sizes && <p className="text-xs text-red-500">{form.formState.errors.sizes.message}</p>}
+                </div>
+
+                <div className="md:col-span-2 flex flex-wrap gap-1.5">
+                  {SIZE_PRESETS.map((size) => {
+                    const isSelected = selectedSizes.includes(size);
+                    return (
+                      <button
+                        key={size}
+                        type="button"
+                        onClick={() => {
+                          const next = isSelected
+                            ? selectedSizes.filter((value) => value !== size)
+                            : [...selectedSizes, size];
+                          form.setValue("sizes", next.join(", "), { shouldValidate: true });
+                        }}
+                        className={cn(
+                          "h-7 rounded-sm border px-2.5 text-xs",
+                          isSelected
+                            ? "border-primary text-primary bg-primary/5"
+                            : "border-border text-muted-foreground",
                         )}
-                      </div>
+                      >
+                        {size}
+                      </button>
+                    );
+                  })}
+                </div>
 
-                      <div className="space-y-3">
-                        <Label className="text-sm font-medium">Available Sizes</Label>
-                        <div className="flex flex-wrap gap-2">
-                          {["XS", "S", "M", "L", "XL", "XXL"].map((size) => {
-                            const currentSizes =
-                              watch("sizes")
-                                ?.split(",")
-                                .map((s) => s.trim())
-                                .filter(Boolean) || [];
-                            const isSelected = currentSizes.includes(size);
+                <div className="md:col-span-2 rounded-md border border-border bg-muted/20 px-3 py-4 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-foreground">Available for purchase</p>
+                    <p className="text-xs text-muted-foreground">Switch off to keep as draft.</p>
+                  </div>
+                  <Switch
+                    id="isAvailable"
+                    checked={formData.isAvailable}
+                    onCheckedChange={(checked) => form.setValue("isAvailable", checked, { shouldValidate: true })}
+                    className="data-[state=checked]:bg-primary"
+                  />
+                </div>
+              </div>
+            )}
 
-                            return (
-                              <button
-                                key={size}
-                                type="button"
-                                onClick={() => {
-                                  let newSizes;
-                                  if (isSelected) {
-                                    newSizes = currentSizes.filter((s) => s !== size);
-                                  } else {
-                                    newSizes = [...currentSizes, size];
-                                  }
-                                  form.setValue("sizes", newSizes.join(", "), { shouldValidate: true });
-                                }}
-                                className={cn(
-                                  "h-10 px-4 rounded-lg text-sm font-medium transition-all border",
-                                  isSelected
-                                    ? "bg-primary text-primary-foreground border-primary"
-                                    : "bg-background text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"
-                                )}
-                              >
-                                {size}
-                              </button>
-                            );
-                          })}
-                        </div>
-                        <Input
-                          placeholder="Or type custom sizes (e.g. 40, 41, 42)"
-                          {...form.register("sizes")}
-                          className="h-11 rounded-lg border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all text-sm"
-                        />
-                        {form.formState.errors.sizes && (
-                          <p className="text-xs text-red-500 flex items-center gap-1">
-                            <AlertCircle className="h-3 w-3" />
-                            {form.formState.errors.sizes.message}
-                          </p>
-                        )}
-                      </div>
+            {currentStep === 2 && (
+              <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_260px]">
+                <div className="space-y-4">
+                  <div className="rounded-md border border-border bg-muted/10 p-4">
+                    <p className="text-sm font-medium text-foreground">Product Image</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Use a clear square image so the product looks good in listings.
+                    </p>
 
-                      <div className="flex items-center justify-between p-4 rounded-xl bg-muted/50 border border-border">
-                        <div className="space-y-0.5">
-                          <Label htmlFor="isAvailable" className="text-sm font-medium">
-                            Available for purchase
-                          </Label>
-                          <p className="text-xs text-muted-foreground">Customers can find and buy this product</p>
-                        </div>
-                        <Switch
-                          id="isAvailable"
-                          checked={watch("isAvailable")}
-                          onCheckedChange={(checked) => form.setValue("isAvailable", checked)}
-                          className="data-[state=checked]:bg-primary"
-                        />
-                      </div>
+                    <div className="mt-4 h-[260px]">
+                      <ImageUpload
+                        value={formData.imageUrl}
+                        onChange={(url) => form.setValue("imageUrl", url, { shouldValidate: true })}
+                        endpoint="productImage"
+                        label="Upload product image"
+                        helperText="PNG, JPG up to 4MB"
+                      />
                     </div>
-                  )}
+                  </div>
 
-                  {/* Step 2: Media */}
-                  {currentStep === 2 && (
-                    <div className="space-y-4">
-                      <div className="rounded-xl border border-dashed border-border p-6 bg-muted/20 hover:bg-muted/30 transition-colors">
-                        <div className="max-w-sm mx-auto">
-                          <ImageUpload
-                            value={watch("imageUrl")}
-                            onChange={(url) => form.setValue("imageUrl", url, { shouldValidate: true })}
-                            endpoint="productImage"
-                          />
-                        </div>
-                      </div>
-                      <p className="text-xs text-muted-foreground text-center">
-                        Upload a high-quality image. Recommended size: 800x800px.
-                      </p>
-                      {form.formState.errors.imageUrl && (
-                        <p className="text-xs text-red-500 flex items-center justify-center gap-1">
-                          <AlertCircle className="h-3 w-3" />
-                          {form.formState.errors.imageUrl.message}
-                        </p>
+                  {form.formState.errors.imageUrl && <p className="text-xs text-red-500">{form.formState.errors.imageUrl.message}</p>}
+                </div>
+
+                <div className="space-y-3">
+                  <div className="rounded-md border border-border bg-muted/20 p-3">
+                    <p className="text-xs text-muted-foreground mb-1">Status</p>
+                    <p className="text-sm text-foreground">
+                      {formData.imageUrl ? "Image uploaded" : "No image uploaded yet"}
+                    </p>
+                  </div>
+
+                  <div className="rounded-md border border-border bg-muted/20 p-3">
+                    <p className="text-xs text-muted-foreground mb-2">Preview</p>
+                    <div className="h-48 rounded-sm overflow-hidden bg-muted">
+                      {formData.imageUrl ? (
+                        <Image src={formData.imageUrl} alt="Preview" width={360} height={360} className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center text-xs text-muted-foreground">No image</div>
                       )}
                     </div>
-                  )}
+                  </div>
 
-                  {/* Step 3: Review */}
-                  {currentStep === 3 && (
-                    <div className="space-y-6">
-                      {/* Product Preview Card */}
-                      <div className="rounded-xl border border-border overflow-hidden bg-background">
-                        <div className="flex flex-col sm:flex-row">
-                          {/* Image */}
-                          <div className="sm:w-40 sm:h-auto h-48 bg-muted shrink-0 overflow-hidden">
-                            {formData.imageUrl ? (
-                              <img
-                                src={formData.imageUrl}
-                                alt="Preview"
-                                className="h-full w-full object-cover"
-                              />
-                            ) : (
-                              <div className="h-full w-full flex items-center justify-center">
-                                <ImageIcon className="h-8 w-8 text-muted-foreground/30" />
-                              </div>
-                            )}
-                          </div>
+                  <div className="rounded-md border border-border bg-background p-3">
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Tip: Keep the product centered and use even lighting.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
-                          {/* Info */}
-                          <div className="flex-1 p-5 space-y-3">
-                            <div className="flex items-start justify-between gap-3">
-                              <div>
-                                <h3 className="font-semibold text-lg text-foreground font-poppins leading-tight">
-                                  {formData.name || "Untitled Product"}
-                                </h3>
-                                {formData.category && (
-                                  <span className="inline-flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-                                    <Tag className="h-3 w-3" />
-                                    {formData.category}
-                                  </span>
-                                )}
-                              </div>
-                              <span className="text-base font-semibold text-foreground font-poppins tabular-nums whitespace-nowrap">
-                                KES {Number(formData.price).toLocaleString()}
-                              </span>
-                            </div>
+            {currentStep === 3 && (
+              <div className="max-w-4xl grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
+                <div className="rounded-md border border-border bg-muted/20 p-3">
+                  <p className="text-xs text-muted-foreground mb-2">Preview</p>
+                  <div className="h-56 rounded-sm overflow-hidden bg-muted">
+                    {formData.imageUrl ? (
+                      <Image src={formData.imageUrl} alt="Preview" width={420} height={420} className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center text-xs text-muted-foreground">No image</div>
+                    )}
+                  </div>
 
-                            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
-                              {formData.description || "No description."}
-                            </p>
+                  <div className="mt-3 space-y-1.5">
+                    <p className="text-sm font-medium text-foreground truncate">{formData.name || "Untitled product"}</p>
+                    <p className="text-xs text-muted-foreground">{formData.category || "No category selected"}</p>
+                    <p className="text-sm text-foreground">
+                      KES {Number(formData.price || 0).toLocaleString()}
+                    </p>
+                    <span
+                      className={cn(
+                        "inline-flex rounded-sm border px-2 py-0.5 text-[11px]",
+                        formData.isAvailable
+                          ? "border-primary/30 text-primary bg-primary/5"
+                          : "border-border text-muted-foreground bg-background",
+                      )}
+                    >
+                      {formData.isAvailable ? "Active" : "Draft"}
+                    </span>
+                  </div>
+                </div>
 
-                            <div className="flex items-center gap-4 pt-1">
-                              {formData.sizes && (
-                                <div className="flex items-center gap-1.5">
-                                  <Ruler className="h-3.5 w-3.5 text-muted-foreground" />
-                                  <span className="text-xs text-muted-foreground">{formData.sizes}</span>
-                                </div>
-                              )}
-                              <div className="flex items-center gap-1.5">
-                                <CircleDot
-                                  className={cn(
-                                    "h-3.5 w-3.5",
-                                    formData.isAvailable ? "text-emerald-500" : "text-muted-foreground"
-                                  )}
-                                />
-                                <span
-                                  className={cn(
-                                    "text-xs font-medium",
-                                    formData.isAvailable ? "text-emerald-600" : "text-muted-foreground"
-                                  )}
-                                >
-                                  {formData.isAvailable ? "Active" : "Draft"}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                <div className="rounded-md border border-border overflow-hidden">
+                  <div className="px-4 py-3 border-b border-border bg-muted/20">
+                    <p className="text-sm font-medium text-foreground">Review Summary</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Confirm details, then click Create to publish.
+                    </p>
+                  </div>
+
+                  {[
+                    { label: "Product Name", value: formData.name || "-", step: 0, complete: Boolean(formData.name) },
+                    { label: "Category", value: formData.category || "-", step: 0, complete: Boolean(formData.category) },
+                    {
+                      label: "Description",
+                      value: formData.description || "-",
+                      step: 0,
+                      complete: Boolean(formData.description),
+                    },
+                    {
+                      label: "Price",
+                      value: Number(formData.price) > 0 ? `KES ${Number(formData.price).toLocaleString()}` : "-",
+                      step: 1,
+                      complete: Number(formData.price) > 0,
+                    },
+                    { label: "Sizes", value: formData.sizes || "-", step: 1, complete: Boolean(formData.sizes) },
+                    { label: "Status", value: formData.isAvailable ? "Active" : "Draft", step: 1, complete: true },
+                    { label: "Image", value: formData.imageUrl ? "Uploaded" : "Missing", step: 2, complete: Boolean(formData.imageUrl) },
+                  ].map((item) => (
+                    <div key={item.label} className="grid grid-cols-[140px_minmax(0,1fr)_64px] items-start border-b last:border-b-0 border-border">
+                      <div className="px-3 py-2.5 text-sm text-muted-foreground bg-muted/10">{item.label}</div>
+                      <div className="px-3 py-2.5 min-w-0">
+                        <p className="text-sm text-foreground break-words">{item.value}</p>
+                        {!item.complete && (
+                          <p className="text-[11px] text-muted-foreground mt-0.5">Missing</p>
+                        )}
                       </div>
-
-                      {/* Field Summary */}
-                      <div className="rounded-xl border border-border divide-y divide-border">
-                        {[
-                          { label: "Name", value: formData.name },
-                          { label: "Description", value: formData.description, truncate: true },
-                          { label: "Category", value: formData.category },
-                          { label: "Price", value: formData.price ? `KES ${Number(formData.price).toLocaleString()}` : "" },
-                          { label: "Sizes", value: formData.sizes },
-                          { label: "Status", value: formData.isAvailable ? "Active" : "Draft" },
-                        ].map((item) => (
-                          <div key={item.label} className="flex items-center justify-between px-4 py-3">
-                            <span className="text-sm text-muted-foreground">{item.label}</span>
-                            <span
-                              className={cn(
-                                "text-sm font-medium text-right max-w-[60%]",
-                                item.value ? "text-foreground" : "text-muted-foreground/40 italic",
-                                item.truncate && "truncate"
-                              )}
-                            >
-                              {item.value || "Not set"}
-                            </span>
-                          </div>
-                        ))}
+                      <div className="px-2 py-2.5">
+                        <button
+                          type="button"
+                          onClick={() => setCurrentStep(item.step)}
+                          className="text-xs text-primary hover:text-primary/80"
+                        >
+                          Edit
+                        </button>
                       </div>
                     </div>
-                  )}
+                  ))}
                 </div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* Footer */}
-          <div className="px-6 sm:px-8 py-4 bg-muted/30 border-t border-border flex items-center justify-between">
-            <Button
-              variant="ghost"
-              onClick={handleBack}
-              disabled={currentStep === 0 || loading}
-              className={cn(
-                "gap-2 text-muted-foreground hover:text-foreground rounded-lg h-10 px-4 text-sm",
-                currentStep === 0 && "opacity-0 pointer-events-none"
-              )}
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </Button>
-
-            {currentStep === steps.length - 1 ? (
-              <Button
-                onClick={handleSubmit}
-                disabled={loading}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all px-6 h-10 rounded-lg text-sm font-medium min-w-[140px]"
-              >
-                {loading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Check className="mr-2 h-4 w-4" />
-                )}
-                Publish Product
-              </Button>
-            ) : (
-              <Button
-                onClick={handleNext}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all px-6 h-10 rounded-lg text-sm font-medium min-w-[120px]"
-              >
-                Continue
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              </div>
             )}
           </div>
-        </div>
+
+          <div className="mt-8 flex items-center justify-end gap-3 text-sm">
+            <button
+              type="button"
+              onClick={() => setCurrentStep((prev) => Math.max(prev - 1, 0))}
+              disabled={currentStep === 0 || loading}
+              className={cn("text-muted-foreground hover:text-foreground", currentStep === 0 && "opacity-40 pointer-events-none")}
+            >
+              Prev
+            </button>
+            <span className="h-3.5 w-px bg-border" />
+
+            {currentStep < STEPS.length - 1 ? (
+              <button
+                type="button"
+                onClick={() => goToStep(currentStep + 1)}
+                className="text-primary hover:text-primary/80"
+              >
+                Next
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleCreateClick}
+                disabled={loading}
+                className="text-primary hover:text-primary/80 disabled:opacity-50"
+              >
+                {loading ? "Creating..." : "Create"}
+              </button>
+            )}
+          </div>
+        </form>
       </div>
     </div>
   );

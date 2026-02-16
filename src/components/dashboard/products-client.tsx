@@ -181,20 +181,20 @@ export function ProductsClient({ initialProducts }: ProductsClientProps) {
           if (!open) handleSheetClose();
           setIsSheetOpen(open);
       }}>
-        <SheetContent className="w-full sm:max-w-[700px] p-0 bg-white border-l-2 border-border">
+        <SheetContent className="w-full sm:max-w-[760px] p-0 bg-card border-l border-border">
           <div className="h-full flex flex-col">
-            <div className="px-8 py-6 border-b border-border">
+            <div className="px-6 py-5 border-b border-border/80">
                 <SheetHeader>
-                <SheetTitle className="text-xl font-medium text-foreground">
+                <SheetTitle className="text-lg font-semibold text-foreground">
                     Edit Product
                 </SheetTitle>
-                <SheetDescription className="text-sm text-muted-foreground">
-                    Make changes to your product details and settings.
+                <SheetDescription className="text-xs text-muted-foreground">
+                    Update product information, media, and availability.
                 </SheetDescription>
                 </SheetHeader>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-8 bg-muted/[0.02]">
+            <div className="flex-1 overflow-y-auto px-6 py-5">
               <ProductForm
                 initialData={selectedProduct}
                 onSuccess={handleFormSuccess}

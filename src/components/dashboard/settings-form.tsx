@@ -251,7 +251,7 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
                               render={({ field }) => (
                                 <div className="border-2 border-input rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-primary/40 transition-all">
                                   <RichTextEditor
-                                    value={field.value}
+                                    value={field.value ?? ""}
                                     onChange={field.onChange}
                                     className="min-h-[120px] bg-white"
                                   />

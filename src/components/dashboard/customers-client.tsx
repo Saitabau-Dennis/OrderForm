@@ -5,6 +5,8 @@ import { Button } from "@/components/dashboard/button";
 import { Separator } from "@/components/ui/separator";
 import { CustomersTable, CustomerColumn } from "@/components/dashboard/customers-table";
 
+export type { CustomerColumn };
+
 interface CustomersClientProps {
   data: CustomerColumn[];
 }

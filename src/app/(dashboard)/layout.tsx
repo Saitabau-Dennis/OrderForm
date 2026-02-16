@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import db from "@/lib/db";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
+import { DashboardFontScope } from "@/components/dashboard/dashboard-font-scope";
 
 export default async function DashboardLayout({
   children,
@@ -31,8 +32,10 @@ export default async function DashboardLayout({
     : null;
 
   return (
-    <DashboardShell user={session.user} store={storeData}>
-      {children}
-    </DashboardShell>
+    <DashboardFontScope>
+      <DashboardShell user={session.user} store={storeData}>
+        {children}
+      </DashboardShell>
+    </DashboardFontScope>
   );
 }

@@ -15,6 +15,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "xubohuah.github.io",
       },
+      {
+        protocol: "https",
+        hostname: "ufs.sh",
+      },
+      {
+        protocol: "https",
+        hostname: "**.ufs.sh",
+      },
     ],
   },
 };
