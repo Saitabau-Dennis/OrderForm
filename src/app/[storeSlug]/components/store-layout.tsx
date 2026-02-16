@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Package, Search, ShieldCheck, Truck, Clock, Heart, X, MessageCircle, Camera, Sparkles } from "lucide-react";
+import { Package, Sparkles, ArrowUpRight } from "lucide-react";
 import { StoreHeader } from "./store-header";
 import { StoreHero } from "./store-hero";
 import { CategoryFilter } from "./category-filter";
@@ -20,132 +20,126 @@ export function StoreContent({ store, products }: StoreLayoutProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const params = useParams();
 
-  // Extract unique categories
   const categories = Array.from(new Set(products.map((p) => p.category).filter(Boolean)));
 
-  // Filter products
   const filteredProducts = products.filter((product) => {
     const nameMatch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
     const descMatch = product.description?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSearch = nameMatch || descMatch;
-
     const matchesCategory = selectedCategory ? product.category === selectedCategory : true;
     return matchesSearch && matchesCategory;
   });
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen font-jakarta bg-[#F8F6F3]">
       <StoreHeader name={store.name} logoUrl={store.logoUrl || undefined} />
 
       <main>
         <StoreHero name={store.name} description={store.description} />
 
-        {/* Stunning Share & Earn Banner */}
-        <div className="container mx-auto px-4 md:px-6 mb-16">
+        {/* ===== Products Card — curved top, overlaps the hero ===== */}
+        <section
+          id="products-section"
+          className="relative bg-white rounded-t-[2.5rem] -mt-8 z-10 shadow-[0_-4px_30px_rgba(0,0,0,0.04)]"
+        >
+          <div className="container mx-auto px-5 md:px-8 pt-12 pb-6">
+            {/* Share banner */}
             <Link href={`/${params.storeSlug}/share`}>
-                <div
-                    className="group relative overflow-hidden rounded-[2rem] p-8 md:p-12 duration-500 border border-gray-100 shadow-sm"
-                    style={{ backgroundColor: secondaryColor + "20" }}
-                >
-                    <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
-                        <div className="space-y-3 max-w-lg">
-                            <div className="flex items-center justify-center md:justify-start gap-2 text-[10px] font-black uppercase tracking-[0.3em]" style={{ color: brandColor }}>
-                                Share & Earn
-                            </div>
-                            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-sora tracking-tight leading-tight">
-                                Show off your <span className="italic" style={{ color: brandColor }}>style.</span>
-                            </h2>
-                            <p className="text-gray-500 font-light text-base">
-                                Upload a photo of your purchase and get featured in our gallery. {store.rewardConfig?.isEnabled && "Plus, get an exclusive discount for your next order."}
-                            </p>
-                        </div>
-                        <div
-                            className="h-14 px-10 rounded-full text-sm font-bold uppercase tracking-widest text-white shadow-xl transition-all flex items-center justify-center gap-2"
-                            style={{ backgroundColor: brandColor }}
-                        >
-                            Upload Photo
-                            <Sparkles className="h-4 w-4" />
-                        </div>
-                    </div>
-
-                    {/* Decorative Elements */}
-                    <div className="absolute top-0 right-0 -mr-20 -mt-20 h-64 w-64 rounded-full opacity-30 blur-3xl" style={{ backgroundColor: secondaryColor }} />
-                    <div className="absolute bottom-0 left-0 -ml-20 -mb-20 h-64 w-64 rounded-full opacity-30 blur-3xl" style={{ backgroundColor: secondaryColor }} />
+              <div
+                className="group relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 sm:p-7 rounded-2xl transition-all duration-500 hover:shadow-md border border-stone-100 overflow-hidden mb-10"
+                style={{ backgroundColor: "#F8F6F3" }}
+              >
+                <div className="flex items-start sm:items-center gap-4 relative z-10">
+                  <div
+                    className="h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: brandColor + "12" }}
+                  >
+                    <Sparkles className="h-4.5 w-4.5" style={{ color: brandColor }} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-stone-900 text-sm">Share your purchase, get featured</h3>
+                    <p className="text-[13px] text-stone-500 mt-0.5">
+                      Upload a photo and join our gallery
+                      {store.rewardConfig?.isEnabled && " — plus earn rewards"}
+                    </p>
+                  </div>
                 </div>
+                <div
+                  className="flex items-center gap-2 h-9 px-5 rounded-full text-[11px] font-semibold text-white transition-all group-hover:gap-3 flex-shrink-0"
+                  style={{ backgroundColor: brandColor }}
+                >
+                  Share Now
+                  <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                </div>
+              </div>
             </Link>
-        </div>
 
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-gray-100 pb-8">
-              <div className="space-y-1">
-                  <h2 className="text-[12px] font-black uppercase tracking-[0.3em] text-gray-400">Our Catalog</h2>
-                  <h3 className="text-4xl font-bold text-gray-900 font-sora">The Collection</h3>
+            {/* Catalog header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 mb-8">
+              <div className="flex items-baseline gap-3">
+                <h2 className="text-2xl md:text-3xl font-extrabold text-stone-900 tracking-[-0.02em] font-jakarta">
+                  {selectedCategory || "All Products"}
+                </h2>
+                <span className="text-sm text-stone-400 font-medium">
+                  ({filteredProducts.length})
+                </span>
               </div>
+              <CategoryFilter
+                categories={categories}
+                selectedCategory={selectedCategory}
+                onSelectCategory={setSelectedCategory}
+              />
+            </div>
 
-              <div className="relative group w-full md:w-72">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-gray-900 transition-colors" />
-                  <input
-                      placeholder="Search products..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full h-11 pl-10 pr-10 bg-gray-50 border border-gray-100 rounded-xl text-sm placeholder:text-gray-400 focus:outline-none focus:bg-white transition-all shadow-sm focus:shadow-md"
-                  />
-                  {searchQuery && (
-                      <button
-                          onClick={() => setSearchQuery("")}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-900 transition-colors p-1"
-                      >
-                          <X className="h-4 w-4" />
-                      </button>
-                  )}
-              </div>
-          </div>
-
-          <CategoryFilter
-              categories={categories}
-              selectedCategory={selectedCategory}
-              onSelectCategory={setSelectedCategory}
-          />
-
-          <div className="min-h-[40vh] pb-24 pt-4">
+            {/* Product Grid */}
+            <div className="pb-16">
               {filteredProducts.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-20 text-center">
-                      <div className="h-16 w-16 rounded-full bg-gray-50 flex items-center justify-center mb-4">
-                          <Package className="h-8 w-8 text-gray-200" />
-                      </div>
-                      <h3 className="text-lg font-bold text-gray-900">No items found</h3>
-                      <p className="text-sm text-gray-500 mt-1 max-w-xs font-light leading-relaxed">
-                          Try adjusting your filters or search terms.
-                      </p>
+                <div className="flex flex-col items-center justify-center py-24 text-center">
+                  <div className="h-16 w-16 rounded-2xl bg-stone-50 flex items-center justify-center mb-4">
+                    <Package className="h-7 w-7 text-stone-300" strokeWidth={1.5} />
                   </div>
+                  <h3 className="text-base font-bold text-stone-800">No products found</h3>
+                  <p className="text-sm text-stone-400 mt-1 max-w-xs">
+                    Try a different category or search term.
+                  </p>
+                </div>
               ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
-                      {filteredProducts.map((product) => (
-                          <ProductCard
-                              key={product.id}
-                              product={product}
-                          />
-                      ))}
-                  </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                  {filteredProducts.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
               )}
+            </div>
           </div>
-        </div>
-      </main>
+        </section>
 
-      <footer className="py-12 border-t border-gray-100 bg-white">
-          <div className="container mx-auto px-4 text-center">
-              <h2 className="text-base font-bold text-gray-900 font-sora mb-2">{store.name}</h2>
-              <p className="text-[11px] text-gray-500 font-bold uppercase tracking-[0.2em]">
-                  Powered by OrderForm
+        {/* ===== Footer Card — curved top, overlaps the products section ===== */}
+        <footer
+          className="relative bg-stone-900 rounded-t-[2.5rem] -mt-6 z-20 py-16 font-jakarta"
+        >
+          <div className="container mx-auto px-5 md:px-8">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-2.5">
+                <div
+                  className="h-7 w-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold"
+                  style={{ backgroundColor: brandColor }}
+                >
+                  {store.name.charAt(0).toUpperCase()}
+                </div>
+                <span className="font-semibold text-white text-sm">{store.name}</span>
+              </div>
+              <p className="text-xs text-stone-500">
+                Powered by <span className="font-semibold text-stone-400">OrderForm</span>
               </p>
+            </div>
           </div>
-      </footer>
+        </footer>
+      </main>
     </div>
   );
 }
 
 export function StoreLayout({ store, products }: StoreLayoutProps) {
-  return (
-    <StoreContent store={store} products={products} />
-  );
+  return <StoreContent store={store} products={products} />;
 }

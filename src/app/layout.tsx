@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Sora, Outfit, Signika, DM_Sans, Instrument_Serif, Poppins } from "next/font/google";
+import { Inter, Sora, Outfit, Signika, DM_Sans, Instrument_Serif, Poppins, Plus_Jakarta_Sans } from "next/font/google";
 import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import { Toaster } from "sonner";
@@ -9,16 +9,21 @@ const sora = Sora({ subsets: ["latin"], variable: "--font-sora" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 const signika = Signika({ subsets: ["latin"], variable: "--font-signika" });
 const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-dm-sans" });
-const poppins = Poppins({ 
-  subsets: ["latin"], 
+const poppins = Poppins({
+  subsets: ["latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-  variable: "--font-poppins" 
+  variable: "--font-poppins"
 });
-const instrumentSerif = Instrument_Serif({ 
-  weight: "400", 
-  subsets: ["latin"], 
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["200", "300", "400", "500", "600", "700", "800"],
+  variable: "--font-jakarta"
+});
+const instrumentSerif = Instrument_Serif({
+  weight: "400",
+  subsets: ["latin"],
   style: "italic",
-  variable: "--font-instrument-serif" 
+  variable: "--font-instrument-serif"
 });
 
 
@@ -37,7 +42,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${sora.variable} ${outfit.variable} ${signika.variable} ${dmSans.variable} ${instrumentSerif.variable} ${poppins.variable} ${GeistSans.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${sora.variable} ${outfit.variable} ${signika.variable} ${dmSans.variable} ${instrumentSerif.variable} ${poppins.variable} ${jakarta.variable} ${GeistSans.variable} font-sans antialiased`}>
         <NextTopLoader color="#00311F" showSpinner={false} height={4} shadow="0 0 10px #00311F,0 0 5px #00311F" />
         <Providers>
           {children}

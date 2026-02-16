@@ -6,7 +6,6 @@ import { OrderDetails } from "./order-details";
 import { updateOrderStatus } from "@/lib/actions/orders";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Separator } from "@/components/ui/separator";
 
 export function OrdersClient({ initialOrders, stats, standalone = true, storeName }: any) {
   const [orders, setOrders] = useState(initialOrders);
@@ -82,60 +81,48 @@ export function OrdersClient({ initialOrders, stats, standalone = true, storeNam
     );
   }
 
+  const weeklyShare = stats.thisMonth > 0 ? Math.min(100, Math.round((stats.thisWeek / stats.thisMonth) * 100)) : 0;
+  const monthlyPace = stats.total > 0 ? Math.min(100, Math.round((stats.thisMonthOrders / stats.total) * 100)) : 0;
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="space-y-1">
-        <h2 className="text-3xl font-medium tracking-tight text-foreground font-poppins">
-          Orders
-        </h2>
-        <p className="text-sm text-muted-foreground font-poppins">
-          Manage and track your store orders.
-        </p>
-      </div>
+      <div className="grid items-start gap-6 xl:justify-start xl:grid-cols-[minmax(0,960px)_390px]">
+        <div className="min-w-0 space-y-4">
+          <div className="grid max-w-[960px] grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="flex h-[238px] flex-col rounded-xl border bg-white px-6 py-6">
+              <p className="text-sm font-normal leading-none text-foreground/80">Completed Order</p>
+              <p className="mt-5 text-[50px] font-normal leading-none text-foreground">{stats.completed}</p>
+            </div>
 
-      <Separator />
-
-      {/* Two-column layout: left (cards + table), right (detail panel) */}
-      <div className="flex gap-5 items-start">
-        {/* Left column */}
-        <div className="flex-1 min-w-0 space-y-5">
-          {/* Stat Cards */}
-          <div className="grid grid-cols-3 gap-4">
-            <div className="p-5 py-8 rounded-xl bg-white border">
-              <p className="text-sm font-normal text-muted-foreground mb-2">Completed Orders</p>
-              <p className="text-4xl font-normal text-foreground">{stats.completed}</p>
-              <div className="mt-4">
-                <p className="text-xs text-muted-foreground">
-                  Out of <span className="font-medium text-foreground">{stats.total}</span> total orders
+            <div className="flex h-[238px] flex-col rounded-xl border bg-white px-6 py-6">
+              <p className="text-sm font-normal leading-none text-foreground/80">This Week</p>
+              <p className="mt-5 text-[50px] font-normal leading-none text-foreground">KSH {stats.thisWeek.toLocaleString()}</p>
+              <div className="mt-auto">
+                <p className="text-sm text-muted-foreground">
+                  From <span className="font-normal text-foreground">{stats.thisWeekOrders}</span> orders in last week
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  <span className="font-medium text-foreground">{stats.pending}</span> pending · <span className="font-medium text-foreground">{stats.processing}</span> processing
-                </p>
+                <div className="mt-5 h-3 w-full overflow-hidden rounded-full bg-muted/30">
+                  <div className="h-full rounded-full bg-foreground/30 transition-all" style={{ width: `${weeklyShare}%` }} />
+                </div>
               </div>
             </div>
-            <div className="p-5 py-8 rounded-xl bg-white border">
-              <p className="text-sm font-normal text-muted-foreground mb-2">This Week</p>
-              <p className="text-4xl font-normal text-foreground">KSH {stats.thisWeek.toLocaleString()}</p>
-              <div className="mt-4">
-                <p className="text-xs text-muted-foreground">
-                  From <span className="font-medium text-foreground">{stats.thisWeekOrders}</span> orders in the last 7 days
+
+            <div className="flex h-[238px] flex-col rounded-xl border bg-white px-6 py-6">
+              <p className="text-sm font-normal leading-none text-foreground/80">This Month</p>
+              <p className="mt-5 text-[50px] font-normal leading-none text-foreground">KSH {stats.thisMonth.toLocaleString()}</p>
+              <div className="mt-auto">
+                <p className="text-sm text-muted-foreground">
+                  From <span className="font-normal text-foreground">{stats.thisMonthOrders}</span> orders this month
                 </p>
-              </div>
-            </div>
-            <div className="p-5 py-8 rounded-xl bg-white border">
-              <p className="text-sm font-normal text-muted-foreground mb-2">This Month</p>
-              <p className="text-4xl font-normal text-foreground">KSH {stats.thisMonth.toLocaleString()}</p>
-              <div className="mt-4">
-                <p className="text-xs text-muted-foreground">
-                  From <span className="font-medium text-foreground">{stats.thisMonthOrders}</span> orders this month
-                </p>
+                <div className="mt-5 h-3 w-full overflow-hidden rounded-full bg-muted/30">
+                  <div className="h-full rounded-full bg-foreground transition-all" style={{ width: `${monthlyPace}%` }} />
+                </div>
               </div>
             </div>
           </div>
 
           {/* Orders Table Card */}
-          <div className="rounded-xl bg-white border overflow-hidden">
+          <div className="max-w-[960px] rounded-xl bg-white border overflow-hidden">
             {/* Table Header */}
             <div className="p-5 pb-4">
               <div className="flex items-start justify-between mb-4">
@@ -211,7 +198,7 @@ export function OrdersClient({ initialOrders, stats, standalone = true, storeNam
         </div>
 
         {/* Right column — Detail Panel (full height) */}
-        <div className="w-[380px] shrink-0 sticky top-24">
+        <div className="w-full shrink-0 self-start xl:mt-0 xl:w-[390px] xl:self-start">
           <div className="rounded-xl bg-white border overflow-hidden">
             {selectedOrder ? (
               <OrderDetails
@@ -221,7 +208,7 @@ export function OrdersClient({ initialOrders, stats, standalone = true, storeNam
                 onClose={() => setSelectedOrder(null)}
               />
             ) : (
-              <div className="h-full flex items-center justify-center min-h-[400px]">
+              <div className="flex min-h-[420px] items-center justify-center">
                 <p className="text-xs text-muted-foreground">Select an order to view details</p>
               </div>
             )}

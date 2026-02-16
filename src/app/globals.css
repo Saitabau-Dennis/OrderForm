@@ -28,6 +28,7 @@ html::-webkit-scrollbar {
   --font-raleway: var(--font-raleway);
   --font-poppins: var(--font-poppins);
   --font-dm-sans: var(--font-dm-sans);
+  --font-jakarta: var(--font-jakarta);
 }
 
 @theme inline {
@@ -300,8 +301,10 @@ html::-webkit-scrollbar {
     left: 0;
     top: 0;
     width: 100%;
-    max-width: 80mm; /* Standard thermal receipt width */
-    margin: 0 auto; /* Center on page */
+    max-width: 80mm;
+    /* Standard thermal receipt width */
+    margin: 0 auto;
+    /* Center on page */
     padding: 0;
     background: white;
     color: black !important;

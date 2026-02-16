@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Filter } from "lucide-react";
+import { Plus, Filter, FileDown } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/dashboard/button";
@@ -151,20 +151,7 @@ export function ProductsClient({ initialProducts }: ProductsClientProps) {
             size="sm"
             className="rounded-lg h-9 px-3 text-sm border-border bg-background hover:bg-accent transition-colors font-medium"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="mr-2 h-3.5 w-3.5 text-muted-foreground"
-            >
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" x2="12" y1="15" y2="3" />
-            </svg>
+            <FileDown className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
             Export
           </Button>
 

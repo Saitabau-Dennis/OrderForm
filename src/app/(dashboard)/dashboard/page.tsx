@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { DollarSign, Package, ShoppingBag, TrendingUp, Users, ArrowUpRight, Calendar, ChevronDown } from "lucide-react";
+import { DollarSign, Package, ShoppingBag, TrendingUp, Users, ArrowUpRight, CalendarRange, ChevronDown } from "lucide-react";
 import { startOfMonth, subMonths, startOfDay, subDays, format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OrdersClient } from "@/components/dashboard/orders-client";
@@ -258,41 +258,19 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-0 animate-appear">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-1">
-          <h2 className="text-3xl font-medium tracking-tight text-foreground font-poppins">
-            Dashboard
-          </h2>
-          <p className="text-sm text-muted-foreground font-poppins">
-            Overview of your store's performance.
-          </p>
-        </div>
-      </div>
+
 
       {/* Stats Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 pt-4">
         {stats.map((stat, i) => (
-          <Card key={stat.title} className="overflow-hidden border-2 border-border shadow-none rounded-3xl bg-card relative">
-            <CardContent className="p-7 relative z-10 flex flex-col h-full">
-              <div className="flex items-start justify-between mb-6">
-                <div className={`w-12 h-12 flex items-center justify-center rounded-2xl bg-primary/5 border border-primary/10 text-primary`}>
-                  <stat.icon className="h-6 w-6" />
-                </div>
-                {stat.trend && (
-                    <span className="flex items-center text-[10px] font-medium text-primary/70 bg-primary/5 px-2.5 py-1 rounded-full border border-primary/10 uppercase tracking-wider">
-                        <TrendingUp className="w-3 h-3 mr-1 text-green-600" />
-                        {stat.trend}
-                    </span>
-                )}
+          <Card key={stat.title} className="overflow-hidden border-2 border-border shadow-none rounded-xl bg-card relative">
+            <CardContent className="p-6 flex flex-col gap-1">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-normal text-muted-foreground">{stat.title}</p>
+                <stat.icon className="h-4 w-4 text-muted-foreground" />
               </div>
-
-              <div className="space-y-1.5">
-                <p className="text-[10px] font-medium text-primary/40 uppercase tracking-[0.2em]">
-                    {stat.title}
-                </p>
-                <div className="text-4xl font-medium text-primary tracking-tighter">
-                    {stat.value}
-                </div>
+              <div className="mt-2">
+                <h3 className="text-3xl font-normal text-foreground tracking-tight">{stat.value}</h3>
               </div>
             </CardContent>
           </Card>
@@ -302,17 +280,18 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       <div className="grid gap-6 grid-cols-1 lg:grid-cols-6">
         {/* Sales Chart */}
         <div className="lg:col-span-4">
-            <div className="rounded-3xl border-2 border-border bg-card overflow-hidden h-full">
+            <div className="rounded-xl border-2 border-border bg-card overflow-hidden h-full">
                 <div className="px-7 pt-7 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-medium text-primary">Sales Overview</h3>
+                    <h3 className="text-2xl font-medium text-primary">Sales</h3>
                   </div>
 
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-primary/5 border border-primary/10 text-[9px] font-medium uppercase tracking-widest text-primary/60 hover:bg-primary/10 transition-colors">
+                      <button className="flex items-center gap-2 px-3 py-2 rounded-lg border bg-white hover:bg-muted/50 transition-colors text-sm font-normal text-foreground">
+                        <CalendarRange className="h-4 w-4 text-muted-foreground" />
                         {rangeLabels[range]}
-                        <ChevronDown className="h-2.5 w-2.5 opacity-50" />
+                        <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48 rounded-2xl bg-card border border-border shadow-xl">
@@ -334,7 +313,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
         {/* Top Selling Products */}
         <div className="lg:col-span-2">
-            <Card className="h-full border-2 border-border shadow-none rounded-3xl bg-card overflow-hidden">
+            <Card className="h-full border-2 border-border shadow-none rounded-xl bg-card overflow-hidden">
                 <CardHeader className="p-7 pb-2">
                     <CardTitle className="text-lg font-medium flex items-center gap-2">
                         Best Sellers

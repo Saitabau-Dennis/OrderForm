@@ -53,9 +53,9 @@ export function SalesChart({ className, data: propData, rangeLabel = "Last 7 Day
   return (
     <Card className={cn("col-span-4 border-none shadow-none bg-transparent", className)}>
       <CardContent className="p-7">
-        <div className="h-[300px] w-full pt-4 relative pl-12">
+        <div className="h-[400px] w-full pt-4 relative pl-12">
             {/* Y-axis labels */}
-            <div className="absolute inset-y-0 left-0 flex flex-col justify-between text-[10px] font-medium text-primary/20 h-[85%] w-12 pr-4 text-right">
+            <div className="absolute inset-y-0 left-0 flex flex-col justify-between text-[10px] font-medium text-primary/20 h-[90%] w-12 pr-4 text-right">
                 <span>{maxValue}</span>
                 <span>{Math.round(maxValue * 0.75)}</span>
                 <span>{Math.round(maxValue * 0.5)}</span>
@@ -66,14 +66,14 @@ export function SalesChart({ className, data: propData, rangeLabel = "Last 7 Day
             {/* Chart Area */}
             <div className="h-full w-full relative">
                 {/* Grid lines */}
-                <div className="absolute inset-0 flex flex-col justify-between h-[85%]">
+                <div className="absolute inset-0 flex flex-col justify-between h-[90%]">
                   {[...Array(5)].map((_, i) => (
                     <div key={i} className="h-px w-full bg-primary/5 border-dashed" />
                   ))}
                 </div>
 
                 {/* SVG Chart */}
-                <svg className="w-full h-[85%] overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <svg className="w-full h-[90%] overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
                     <defs>
                         <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
                             <stop offset="0%" stopColor="#00311F" stopOpacity="0.8" />

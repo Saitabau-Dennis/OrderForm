@@ -4,10 +4,9 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
-  Home,
   Package,
   Settings,
-  ShoppingBag,
+  ShoppingCart,
   LogOut,
   Menu,
   ChevronRight,
@@ -15,9 +14,11 @@ import {
   ChevronUp,
   LifeBuoy,
   Plus,
-  BarChart3,
+
   Users,
   Store,
+  ExternalLink,
+  Home,
   MoreHorizontal,
   Check
 } from "lucide-react";
@@ -71,9 +72,9 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen, setShowSupportModal 
   const routes = [
     { label: "Overview", icon: Home, href: "/dashboard", active: pathname === "/dashboard" },
     { label: "Products", icon: Package, href: "/products", active: pathname === "/products" },
-    { label: "Orders", icon: ShoppingBag, href: "/orders", active: pathname === "/orders" },
+    { label: "Orders", icon: ShoppingCart, href: "/orders", active: pathname === "/orders" },
     { label: "Customers", icon: Users, href: "/customers", active: pathname === "/customers" },
-    { label: "Analytics", icon: BarChart3, href: "#", active: false, comingSoon: true },
+
     { label: "Settings", icon: Settings, href: "/settings", active: pathname === "/settings" },
   ];
 
@@ -138,19 +139,14 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen, setShowSupportModal 
               "flex items-center gap-3 rounded-md px-3.5 py-2.5 text-sm font-normal transition-all duration-200 group relative",
               route.active
                 ? "bg-primary text-primary-foreground shadow-sm font-medium"
-                : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground",
-              route.comingSoon && "opacity-70 cursor-not-allowed"
+                : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground"
             )}
-            onClick={(e) => {
-              if (route.comingSoon) e.preventDefault();
-              else setIsMobileMenuOpen(false);
+            onClick={() => {
+              setIsMobileMenuOpen(false);
             }}
           >
             <route.icon className={cn("h-[22px] w-[22px]", route.active ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground")} />
             <span className="font-poppins tracking-wide">{route.label}</span>
-            {route.comingSoon && (
-              <span className="ml-auto text-[10px] uppercase font-bold bg-foreground/10 px-2 py-0.5 rounded">Soon</span>
-            )}
           </Link>
         ))}
       </nav>
@@ -160,14 +156,17 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen, setShowSupportModal 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-3 rounded-md p-2.5 hover:bg-foreground/[0.04] transition-all duration-150 cursor-pointer w-full group focus:outline-none">
-              <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.image || ""} className="rounded-lg" />
-                <AvatarFallback className="bg-foreground/10 text-foreground text-xs font-semibold rounded-lg">
+              <Avatar className="h-10 w-10 rounded-none bg-muted/50">
+                <AvatarImage
+                  src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${user.name || "User"}&backgroundColor=e9c46a,2a9d8f,264653`}
+                  className="rounded-none object-cover"
+                />
+                <AvatarFallback className="bg-foreground/10 text-foreground text-xs font-normal rounded-none">
                   {user.name?.charAt(0).toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 overflow-hidden text-left">
-                <p className="truncate text-sm font-medium text-foreground leading-tight">{user.name || "User"}</p>
+                <p className="truncate text-sm font-normal text-foreground leading-tight">{user.name || "User"}</p>
                 <p className="truncate text-[11px] text-muted-foreground leading-tight mt-0.5">{user.email}</p>
               </div>
               <MoreHorizontal className="h-4 w-4 text-muted-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
@@ -175,15 +174,15 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen, setShowSupportModal 
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" side="top" sideOffset={4} className="w-[240px] bg-white rounded-xl border border-black/[0.06] shadow-[0_8px_30px_rgba(0,0,0,0.08)] p-1.5 font-poppins">
             <div className="px-2.5 pt-1 pb-2">
-              <p className="text-sm font-bold text-foreground">{user.name}</p>
+              <p className="text-sm font-normal text-foreground">{user.name}</p>
               <p className="text-xs font-medium text-foreground/50 mt-0.5">{user.email}</p>
             </div>
-            <DropdownMenuSeparator className="bg-black/[0.05] my-1" />
+
             <DropdownMenuItem className="focus:bg-foreground/[0.04] cursor-pointer px-2.5 py-2 rounded-lg" onSelect={() => setShowSupportModal(true)}>
-              <span className="text-sm font-semibold text-foreground/70">Help & Support</span>
+              <span className="text-sm font-normal text-foreground/70">Help & Support</span>
             </DropdownMenuItem>
             <DropdownMenuItem className="focus:bg-red-50 cursor-pointer px-2.5 py-2 rounded-lg" onSelect={() => signOut({ callbackUrl: "/login" })}>
-              <span className="text-sm font-semibold text-red-500">Sign out</span>
+              <span className="text-sm font-normal text-red-500">Sign out</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -237,7 +236,7 @@ export function DashboardShell({ children, user, store }: DashboardShellProps) {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground font-poppins">
-      <aside className="hidden w-72 border-r border-sidebar-border bg-white md:block fixed inset-y-0 left-0 z-30">
+      <aside className="hidden w-72 border-r border-border bg-white md:block fixed inset-y-0 left-0 z-30">
         <SidebarContent user={user} store={store} setIsMobileMenuOpen={setIsMobileMenuOpen} setShowSupportModal={setShowSupportModal} />
       </aside>
 

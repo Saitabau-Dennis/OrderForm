@@ -11,43 +11,44 @@ export function StoreHero({ name, description }: StoreHeroProps) {
   const { brandColor } = useStore();
 
   return (
-    <div className="bg-white pt-32 pb-20">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
-          <div
-            className="group flex items-center gap-2 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-[0.25em] bg-white border border-gray-100 mb-10 shadow-sm hover:shadow-md transition-all cursor-default"
-            style={{ color: brandColor }}
-          >
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: brandColor }}></span>
-              <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: brandColor }}></span>
-            </span>
-            WhatsApp Shopping
-          </div>
+    <section className="relative overflow-hidden font-jakarta" style={{ backgroundColor: "#F8F6F3" }}>
+      {/* Gradient orbs */}
+      <div
+        className="absolute top-[-30%] right-[-15%] w-[60vw] h-[60vw] rounded-full opacity-[0.07] blur-[120px]"
+        style={{ backgroundColor: brandColor }}
+      />
+      <div
+        className="absolute bottom-[-30%] left-[-15%] w-[40vw] h-[40vw] rounded-full opacity-[0.05] blur-[100px]"
+        style={{ backgroundColor: brandColor }}
+      />
 
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 font-sora tracking-tighter leading-[1] mb-8">
+      <div className="container mx-auto px-5 md:px-8 relative z-10 pt-36 pb-28 md:pt-44 md:pb-36">
+        <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold text-stone-900 leading-[0.9] tracking-[-0.04em] font-jakarta mb-8">
             {name}
           </h1>
 
-          <div className="space-y-6 max-w-2xl mx-auto">
+          <div className="flex items-center gap-2 mb-8">
+            <div className="h-[2px] w-6 rounded-full" style={{ backgroundColor: brandColor, opacity: 0.3 }} />
+            <div className="h-[2px] w-12 rounded-full" style={{ backgroundColor: brandColor, opacity: 0.6 }} />
+            <div className="h-[2px] w-6 rounded-full" style={{ backgroundColor: brandColor, opacity: 0.3 }} />
+          </div>
+
+          <div className="max-w-lg">
             {description ? (
               <div
-                className="text-xl md:text-2xl text-gray-500 font-light leading-relaxed prose prose-p:my-0 prose-p:leading-relaxed prose-strong:font-semibold prose-headings:font-bold text-center"
+                className="text-base md:text-[17px] text-stone-400 leading-relaxed prose prose-p:my-0"
                 dangerouslySetInnerHTML={{ __html: description }}
               />
             ) : (
-              <p className="text-xl md:text-2xl text-gray-500 font-light leading-relaxed">
-                Welcome to our store. Explore our curated collection of quality products and enjoy a seamless shopping experience.
+              <p className="text-base md:text-[17px] text-stone-400 leading-relaxed">
+                Explore our curated collection of quality products,
+                designed for people who appreciate the finer things.
               </p>
             )}
           </div>
-
-          <div
-            className="h-1.5 w-24 rounded-full opacity-10 mt-10"
-            style={{ backgroundColor: brandColor }}
-          />
         </div>
       </div>
-    </div>
+    </section>
   );
 }

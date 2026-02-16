@@ -17,20 +17,20 @@ export function OrderDetails({
   return (
     <div className="flex flex-col print-area">
       {/* Receipt Header */}
-      <div className="px-6 pt-6 pb-4 text-center">
-        <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">{storeName}</p>
-        <h2 className="text-base font-medium text-foreground">
+      <div className="relative px-6 pt-6 pb-5">
+        <p className="mb-1 text-[11px] uppercase tracking-widest text-muted-foreground">{storeName}</p>
+        <h2 className="text-[30px] font-normal leading-tight text-foreground">
           Order ID: {order.displayId || order.orderNumber}
         </h2>
-        <p className="text-xs text-muted-foreground mt-1">
+        <p className="mt-1 text-sm text-muted-foreground">
           {format(new Date(order.createdAt), "MMM d, yyyy · h:mm a")}
         </p>
         {onClose && (
           <button
             onClick={onClose}
-            className="absolute right-4 top-4 w-7 h-7 rounded-md flex items-center justify-center hover:bg-muted transition-colors no-print"
+            className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-md border bg-background hover:bg-muted transition-colors no-print"
           >
-            <svg className="w-4 h-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <svg className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>

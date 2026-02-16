@@ -21,6 +21,7 @@ const config: Config = {
         "signika": ["var(--font-signika)"],
         "dm-sans": ["var(--font-dm-sans)"],
         "poppins": ["var(--font-poppins)"],
+        "jakarta": ["var(--font-jakarta)"],
       },
     },
   },

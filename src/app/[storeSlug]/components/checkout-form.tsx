@@ -3,7 +3,7 @@
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, MessageCircle, CreditCard, Banknote, ShieldCheck } from "lucide-react";
+import { Loader2, MessageCircle, CreditCard, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -27,12 +27,12 @@ interface CheckoutFormProps {
   onSubmit: (data: CheckoutFormData) => void;
   isLoading: boolean;
   totalAmount: number;
-    currency: string;
-    hideSummary?: boolean;
+  currency: string;
+  hideSummary?: boolean;
 }
 
 export function CheckoutForm({ onSubmit, isLoading, totalAmount, currency, hideSummary = false }: CheckoutFormProps) {
-  const { brandColor, secondaryColor } = useStore();
+  const { brandColor } = useStore();
 
   const form = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
@@ -50,179 +50,140 @@ export function CheckoutForm({ onSubmit, isLoading, totalAmount, currency, hideS
   const paymentMethod = useWatch({ control: form.control, name: "paymentMethod" });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 py-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-10 font-dm-sans">
 
-      {/* Contact Information */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 mb-2">
-            <div className="h-6 w-6 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-600">1</div>
-            <h3 className="font-bold text-gray-900 font-sora">Contact Information</h3>
-        </div>
-
-        <div className="grid gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="name" className="text-xs font-bold uppercase text-gray-500 tracking-wider">Full Name</Label>
+      {/* 1. Contact */}
+      <div className="space-y-5">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-stone-400 pb-3 border-b border-stone-100">
+          Contact Information
+        </h3>
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="name" className="text-sm font-medium text-stone-700">Full Name</Label>
             <Input
               id="name"
-              placeholder="e.g. John Doe"
+              placeholder="John Doe"
               {...register("name")}
-              className={cn("h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all", errors.name && "border-red-300 focus:border-red-300")}
+              className={cn("h-12 rounded-xl border-stone-200 bg-white font-dm-sans focus:border-stone-400 transition-colors", errors.name && "border-red-300")}
             />
-            {errors.name && <p className="text-xs text-red-500 font-medium">{errors.name.message}</p>}
+            {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-               <Label htmlFor="email" className="text-xs font-bold uppercase text-gray-500 tracking-wider">Email</Label>
-               <Input
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-sm font-medium text-stone-700">Email</Label>
+              <Input
                 id="email"
                 type="email"
                 placeholder="john@example.com"
                 {...register("email")}
-                className={cn("h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all", errors.email && "border-red-300 focus:border-red-300")}
+                className={cn("h-12 rounded-xl border-stone-200 bg-white font-dm-sans focus:border-stone-400 transition-colors", errors.email && "border-red-300")}
               />
-              {errors.email && <p className="text-xs text-red-500 font-medium">{errors.email.message}</p>}
+              {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
             </div>
-
-            <div className="space-y-2">
-               <Label htmlFor="phone" className="text-xs font-bold uppercase text-gray-500 tracking-wider">Phone</Label>
-               <Input
+            <div className="space-y-1.5">
+              <Label htmlFor="phone" className="text-sm font-medium text-stone-700">Phone</Label>
+              <Input
                 id="phone"
                 type="tel"
                 placeholder="0712 345 678"
                 {...register("phone")}
-                className={cn("h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all", errors.phone && "border-red-300 focus:border-red-300")}
+                className={cn("h-12 rounded-xl border-stone-200 bg-white font-dm-sans focus:border-stone-400 transition-colors", errors.phone && "border-red-300")}
               />
-              {errors.phone && <p className="text-xs text-red-500 font-medium">{errors.phone.message}</p>}
+              {errors.phone && <p className="text-xs text-red-500">{errors.phone.message}</p>}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Delivery Details */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 mb-2">
-            <div className="h-6 w-6 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-600">2</div>
-            <h3 className="font-bold text-gray-900 font-sora">Delivery Details</h3>
-        </div>
-
-        <div className="space-y-2">
-            <Label htmlFor="address" className="text-xs font-bold uppercase text-gray-500 tracking-wider">Delivery Address</Label>
+      {/* 2. Delivery */}
+      <div className="space-y-5">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-stone-400 pb-3 border-b border-stone-100">
+          Delivery
+        </h3>
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="address" className="text-sm font-medium text-stone-700">Delivery Address</Label>
             <Textarea
-                id="address"
-                placeholder="Street name, Apartment, Region..."
-                {...register("address")}
-                className={cn("min-h-[80px] bg-gray-50 border-gray-100 focus:bg-white transition-all resize-none", errors.address && "border-red-300 focus:border-red-300")}
+              id="address"
+              placeholder="Street name, Apartment, Region..."
+              {...register("address")}
+              className={cn("min-h-[80px] rounded-xl border-stone-200 bg-white font-dm-sans resize-none focus:border-stone-400 transition-colors", errors.address && "border-red-300")}
             />
-            {errors.address && <p className="text-xs text-red-500 font-medium">{errors.address.message}</p>}
-        </div>
-
-        <div className="space-y-2">
-             <Label htmlFor="notes" className="text-xs font-bold uppercase text-gray-500 tracking-wider">Order Notes (Optional)</Label>
+            {errors.address && <p className="text-xs text-red-500">{errors.address.message}</p>}
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="notes" className="text-sm font-medium text-stone-700">
+              Notes <span className="text-stone-400 font-normal">(optional)</span>
+            </Label>
             <Textarea
-                id="notes"
-                placeholder="Any special instructions for delivery?"
-                {...register("notes")}
-                className="min-h-[60px] bg-gray-50 border-gray-100 focus:bg-white transition-all resize-none"
+              id="notes"
+              placeholder="Any special instructions?"
+              {...register("notes")}
+              className="min-h-[60px] rounded-xl border-stone-200 bg-white font-dm-sans resize-none focus:border-stone-400 transition-colors"
             />
+          </div>
         </div>
       </div>
 
-      {/* Payment Method */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 mb-2">
-            <div className="h-6 w-6 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-600">3</div>
-            <h3 className="font-bold text-gray-900 font-sora">Payment Method</h3>
-        </div>
+      {/* 3. Payment */}
+      <div className="space-y-5">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-stone-400 pb-3 border-b border-stone-100">
+          Payment
+        </h3>
+        <RadioGroup value={paymentMethod} onValueChange={(val) => setValue("paymentMethod", val as "whatsapp" | "mpesa")} className="space-y-3">
+          <Label
+            htmlFor="whatsapp"
+            className={cn(
+              "flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all",
+              paymentMethod === "whatsapp" ? "border-stone-900 bg-stone-50" : "border-stone-200 bg-white hover:border-stone-300"
+            )}
+          >
+            <div className="flex items-center gap-3">
+              <RadioGroupItem value="whatsapp" id="whatsapp" className="border-stone-300" />
+              <div>
+                <span className="font-semibold text-stone-900 text-sm">WhatsApp</span>
+                <p className="text-xs text-stone-400">Complete order via chat</p>
+              </div>
+            </div>
+            <MessageCircle className={cn("h-5 w-5", paymentMethod === "whatsapp" ? "text-stone-900" : "text-stone-300")} />
+          </Label>
 
-        <RadioGroup value={paymentMethod} onValueChange={(val) => setValue("paymentMethod", val as "whatsapp" | "mpesa")} className="grid gap-3">
-
-            <Label
-              htmlFor="whatsapp"
-              className={cn(
-                "flex items-center justify-between px-4 py-3 rounded-xl border-2 cursor-pointer transition-all",
-                paymentMethod === "whatsapp" ? "" : "border-gray-100 bg-white hover:border-gray-200"
-              )}
-              style={paymentMethod === "whatsapp" ? {
-                borderColor: brandColor,
-                backgroundColor: secondaryColor + "40" // 25% opacity
-              } : {}}
-            >
-                <div className="flex items-center gap-3">
-                    <RadioGroupItem
-                      value="whatsapp"
-                      id="whatsapp"
-                      className="border-gray-300"
-                      style={paymentMethod === "whatsapp" ? { color: brandColor } : {}}
-                    />
-                    <div className="flex flex-col">
-                        <span className="font-bold text-gray-900">Pay via WhatsApp</span>
-                        <span className="text-xs text-gray-500">Complete order with agent</span>
-                    </div>
-                </div>
-                <MessageCircle
-                  className="h-5 w-5"
-                  style={{ color: paymentMethod === "whatsapp" ? brandColor : "#9CA3AF" }}
-                />
-            </Label>
-
-            <Label
-              htmlFor="mpesa"
-              className={cn(
-                "flex items-center justify-between px-4 py-3 rounded-xl border-2 transition-all relative overflow-hidden grayscale opacity-60 cursor-not-allowed",
-                paymentMethod === "mpesa" ? "" : "border-gray-100 bg-gray-50"
-              )}
-              style={paymentMethod === "mpesa" ? {
-                borderColor: brandColor,
-                backgroundColor: secondaryColor + "40"
-              } : {}}
-            >
-                <div className="flex items-center gap-3">
-                    <RadioGroupItem value="mpesa" id="mpesa" disabled className="border-gray-300" />
-                    <div className="flex flex-col">
-                        <div className="flex items-center gap-2">
-                            <span className="font-bold text-gray-900">M-Pesa</span>
-                            <span className="bg-gray-200 text-gray-600 text-[9px] px-1.5 py-0.5 rounded font-black uppercase tracking-wider">Coming Soon</span>
-                        </div>
-                        <span className="text-xs text-gray-500">Automatic payment execution</span>
-                    </div>
-                </div>
-                 <CreditCard className="h-5 w-5 text-gray-400" />
-            </Label>
+          <Label
+            htmlFor="mpesa"
+            className="flex items-center justify-between p-4 rounded-xl border-2 border-stone-200 bg-stone-50 opacity-50 cursor-not-allowed"
+          >
+            <div className="flex items-center gap-3">
+              <RadioGroupItem value="mpesa" id="mpesa" disabled className="border-stone-300" />
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-stone-900 text-sm">M-Pesa</span>
+                <span className="text-[9px] px-1.5 py-0.5 bg-stone-200 rounded font-bold uppercase text-stone-500">Soon</span>
+              </div>
+            </div>
+            <CreditCard className="h-5 w-5 text-stone-300" />
+          </Label>
         </RadioGroup>
       </div>
 
-       {/* Order Summary & Actions */}
-       <div className="bg-gray-50 rounded-2xl p-6 space-y-4">
-            <div className="flex items-center justify-between text-base font-bold text-gray-900">
-                <span>Total to Pay</span>
-                <span className="text-xl">{currency} {totalAmount.toLocaleString()}</span>
-            </div>
-
-            <div className="flex items-center gap-2 text-xs text-gray-500 bg-white p-3 rounded-lg border border-gray-100">
-                <ShieldCheck className="h-4 w-4 text-green-600" />
-                <span>Secure checkout powered by OrderForm</span>
-            </div>
-
-            <Button
-                type="submit"
-                className="w-full h-12 text-base font-bold rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all active:scale-[0.99]"
-                style={{
-                  backgroundColor: brandColor,
-                  color: "white"
-                }}
-                disabled={isLoading}
-            >
-                {isLoading ? (
-                    <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Processing...
-                    </>
-                ) : (
-                    paymentMethod === "whatsapp" ? "Complete on WhatsApp" : "Pay with M-Pesa"
-                )}
-            </Button>
-       </div>
+      {/* Submit */}
+      <div className="pt-4 space-y-4">
+        <Button
+          type="submit"
+          className="w-full h-14 rounded-xl text-sm font-bold transition-all active:scale-[0.99] shadow-md"
+          style={{ backgroundColor: brandColor, color: "white" }}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...</>
+          ) : (
+            <>Place Order — {currency} {totalAmount.toLocaleString()}</>
+          )}
+        </Button>
+        <div className="flex items-center justify-center gap-2 text-xs text-stone-400">
+          <ShieldCheck className="h-3.5 w-3.5" />
+          Secure checkout by OrderForm
+        </div>
+      </div>
     </form>
   );
 }

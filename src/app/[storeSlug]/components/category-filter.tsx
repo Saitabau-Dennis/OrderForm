@@ -19,43 +19,39 @@ export function CategoryFilter({
   if (categories.length === 0) return null;
 
   return (
-    <div className="sticky top-[72px] z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100 py-4 mb-8">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center space-x-3 overflow-x-auto pb-1 scrollbar-hide">
-          <button
-            onClick={() => onSelectCategory(null)}
-            className={cn(
-              "flex-shrink-0 rounded-full px-6 py-2.5 text-sm font-semibold transition-all duration-300",
-              !selectedCategory
-                ? "text-white shadow-md transform scale-105"
-                : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-            )}
-            style={!selectedCategory ? { backgroundColor: brandColor } : {}}
-          >
-            All Items
-          </button>
-          
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => onSelectCategory(category)}
-              className={cn(
-                "flex-shrink-0 rounded-full px-6 py-2.5 text-sm font-semibold transition-all duration-300",
-                selectedCategory === category
-                  ? "text-white shadow-md transform scale-105"
-                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-              )}
-              style={
-                selectedCategory === category
-                  ? { backgroundColor: brandColor }
-                  : {}
-              }
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-      </div>
+    <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide font-dm-sans">
+      <button
+        onClick={() => onSelectCategory(null)}
+        className={cn(
+          "flex-shrink-0 h-9 px-4 rounded-full text-[13px] font-medium transition-all duration-300 border",
+          !selectedCategory
+            ? "text-white border-transparent shadow-sm"
+            : "border-stone-200 text-stone-500 hover:text-stone-800 hover:border-stone-300 bg-transparent"
+        )}
+        style={!selectedCategory ? { backgroundColor: brandColor } : {}}
+      >
+        All
+      </button>
+
+      {categories.map((category) => (
+        <button
+          key={category}
+          onClick={() => onSelectCategory(category)}
+          className={cn(
+            "flex-shrink-0 h-9 px-4 rounded-full text-[13px] font-medium transition-all duration-300 border",
+            selectedCategory === category
+              ? "text-white border-transparent shadow-sm"
+              : "border-stone-200 text-stone-500 hover:text-stone-800 hover:border-stone-300 bg-transparent"
+          )}
+          style={
+            selectedCategory === category
+              ? { backgroundColor: brandColor }
+              : {}
+          }
+        >
+          {category}
+        </button>
+      ))}
     </div>
   );
 }
