@@ -1,7 +1,7 @@
 "use client"
 
 import {
-  Camera,
+  Upload,
   ShoppingBag,
   ShoppingCart,
   TicketPercent,
@@ -55,7 +55,7 @@ const features = [
     className: "sm:col-span-2 lg:col-span-1 lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4",
   },
   {
-    Icon: Camera,
+    Icon: Upload,
     name: "Share & Earn",
     description:
       "Turn customers into advocates. Shoppers can upload photos of their purchase. Once you approve it, they get rewarded, and you get authentic social proof.",

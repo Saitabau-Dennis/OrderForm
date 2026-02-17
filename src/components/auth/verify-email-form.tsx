@@ -82,8 +82,8 @@ export function VerifyEmailForm() {
   return (
     <div className="w-full max-w-md mx-auto space-y-8">
       <div className="text-center space-y-2">
-        <h2 className="font-heading text-3xl font-bold">Check your email</h2>
-        <p className="text-muted-foreground">
+        <h2 className="font-heading text-3xl md:text-4xl font-semibold tracking-tight">Check your email</h2>
+        <p className="text-base text-muted-foreground">
           We sent a verification code to <span className="font-medium text-foreground">{email}</span>
         </p>
       </div>
@@ -99,10 +99,10 @@ export function VerifyEmailForm() {
         </div>
 
         {loading && (
-            <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm animate-pulse">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Verifying...</span>
-            </div>
+          <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm animate-pulse">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span>Verifying...</span>
+          </div>
         )}
       </div>
 

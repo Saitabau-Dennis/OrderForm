@@ -88,7 +88,7 @@ function ResetPasswordForm() {
         <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
           <ShieldCheck className="w-8 h-8 text-red-500" />
         </div>
-        <h2 className="font-heading text-2xl font-bold mb-2">Invalid Request</h2>
+        <h2 className="font-heading text-2xl font-semibold tracking-tight mb-2">Invalid Request</h2>
         <p className="font-sans text-muted-foreground mb-6">
           We couldnt find your email address in the request. Please start over.
         </p>
@@ -110,7 +110,7 @@ function ResetPasswordForm() {
           </div>
         </div>
 
-        <h2 className="font-heading text-3xl font-bold text-foreground mb-4 tracking-tight">
+        <h2 className="font-heading text-3xl font-semibold text-foreground mb-4 tracking-tight">
           All Secure!
         </h2>
 
@@ -138,7 +138,7 @@ function ResetPasswordForm() {
         <div className="w-12 h-12 bg-primary/5 rounded-xl flex items-center justify-center mb-6 text-primary">
           <LockKeyhole className="w-6 h-6" />
         </div>
-        <h2 className="font-heading text-2xl text-foreground mb-2">
+        <h2 className="font-heading text-3xl font-semibold tracking-tight text-foreground mb-2">
           {step === 1 ? "Enter Code" : "Reset Password"}
         </h2>
         <p className="font-sans text-muted-foreground">
@@ -254,14 +254,14 @@ export default function ResetPasswordPage() {
         <div className="relative z-10">
           <Link
             href="/"
-            className="font-heading text-2xl font-bold mb-12 block"
+            className="font-logo text-2xl font-semibold tracking-tight mb-12 block"
           >
             Orderform
           </Link>
-          <h1 className="font-heading text-3xl md:text-4xl leading-tight mb-6">
+          <h1 className="font-heading text-4xl md:text-5xl font-semibold tracking-tight leading-tight mb-6">
             Secure your account.
           </h1>
-          <p className="font-sans text-primary-foreground/70 text-lg">
+          <p className="font-sans text-primary-foreground/75 text-base md:text-lg leading-relaxed">
             Create a strong password to keep your store safe.
           </p>
         </div>
@@ -280,7 +280,7 @@ export default function ResetPasswordPage() {
       {/* Right Side - Form */}
       <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col justify-center bg-background">
          <div className="md:hidden mb-6 text-center max-w-sm mx-auto w-full">
-             <Link href="/" className="font-heading text-2xl font-bold text-primary">
+             <Link href="/" className="font-logo text-2xl font-semibold tracking-tight text-primary">
               Orderform
             </Link>
           </div>

@@ -15,15 +15,15 @@ export function AboutUs() {
           {/* Left Column: Text Content */}
           <div className="flex flex-col items-start text-left">
              <ScrollAnimation variant="fade-up">
-                <div className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-primary/20 text-primary text-[10px] font-medium mb-6 uppercase tracking-widest">
+                <div className="inline-flex items-center px-3 py-1 rounded-full border border-primary/20 text-primary text-xs font-semibold mb-6 uppercase tracking-[0.16em]">
                   What is OrderForm?
                 </div>
                 
-                <h2 className="text-2xl md:text-4xl font-heading font-medium text-foreground mb-6 leading-[1.1] tracking-tight">
+                <h2 className="text-3xl md:text-5xl font-heading font-semibold text-foreground mb-6 leading-[1.06] tracking-[-0.02em]">
                   Empowering social sellers to scale <span className="text-primary italic font-heading">without the chaos.</span>
                 </h2>
                 
-                <div className="space-y-6 text-muted-foreground font-sans text-sm md:text-base leading-relaxed">
+                <div className="space-y-6 text-muted-foreground font-sans text-base md:text-lg leading-relaxed">
                    <p>
                       We’re on a mission to replace messy DM back-and-forths with a streamlined checkout. OrderForm gives solo entrepreneurs and small businesses a professional store link, automated order tracking, and a direct line to customers on WhatsApp.
                    </p>
@@ -34,7 +34,7 @@ export function AboutUs() {
 
                 <div className="mt-8">
                    <Link href="/register" target="_blank" rel="noopener noreferrer">
-                      <Button size="lg" className="group rounded-full px-8 text-xs md:text-sm font-semibold">
+                      <Button size="lg" className="group rounded-full px-8 text-sm md:text-base font-semibold">
                          Get Started
                          <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                       </Button>

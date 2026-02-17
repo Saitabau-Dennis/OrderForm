@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import Image from "next/image"
 import { Twitter, Instagram, Mail } from "lucide-react"
 
 export function Footer() {
@@ -12,7 +11,7 @@ export function Footer() {
         {/* Brand Section */}
         <div className="flex flex-col gap-4 max-w-xs">
             <div className="flex items-center gap-1">
-                 <span className="font-heading text-lg font-semibold text-foreground tracking-tight">
+                 <span className="font-logo text-xl font-semibold text-foreground tracking-[-0.01em]">
                     OrderForm
                 </span>
             </div>
@@ -29,17 +28,17 @@ export function Footer() {
         {/* Links Section */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 md:gap-12">
             <div className="flex flex-col gap-3">
-                <h4 className="font-medium text-base">Product</h4>
+                <h4 className="font-semibold text-base">Product</h4>
                 <Link href="#features" className="text-base text-muted-foreground hover:text-foreground transition-colors">Features</Link>
                 <Link href="#pricing" className="text-base text-muted-foreground hover:text-foreground transition-colors">Pricing</Link>
             </div>
             <div className="flex flex-col gap-3">
-                <h4 className="font-medium text-base">Company</h4>
+                <h4 className="font-semibold text-base">Company</h4>
                  <Link href="#" className="text-base text-muted-foreground hover:text-foreground transition-colors">About</Link>
                  <Link href="mailto:dennisntete28@gmail.com" className="text-base text-muted-foreground hover:text-foreground transition-colors">Contact</Link>
             </div>
             <div className="flex flex-col gap-3">
-                <h4 className="font-medium text-base">Legal</h4>
+                <h4 className="font-semibold text-base">Legal</h4>
                 <Link href="/privacy" className="text-base text-muted-foreground hover:text-foreground transition-colors">Privacy</Link>
                 <Link href="/terms" className="text-base text-muted-foreground hover:text-foreground transition-colors">Terms</Link>
             </div>

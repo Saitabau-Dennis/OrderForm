@@ -60,21 +60,21 @@ const Hero = React.forwardRef<HTMLDivElement, HeroProps>(
 
         {eyebrow && (
           <p
-            className="font-heading uppercase tracking-[0.2em] leading-[133%] text-center text-[9px] md:text-xs mb-6 md:mb-8 text-primary font-medium animate-appear opacity-0 delay-100"
+            className="font-heading uppercase tracking-[0.18em] leading-[133%] text-center text-xs md:text-sm mb-6 md:mb-8 text-primary font-semibold animate-appear opacity-0 delay-100"
           >
             {eyebrow}
           </p>
         )}
 
         <h1
-          className="text-3xl md:text-5xl lg:text-6xl leading-[1.15] text-center px-4 md:px-6 max-w-5xl text-foreground font-heading font-normal animate-appear opacity-0 delay-100 tracking-[-0.02em]"
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[1.04] text-center px-4 md:px-6 max-w-5xl text-foreground font-heading font-semibold animate-appear opacity-0 delay-100 tracking-[-0.03em]"
         >
           {title}
         </h1>
 
         {subtitle && (
           <p
-            className="text-base md:text-lg text-center font-sans font-normal px-6 max-w-2xl mt-6 mb-12 leading-relaxed text-muted-foreground animate-appear opacity-0 delay-300"
+            className="text-base md:text-xl text-center font-sans px-6 max-w-3xl mt-6 mb-12 leading-relaxed text-muted-foreground animate-appear opacity-0 delay-300"
           >
             {subtitle}
           </p>
@@ -84,7 +84,7 @@ const Hero = React.forwardRef<HTMLDivElement, HeroProps>(
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 animate-appear opacity-0 delay-500 w-full sm:w-auto px-4">
             {ctaText && ctaLink && (
               <Link href={ctaLink} target={ctaTarget} rel={ctaTarget === "_blank" ? "noopener noreferrer" : undefined} className="w-full sm:w-auto">
-                 <Button size="lg" className="w-full sm:w-auto rounded-full px-8 text-sm md:text-base font-semibold">
+                 <Button size="lg" className="w-full sm:w-auto rounded-full px-8 text-base font-semibold">
                     <span className="relative z-10">{ctaText}</span>
                  </Button>
               </Link>
@@ -92,7 +92,7 @@ const Hero = React.forwardRef<HTMLDivElement, HeroProps>(
 
             {secondaryCtaText && secondaryCtaLink && (
               <Link href={secondaryCtaLink} target={secondaryCtaTarget} rel={secondaryCtaTarget === "_blank" ? "noopener noreferrer" : undefined} className="w-full sm:w-auto">
-                <Button variant="outline" size="lg" className="w-full sm:w-auto rounded-full px-8 text-sm md:text-base font-medium group">
+                <Button variant="outline" size="lg" className="w-full sm:w-auto rounded-full px-8 text-base font-semibold group">
                   <span>{secondaryCtaText}</span>
                   <ChevronRight className="h-4 w-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
                 </Button>

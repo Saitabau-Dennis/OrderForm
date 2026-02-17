@@ -148,12 +148,11 @@ export function Pricing() {
     >
       <div className="mx-auto max-w-7xl px-6">
         <ScrollAnimation className="mx-auto mb-10 max-w-3xl text-center md:mb-14" variant="fade-up">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/[0.03] px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-primary">
-            <Sparkles className="h-3 w-3" />
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
             Pricing
           </div>
 
-          <h2 className="font-heading text-2xl font-medium leading-[1.1] tracking-tight text-foreground md:text-4xl">
+          <h2 className="font-heading text-3xl md:text-5xl font-semibold leading-[1.06] tracking-[-0.02em] text-foreground">
             Start free, upgrade as you grow
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground md:text-lg">
@@ -166,7 +165,7 @@ export function Pricing() {
             <div className="min-w-[760px]">
               <div className="grid [grid-template-columns:minmax(260px,1.6fr)_minmax(170px,1fr)_minmax(170px,1fr)] items-end gap-x-8 border-b border-black/10 pb-6">
                 <div className="pr-4">
-                  <p className="text-[11px] font-medium uppercase tracking-[0.15em] text-muted-foreground">
+                  <p className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
                     Plan comparison
                   </p>
                 </div>
@@ -174,7 +173,7 @@ export function Pricing() {
                 {plans.map((plan) => (
                   <div key={plan.key} className="space-y-3 text-left">
                     <div className="flex items-center gap-2">
-                      <p className="text-lg font-medium text-foreground">{plan.name}</p>
+                      <p className="text-lg font-semibold text-foreground">{plan.name}</p>
                       {plan.popular && (
                         <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
                           Popular
@@ -186,7 +185,7 @@ export function Pricing() {
                         variant={plan.popular ? "default" : "outline"}
                         size="sm"
                         className={cn(
-                          "h-9 rounded-full px-4 text-sm font-medium",
+                          "h-9 rounded-full px-4 text-sm font-semibold",
                           !plan.popular && "bg-background"
                         )}
                       >

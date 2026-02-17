@@ -43,10 +43,10 @@ export function HowItWorks() {
           {/* Left Column - Content */}
           <ScrollAnimation variant="fade-up" className="lg:sticky lg:top-32 self-start space-y-8 text-center lg:text-left">
             <div className="space-y-4">
-              <div className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-primary/20 text-primary text-[10px] font-medium mb-4 uppercase tracking-widest">
+              <div className="inline-flex items-center px-3 py-1 rounded-full border border-primary/20 text-primary text-xs font-semibold mb-4 uppercase tracking-[0.16em]">
                 How It Works
               </div>
-              <h2 className="text-2xl md:text-4xl font-medium tracking-tight font-heading leading-[1.1]">
+              <h2 className="text-3xl md:text-5xl font-semibold tracking-[-0.02em] font-heading leading-[1.06]">
                 From link to <br/>
                 <span className="text-primary">order in seconds.</span>
               </h2>
@@ -57,7 +57,7 @@ export function HowItWorks() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Link href="/register">
-                <Button size="lg" className="w-full sm:w-auto rounded-full px-8 text-sm md:text-base font-semibold">
+                <Button size="lg" className="w-full sm:w-auto rounded-full px-8 text-base font-semibold">
                   Start Selling Now
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
@@ -86,16 +86,16 @@ export function HowItWorks() {
                 )}>
                   <CardHeader className="p-0 pb-4">
                     <step.icon className="w-14 h-14 text-primary mb-5 stroke-[1.25]" />
-                    <CardTitle className="text-xl md:text-2xl font-medium font-heading text-foreground">{step.title}</CardTitle>
+                    <CardTitle className="text-xl md:text-2xl font-semibold font-heading tracking-[-0.01em] text-foreground">{step.title}</CardTitle>
                   </CardHeader>
                   <CardContent className="p-0">
-                    <CardDescription className="text-base leading-relaxed text-muted-foreground font-sans">
+                    <CardDescription className="text-base md:text-lg leading-relaxed text-muted-foreground font-sans">
                       {step.description}
                     </CardDescription>
                   </CardContent>
                   
                   {/* Decorative number */}
-                  <div className="absolute top-4 right-6 text-7xl md:text-9xl font-medium opacity-5 select-none font-heading">
+                  <div className="absolute top-4 right-6 text-7xl md:text-9xl font-semibold opacity-5 select-none font-heading">
                     {index + 1}
                   </div>
                 </Card>

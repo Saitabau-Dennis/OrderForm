@@ -1,5 +1,4 @@
 import { Navbar } from "@/components/landing/navbar"
-import { TextHighlight } from "@/components/ui/text-highlight"
 import { Hero } from "@/components/ui/hero"
 import { AboutUs } from "@/components/landing/about-us"
 import { Features } from "@/components/landing/features"
@@ -9,7 +8,6 @@ import { Pricing } from "@/components/landing/pricing"
 import { FAQ } from "@/components/landing/faq"
 import { CTA } from "@/components/landing/cta"
 import { Footer } from "@/components/landing/footer"
-import { ChevronRight } from "lucide-react"
 import { AnimatedBadge } from "@/components/ui/animated-badge"
 
 export default function Home() {
@@ -25,7 +23,7 @@ export default function Home() {
         title={
           <>
             Turn social media traffic into{" "}
-            clean <span className="font-heading italic font-normal">WhatsApp orders</span>
+            clean <span className="font-heading italic font-semibold">WhatsApp orders</span>
           </>
         }
         subtitle={

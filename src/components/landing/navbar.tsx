@@ -74,7 +74,7 @@ export function Navbar() {
             className="flex items-center gap-0.5 relative z-10 shrink-0" 
             onClick={() => setIsMobileMenuOpen(false)}
         >
-            <span className="font-heading text-base md:text-lg font-semibold text-foreground tracking-tight">
+            <span className="font-logo text-lg md:text-xl font-semibold text-foreground tracking-[-0.01em]">
             OrderForm
             </span>
         </Link>
@@ -85,7 +85,7 @@ export function Navbar() {
             
             <div className="relative group">
                 <button 
-                    className="flex items-center gap-1 relative px-4 py-2 text-sm font-medium text-foreground/70 hover:text-primary transition-colors rounded-full hover:bg-gray-50 cursor-pointer outline-none"
+                    className="flex items-center gap-1 relative px-4 py-2 text-[15px] font-semibold text-foreground/70 hover:text-primary transition-colors rounded-full hover:bg-gray-50 cursor-pointer outline-none"
                     onClick={(e) => handleScroll(e, "#features")}
                 >
                     Features
@@ -132,14 +132,14 @@ export function Navbar() {
             <Link 
                 href={session ? "/dashboard" : "/login"}
                 target="_blank"
-                className="hidden md:block text-sm font-medium text-foreground/70 hover:text-primary transition-colors px-4"
+                className="hidden md:block text-[15px] font-semibold text-foreground/70 hover:text-primary transition-colors px-4"
             >
             Log in
             </Link>
             <Link href={session ? "/dashboard" : "/register"} target="_blank" className="hidden md:block">
                 <Button 
                     size="sm"
-                    className="rounded-full px-4 font-medium"
+                    className="rounded-full px-4 font-semibold"
                 >
                     Get Started
                 </Button>
@@ -155,7 +155,7 @@ export function Navbar() {
             <SheetContent side="right" className=" w-[85vw] max-w-xs p-0 flex flex-col border-l border-border/50 bg-background/95 backdrop-blur-xl">
                 <SheetHeader className="px-6 pt-8 pb-4 text-left border-b border-border/10">
                 <div className="flex items-center gap-2 mb-2">
-                    <SheetTitle className="font-heading tracking-tight text-lg mb-0 font-semibold text-foreground">
+                    <SheetTitle className="font-logo tracking-tight text-lg mb-0 font-semibold text-foreground">
                         OrderForm
                     </SheetTitle>
                 </div>
@@ -201,7 +201,7 @@ function NavLink({ href, onClick, children }: { href: string, onClick?: (e: Reac
         <a 
             href={href}
             onClick={onClick}
-            className="relative px-4 py-2 text-sm font-medium text-foreground/70 hover:text-primary transition-all rounded-full hover:bg-gray-50 cursor-pointer"
+            className="relative px-4 py-2 text-[15px] font-semibold text-foreground/70 hover:text-primary transition-all rounded-full hover:bg-gray-50 cursor-pointer"
         >
             {children}
         </a>
@@ -215,7 +215,7 @@ function MobileNavLink({ href, onClick, children }: { href: string, onClick: (e:
         onClick={onClick}
         className="flex items-center justify-between p-4 rounded-2xl hover:bg-muted/60 active:bg-muted transition-all group cursor-pointer"
       >
-        <span className="text-base font-medium text-foreground/90 group-hover:text-primary transition-colors">{children}</span>
+        <span className="text-base font-semibold text-foreground/90 group-hover:text-primary transition-colors">{children}</span>
         <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
       </a>
     )

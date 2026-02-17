@@ -9,10 +9,10 @@ export function MiniStorePreview() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-12 md:mb-16 max-w-4xl mx-auto">
           <ScrollAnimation variant="fade-up">
-            <div className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-primary/20 text-primary text-[10px] font-medium mb-4 uppercase tracking-widest">
+            <div className="inline-flex items-center px-3 py-1 rounded-full border border-primary/20 text-primary text-xs font-semibold mb-4 uppercase tracking-[0.16em]">
               Mini store
             </div>
-            <h2 className="text-2xl md:text-4xl font-heading font-medium text-foreground leading-[1.1] tracking-tight">
+            <h2 className="text-3xl md:text-5xl font-heading font-semibold text-foreground leading-[1.06] tracking-[-0.02em]">
               A checkout experience your <br className="hidden md:block" />
                customers will <span className="text-primary">actually love.</span>
             </h2>
