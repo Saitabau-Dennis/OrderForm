@@ -14,7 +14,7 @@ import { AnimatedBadge } from "@/components/ui/animated-badge"
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col theme-landing bg-background text-foreground">
+    <main className="min-h-screen flex flex-col theme-landing font-sans bg-background text-foreground">
       <Navbar />
 
       <Hero
@@ -25,7 +25,7 @@ export default function Home() {
         title={
           <>
             Turn social media traffic into{" "}
-            clean <span className="font-[family-name:var(--font-instrument-serif)] italic font-normal">WhatsApp orders</span>
+            clean <span className="font-heading italic font-normal">WhatsApp orders</span>
           </>
         }
         subtitle={

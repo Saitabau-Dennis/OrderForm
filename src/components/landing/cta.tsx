@@ -43,7 +43,7 @@ export function CTA() {
             </div>
 
             <h2 className="text-4xl md:text-6xl font-heading font-medium text-white mb-6 leading-[1.05] tracking-tight max-w-4xl mx-auto">
-              Ready to <span className="font-instrument-serif italic text-emerald-50 relative inline-block">boost<svg className="absolute -bottom-2 left-0 w-full h-2 text-emerald-400/30" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="4" fill="none" /></svg></span> your growth with OrderForm?
+              Ready to <span className="font-heading italic text-emerald-50 relative inline-block">boost<svg className="absolute -bottom-2 left-0 w-full h-2 text-emerald-400/30" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="4" fill="none" /></svg></span> your growth with OrderForm?
             </h2>
 
             <p className="text-lg md:text-xl text-emerald-100/80 font-sans font-light max-w-2xl mx-auto mb-10 leading-relaxed">
@@ -51,13 +51,13 @@ export function CTA() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
-              <Link href="/register" target="_blank">
-                 <Button variant="outline" size="lg" className="w-full sm:w-auto bg-transparent border-white/20 text-white hover:bg-white hover:text-primary hover:border-white h-12 px-8 transition-all font-semibold">
-                  Try it now
+              {/* <Link href="/register" target="_blank">
+                 <Button variant="outline" size="lg" className="w-full sm:w-auto rounded-full px-8 font-semibold">
+                  Demo
                 </Button>
-              </Link>
+              </Link> */}
               <Link href="/register" target="_blank">
-                <Button size="lg" className="w-full sm:w-auto bg-white text-primary hover:bg-white/90 text-lg transition-all hover:scale-105 flex items-center justify-center gap-2 group h-12 px-8 font-semibold">
+                <Button size="lg" className="group flex w-full sm:w-auto items-center justify-center gap-2 rounded-full px-8 font-semibold">
                   Get Started
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>

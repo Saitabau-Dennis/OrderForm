@@ -120,8 +120,8 @@ export default function RegisterPage() {
           <WaveLoader />
         </div>
         <div className="text-center space-y-2">
-          <h2 className="font-instrument-serif text-xl font-bold text-foreground">Account Created!</h2>
-          <p className="font-instrument-sans text-muted-foreground text-sm">
+          <h2 className="font-heading text-xl font-bold text-foreground">Account Created!</h2>
+          <p className="font-sans text-muted-foreground text-sm">
             Redirecting you to verify your email...
           </p>
         </div>
@@ -139,8 +139,8 @@ export default function RegisterPage() {
             </svg>
           </div>
           <div className="space-y-2">
-            <h2 className="font-instrument-serif text-2xl font-bold text-foreground">Registration Successful!</h2>
-            <p className="font-instrument-sans text-muted-foreground text-lg leading-relaxed">
+            <h2 className="font-heading text-2xl font-bold text-foreground">Registration Successful!</h2>
+            <p className="font-sans text-muted-foreground text-lg leading-relaxed">
               We've sent a verification link to <strong className="text-foreground">{formData.email}</strong>.
               Please check your inbox to activate your account.
             </p>
@@ -165,13 +165,13 @@ export default function RegisterPage() {
       {/* Left Side - Text */}
       <div className="w-full hidden md:flex md:w-1/2 bg-primary p-10 flex-col justify-between text-primary-foreground relative overflow-hidden">
         <div className="relative z-10">
-          <Link href="/" className="font-instrument-serif text-2xl font-bold mb-12 block">
+          <Link href="/" className="font-heading text-2xl font-bold mb-12 block">
             Orderform
           </Link>
-          <h1 className="font-instrument-serif text-3xl md:text-4xl leading-tight mb-6">
+          <h1 className="font-heading text-3xl md:text-4xl leading-tight mb-6">
             Start your journey with us.
           </h1>
-          <p className="font-instrument-sans text-primary-foreground/70 text-lg">
+          <p className="font-sans text-primary-foreground/70 text-lg">
             Create your store in minutes and start selling to your customers on WhatsApp.
           </p>
         </div>
@@ -185,7 +185,7 @@ export default function RegisterPage() {
               />
             ))}
           </div>
-          <p className="font-instrument-sans text-primary-foreground/50 text-sm">
+          <p className="font-sans text-primary-foreground/50 text-sm">
             Step {step} of 3: {getStepTitle()}
           </p>
         </div>
@@ -199,7 +199,7 @@ export default function RegisterPage() {
       <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col justify-center bg-background">
         <div className="max-w-sm mx-auto w-full">
           <div className="md:hidden mb-6 text-center">
-             <Link href="/" className="font-instrument-serif text-2xl font-bold text-primary">
+             <Link href="/" className="font-heading text-2xl font-bold text-primary">
               Orderform
             </Link>
             <div className="flex gap-2 justify-center mt-4 mb-2" role="progressbar" aria-valuemin={1} aria-valuemax={3} aria-valuenow={step} aria-label={`Step ${step} of 3`}>
@@ -210,12 +210,12 @@ export default function RegisterPage() {
               />
             ))}
             </div>
-            <p className="font-instrument-sans text-muted-foreground text-xs">
+            <p className="font-sans text-muted-foreground text-xs">
               Step {step} of 3
             </p>
           </div>
-          <h2 className="font-instrument-serif text-3xl text-foreground mb-2">Create account</h2>
-          <p className="font-instrument-sans text-muted-foreground mb-8">
+          <h2 className="font-heading text-3xl text-foreground mb-2">Create account</h2>
+          <p className="font-sans text-muted-foreground mb-8">
             {getStepDescription()}
           </p>
 

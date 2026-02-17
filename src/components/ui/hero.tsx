@@ -84,7 +84,7 @@ const Hero = React.forwardRef<HTMLDivElement, HeroProps>(
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 animate-appear opacity-0 delay-500 w-full sm:w-auto px-4">
             {ctaText && ctaLink && (
               <Link href={ctaLink} target={ctaTarget} rel={ctaTarget === "_blank" ? "noopener noreferrer" : undefined} className="w-full sm:w-auto">
-                 <Button size="lg" className="w-full sm:w-auto text-sm md:text-base font-semibold">
+                 <Button size="lg" className="w-full sm:w-auto rounded-full px-8 text-sm md:text-base font-semibold">
                     <span className="relative z-10">{ctaText}</span>
                  </Button>
               </Link>
@@ -92,7 +92,7 @@ const Hero = React.forwardRef<HTMLDivElement, HeroProps>(
 
             {secondaryCtaText && secondaryCtaLink && (
               <Link href={secondaryCtaLink} target={secondaryCtaTarget} rel={secondaryCtaTarget === "_blank" ? "noopener noreferrer" : undefined} className="w-full sm:w-auto">
-                <Button variant="ghost" size="lg" className="w-full sm:w-auto text-sm md:text-base font-medium group shadow-none active:translate-y-0">
+                <Button variant="outline" size="lg" className="w-full sm:w-auto rounded-full px-8 text-sm md:text-base font-medium group">
                   <span>{secondaryCtaText}</span>
                   <ChevronRight className="h-4 w-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
                 </Button>

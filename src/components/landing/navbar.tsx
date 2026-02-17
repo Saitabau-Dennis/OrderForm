@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
@@ -11,11 +10,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { cn } from "@/lib/utils"
 import { useEffect, useState } from "react"
-import { Menu, LayoutDashboard, ChevronRight, ChevronDown, Store, ShoppingBag, MessageCircle, Smartphone } from "lucide-react"
+import { Menu, ChevronRight, ChevronDown } from "lucide-react"
 import { useSession } from "next-auth/react"
-import { motion } from "motion/react"
 import { usePathname, useRouter } from "next/navigation"
 
 export function Navbar() {
@@ -36,7 +33,7 @@ export function Navbar() {
     }
   }, [isMobileMenuOpen])
 
-  const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const handleScroll = (e: React.MouseEvent<HTMLElement>, href: string) => {
     // If it's a hash link
     if (href.startsWith('#')) {
       // If we're not on the home page, let the link navigation handle it
@@ -77,7 +74,7 @@ export function Navbar() {
             className="flex items-center gap-0.5 relative z-10 shrink-0" 
             onClick={() => setIsMobileMenuOpen(false)}
         >
-            <span className="font-(family-name:--font-geist-sans) text-base md:text-lg font-semibold text-foreground tracking-tight">
+            <span className="font-heading text-base md:text-lg font-semibold text-foreground tracking-tight">
             OrderForm
             </span>
         </Link>
@@ -89,7 +86,7 @@ export function Navbar() {
             <div className="relative group">
                 <button 
                     className="flex items-center gap-1 relative px-4 py-2 text-sm font-medium text-foreground/70 hover:text-primary transition-colors rounded-full hover:bg-gray-50 cursor-pointer outline-none"
-                    onClick={(e) => handleScroll(e as any, "#features")}
+                    onClick={(e) => handleScroll(e, "#features")}
                 >
                     Features
                     <ChevronDown className="w-3 h-3 transition-transform duration-200 group-hover:rotate-180 opacity-70" />
@@ -141,8 +138,8 @@ export function Navbar() {
             </Link>
             <Link href={session ? "/dashboard" : "/register"} target="_blank" className="hidden md:block">
                 <Button 
-                    size="default"
-                    className="font-semibold px-6"
+                    size="sm"
+                    className="rounded-full px-4 font-medium"
                 >
                     Get Started
                 </Button>
@@ -158,7 +155,7 @@ export function Navbar() {
             <SheetContent side="right" className=" w-[85vw] max-w-xs p-0 flex flex-col border-l border-border/50 bg-background/95 backdrop-blur-xl">
                 <SheetHeader className="px-6 pt-8 pb-4 text-left border-b border-border/10">
                 <div className="flex items-center gap-2 mb-2">
-                    <SheetTitle className="font-(family-name:--font-geist-sans) tracking-tight text-lg mb-0 font-semibold text-foreground">
+                    <SheetTitle className="font-heading tracking-tight text-lg mb-0 font-semibold text-foreground">
                         OrderForm
                     </SheetTitle>
                 </div>
@@ -179,12 +176,12 @@ export function Navbar() {
                 <div className="p-6 mt-auto border-t border-border/10 bg-muted/20">
                     <div className="flex flex-col gap-3">
                     <Link href={session ? "/dashboard" : "/register"} target="_blank" onClick={() => setIsMobileMenuOpen(false)}>
-                        <Button size="lg" className="w-full text-base font-semibold">
+                        <Button size="lg" className="w-full rounded-full text-base font-semibold">
                         Get Started
                         </Button>
                     </Link>
                     <Link href={session ? "/dashboard" : "/login"} target="_blank" onClick={() => setIsMobileMenuOpen(false)}>
-                        <Button variant="outline" size="lg" className="w-full text-base font-medium">
+                        <Button variant="outline" size="lg" className="w-full rounded-full text-base font-medium">
                         Log in
                         </Button>
                     </Link>

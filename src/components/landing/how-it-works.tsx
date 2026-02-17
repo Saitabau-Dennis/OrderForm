@@ -3,7 +3,6 @@
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { ArrowRight, Store, ShoppingBag, Share2, MessageCircle } from "lucide-react"
 import Link from "next/link"
 import { ScrollAnimation } from "@/components/ui/scroll-animation"
@@ -58,7 +57,7 @@ export function HowItWorks() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Link href="/register">
-                <Button size="lg" className="text-sm md:text-base transition-all font-sans w-full sm:w-auto">
+                <Button size="lg" className="w-full sm:w-auto rounded-full px-8 text-sm md:text-base font-semibold">
                   Start Selling Now
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>

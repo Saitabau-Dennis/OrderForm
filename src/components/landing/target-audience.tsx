@@ -60,10 +60,10 @@ export function TargetAudience() {
               Who is it for?
             </div>
             <h2 className="text-2xl md:text-4xl font-heading font-medium text-foreground mb-6 leading-[1.1] tracking-tight">
-              Built for every kind of <span className="text-primary italic font-serif">social seller.</span>
+              Built for every kind of <span className="text-primary italic font-heading">social seller.</span>
             </h2>
             <p className="text-base md:text-lg text-muted-foreground font-sans leading-relaxed">
-              Whether you're just starting out or processing hundreds of orders, OrderForm adapts to your business needs.
+              Whether you&apos;re just starting out or processing hundreds of orders, OrderForm adapts to your business needs.
             </p>
           </ScrollAnimation>
         </div>

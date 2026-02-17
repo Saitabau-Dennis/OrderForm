@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ScrollAnimation } from "@/components/ui/scroll-animation"
-import { ArrowRight, Instagram, Facebook, MessageCircle, Store, Youtube, Linkedin } from "lucide-react"
+import { ArrowRight, Instagram, Facebook, MessageCircle, Linkedin } from "lucide-react"
 
 export function AboutUs() {
   return (
@@ -20,7 +20,7 @@ export function AboutUs() {
                 </div>
                 
                 <h2 className="text-2xl md:text-4xl font-heading font-medium text-foreground mb-6 leading-[1.1] tracking-tight">
-                  Empowering social sellers to scale <span className="text-primary italic font-serif">without the chaos.</span>
+                  Empowering social sellers to scale <span className="text-primary italic font-heading">without the chaos.</span>
                 </h2>
                 
                 <div className="space-y-6 text-muted-foreground font-sans text-sm md:text-base leading-relaxed">
@@ -34,7 +34,7 @@ export function AboutUs() {
 
                 <div className="mt-8">
                    <Link href="/register" target="_blank" rel="noopener noreferrer">
-                      <Button size="lg" className="text-xs md:text-sm font-medium transition-all group">
+                      <Button size="lg" className="group rounded-full px-8 text-xs md:text-sm font-semibold">
                          Get Started
                          <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                       </Button>

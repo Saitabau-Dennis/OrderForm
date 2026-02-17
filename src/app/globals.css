@@ -142,9 +142,13 @@ html::-webkit-scrollbar {
 }
 
 .theme-landing {
-  font-family: var(--font-dm-sans);
+  font-family: var(--font-dm-sans), sans-serif;
   --font-sans: var(--font-dm-sans);
-  --font-heading: var(--font-poppins);
+  --font-heading: var(--font-sora);
+  --font-poppins: var(--font-sora);
+  --font-instrument-serif: var(--font-sora);
+  --font-instrument-sans: var(--font-dm-sans);
+  --font-geist-sans: var(--font-sora);
   --background: #FFFFFF;
   --foreground: #000000;
   --primary: #00311F;

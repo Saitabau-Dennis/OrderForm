@@ -1,14 +1,42 @@
 "use client"
 
-import { Check, Sparkles, ArrowRight } from "lucide-react"
+import Link from "next/link"
+import { Check, Sparkles, Star } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ScrollAnimation } from "@/components/ui/scroll-animation"
-import { TextHighlight } from "@/components/ui/text-highlight"
 import { cn } from "@/lib/utils"
-import Link from "next/link"
 
-const plans = [
+type PlanKey = "starter" | "business"
+
+type Plan = {
+  key: PlanKey
+  name: string
+  price: string
+  period: string
+  description: string
+  features: string[]
+  cta: string
+  href: string
+  popular: boolean
+}
+
+type ComparisonValue = string | boolean | null
+
+type ComparisonRow = {
+  label: string
+  values: Record<PlanKey, ComparisonValue>
+}
+
+type ComparisonSection = {
+  title: string
+  icon: LucideIcon
+  rows: ComparisonRow[]
+}
+
+const plans: Plan[] = [
   {
+    key: "starter",
     name: "Starter",
     price: "Free",
     period: "forever",
@@ -19,14 +47,14 @@ const plans = [
       "WhatsApp Checkout",
       "Unlimited Orders",
       "Basic Analytics",
-      "Standard Support"
+      "Standard Support",
     ],
     cta: "Start for free",
     href: "/register",
     popular: false,
-    gradient: "from-blue-500/20 to-cyan-500/20"
   },
   {
+    key: "business",
     name: "Business",
     price: "KES 990",
     period: "/ month",
@@ -38,142 +66,176 @@ const plans = [
       "Discount Codes",
       "Priority Support",
       "Advanced Analytics",
-      "Custom Domain (Coming Soon)"
+      "Custom Domain (Coming Soon)",
     ],
     cta: "Get Business Plan",
     href: "/register?plan=pro",
     popular: true,
-    gradient: "from-primary/20 to-emerald-500/20"
-  }
+  },
 ]
+
+const planByKey = Object.fromEntries(plans.map((plan) => [plan.key, plan])) as Record<PlanKey, Plan>
+const starterFeatureSet = new Set(planByKey.starter.features)
+
+const allFeatures = Array.from(new Set(plans.flatMap((plan) => plan.features)))
+
+function hasFeature(plan: Plan, feature: string): boolean {
+  if (plan.features.includes(feature)) {
+    return true
+  }
+
+  const includesStarterBundle =
+    plan.key === "business" && plan.features.includes("Everything in Starter")
+
+  if (includesStarterBundle && starterFeatureSet.has(feature)) {
+    return true
+  }
+
+  return false
+}
+
+const comparisonSections: ComparisonSection[] = [
+  {
+    title: "Plan details",
+    icon: Star,
+    rows: [
+      {
+        label: "Price",
+        values: {
+          starter: `${planByKey.starter.price} ${planByKey.starter.period}`,
+          business: `${planByKey.business.price} ${planByKey.business.period}`,
+        },
+      },
+      {
+        label: "Description",
+        values: {
+          starter: planByKey.starter.description,
+          business: planByKey.business.description,
+        },
+      },
+    ],
+  },
+  {
+    title: "Included features",
+    icon: Sparkles,
+    rows: allFeatures.map((feature) => ({
+      label: feature,
+      values: {
+        starter: hasFeature(planByKey.starter, feature),
+        business: hasFeature(planByKey.business, feature),
+      },
+    })),
+  },
+]
+
+function renderValue(value: ComparisonValue) {
+  if (value === true) {
+    return <Check className="h-4 w-4 text-primary stroke-[2.75]" />
+  }
+
+  if (value === false || value === null) {
+    return <span className="text-muted-foreground/45">-</span>
+  }
+
+  return <span>{value}</span>
+}
 
 export function Pricing() {
   return (
-    <section id="pricing" className="py-24 md:py-32 scroll-mt-20 bg-background relative overflow-hidden">
-      {/* Decorative background elements */}
-      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] -z-10" />
-      <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-[100px] -z-10" />
-
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <ScrollAnimation className="text-center mb-16 md:mb-24">
-          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full border border-primary/20 text-primary text-[10px] font-medium mb-6">
-            <span className="tracking-wide uppercase">Simple Pricing</span>
+    <section
+      id="pricing"
+      className="py-20 md:py-28 scroll-mt-20"
+    >
+      <div className="mx-auto max-w-7xl px-6">
+        <ScrollAnimation className="mx-auto mb-10 max-w-3xl text-center md:mb-14" variant="fade-up">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/[0.03] px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-primary">
+            <Sparkles className="h-3 w-3" />
+            Pricing
           </div>
 
-          <h2 className="text-2xl md:text-4xl font-heading font-medium text-foreground leading-[1.1] tracking-tight mb-6">
-            Start free, upgrade as you{" "}
-            <span className="relative inline-block">
-              <span className="relative z-10">grow</span>
-              <svg className="absolute -bottom-2 left-0 w-full h-3 text-primary/20 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
-                <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none" />
-              </svg>
-            </span>
+          <h2 className="font-heading text-2xl font-medium leading-[1.1] tracking-tight text-foreground md:text-4xl">
+            Start free, upgrade as you grow
           </h2>
-
-          <p className="text-2xl md:text-xl text-muted-foreground font-sans font-light max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-4 text-base leading-relaxed text-muted-foreground md:text-lg">
             Transparent pricing with no hidden fees. We only grow when you grow.
           </p>
         </ScrollAnimation>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto items-start">
-          {plans.map((plan, index) => (
-            <ScrollAnimation
-              key={index}
-              delay={index * 0.1}
-              className={cn(
-                "relative group flex flex-col h-full rounded-[2rem] transition-all duration-500",
-                plan.popular
-                  ? "bg-white shadow-2xl shadow-primary/10 ring-1 ring-primary/20 z-10 md:-mt-8 md:mb-8"
-                  : "bg-white/60 backdrop-blur-sm border border-stone-200/60 hover:border-stone-300 hover:bg-white hover:shadow-xl hover:shadow-stone-200/50"
-              )}
-            >
-              {plan.popular && (
-                <div className="absolute -top-5 left-1/2 -translate-x-1/2 z-20">
-                   <div className="bg-primary text-white px-5 py-1.5 text-xs font-bold uppercase tracking-widest rounded-full shadow-lg shadow-primary/20 flex items-center gap-2">
-                      <Sparkles className="h-3 w-3 fill-current animate-pulse" /> Most Popular
-                   </div>
-                </div>
-              )}
-
-              <div className="p-8 md:p-10 flex flex-col h-full">
-                <div className="mb-8">
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-2xl font-heading font-medium text-foreground">
-                      {plan.name}
-                    </h3>
-                    {!plan.popular && (
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center">
-                            <span className="text-xl">🌱</span>
-                        </div>
-                    )}
-                    {plan.popular && (
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center">
-                            <span className="text-xl">🚀</span>
-                        </div>
-                    )}
-                  </div>
-
-                  <p className="text-muted-foreground font-sans text-sm mb-6 min-h-[40px]">
-                    {plan.description}
+        <ScrollAnimation variant="fade-up" delay={0.1}>
+          <div className="mx-auto max-w-5xl overflow-x-auto">
+            <div className="min-w-[760px]">
+              <div className="grid [grid-template-columns:minmax(260px,1.6fr)_minmax(170px,1fr)_minmax(170px,1fr)] items-end gap-x-8 border-b border-black/10 pb-6">
+                <div className="pr-4">
+                  <p className="text-[11px] font-medium uppercase tracking-[0.15em] text-muted-foreground">
+                    Plan comparison
                   </p>
+                </div>
 
-                  <div className="flex items-baseline gap-1 mb-2">
-                    <span className="text-4xl md:text-5xl font-medium font-(family-name:--font-geist-sans) tracking-tight text-foreground">
-                      {plan.price}
-                    </span>
-                    {plan.period && (
-                      <span className="text-sm font-sans font-medium text-muted-foreground ml-1">
-                        {plan.period}
-                      </span>
-                    )}
+                {plans.map((plan) => (
+                  <div key={plan.key} className="space-y-3 text-left">
+                    <div className="flex items-center gap-2">
+                      <p className="text-lg font-medium text-foreground">{plan.name}</p>
+                      {plan.popular && (
+                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
+                          Popular
+                        </span>
+                      )}
+                    </div>
+                    <Link href={plan.href}>
+                      <Button
+                        variant={plan.popular ? "default" : "outline"}
+                        size="sm"
+                        className={cn(
+                          "h-9 rounded-full px-4 text-sm font-medium",
+                          !plan.popular && "bg-background"
+                        )}
+                      >
+                        {plan.cta}
+                      </Button>
+                    </Link>
                   </div>
-                </div>
-
-                <div className="space-y-4 mb-10 flex-grow">
-                    <div className="h-px w-full bg-gradient-to-r from-transparent via-stone-200 to-transparent mb-6" />
-                    {plan.features.map((feature, i) => (
-                        <div key={i} className="flex items-start gap-3 text-sm md:text-base text-stone-600">
-                        <div className={cn(
-                            "mt-1 rounded-full p-0.5 shrink-0",
-                            plan.popular ? "text-primary bg-primary/10" : "text-stone-400 bg-stone-100"
-                        )}>
-                            <Check className="h-3 w-3 md:h-3.5 md:w-3.5 stroke-[3]" />
-                        </div>
-                        <span className={cn(
-                            feature.includes("Everything") ? "font-semibold text-foreground" : ""
-                        )}>{feature}</span>
-                        </div>
-                    ))}
-                </div>
-
-                <Link href={plan.href} className="mt-auto block">
-                  <Button
-                    variant={plan.popular ? "default" : "outline"}
-                    size="lg"
-                    className={cn(
-                        "w-full text-base font-semibold group-hover:scale-[1.02] transition-transform duration-300",
-                        plan.popular ? "" : "bg-transparent border-stone-300 text-stone-700 hover:bg-stone-50"
-                    )}
-                  >
-                    {plan.cta}
-                    {plan.popular && <ArrowRight className="ml-2 h-4 w-4" />}
-                  </Button>
-                </Link>
-
-                {!plan.popular && (
-                    <p className="text-center text-xs text-muted-foreground mt-4">
-                        No credit card required
-                    </p>
-                )}
-                {plan.popular && (
-                    <p className="text-center text-xs text-primary/80 mt-4 font-medium">
-                        30-day money-back guarantee
-                    </p>
-                )}
+                ))}
               </div>
-            </ScrollAnimation>
-          ))}
-        </div>
+
+              {comparisonSections.map((section) => {
+                const SectionIcon = section.icon
+
+                return (
+                  <div key={section.title} className="pt-5">
+                    <div className="grid [grid-template-columns:minmax(260px,1.6fr)_minmax(170px,1fr)_minmax(170px,1fr)] items-center gap-x-8 py-2">
+                      <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                        <SectionIcon className="h-4 w-4" />
+                        <span>{section.title}</span>
+                      </div>
+                      <div />
+                      <div />
+                    </div>
+
+                    {section.rows.map((row) => (
+                      <div
+                        key={`${section.title}-${row.label}`}
+                        className="grid [grid-template-columns:minmax(260px,1.6fr)_minmax(170px,1fr)_minmax(170px,1fr)] items-center gap-x-8 border-b border-black/8 py-4"
+                      >
+                        <div className="pr-4 text-[15px] text-muted-foreground">{row.label}</div>
+                        {plans.map((plan) => (
+                          <div key={`${row.label}-${plan.key}`} className="text-[15px] text-foreground">
+                            {renderValue(row.values[plan.key])}
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                )
+              })}
+
+              {/* <div className="mt-5 grid [grid-template-columns:minmax(260px,1.6fr)_minmax(170px,1fr)_minmax(170px,1fr)] gap-x-8 text-xs">
+                <div />
+                <p className="text-muted-foreground">No credit card required</p>
+                <p className="font-medium text-primary/80">30-day money-back guarantee</p>
+              </div> */}
+            </div>
+          </div>
+        </ScrollAnimation>
       </div>
     </section>
   )

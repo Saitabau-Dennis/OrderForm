@@ -49,19 +49,19 @@ export default function LoginPage() {
       {/* Left Side - Text */}
       <div className="w-full hidden md:flex md:w-1/2 bg-primary p-10 flex-col justify-between text-primary-foreground relative overflow-hidden">
         <div className="relative z-10">
-          <Link href="/" className="font-instrument-serif text-2xl font-bold mb-12 block">
+          <Link href="/" className="font-heading text-2xl font-bold mb-12 block">
             Orderform
           </Link>
-          <h1 className="font-instrument-serif text-3xl md:text-4xl leading-tight mb-6">
+          <h1 className="font-heading text-3xl md:text-4xl leading-tight mb-6">
             Welcome back to your store.
           </h1>
-          <p className="font-instrument-sans text-primary-foreground/70 text-lg">
+          <p className="font-sans text-primary-foreground/70 text-lg">
             Manage your products, orders, and customers all in one place.
           </p>
         </div>
 
         <div className="relative z-10">
-          <p className="font-instrument-sans text-primary-foreground/50 text-sm">
+          <p className="font-sans text-primary-foreground/50 text-sm">
             &copy; 2026 Orderform. All rights reserved.
           </p>
         </div>
@@ -75,12 +75,12 @@ export default function LoginPage() {
       <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col justify-center bg-background">
         <div className="max-w-sm mx-auto w-full">
           <div className="md:hidden mb-6 text-center">
-            <Link href="/" className="font-instrument-serif text-2xl font-bold text-primary">
+            <Link href="/" className="font-heading text-2xl font-bold text-primary">
               Orderform
             </Link>
           </div>
-          <h2 className="font-instrument-serif text-2xl text-foreground mb-2">Log in</h2>
-          <p className="font-instrument-sans text-muted-foreground mb-8">
+          <h2 className="font-heading text-2xl text-foreground mb-2">Log in</h2>
+          <p className="font-sans text-muted-foreground mb-8">
             Enter your details to access your account.
           </p>
 

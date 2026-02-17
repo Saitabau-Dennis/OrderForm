@@ -33,37 +33,50 @@ const faqs = [
 
 export function FAQ() {
   return (
-    <section id="faq" className="py-16 md:py-24 scroll-mt-28 bg-background relative overflow-hidden">
-      <div className="max-w-3xl mx-auto px-6 relative z-10">
-        <ScrollAnimation className="text-center mb-16 md:mb-20">
-          <div className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-primary/20 text-primary text-[10px] font-medium mb-4 uppercase tracking-widest">
-            FAQ
-          </div>
-          <h2 className="text-2xl md:text-4xl font-heading font-medium text-foreground mb-6 tracking-tight">
-            Need help? <span className="text-primary">We&apos;ve got you covered.</span>
-          </h2>
-          <p className="text-base md:text-lg text-muted-foreground font-sans max-w-2xl mx-auto leading-relaxed">
-            Explore answers to common queries and get the information you need to make the most of OrderForm.
-          </p>
-        </ScrollAnimation>
+    <section id="faq" className="py-16 md:py-24 scroll-mt-28">
+      <div className="mx-auto max-w-6xl px-6">
+        <ScrollAnimation variant="fade-up">
+          <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-14">
+            <div className="space-y-5">
+              <h2 className="font-heading text-3xl font-medium tracking-tight text-foreground md:text-4xl">
+                FAQs
+              </h2>
+              <p className="text-lg font-medium text-muted-foreground">
+                Your questions answered
+              </p>
+              <p className="max-w-sm font-sans text-base leading-relaxed text-muted-foreground">
+                Explore answers to common queries and get the information you need to make the most of OrderForm.
+              </p>
+              <p className="max-w-sm font-sans text-base leading-relaxed text-muted-foreground">
+                Need more help? Contact our{" "}
+                <a
+                  href="mailto:support@orderform.store"
+                  className="font-semibold text-primary underline underline-offset-2"
+                >
+                  customer support team
+                </a>
+                .
+              </p>
+            </div>
 
-        <Accordion type="single" collapsible className="w-full">
-          {faqs.map((faq, index) => (
-            <ScrollAnimation key={index} delay={index * 0.05}>
-              <AccordionItem 
-                value={`item-${index}`} 
-                className="border-b border-border/60 last:border-0"
-              >
-                <AccordionTrigger className="text-base md:text-lg font-heading font-medium text-foreground hover:no-underline hover:text-primary py-6 text-left [&[data-state=open]]:text-primary transition-colors">
-                  {faq.question}
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground font-sans font-normal text-sm md:text-base leading-relaxed pb-6">
-                  {faq.answer}
-                </AccordionContent>
-              </AccordionItem>
-            </ScrollAnimation>
-          ))}
-        </Accordion>
+            <Accordion type="single" collapsible className="w-full">
+              {faqs.map((faq, index) => (
+                <AccordionItem
+                  key={index}
+                  value={`item-${index}`}
+                  className="border-b border-black/10 last:border-b"
+                >
+                  <AccordionTrigger className="py-5 text-left font-heading text-xl font-medium text-foreground hover:no-underline [&>svg]:text-muted-foreground">
+                    {faq.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-5 pr-6 font-sans text-base leading-relaxed text-muted-foreground">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        </ScrollAnimation>
       </div>
     </section>
   )
