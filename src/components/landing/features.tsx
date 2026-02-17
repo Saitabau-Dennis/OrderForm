@@ -96,7 +96,7 @@ export function Features() {
                                     description={item.description}
                                 />
 
-                                <div className="px-5 pb-5 pt-3 md:px-6 md:pb-6 md:pt-4">
+                                <div className="mt-auto px-5 pb-5 pt-3 md:px-6 md:pb-6 md:pt-4">
                                     <DualModeImage
                                         src={item.src}
                                         alt={item.alt}
