@@ -21,6 +21,7 @@ export default async function ProductsPage() {
   });
 
   let productsData: any[] = [];
+  const isStoreConfigured = Boolean(store?.whatsappNumber?.trim());
 
   if (store) {
     const products = await db.product.findMany({
@@ -37,7 +38,7 @@ export default async function ProductsPage() {
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-0 animate-appear">
-      <ProductsClient initialProducts={productsData} />
+      <ProductsClient initialProducts={productsData} canAddProduct={isStoreConfigured} />
     </div>
   );
 }

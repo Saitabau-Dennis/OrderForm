@@ -20,6 +20,11 @@ export async function createProduct(data: any) {
       return { error: "Store not found" };
     }
 
+    const isStoreConfigured = Boolean(store.whatsappNumber?.trim());
+    if (!isStoreConfigured) {
+      return { error: "Please configure your store settings before adding products." };
+    }
+
     const product = await db.product.create({
       data: {
         storeId: store.id,

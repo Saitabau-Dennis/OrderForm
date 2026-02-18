@@ -12,6 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import { SetupChecklist } from "@/components/dashboard/setup-checklist";
 import Link from "next/link";
 
 import db from "@/lib/db";
@@ -256,99 +257,111 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     },
   ];
 
+  const isStoreConfigured = Boolean(store?.whatsappNumber?.trim());
+  const hasFirstProduct = productsCount > 0;
+  const onboardingComplete = isStoreConfigured && hasFirstProduct;
+
   return (
     <div className="flex-1 space-y-4 p-8 pt-0 animate-appear">
+      <SetupChecklist
+        storeName={store?.name}
+        isStoreConfigured={isStoreConfigured}
+        hasFirstProduct={hasFirstProduct}
+      />
 
-
-      {/* Stats Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 pt-4">
-        {stats.map((stat, i) => (
-          <Card key={stat.title} className="overflow-hidden border-2 border-border shadow-none rounded-xl bg-card relative">
-            <CardContent className="p-6 flex flex-col gap-1">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-normal text-muted-foreground">{stat.title}</p>
-                <stat.icon className="h-4 w-4 text-muted-foreground" />
-              </div>
-              <div className="mt-2">
-                <h3 className="text-3xl font-normal text-foreground tracking-tight">{stat.value}</h3>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <div className="grid gap-6 grid-cols-1 lg:grid-cols-6">
-        {/* Sales Chart */}
-        <div className="lg:col-span-4">
-            <div className="rounded-xl border-2 border-border bg-card overflow-hidden h-full">
-                <div className="px-7 pt-7 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-2xl font-medium text-primary">Sales</h3>
+      {onboardingComplete ? (
+        <>
+          {/* Stats Grid */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 pt-4">
+            {stats.map((stat) => (
+              <Card key={stat.title} className="overflow-hidden border-2 border-border shadow-none rounded-xl bg-card relative">
+                <CardContent className="p-6 flex flex-col gap-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-normal text-muted-foreground">{stat.title}</p>
+                    <stat.icon className="h-4 w-4 text-muted-foreground" />
                   </div>
-
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button className="flex items-center gap-2 px-3 py-2 rounded-lg border bg-white hover:bg-muted/50 transition-colors text-sm font-normal text-foreground">
-                        <CalendarRange className="h-4 w-4 text-muted-foreground" />
-                        {rangeLabels[range]}
-                        <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48 rounded-2xl bg-card border border-border shadow-xl">
-                      <DropdownMenuItem asChild className="focus:bg-primary/5 focus:text-primary cursor-pointer rounded-xl m-1 px-3 py-2">
-                        <Link href="?range=7d" scroll={false} className="w-full text-xs font-medium uppercase tracking-wider">Last 7 Days</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild className="focus:bg-primary/5 focus:text-primary cursor-pointer rounded-xl m-1 px-3 py-2">
-                        <Link href="?range=30d" scroll={false} className="w-full text-xs font-medium uppercase tracking-wider">Last 30 Days</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild className="focus:bg-primary/5 focus:text-primary cursor-pointer rounded-xl m-1 px-3 py-2">
-                        <Link href="?range=1y" scroll={false} className="w-full text-xs font-medium uppercase tracking-wider">Last Year</Link>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-                <SalesChart data={salesData} className="border-none shadow-none" rangeLabel={rangeLabels[range]} />
-            </div>
-        </div>
-
-        {/* Top Selling Products */}
-        <div className="lg:col-span-2">
-            <Card className="h-full border-2 border-border shadow-none rounded-xl bg-card overflow-hidden">
-                <CardHeader className="p-7 pb-2">
-                    <CardTitle className="text-lg font-medium flex items-center gap-2">
-                        Best Sellers
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="p-7">
-                    <div className="space-y-6 mt-2">
-                        {topProducts.length > 0 ? topProducts.map((product, i) => (
-                            <div key={i} className="flex items-center justify-between group">
-                                <div className="flex items-center gap-4">
-                                    <div className="h-10 w-10 rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-center text-primary font-medium text-xs">
-                                        {i + 1}
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="font-medium text-sm text-primary truncate max-w-[120px]">
-                                            {product.name}
-                                        </span>
-                                        <span className="text-[10px] text-primary/40 uppercase tracking-wider font-medium">
-                                            {product.sales} sold
-                                        </span>
-                                    </div>
-                                </div>
-                                <ArrowUpRight className="h-4 w-4 text-primary/20 group-hover:text-primary transition-colors" />
-                            </div>
-                        )) : (
-                            <div className="flex flex-col items-center justify-center py-10 text-center opacity-40">
-                                <Package className="h-10 w-10 mb-2" />
-                                <p className="text-xs font-medium uppercase tracking-widest">No sales yet</p>
-                            </div>
-                        )}
-                    </div>
+                  <div className="mt-2">
+                    <h3 className="text-3xl font-normal text-foreground tracking-tight">{stat.value}</h3>
+                  </div>
                 </CardContent>
-            </Card>
-        </div>
-      </div>
+              </Card>
+            ))}
+          </div>
+
+          <div className="grid gap-6 grid-cols-1 lg:grid-cols-6">
+            {/* Sales Chart */}
+            <div className="lg:col-span-4">
+                <div className="rounded-xl border-2 border-border bg-card overflow-hidden h-full">
+                    <div className="px-7 pt-7 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-2xl font-medium text-primary">Sales</h3>
+                      </div>
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="flex items-center gap-2 px-3 py-2 rounded-lg border bg-white hover:bg-muted/50 transition-colors text-sm font-normal text-foreground">
+                            <CalendarRange className="h-4 w-4 text-muted-foreground" />
+                            {rangeLabels[range]}
+                            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48 rounded-2xl bg-card border border-border shadow-xl">
+                          <DropdownMenuItem asChild className="focus:bg-primary/5 focus:text-primary cursor-pointer rounded-xl m-1 px-3 py-2">
+                            <Link href="?range=7d" scroll={false} className="w-full text-xs font-medium uppercase tracking-wider">Last 7 Days</Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild className="focus:bg-primary/5 focus:text-primary cursor-pointer rounded-xl m-1 px-3 py-2">
+                            <Link href="?range=30d" scroll={false} className="w-full text-xs font-medium uppercase tracking-wider">Last 30 Days</Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild className="focus:bg-primary/5 focus:text-primary cursor-pointer rounded-xl m-1 px-3 py-2">
+                            <Link href="?range=1y" scroll={false} className="w-full text-xs font-medium uppercase tracking-wider">Last Year</Link>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                    <SalesChart data={salesData} className="border-none shadow-none" rangeLabel={rangeLabels[range]} />
+                </div>
+            </div>
+
+            {/* Top Selling Products */}
+            <div className="lg:col-span-2">
+                <Card className="h-full border-2 border-border shadow-none rounded-xl bg-card overflow-hidden">
+                    <CardHeader className="p-7 pb-2">
+                        <CardTitle className="text-lg font-medium flex items-center gap-2">
+                            Best Sellers
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-7">
+                        <div className="space-y-6 mt-2">
+                            {topProducts.length > 0 ? topProducts.map((product, i) => (
+                                <div key={i} className="flex items-center justify-between group">
+                                    <div className="flex items-center gap-4">
+                                        <div className="h-10 w-10 rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-center text-primary font-medium text-xs">
+                                            {i + 1}
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="font-medium text-sm text-primary truncate max-w-[120px]">
+                                                {product.name}
+                                            </span>
+                                            <span className="text-[10px] text-primary/40 uppercase tracking-wider font-medium">
+                                                {product.sales} sold
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <ArrowUpRight className="h-4 w-4 text-primary/20 group-hover:text-primary transition-colors" />
+                                </div>
+                            )) : (
+                                <div className="flex flex-col items-center justify-center py-10 text-center opacity-40">
+                                    <Package className="h-10 w-10 mb-2" />
+                                    <p className="text-xs font-medium uppercase tracking-widest">No sales yet</p>
+                                </div>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }

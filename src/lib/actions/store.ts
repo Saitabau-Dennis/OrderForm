@@ -3,6 +3,7 @@
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import db from "@/lib/db";
+import { Prisma } from "@prisma/client";
 
 interface StoreSettingsData {
   name: string;
@@ -29,6 +30,8 @@ export async function updateStoreSettings(data: StoreSettingsData) {
       where: { userId: session.user.id }
     });
 
+    const previousSlug = existingStore?.slug ?? null;
+
     if (!existingStore) {
       // Create new store
       await db.store.create({
@@ -53,6 +56,7 @@ export async function updateStoreSettings(data: StoreSettingsData) {
         where: { id: existingStore.id },
         data: {
           name: data.name,
+          slug: data.slug,
           description: data.description,
           whatsappNumber: data.whatsappNumber,
           currency: data.currency,
@@ -69,15 +73,25 @@ export async function updateStoreSettings(data: StoreSettingsData) {
     }
 
     revalidatePath("/settings");
+    revalidatePath("/dashboard");
+    revalidatePath("/products");
 
-    // Revalidate store page
-    const slugToRevalidate = existingStore?.slug || data.slug;
-    if (slugToRevalidate) {
-      revalidatePath(`/${slugToRevalidate}`);
+    // Revalidate both old and new public store paths when slug changes.
+    if (previousSlug) {
+      revalidatePath(`/${previousSlug}`);
+    }
+    if (data.slug && data.slug !== previousSlug) {
+      revalidatePath(`/${data.slug}`);
     }
 
     return { success: true };
   } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      return { error: "This store link is already in use. Please choose another slug." };
+    }
     console.error("Error updating store settings:", error);
     return { error: "Something went wrong" };
   }
@@ -96,13 +110,19 @@ export async function getStoreStatus() {
     });
 
     if (!store) {
-      return { configured: false };
+      return { configured: false, hasFirstProduct: false, onboardingComplete: false };
     }
 
     const isConfigured = !!store.whatsappNumber;
+    const productsCount = await db.product.count({
+      where: { storeId: store.id }
+    });
+    const hasFirstProduct = productsCount > 0;
 
     return {
       configured: isConfigured,
+      hasFirstProduct,
+      onboardingComplete: isConfigured && hasFirstProduct,
       slug: store.slug
     };
   } catch (error) {

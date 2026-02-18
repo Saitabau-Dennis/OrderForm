@@ -16,30 +16,39 @@ export default async function OrdersPage() {
     where: { userId: session.user.id }
   });
 
-  if (!store) return null;
+  const orders = store
+    ? await db.order.findMany({
+        where: { storeId: store.id },
+        orderBy: { createdAt: "desc" },
+        include: { items: true },
+      })
+    : [];
 
-  const orders = await db.order.findMany({
-    where: { storeId: store.id },
-    orderBy: { createdAt: 'desc' },
-    include: { items: true }
+  const now = new Date();
+  const sevenDaysAgo = new Date(now);
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  const weekCompleted = orders.filter(
+    (o) => new Date(o.createdAt) > sevenDaysAgo && o.status === "completed"
+  );
+
+  const monthCompleted = orders.filter((o) => {
+    const createdAt = new Date(o.createdAt);
+    return (
+      createdAt.getMonth() === currentMonth &&
+      createdAt.getFullYear() === currentYear &&
+      o.status === "completed"
+    );
   });
-
-  const weekCompleted = orders.filter(o =>
-    new Date(o.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) &&
-    o.status === 'completed'
-  );
-
-  const monthCompleted = orders.filter(o =>
-    new Date(o.createdAt).getMonth() === new Date().getMonth() &&
-    o.status === 'completed'
-  );
 
   const stats = {
     total: orders.length,
-    pending: orders.filter(o => o.status === 'pending').length,
-    processing: orders.filter(o => o.status === 'processing').length,
-    completed: orders.filter(o => o.status === 'completed').length,
-    cancelled: orders.filter(o => o.status === 'cancelled').length,
+    pending: orders.filter((o) => o.status === "pending").length,
+    processing: orders.filter((o) => o.status === "processing").length,
+    completed: orders.filter((o) => o.status === "completed").length,
+    cancelled: orders.filter((o) => o.status === "cancelled").length,
     thisWeek: weekCompleted.reduce((sum, o) => sum + Number(o.totalAmount), 0),
     thisWeekOrders: weekCompleted.length,
     thisMonth: monthCompleted.reduce((sum, o) => sum + Number(o.totalAmount), 0),
@@ -51,7 +60,7 @@ export default async function OrdersPage() {
       <OrdersClient
         initialOrders={JSON.parse(JSON.stringify(orders))}
         stats={stats}
-        storeName={store.name}
+        storeName={store?.name || "Your store"}
       />
     </div>
   );

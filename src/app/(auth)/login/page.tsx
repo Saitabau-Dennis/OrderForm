@@ -3,15 +3,17 @@
 import Link from "next/link"
 import { useState } from "react"
 import { signIn } from "next-auth/react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Loader2, Eye, EyeOff } from "lucide-react"
+import { Eye, EyeOff } from "lucide-react"
+import { ButtonLoader } from "@/components/ui/button-loader"
 import { toast } from "sonner"
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
@@ -31,10 +33,16 @@ export default function LoginPage() {
       })
 
       if (res?.error) {
-        toast.error("Invalid email or password")
+        toast.error("Invalid email/password or your email is not verified yet")
       } else {
+        const callbackUrl = searchParams.get("callbackUrl")
+        const safeRedirect =
+          callbackUrl && callbackUrl.startsWith("/") && !callbackUrl.startsWith("//")
+            ? callbackUrl
+            : "/dashboard"
+
         toast.success("Logged in successfully")
-        router.push("/dashboard")
+        router.push(safeRedirect)
         router.refresh()
       }
     } catch (err) {
@@ -134,7 +142,8 @@ export default function LoginPage() {
             >
               {loading ? (
                 <span className="flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <ButtonLoader />
+                  Signing in...
                 </span>
               ) : (
                 "Log in"

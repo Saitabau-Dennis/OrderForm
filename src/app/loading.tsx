@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { WaveLoader } from "@/components/ui/wave-loader";
 
 export default function Loading() {

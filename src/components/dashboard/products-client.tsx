@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Filter, FileDown } from "lucide-react";
+import { Plus, Filter, FileDown, Settings } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/dashboard/button";
@@ -30,9 +30,10 @@ import { cn } from "@/lib/utils";
 
 interface ProductsClientProps {
   initialProducts: any[];
+  canAddProduct: boolean;
 }
 
-export function ProductsClient({ initialProducts }: ProductsClientProps) {
+export function ProductsClient({ initialProducts, canAddProduct }: ProductsClientProps) {
   const router = useRouter();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
@@ -156,12 +157,16 @@ export function ProductsClient({ initialProducts }: ProductsClientProps) {
           </Button>
 
           <Button
-            onClick={() => router.push("/products/new")}
+            onClick={() => router.push(canAddProduct ? "/products/new" : "/settings")}
             size="sm"
             className="bg-foreground text-background hover:bg-foreground/90 transition-all rounded-lg h-9 px-4 text-sm font-medium shadow-sm"
           >
-            <Plus className="mr-2 h-3.5 w-3.5" />
-            Add Product
+            {canAddProduct ? (
+              <Plus className="mr-2 h-3.5 w-3.5" />
+            ) : (
+              <Settings className="mr-2 h-3.5 w-3.5" />
+            )}
+            {canAddProduct ? "Add Product" : "Configure Store"}
           </Button>
         </div>
       </div>

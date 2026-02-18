@@ -8,12 +8,13 @@ import { Label } from "@/components/ui/label";
 import { Loader2, Eye, EyeOff, LockKeyhole, ShieldCheck, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { resetPassword, verifyResetCode } from "@/lib/actions/auth";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { OTPInput } from "@/components/ui/otp-input";
+import { WaveLoader } from "@/components/ui/wave-loader";
+import { ButtonLoader } from "@/components/ui/button-loader";
 
 function ResetPasswordForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
 
@@ -25,6 +26,16 @@ function ResetPasswordForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  const passwordRequirements = [
+    { label: "At least 8 characters", test: (p: string) => p.length >= 8 },
+    { label: "One uppercase letter", test: (p: string) => /[A-Z]/.test(p) },
+    { label: "One lowercase letter", test: (p: string) => /[a-z]/.test(p) },
+    { label: "One number", test: (p: string) => /[0-9]/.test(p) },
+    { label: "One special character (!@#$%^&*)", test: (p: string) => /[!@#$%^&*(),.?":{}|<>]/.test(p) },
+  ];
+
+  const isPasswordStrong = passwordRequirements.every((req) => req.test(password));
 
   const handleVerifyCode = useCallback(async (verificationCode: string) => {
     if (!email) return;
@@ -40,7 +51,7 @@ function ResetPasswordForm() {
         setStep(2);
         setLoading(false);
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to verify code");
       setLoading(false);
     }
@@ -61,6 +72,11 @@ function ResetPasswordForm() {
       return;
     }
 
+    if (!isPasswordStrong) {
+      toast.error("Please meet all password requirements");
+      return;
+    }
+
     if (password !== confirmPassword) {
       toast.error("Passwords do not match");
       return;
@@ -75,7 +91,7 @@ function ResetPasswordForm() {
       } else {
         setSuccess(true);
       }
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong");
     } finally {
       setLoading(false);
@@ -195,6 +211,11 @@ function ResetPasswordForm() {
                   )}
                 </button>
               </div>
+              {password && !isPasswordStrong && (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Use 8+ characters with uppercase, lowercase, number & special character
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -227,12 +248,12 @@ function ResetPasswordForm() {
 
             <Button
               type="submit"
-              disabled={loading || !password}
+              disabled={loading || !password || !isPasswordStrong}
               className="w-full h-12 text-base rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
             >
               {loading ? (
                 <span className="flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <ButtonLoader />
                   Resetting...
                 </span>
               ) : (
@@ -284,7 +305,13 @@ export default function ResetPasswordPage() {
               Orderform
             </Link>
           </div>
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense
+          fallback={
+            <div className="flex min-h-[220px] items-center justify-center">
+              <WaveLoader className="h-10" />
+            </div>
+          }
+        >
           <ResetPasswordForm />
         </Suspense>
       </div>

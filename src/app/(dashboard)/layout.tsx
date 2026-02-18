@@ -16,18 +16,26 @@ export default async function DashboardLayout({
   }
 
   const store = await db.store.findFirst({
-      where: { userId: session.user.id }
+    where: { userId: session.user.id },
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      whatsappNumber: true,
+      _count: {
+        select: {
+          products: true,
+        },
+      },
+    },
   });
-
-  if (store && !store.whatsappNumber) {
-    redirect("/onboarding");
-  }
 
   const storeData = store
     ? {
         name: store.name,
         slug: store.slug,
-        configured: !!store.whatsappNumber,
+        configured: Boolean(store.whatsappNumber?.trim()),
+        hasFirstProduct: store._count.products > 0,
       }
     : null;
 

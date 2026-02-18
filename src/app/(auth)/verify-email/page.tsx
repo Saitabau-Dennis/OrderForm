@@ -1,6 +1,7 @@
 import { VerifyEmailForm } from "@/components/auth/verify-email-form";
 import Link from "next/link";
 import { Suspense } from "react";
+import { WaveLoader } from "@/components/ui/wave-loader";
 
 export default function VerifyEmailPage() {
   return (
@@ -37,7 +38,13 @@ export default function VerifyEmailPage() {
               Orderform
             </Link>
           </div>
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense
+          fallback={
+            <div className="flex min-h-[220px] items-center justify-center">
+              <WaveLoader className="h-10" />
+            </div>
+          }
+        >
           <VerifyEmailForm />
         </Suspense>
       </div>

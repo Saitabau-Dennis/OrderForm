@@ -5,10 +5,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { sendPasswordResetCode } from "@/lib/actions/auth";
 import { useRouter } from "next/navigation";
+import { ButtonLoader } from "@/components/ui/button-loader";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -103,7 +104,7 @@ export default function ForgotPasswordPage() {
             >
               {loading ? (
                 <span className="flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <ButtonLoader />
                   Sending code...
                 </span>
               ) : (

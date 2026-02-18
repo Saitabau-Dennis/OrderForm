@@ -1,48 +1,119 @@
 "use client";
 
+import { useState } from "react";
+
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/dashboard/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { LifeBuoy, SendHorizonal } from "lucide-react";
+import { toast } from "sonner";
 
 interface SupportModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function SupportModal({ open, onOpenChange }: SupportModalProps) {
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[450px] bg-card border-4 border-dotted border-primary/40 shadow-2xl rounded-3xl p-0 overflow-hidden">
-        <div className="bg-primary/5 p-8 pb-6 border-b-2 border-dotted border-border">
-            <div className="mx-auto w-12 h-12 bg-card rounded-3xl border-2 border-dotted border-primary/20 flex items-center justify-center mb-4 shadow-sm">
-                <LifeBuoy className="h-6 w-6 text-primary" />
-            </div>
-            <DialogHeader>
-            <DialogTitle className="text-2xl font-medium text-center font-poppins text-primary uppercase tracking-tight">Contact Support</DialogTitle>
-            <DialogDescription className="text-center text-muted-foreground font-poppins text-base mt-2">
-                We&apos;re here to help. Send us a message and we&apos;ll get back to you shortly.
-            </DialogDescription>
-            </DialogHeader>
-        </div>
+const SUPPORT_EMAIL = "support@orderform.store";
 
-        <div className="p-8 pt-6 grid gap-6">
-          <div className="grid gap-2">
-            <Label htmlFor="subject" className="font-medium text-primary uppercase text-[10px] tracking-widest">Subject</Label>
-            <Input id="subject" placeholder="e.g. Issue with payment" className="bg-secondary border-2 border-dotted border-border focus:bg-card focus:border-primary/30 transition-all h-11 rounded-3xl px-4" />
+export function SupportModal({ open, onOpenChange }: SupportModalProps) {
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      setSubject("");
+      setMessage("");
+    }
+    onOpenChange(nextOpen);
+  };
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const cleanSubject = subject.trim();
+    const cleanMessage = message.trim();
+
+    if (!cleanSubject || !cleanMessage) {
+      toast.error("Please add a subject and message.");
+      return;
+    }
+
+    const body = `${cleanMessage}\n\n---\nSent from OrderForm dashboard support modal.`;
+    const mailtoUrl = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(
+      cleanSubject
+    )}&body=${encodeURIComponent(body)}`;
+
+    window.location.href = mailtoUrl;
+    toast.success("Opening your email app...");
+    handleOpenChange(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent className="sm:max-w-[520px] rounded-2xl border border-border bg-card p-0 shadow-xl">
+        <DialogHeader className="border-b border-border/70 px-6 pb-4 pt-6 text-left">
+          <DialogTitle className="text-xl font-semibold tracking-tight text-foreground">
+            Contact Support
+          </DialogTitle>
+          <DialogDescription className="pt-1 text-sm leading-relaxed text-muted-foreground">
+            Send us details about your issue and we&apos;ll get back to you as quickly as possible.
+          </DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="space-y-5 px-6 py-5">
+          <div className="rounded-lg border border-border/70 bg-muted/[0.03] px-3.5 py-3">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Support Email
+            </p>
+            <a
+              href={`mailto:${SUPPORT_EMAIL}`}
+              className="mt-1 inline-block text-sm font-medium text-foreground hover:text-primary"
+            >
+              {SUPPORT_EMAIL}
+            </a>
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="message" className="font-medium text-primary uppercase text-[10px] tracking-widest">Message</Label>
-            <Textarea id="message" placeholder="Describe your issue..." className="min-h-[120px] bg-secondary border-2 border-dotted border-border focus:bg-card focus:border-primary/30 transition-all rounded-3xl resize-none p-4" />
+
+          <div className="space-y-2">
+            <Label htmlFor="support-subject" className="text-sm font-normal text-muted-foreground">
+              Subject
+            </Label>
+            <Input
+              id="support-subject"
+              value={subject}
+              onChange={(event) => setSubject(event.target.value)}
+              placeholder="e.g. Issue with payment confirmation"
+              className="h-11 rounded-lg"
+            />
           </div>
-          
-          <Button className="w-full h-12 rounded-3xl text-base font-medium shadow-lg shadow-primary/10 hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] transition-all bg-primary text-primary-foreground border-2 border-white/10">
-            <SendHorizonal className="mr-2 h-5 w-5" />
-            Send Message
-          </Button>
-        </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="support-message" className="text-sm font-normal text-muted-foreground">
+              Message
+            </Label>
+            <Textarea
+              id="support-message"
+              value={message}
+              onChange={(event) => setMessage(event.target.value)}
+              placeholder="Describe your issue in detail..."
+              className="min-h-[130px] resize-none rounded-lg"
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-2 border-t border-border/70 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              className="h-10 rounded-lg px-4"
+              onClick={() => handleOpenChange(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" className="h-10 rounded-lg px-5">
+              Send Message
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );

@@ -12,10 +12,12 @@ import * as React from "react";
 
 const EMAIL_THEME = {
   colors: {
-    background: "#FFFFFF",
-    foreground: "#1A1A1A",
+    pageBackground: "#F6F7F9",
+    cardBackground: "#FFFFFF",
+    foreground: "#101828",
     muted: "#6B7280",
     primary: "#00311F",
+    border: "#E5E7EB",
   },
 } as const;
 
@@ -29,48 +31,85 @@ export function EmailLayout({ preview, children }: EmailLayoutProps) {
     <Html>
       <Head>
         <Font
-          fontFamily="Sora"
+          fontFamily="Montserrat"
           fallbackFontFamily="Arial"
           webFont={{
-            url: "https://fonts.gstatic.com/s/sora/v12/xMQOuFFYT72X5wkB_18qmnndmSdSnk-DKQRDA.woff2",
+            url: "https://cdn.jsdelivr.net/npm/@fontsource/montserrat/files/montserrat-latin-400-normal.woff2",
             format: "woff2",
           }}
           fontWeight={400}
           fontStyle="normal"
         />
         <Font
-          fontFamily="Sora"
+          fontFamily="Montserrat"
           fallbackFontFamily="Arial"
           webFont={{
-            url: "https://fonts.gstatic.com/s/sora/v12/xMQOuFFYT72X5wkB_18qmnndmSdSnk-DKQRDA.woff2",
+            url: "https://cdn.jsdelivr.net/npm/@fontsource/montserrat/files/montserrat-latin-600-normal.woff2",
             format: "woff2",
           }}
           fontWeight={600}
           fontStyle="normal"
         />
+        <Font
+          fontFamily="Montserrat"
+          fallbackFontFamily="Arial"
+          webFont={{
+            url: "https://cdn.jsdelivr.net/npm/@fontsource/montserrat/files/montserrat-latin-700-normal.woff2",
+            format: "woff2",
+          }}
+          fontWeight={700}
+          fontStyle="normal"
+        />
       </Head>
       <Preview>{preview}</Preview>
-      <Body style={{
-        backgroundColor: EMAIL_THEME.colors.background,
-        fontFamily: "'Sora', Arial, sans-serif",
-        margin: 0,
-        padding: "48px 24px",
-      }}>
-        <Container style={{
-          maxWidth: "400px",
-          margin: "0 auto",
-          textAlign: "center",
-        }}>
-          <Text style={{
-            fontSize: "18px",
-            fontWeight: 600,
-            color: EMAIL_THEME.colors.primary,
-            margin: "0 0 40px 0",
-          }}>
-            OrderForm
-          </Text>
+      <Body
+        style={{
+          backgroundColor: EMAIL_THEME.colors.pageBackground,
+          fontFamily: "'Montserrat', Arial, sans-serif",
+          margin: 0,
+          padding: "28px 14px",
+        }}
+      >
+        <Container
+          style={{
+            maxWidth: "520px",
+            margin: "0 auto",
+          }}
+        >
+          <Section
+            style={{
+              border: `1px solid ${EMAIL_THEME.colors.border}`,
+              borderRadius: "12px",
+              backgroundColor: EMAIL_THEME.colors.cardBackground,
+              padding: "28px 24px",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: "16px",
+                lineHeight: "24px",
+                fontWeight: 700,
+                color: EMAIL_THEME.colors.primary,
+                margin: "0 0 20px",
+                textAlign: "center",
+              }}
+            >
+              OrderForm
+            </Text>
+            <Section>{children}</Section>
+          </Section>
 
-          <Section>{children}</Section>
+          <Text
+            style={{
+              fontSize: "12px",
+              lineHeight: "18px",
+              color: EMAIL_THEME.colors.muted,
+              textAlign: "center",
+              margin: "12px 0 0",
+            }}
+          >
+            This email was sent by OrderForm.
+          </Text>
         </Container>
       </Body>
     </Html>
@@ -79,20 +118,47 @@ export function EmailLayout({ preview, children }: EmailLayoutProps) {
 
 type CodePillProps = {
   code: string;
+  label: string;
 };
 
-export function CodePill({ code }: CodePillProps) {
+export function CodePill({ code, label }: CodePillProps) {
   return (
-    <Text style={{
-      fontSize: "36px",
-      fontWeight: 600,
-      letterSpacing: "0.3em",
-      color: EMAIL_THEME.colors.primary,
-      margin: "32px 0",
-      fontFamily: "'Sora', Arial, sans-serif",
-    }}>
-      {code}
-    </Text>
+    <Section
+      style={{
+        border: `1px solid ${EMAIL_THEME.colors.border}`,
+        borderRadius: "10px",
+        padding: "14px 12px",
+        backgroundColor: "#F9FAFB",
+        textAlign: "center",
+        margin: "18px 0",
+      }}
+    >
+      <Text
+        style={{
+          fontSize: "11px",
+          lineHeight: "16px",
+          textTransform: "uppercase",
+          letterSpacing: "0.1em",
+          fontWeight: 600,
+          color: EMAIL_THEME.colors.muted,
+          margin: "0 0 6px",
+        }}
+      >
+        {label}
+      </Text>
+      <Text
+        style={{
+          fontSize: "30px",
+          lineHeight: "36px",
+          fontWeight: 700,
+          letterSpacing: "0.2em",
+          color: EMAIL_THEME.colors.primary,
+          margin: 0,
+          fontFamily: "'Montserrat', Arial, sans-serif",
+        }}
+      >
+        {code}
+      </Text>
+    </Section>
   );
 }
-

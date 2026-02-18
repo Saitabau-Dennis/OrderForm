@@ -325,6 +325,7 @@ export default function RegisterPage() {
                 {loading ? (
                   <span className="flex items-center gap-2">
                     <ButtonLoader />
+                    Creating account...
                   </span>
                 ) : step < 3 ? (
                   <span className="flex items-center gap-2">

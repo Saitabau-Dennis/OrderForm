@@ -53,6 +53,11 @@ export async function POST(req: Request) {
       return new NextResponse("Store not found", { status: 404 });
     }
 
+    const isStoreConfigured = Boolean(store.whatsappNumber?.trim());
+    if (!isStoreConfigured) {
+      return new NextResponse("Please configure your store settings before adding products.", { status: 400 });
+    }
+
     const product = await db.product.create({
       data: {
         storeId: store.id,

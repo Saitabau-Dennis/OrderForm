@@ -8,6 +8,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
 import { OTPInput } from "@/components/ui/otp-input";
+import { ButtonLoader } from "@/components/ui/button-loader";
 
 export function VerifyEmailForm() {
   const router = useRouter();
@@ -114,7 +115,14 @@ export function VerifyEmailForm() {
             disabled={resending || loading}
             className="text-primary hover:underline font-medium disabled:opacity-50 transition-colors"
           >
-            {resending ? "Resending..." : "Click to resend"}
+            {resending ? (
+              <span className="inline-flex items-center gap-2">
+                <ButtonLoader className="gap-0.5" dotClassName="h-1 w-1" />
+                Resending...
+              </span>
+            ) : (
+              "Click to resend"
+            )}
           </button>
         </p>
       </div>

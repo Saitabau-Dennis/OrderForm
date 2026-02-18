@@ -10,26 +10,45 @@ export default function PasswordResetEmail({
   validationCode = "123456",
 }: PasswordResetEmailProps) {
   return (
-    <EmailLayout preview={`Your code is ${validationCode}`}>
-      <Text style={{
-        fontSize: "15px",
-        lineHeight: "24px",
-        color: "#4B5563",
-        margin: "0 0 8px 0",
-        fontFamily: "'Sora', Arial, sans-serif",
-      }}>
-        Your password reset code is
+    <EmailLayout preview={`Your OrderForm password reset code is ${validationCode}`}>
+      <Text
+        style={{
+          fontSize: "24px",
+          lineHeight: "32px",
+          fontWeight: 700,
+          color: "#101828",
+          margin: "0 0 10px",
+          textAlign: "center",
+        }}
+      >
+        Reset your password
       </Text>
 
-      <CodePill code={validationCode} />
+      <Text
+        style={{
+          fontSize: "14px",
+          lineHeight: "22px",
+          color: "#4B5563",
+          margin: "0 0 2px",
+          textAlign: "center",
+        }}
+      >
+        Use the code below to reset your OrderForm account password.
+      </Text>
 
-      <Text style={{
-        fontSize: "13px",
-        color: "#9CA3AF",
-        margin: 0,
-        fontFamily: "'Sora', Arial, sans-serif",
-      }}>
-        Expires in 10 minutes
+      <CodePill code={validationCode} label="Reset Code" />
+
+      <Text
+        style={{
+          fontSize: "13px",
+          lineHeight: "20px",
+          color: "#6B7280",
+          margin: "0",
+          textAlign: "center",
+        }}
+      >
+        This code expires in 10 minutes. If you did not request a password
+        reset, you can ignore this email.
       </Text>
     </EmailLayout>
   );

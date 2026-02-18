@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 import {
   Package,
   Settings,
@@ -20,7 +20,8 @@ import {
   ExternalLink,
   Home,
   MoreHorizontal,
-  Check
+  Check,
+  CircleAlert
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/dashboard/button";
@@ -48,6 +49,7 @@ interface DashboardShellProps {
     name: string;
     slug: string;
     configured: boolean;
+    hasFirstProduct: boolean;
   } | null;
 }
 
@@ -61,6 +63,7 @@ interface SidebarContentProps {
     name: string;
     slug: string;
     configured: boolean;
+    hasFirstProduct: boolean;
   } | null;
   setIsMobileMenuOpen: (open: boolean) => void;
   setShowSupportModal: (open: boolean) => void;
@@ -155,34 +158,48 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen, setShowSupportModal 
       <div className="mt-auto border-t border-border/60 pt-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-3 rounded-md p-2.5 hover:bg-foreground/[0.04] transition-all duration-150 cursor-pointer w-full group focus:outline-none">
-              <Avatar className="h-10 w-10 rounded-none bg-muted/50">
+            <button className="group flex w-full cursor-pointer items-center gap-3 rounded-xl border border-transparent p-2.5 text-left transition-colors hover:border-border/70 hover:bg-muted/40 focus:outline-none">
+              <Avatar className="h-10 w-10 rounded-md bg-muted/50">
                 <AvatarImage
                   src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${user.name || "User"}&backgroundColor=e9c46a,2a9d8f,264653`}
-                  className="rounded-none object-cover"
+                  className="rounded-md object-cover"
                 />
-                <AvatarFallback className="bg-foreground/10 text-foreground text-xs font-normal rounded-none">
+                <AvatarFallback className="rounded-md bg-foreground/10 text-xs font-normal text-foreground">
                   {user.name?.charAt(0).toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 overflow-hidden text-left">
-                <p className="truncate text-sm font-normal text-foreground leading-tight">{user.name || "User"}</p>
-                <p className="truncate text-[11px] text-muted-foreground leading-tight mt-0.5">{user.email}</p>
+                <p className="truncate text-sm font-medium leading-tight text-foreground">{user.name || "User"}</p>
+                <p className="mt-0.5 truncate text-xs leading-tight text-muted-foreground">{user.email}</p>
               </div>
-              <MoreHorizontal className="h-4 w-4 text-muted-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+              <MoreHorizontal className="h-4 w-4 shrink-0 text-muted-foreground/70 transition-colors group-hover:text-foreground" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" side="top" sideOffset={4} className="w-[240px] bg-white rounded-xl border border-black/[0.06] shadow-[0_8px_30px_rgba(0,0,0,0.08)] p-1.5 font-poppins">
-            <div className="px-2.5 pt-1 pb-2">
-              <p className="text-sm font-normal text-foreground">{user.name}</p>
-              <p className="text-xs font-medium text-foreground/50 mt-0.5">{user.email}</p>
+          <DropdownMenuContent
+            align="start"
+            side="top"
+            sideOffset={6}
+            className="w-[236px] rounded-xl border border-border bg-card p-1.5 font-poppins shadow-[0_10px_24px_rgba(0,0,0,0.08)]"
+          >
+            <div className="rounded-lg px-3 py-2.5">
+              <p className="truncate text-base font-normal leading-tight text-foreground">{user.name || "User"}</p>
+              <p className="mt-0.5 truncate text-xs font-normal text-muted-foreground">{user.email}</p>
             </div>
 
-            <DropdownMenuItem className="focus:bg-foreground/[0.04] cursor-pointer px-2.5 py-2 rounded-lg" onSelect={() => setShowSupportModal(true)}>
-              <span className="text-sm font-normal text-foreground/70">Help & Support</span>
+            <DropdownMenuItem
+              className="cursor-pointer rounded-md px-3 py-2.5 focus:bg-primary/5"
+              onSelect={() => setShowSupportModal(true)}
+            >
+              <div className="flex flex-col leading-tight">
+                <span className="text-sm font-normal text-foreground">Help & Support</span>
+                <span className="mt-0.5 text-[11px] text-muted-foreground">Contact support and report issues</span>
+              </div>
             </DropdownMenuItem>
-            <DropdownMenuItem className="focus:bg-red-50 cursor-pointer px-2.5 py-2 rounded-lg" onSelect={() => signOut({ callbackUrl: "/login" })}>
-              <span className="text-sm font-normal text-red-500">Sign out</span>
+            <DropdownMenuItem
+              className="cursor-pointer rounded-md px-3 py-2 text-sm font-normal text-red-500 focus:bg-red-50 focus:text-red-500"
+              onSelect={() => signOut({ callbackUrl: "/login" })}
+            >
+              <span>Sign out</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -193,13 +210,17 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen, setShowSupportModal 
 
 export function DashboardShell({ children, user, store }: DashboardShellProps) {
   const pathname = usePathname();
-  const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showSupportModal, setShowSupportModal] = useState(false);
-
-  useEffect(() => {
-    // Redirect logic removed to prepare for onboarding flow
-  }, [pathname, router, store]);
+  const onboardingComplete = Boolean(store?.configured && store?.hasFirstProduct);
+  const showSetupReminder =
+    !onboardingComplete &&
+    pathname !== "/dashboard" &&
+    pathname !== "/settings" &&
+    pathname !== "/products/new";
+  const nextSetupStep = store?.configured
+    ? { href: "/products/new", label: "Add First Product" }
+    : { href: "/settings", label: "Configure Store" };
 
   const getBreadcrumb = () => {
     const path = pathname.split("/").filter(Boolean);
@@ -273,19 +294,58 @@ export function DashboardShell({ children, user, store }: DashboardShellProps) {
               />
             </div>
 
-            <a
-              href={`/${store?.slug}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 h-9 px-4 text-sm font-normal border rounded-md hover:bg-muted/50 transition-colors text-foreground"
-            >
-              View Store
-              <Store className="h-4 w-4 text-muted-foreground" />
-            </a>
+            {store?.slug ? (
+              <Link
+                href={`/${store.slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 h-9 px-4 text-sm font-normal border rounded-md hover:bg-muted/50 transition-colors text-foreground"
+              >
+                View Store
+                <Store className="h-4 w-4 text-muted-foreground" />
+              </Link>
+            ) : (
+              <span className="inline-flex items-center gap-2 h-9 px-4 text-sm font-normal border rounded-md text-muted-foreground/60 cursor-not-allowed">
+                View Store
+                <Store className="h-4 w-4" />
+              </span>
+            )}
           </div>
         </header>
 
         <main className="flex-1 w-full p-4 md:px-10 md:py-3 mx-auto animate-appear">
+          {showSetupReminder ? (
+            <div className="mb-4 py-1">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-2.5">
+                  <CircleAlert className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <div className="space-y-0.5">
+                    <p className="text-sm font-medium text-foreground">
+                      Finish setup to unlock the full dashboard.
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Complete your store details, then add your first product.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/dashboard"
+                    className="inline-flex h-8 items-center rounded-md border border-border bg-background px-3 text-xs font-medium text-foreground hover:bg-muted/40"
+                  >
+                    View Checklist
+                  </Link>
+                  <Link
+                    href={nextSetupStep.href}
+                    className="inline-flex h-8 items-center rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+                  >
+                    {nextSetupStep.label}
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ) : null}
           {children}
         </main>
       </div>

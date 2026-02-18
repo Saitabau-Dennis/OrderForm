@@ -44,6 +44,11 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           return null;
         }
 
+        // Enforce email verification before allowing dashboard access.
+        if (!user.emailVerified) {
+          return null;
+        }
+
         const isPasswordValid = await bcrypt.compare(
           password,
           user.password

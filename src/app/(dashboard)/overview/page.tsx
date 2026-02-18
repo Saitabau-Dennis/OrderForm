@@ -6,6 +6,7 @@ import { startOfMonth, subMonths, startOfDay, subDays, format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OrdersClient } from "@/components/dashboard/orders-client";
 import { SalesChart } from "@/components/dashboard/sales-chart";
+import { SetupChecklist } from "@/components/dashboard/setup-checklist";
 
 import db from "@/lib/db";
 
@@ -180,96 +181,110 @@ export default async function OverviewPage() {
     },
   ];
 
+  const isStoreConfigured = Boolean(store?.whatsappNumber?.trim());
+  const hasFirstProduct = productsCount > 0;
+  const onboardingComplete = isStoreConfigured && hasFirstProduct;
+
   return (
     <div className="space-y-8 animate-appear">
-      {/* Stats Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, i) => (
-          <Card key={stat.title} className="overflow-hidden border-2 border-border shadow-none rounded-3xl bg-card relative">
-            <CardContent className="p-7 relative z-10 flex flex-col h-full">
-              <div className="flex items-start justify-between mb-6">
-                <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-primary/5 border border-primary/10 text-primary">
-                  <stat.icon className="h-6 w-6" />
-                </div>
-                {stat.trend && (
-                    <span className="flex items-center text-[10px] font-bold text-primary/70 bg-primary/5 px-2.5 py-1 rounded-full border border-primary/10 uppercase tracking-wider">
-                        <TrendingUp className="w-3 h-3 mr-1 text-green-600" />
-                        {stat.trend}
-                    </span>
-                )}
-              </div>
+      <SetupChecklist
+        storeName={store?.name}
+        isStoreConfigured={isStoreConfigured}
+        hasFirstProduct={hasFirstProduct}
+      />
 
-              <div className="space-y-1.5">
-                <p className="text-[10px] font-bold text-primary/40 uppercase tracking-[0.2em]">
-                    {stat.title}
-                </p>
-                <div className="text-4xl font-semibold text-primary tracking-tighter">
-                    {stat.value}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <div className="grid gap-6 grid-cols-1 lg:grid-cols-6">
-        {/* Sales Chart */}
-        <div className="lg:col-span-4">
-            <div className="rounded-3xl border-2 border-border bg-card overflow-hidden">
-                <SalesChart data={salesData} className="border-none shadow-none" />
-            </div>
-        </div>
-
-        {/* Top Selling Products */}
-        <div className="lg:col-span-2">
-            <Card className="h-full border-2 border-border shadow-none rounded-3xl bg-card overflow-hidden">
-                <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                        <TrendingUp className="h-5 w-5 text-green-600" />
-                        Best Sellers
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="space-y-6 mt-4">
-                        {topProducts.length > 0 ? topProducts.map((product, i) => (
-                            <div key={i} className="flex items-center justify-between group">
-                                <div className="flex items-center gap-4">
-                                    <div className="h-10 w-10 rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-center text-primary font-bold text-xs">
-                                        {i + 1}
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="font-semibold text-sm text-primary truncate max-w-[120px]">
-                                            {product.name}
-                                        </span>
-                                        <span className="text-[10px] text-primary/40 uppercase tracking-wider font-bold">
-                                            {product.sales} sold
-                                        </span>
-                                    </div>
-                                </div>
-                                <ArrowUpRight className="h-4 w-4 text-primary/20 group-hover:text-primary transition-colors" />
-                            </div>
-                        )) : (
-                            <div className="flex flex-col items-center justify-center py-10 text-center opacity-40">
-                                <Package className="h-10 w-10 mb-2" />
-                                <p className="text-xs font-medium uppercase tracking-widest">No sales yet</p>
-                            </div>
-                        )}
+      {onboardingComplete ? (
+        <>
+          {/* Stats Grid */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {stats.map((stat) => (
+              <Card key={stat.title} className="overflow-hidden border-2 border-border shadow-none rounded-3xl bg-card relative">
+                <CardContent className="p-7 relative z-10 flex flex-col h-full">
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-primary/5 border border-primary/10 text-primary">
+                      <stat.icon className="h-6 w-6" />
                     </div>
+                    {stat.trend && (
+                        <span className="flex items-center text-[10px] font-bold text-primary/70 bg-primary/5 px-2.5 py-1 rounded-full border border-primary/10 uppercase tracking-wider">
+                            <TrendingUp className="w-3 h-3 mr-1 text-green-600" />
+                            {stat.trend}
+                        </span>
+                    )}
+                </div>
+
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] font-bold text-primary/40 uppercase tracking-[0.2em]">
+                        {stat.title}
+                    </p>
+                    <div className="text-4xl font-semibold text-primary tracking-tighter">
+                        {stat.value}
+                    </div>
+                  </div>
                 </CardContent>
-            </Card>
-        </div>
-      </div>
-
-      {/* Recent Orders Table */}
-      <div className="space-y-4">
-          <div className="flex items-center justify-between">
-              <h3 className="text-xl font-medium tracking-tight text-primary font-poppins">Recent Orders</h3>
+              </Card>
+            ))}
           </div>
 
-          <div className="rounded-3xl border-2 border-border bg-card overflow-hidden">
-               <OrdersClient initialOrders={recentOrders} standalone={false} />
+          <div className="grid gap-6 grid-cols-1 lg:grid-cols-6">
+            {/* Sales Chart */}
+            <div className="lg:col-span-4">
+                <div className="rounded-3xl border-2 border-border bg-card overflow-hidden">
+                    <SalesChart data={salesData} className="border-none shadow-none" />
+                </div>
+            </div>
+
+            {/* Top Selling Products */}
+            <div className="lg:col-span-2">
+                <Card className="h-full border-2 border-border shadow-none rounded-3xl bg-card overflow-hidden">
+                    <CardHeader className="pb-2">
+                        <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                            <TrendingUp className="h-5 w-5 text-green-600" />
+                            Best Sellers
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-6 mt-4">
+                            {topProducts.length > 0 ? topProducts.map((product, i) => (
+                                <div key={i} className="flex items-center justify-between group">
+                                    <div className="flex items-center gap-4">
+                                        <div className="h-10 w-10 rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                                            {i + 1}
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="font-semibold text-sm text-primary truncate max-w-[120px]">
+                                                {product.name}
+                                            </span>
+                                            <span className="text-[10px] text-primary/40 uppercase tracking-wider font-bold">
+                                                {product.sales} sold
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <ArrowUpRight className="h-4 w-4 text-primary/20 group-hover:text-primary transition-colors" />
+                                </div>
+                            )) : (
+                                <div className="flex flex-col items-center justify-center py-10 text-center opacity-40">
+                                    <Package className="h-10 w-10 mb-2" />
+                                    <p className="text-xs font-medium uppercase tracking-widest">No sales yet</p>
+                                </div>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
           </div>
-      </div>
+
+          {/* Recent Orders Table */}
+          <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-medium tracking-tight text-primary font-poppins">Recent Orders</h3>
+              </div>
+
+              <div className="rounded-3xl border-2 border-border bg-card overflow-hidden">
+                   <OrdersClient initialOrders={recentOrders} standalone={false} />
+              </div>
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }

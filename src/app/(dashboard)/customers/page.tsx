@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import db from "@/lib/db";
@@ -27,7 +26,11 @@ export default async function CustomersPage() {
   });
 
   if (!store) {
-    redirect("/onboarding");
+    return (
+      <div className="flex-1 space-y-4 p-8 pt-0">
+        <CustomersClient data={[]} />
+      </div>
+    );
   }
 
   // Fetch all orders for this store
