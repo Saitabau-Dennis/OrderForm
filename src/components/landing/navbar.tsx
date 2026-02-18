@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
@@ -71,11 +72,21 @@ export function Navbar() {
       >
         <Link 
             href="/" 
-            className="flex items-center gap-0.5 relative z-10 shrink-0" 
+            className="flex items-center gap-2 relative z-10 shrink-0" 
             onClick={() => setIsMobileMenuOpen(false)}
         >
-            <span className="font-logo text-lg md:text-xl font-semibold text-foreground tracking-[-0.01em]">
-            OrderForm
+            <span className="relative inline-flex h-9 w-9 items-center justify-center overflow-hidden">
+                <Image
+                    src="/images/Logo-OF.png"
+                    alt="OrderForm logo"
+                    width={661}
+                    height={377}
+                    priority
+                    className="h-6 w-6 object-cover scale-[3]"
+                />
+            </span>
+            <span className="[font-family:var(--font-signika)] text-xl md:text-2xl font-bold [font-style:oblique_18deg] text-foreground tracking-tight">
+              OrderForm
             </span>
         </Link>
 
@@ -155,7 +166,16 @@ export function Navbar() {
             <SheetContent side="right" className=" w-[85vw] max-w-xs p-0 flex flex-col border-l border-border/50 bg-background/95 backdrop-blur-xl">
                 <SheetHeader className="px-6 pt-8 pb-4 text-left border-b border-border/10">
                 <div className="flex items-center gap-2 mb-2">
-                    <SheetTitle className="font-logo tracking-tight text-lg mb-0 font-semibold text-foreground">
+                    <span className="relative inline-flex h-9 w-9 items-center justify-center overflow-hidden">
+                        <Image
+                            src="/images/Logo-OF.png"
+                            alt="OrderForm logo"
+                            width={661}
+                            height={377}
+                            className="h-6 w-6 object-cover scale-[3]"
+                        />
+                    </span>
+                    <SheetTitle className="[font-family:var(--font-signika)] tracking-tight text-xl mb-0 font-bold [font-style:oblique_18deg] text-foreground">
                         OrderForm
                     </SheetTitle>
                 </div>
