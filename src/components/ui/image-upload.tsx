@@ -18,6 +18,26 @@ interface ImageUploadProps {
   variant?: "default" | "dashboard";
 }
 
+function LogoUploadLoader() {
+  return (
+    <div className="flex flex-col items-center gap-3 text-center">
+      <div className="rounded-xl border border-border/80 bg-card/90 px-3 py-2 shadow-sm">
+        <div className="flex items-center gap-2">
+          <div className="h-8 w-8 animate-pulse rounded-full bg-muted" />
+          <div className="space-y-1">
+            <div className="h-2 w-16 animate-pulse rounded bg-muted" />
+            <div className="h-2 w-10 animate-pulse rounded bg-muted/80" />
+          </div>
+        </div>
+      </div>
+      <div className="inline-flex items-center gap-1.5 text-xs text-foreground">
+        <Loader2 className="h-3.5 w-3.5 animate-spin text-emerald-600" />
+        Uploading logo...
+      </div>
+    </div>
+  );
+}
+
 export function ImageUpload({
   value,
   onChange,
@@ -149,8 +169,12 @@ export function ImageUpload({
             className={`object-cover transition-transform group-hover:scale-[1.02] ${isUploading ? "opacity-50" : ""}`}
           />
           {isUploading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-card/60 backdrop-blur-[1px]">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <div className="absolute inset-0 flex items-center justify-center bg-card/70 backdrop-blur-[1px]">
+              {variant === "dashboard" ? (
+                <LogoUploadLoader />
+              ) : (
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              )}
             </div>
           )}
           {!isUploading && (
@@ -186,7 +210,11 @@ export function ImageUpload({
           }
         >
           {isUploading ? (
-            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            variant === "dashboard" ? (
+              <LogoUploadLoader />
+            ) : (
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            )
           ) : variant === "dashboard" ? (
             <div className="flex flex-col items-center">
               <UploadCloud className="h-10 w-10 text-muted-foreground/75" strokeWidth={1.75} />

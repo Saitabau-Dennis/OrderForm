@@ -150,7 +150,7 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
       <div className="mt-10 grid min-h-[430px] gap-8 lg:grid-cols-[260px_minmax(0,1fr)]">
         <aside className="h-full">
           <div className="relative h-full flex flex-col justify-between">
-            <div className="absolute right-3 top-4 bottom-4 w-px bg-border" />
+            <div className="absolute right-3 top-4 bottom-4 border-r-2 border-dotted border-border/80" />
 
             {STEPS.map((step, index) => {
               const isDone = index < currentStep;
@@ -197,12 +197,14 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
               <div className="grid gap-5 md:grid-cols-2">
                 <div className="space-y-1.5">
                   <Label htmlFor="name" className="text-sm text-muted-foreground">Product Name</Label>
+                  <p className="text-[11px] text-muted-foreground">Customer-facing name used in product listings.</p>
                   <Input id="name" placeholder="e.g. Classic Leather Watch" className="h-10 rounded-md" {...form.register("name")} />
                   {form.formState.errors.name && <p className="text-xs text-red-500">{form.formState.errors.name.message}</p>}
                 </div>
 
                 <div className="space-y-1.5">
                   <Label className="text-sm text-muted-foreground">Category</Label>
+                  <p className="text-[11px] text-muted-foreground">Helps shoppers find the product faster.</p>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button
@@ -229,6 +231,9 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
 
                 <div className="space-y-1.5 md:col-span-2">
                   <Label htmlFor="description" className="text-sm text-muted-foreground">Description</Label>
+                  <p className="text-[11px] text-muted-foreground">
+                    Add highlights, materials, care details, or key selling points.
+                  </p>
                   <Controller
                     control={form.control}
                     name="description"
@@ -242,9 +247,6 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
                       />
                     )}
                   />
-                  <p className="text-[11px] text-muted-foreground">
-                    Use headings, lists, emphasis, block quotes, code blocks, and history controls.
-                  </p>
                   {form.formState.errors.description && (
                     <p className="text-xs text-red-500">{form.formState.errors.description.message}</p>
                   )}
@@ -256,6 +258,7 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
               <div className="grid gap-5 md:grid-cols-2">
                 <div className="space-y-1.5">
                   <Label htmlFor="price" className="text-sm text-muted-foreground">Price</Label>
+                  <p className="text-[11px] text-muted-foreground">Set the selling price in Kenyan Shillings.</p>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">KES</span>
                     <Input id="price" type="number" placeholder="0.00" className="h-10 rounded-md pl-12" {...form.register("price")} />
@@ -265,6 +268,7 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
 
                 <div className="space-y-1.5">
                   <Label htmlFor="sizes" className="text-sm text-muted-foreground">Sizes / Variants</Label>
+                  <p className="text-[11px] text-muted-foreground">List options customers can choose at checkout.</p>
                   <Input id="sizes" placeholder="e.g. XS, S, M" className="h-10 rounded-md" {...form.register("sizes")} />
                   {form.formState.errors.sizes && <p className="text-xs text-red-500">{form.formState.errors.sizes.message}</p>}
                 </div>
