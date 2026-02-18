@@ -239,12 +239,15 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
             <div className="grid gap-7 lg:grid-cols-[180px_minmax(0,1fr)]">
               <div>
                 <Label className="text-sm font-normal text-muted-foreground">Logo</Label>
-                <div className="mt-2 h-36 w-36 overflow-hidden rounded-xl border border-border">
+                <div className="mt-2 h-44 w-full max-w-[176px]">
                   <ImageUpload
                     value={form.watch("logoUrl")}
                     onChange={(url) => form.setValue("logoUrl", url, { shouldDirty: true })}
                     endpoint="imageUploader"
-                    className="h-full w-full object-cover"
+                    className="h-full w-full"
+                    variant="dashboard"
+                    helperText="Drop Store Logo Here"
+                    label="Upload Store Logo"
                   />
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">Recommended: square PNG or SVG.</p>

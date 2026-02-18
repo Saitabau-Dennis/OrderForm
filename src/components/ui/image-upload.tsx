@@ -15,6 +15,7 @@ interface ImageUploadProps {
   className?: string;
   label?: string;
   helperText?: string;
+  variant?: "default" | "dashboard";
 }
 
 export function ImageUpload({
@@ -25,6 +26,7 @@ export function ImageUpload({
   className,
   label = "Upload image",
   helperText = "Drag and drop or click to choose a file",
+  variant = "default",
 }: ImageUploadProps) {
   const [optimisticPreview, setOptimisticPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -133,7 +135,12 @@ export function ImageUpload({
       />
 
       {preview ? (
-        <div className="relative w-full h-full overflow-hidden rounded-md border border-border group">
+        <div
+          className={cn(
+            "relative h-full w-full overflow-hidden border group",
+            variant === "dashboard" ? "rounded-2xl border-border/80" : "rounded-md border-border"
+          )}
+        >
           <Image
             src={preview}
             alt="Preview"
@@ -162,15 +169,31 @@ export function ImageUpload({
           onClick={() => !disabled && !isUploading && fileInputRef.current?.click()}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
-          className={cn(
-            "flex h-full w-full cursor-pointer flex-col items-center justify-center rounded-md border border-dashed transition-all duration-200 bg-muted/20",
-            (disabled || isUploading)
-              ? "cursor-not-allowed opacity-50 border-border"
-              : "border-border hover:border-primary/30 hover:bg-primary/5",
-          )}
+          className={
+            variant === "dashboard"
+              ? cn(
+                  "flex h-full w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-4 py-5 text-center transition-colors",
+                  (disabled || isUploading)
+                    ? "cursor-not-allowed border-zinc-400 bg-muted/20 opacity-50"
+                    : "border-zinc-400/90 bg-muted/20 hover:border-emerald-500/70 hover:bg-emerald-50/40"
+                )
+              : cn(
+                  "flex h-full w-full cursor-pointer flex-col items-center justify-center rounded-md border border-dashed transition-all duration-200 bg-muted/20",
+                  (disabled || isUploading)
+                    ? "cursor-not-allowed border-border opacity-50"
+                    : "border-border hover:border-primary/30 hover:bg-primary/5"
+                )
+          }
         >
           {isUploading ? (
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          ) : variant === "dashboard" ? (
+            <div className="flex flex-col items-center">
+              <UploadCloud className="h-10 w-10 text-muted-foreground/75" strokeWidth={1.75} />
+              <p className="mt-2 text-sm leading-tight text-foreground">{helperText}</p>
+              <p className="mt-1 text-xs text-muted-foreground">or</p>
+              <p className="mt-1.5 text-sm font-semibold leading-tight text-emerald-600">{label}</p>
+            </div>
           ) : (
             <div className="flex flex-col items-center gap-2 p-4 text-center">
               <div className="rounded-md border border-border bg-card p-2.5 shadow-sm">
