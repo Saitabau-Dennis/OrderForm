@@ -3,15 +3,30 @@
 import { useState } from "react";
 import { Minus, Plus, ShoppingBag, ArrowLeft, Check } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useStore } from "./store-context";
 import { ProductCard } from "./product-card";
 
+interface ProductDetailsProduct {
+  id: string;
+  name: string;
+  price: number;
+  category?: string | null;
+  description?: string | null;
+  imageUrl?: string | null;
+  sizes?: string | null;
+  [key: string]: unknown;
+}
+
+interface ProductDetailsStore {
+  slug: string;
+  [key: string]: unknown;
+}
+
 interface ProductDetailsProps {
-  product: any;
-  store: any;
-  similarProducts?: any[];
+  product: ProductDetailsProduct;
+  store: ProductDetailsStore;
+  similarProducts?: ProductDetailsProduct[];
 }
 
 export function ProductDetails({
@@ -89,9 +104,10 @@ export function ProductDetails({
                 {/* Description */}
                 {product.description && (
                   <div className="border-t border-stone-100 pt-6">
-                    <p className="text-sm text-stone-500 leading-relaxed">
-                      {product.description}
-                    </p>
+                    <div
+                      className="prose prose-sm max-w-none text-stone-500 prose-p:my-2 prose-headings:mb-2 prose-headings:mt-3 prose-li:my-0.5"
+                      dangerouslySetInnerHTML={{ __html: product.description }}
+                    />
                   </div>
                 )}
 

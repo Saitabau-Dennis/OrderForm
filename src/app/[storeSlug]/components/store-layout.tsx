@@ -11,20 +11,37 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 
 interface StoreLayoutProps {
-  store: any;
-  products: any[];
+  store: {
+    name: string;
+    logoUrl?: string | null;
+    description?: string | null;
+    rewardConfig?: { isEnabled?: boolean | null } | null;
+    [key: string]: unknown;
+  };
+  products: Array<{
+    id: string;
+    name: string;
+    category?: string | null;
+    description?: string | null;
+    [key: string]: unknown;
+  }>;
 }
 
 export function StoreContent({ store, products }: StoreLayoutProps) {
-  const { searchQuery, setSearchQuery, brandColor, secondaryColor } = useStore();
+  const { searchQuery, brandColor } = useStore();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const params = useParams();
+  const normalizedQuery = searchQuery.toLowerCase();
 
   const categories = Array.from(new Set(products.map((p) => p.category).filter(Boolean)));
 
   const filteredProducts = products.filter((product) => {
-    const nameMatch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const descMatch = product.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    const plainDescription = (product.description || "")
+      .replace(/<[^>]*>/g, " ")
+      .replace(/&nbsp;/gi, " ")
+      .toLowerCase();
+    const nameMatch = product.name.toLowerCase().includes(normalizedQuery);
+    const descMatch = plainDescription.includes(normalizedQuery);
     const matchesSearch = nameMatch || descMatch;
     const matchesCategory = selectedCategory ? product.category === selectedCategory : true;
     return matchesSearch && matchesCategory;

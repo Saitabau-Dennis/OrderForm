@@ -281,13 +281,13 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
                     control={form.control}
                     name="description"
                     render={({ field }) => (
-                      <div className="overflow-hidden rounded-lg border border-input">
-                        <RichTextEditor
-                          value={field.value ?? ""}
-                          onChange={field.onChange}
-                          className="min-h-[140px]"
-                        />
-                      </div>
+                      <RichTextEditor
+                        value={field.value ?? ""}
+                        onChange={field.onChange}
+                        toolbar="advanced"
+                        placeholder="Describe your store..."
+                        className="min-h-[170px]"
+                      />
                     )}
                   />
                 </FieldGroup>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader2 } from "lucide-react";
@@ -9,10 +9,10 @@ import { Loader2 } from "lucide-react";
 import { Button } from "@/components/dashboard/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { ImageUpload } from "@/components/ui/image-upload";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,10 +22,18 @@ import {
 import { createProduct, updateProduct } from "@/lib/actions/products";
 import { cn } from "@/lib/utils";
 
+const stripRichText = (value: string) =>
+  value
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 
 export const productSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  description: z.string().min(1, "Description is required"),
+  description: z.string().refine((value) => stripRichText(value).length > 0, {
+    message: "Description is required",
+  }),
   price: z.coerce.number().min(0, "Price must be positive"),
   category: z.string().min(1, "Category is required"),
   isAvailable: z.boolean().default(true),
@@ -34,9 +42,10 @@ export const productSchema = z.object({
 });
 
 export type ProductValues = z.infer<typeof productSchema>;
+type ProductInitialData = Partial<ProductValues> & { id: string };
 
 interface ProductFormProps {
-  initialData?: any;
+  initialData?: ProductInitialData | null;
   onSuccess: () => void;
   layout?: "default" | "sheet";
 }
@@ -46,7 +55,7 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
   const isSheet = layout === "sheet";
 
   const form = useForm<ProductValues>({
-    resolver: zodResolver(productSchema) as any,
+    resolver: zodResolver(productSchema),
     defaultValues: {
       name: initialData?.name || "",
       description: initialData?.description || "",
@@ -76,7 +85,7 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
 
       toast.success(initialData ? "Product updated" : "Product created");
       onSuccess();
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong");
     } finally {
       setLoading(false);
@@ -143,17 +152,25 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                   <div className="flex items-center justify-between">
                     <Label htmlFor="description" className="text-sm font-normal text-muted-foreground">Description <span className="text-red-500">*</span></Label>
                   </div>
-                  <Textarea
-                    id="description"
-                    placeholder="Tell your customers about this product..."
-                    className={cn(
-                      "min-h-[100px] transition-all resize-y p-3 font-poppins leading-relaxed text-sm",
-                      isSheet
-                        ? "rounded-md border-border bg-background focus:bg-background focus:border-primary/30"
-                        : "rounded-3xl border-border bg-secondary/50 focus:bg-card focus:border-primary/30"
+                  <Controller
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <RichTextEditor
+                        value={field.value ?? ""}
+                        onChange={field.onChange}
+                        placeholder="Tell your customers about this product..."
+                        toolbar="advanced"
+                        className={cn(
+                          "transition-all text-sm",
+                          isSheet ? "min-h-[170px]" : "min-h-[190px]"
+                        )}
+                      />
                     )}
-                    {...form.register("description")}
                   />
+                  <p className="text-[11px] text-muted-foreground">
+                    Use headings, bold/italic text, lists, quotes, code blocks, and undo/redo.
+                  </p>
                   {form.formState.errors.description && (
                     <p className="text-xs text-red-500">
                         {form.formState.errors.description.message}

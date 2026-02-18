@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -17,8 +17,8 @@ import {
 import { ImageUpload } from "@/components/ui/image-upload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
 import { createProduct } from "@/lib/actions/products";
 import { cn } from "@/lib/utils";
 
@@ -34,6 +34,13 @@ const wizardSchema = productSchema.extend({
 });
 type WizardFormInput = z.input<typeof wizardSchema>;
 type WizardFormValues = z.output<typeof wizardSchema>;
+
+const stripRichText = (value?: string) =>
+  (value || "")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 
 const STEPS = [
   {
@@ -81,6 +88,7 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
   });
 
   const formData = form.watch();
+  const plainDescription = stripRichText(formData.description);
   const selectedSizes = (formData.sizes || "")
     .split(",")
     .map((size) => size.trim())
@@ -221,12 +229,22 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
 
                 <div className="space-y-1.5 md:col-span-2">
                   <Label htmlFor="description" className="text-sm text-muted-foreground">Description</Label>
-                  <Textarea
-                    id="description"
-                    placeholder="Describe your product..."
-                    className="min-h-[155px] rounded-md resize-none"
-                    {...form.register("description")}
+                  <Controller
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <RichTextEditor
+                        value={field.value ?? ""}
+                        onChange={field.onChange}
+                        placeholder="Describe your product..."
+                        toolbar="advanced"
+                        className="min-h-[170px]"
+                      />
+                    )}
                   />
+                  <p className="text-[11px] text-muted-foreground">
+                    Use headings, lists, emphasis, block quotes, code blocks, and history controls.
+                  </p>
                   {form.formState.errors.description && (
                     <p className="text-xs text-red-500">{form.formState.errors.description.message}</p>
                   )}
@@ -387,9 +405,9 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
                     { label: "Category", value: formData.category || "-", step: 0, complete: Boolean(formData.category) },
                     {
                       label: "Description",
-                      value: formData.description || "-",
+                      value: plainDescription || "-",
                       step: 0,
-                      complete: Boolean(formData.description),
+                      complete: Boolean(plainDescription),
                     },
                     {
                       label: "Price",
