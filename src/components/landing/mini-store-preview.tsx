@@ -9,7 +9,7 @@ export function MiniStorePreview() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-12 md:mb-16 max-w-4xl mx-auto">
           <ScrollAnimation variant="fade-up">
-            <div className="inline-flex items-center px-3 py-1 rounded-full border border-primary/20 text-primary text-xs font-semibold mb-4 uppercase tracking-[0.16em]">
+            <div className="inline-flex items-center px-3 py-1 rounded-full border border-primary/20 text-primary text-xs font-medium mb-4 uppercase tracking-[0.16em]">
               Mini store
             </div>
             <h2 className="text-3xl md:text-5xl font-heading font-semibold text-foreground leading-[1.06] tracking-[-0.02em]">

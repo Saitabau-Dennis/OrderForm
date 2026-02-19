@@ -103,7 +103,7 @@ const Hero = React.forwardRef<HTMLDivElement, HeroProps>(
 
         {mockupImage && (
           <div className="mt-16 w-full max-w-6xl mx-auto relative animate-appear opacity-0 delay-700 px-4 md:px-0">
-            <MockupFrame className="p-0 rounded-[2rem] md:rounded-[3rem] border-none ring-[12px] md:ring-[24px] ring-primary/15 shadow-2xl shadow-primary/10 bg-transparent">
+            <MockupFrame className="p-0 rounded-[2rem] md:rounded-[3rem] border-none ring-[6px] md:ring-[12px] ring-primary/15 shadow-2xl shadow-primary/10 bg-transparent">
               <Mockup type="responsive" className="rounded-[2rem] md:rounded-[3rem] border border-stone-200/50 shadow-sm">
                 <Image
                   src={mockupImage.src}

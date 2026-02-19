@@ -75,9 +75,9 @@ export function Features() {
             <div className="mx-auto max-w-7xl px-6">
                 <ScrollAnimation variant="fade-up">
                     <div className="mb-16 text-center max-w-3xl mx-auto">
-                    <p className="font-heading uppercase tracking-[0.16em] text-xs text-primary mb-4 font-semibold">
-                        Features
-                    </p>
+                    <div className="inline-flex items-center px-3 py-1 rounded-full border border-primary/20 text-primary text-xs font-medium mb-4 uppercase tracking-[0.16em]">
+               Features
+              </div>
                     <h2 className="text-3xl md:text-5xl font-heading font-semibold text-foreground leading-[1.06] tracking-[-0.02em] mb-6">
                         Everything you need <br className="hidden md:block" />
                         to <span className="text-primary">run your store.</span>

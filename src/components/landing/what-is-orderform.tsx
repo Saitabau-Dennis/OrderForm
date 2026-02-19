@@ -8,7 +8,7 @@ export function WhatIsOrderform() {
     <section className="py-16 md:py-24 bg-background overflow-hidden">
       <div className="max-w-4xl mx-auto px-6 text-center">
         <ScrollAnimation variant="fade-up">
-          <div className="inline-flex items-center px-3 py-1 rounded-full border border-primary/20 text-primary text-xs font-semibold mb-6 uppercase tracking-[0.16em]">
+          <div className="inline-flex items-center px-3 py-1 rounded-full border border-primary/20 text-primary text-xs font-medium mb-6 uppercase tracking-[0.16em]">
             What is OrderForm?
           </div>
           <h2 className="text-3xl md:text-5xl font-heading font-semibold text-foreground mb-8 leading-[1.06] tracking-[-0.02em]">

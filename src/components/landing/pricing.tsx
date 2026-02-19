@@ -148,7 +148,7 @@ export function Pricing() {
     >
       <div className="mx-auto max-w-7xl px-6">
         <ScrollAnimation className="mx-auto mb-10 max-w-3xl text-center md:mb-14" variant="fade-up">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/20 px-3 py-1 text-xs font-medium uppercase tracking-[0.16em] text-primary">
             Pricing
           </div>
 

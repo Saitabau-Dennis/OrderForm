@@ -85,8 +85,8 @@ export function Navbar() {
                     className="h-6 w-6 object-cover scale-[3]"
                 />
             </span>
-            <span className="[font-family:var(--font-signika)] text-xl md:text-2xl font-bold [font-style:oblique_18deg] text-foreground tracking-tight">
-              OrderForm
+            <span className="[font-family:var(--font-signika)] text-xl md:text-2xl font-medium [font-style:oblique_18deg] text-foreground tracking-tight">
+              Orderform
             </span>
         </Link>
 

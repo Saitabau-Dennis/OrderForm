@@ -11,9 +11,9 @@ export function Footer() {
         {/* Brand Section */}
         <div className="flex flex-col gap-4 max-w-xs">
             <div className="flex items-center gap-1">
-                 <span className="font-logo text-xl font-semibold text-foreground tracking-[-0.01em]">
-                    OrderForm
-                </span>
+                 <span className="[font-family:var(--font-signika)] text-xl md:text-2xl font-medium [font-style:oblique_18deg] text-foreground tracking-tight">
+              Orderform
+            </span>
             </div>
             <p className="text-base text-muted-foreground leading-relaxed">
                 Simplifying commerce for the modern entrepreneur. Built for growth.
