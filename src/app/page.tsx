@@ -9,6 +9,7 @@ import { FAQ } from "@/components/landing/faq"
 import { CTA } from "@/components/landing/cta"
 import { Footer } from "@/components/landing/footer"
 import { AnimatedBadge } from "@/components/ui/animated-badge"
+import { TextHighlight } from "@/components/ui/text-highlight"
 
 export default function Home() {
   return (
@@ -22,8 +23,8 @@ export default function Home() {
         }
         title={
           <>
-            Turn social media traffic into{" "}
-            clean <span className="font-heading italic font-medium">WhatsApp orders</span>
+            Turn social media traffic into <br />
+            clean <TextHighlight color="yellow" className="font-heading italic text-foreground tracking-tight px-1">WhatsApp orders</TextHighlight>
           </>
         }
         subtitle={
@@ -36,8 +37,6 @@ export default function Home() {
         ctaText="Create your store"
         ctaLink="/register"
         ctaTarget="_blank"
-        secondaryCtaText="Features"
-        secondaryCtaLink="#features"
         mockupImage={{
           src: "/images/dashboard-v2.png",
           alt: "OrderForm Dashboard Interface",

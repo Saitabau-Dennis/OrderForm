@@ -10,6 +10,8 @@ import {
 
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid"
 
+import Image from "next/image"
+
 const backgroundLayer = () => (
   <>
     <div

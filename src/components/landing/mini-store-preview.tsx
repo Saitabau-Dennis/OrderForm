@@ -19,7 +19,7 @@ export function MiniStorePreview() {
           </ScrollAnimation>
 
           <ScrollAnimation variant="fade-up" delay={0.1}>
-            <p className="mt-6 text-base md:text-lg text-muted-foreground font-sans leading-relaxed">
+            <p className="mt-6 text-lg md:text-xl text-muted-foreground font-sans leading-relaxed">
               Fast, visual, and incredibly simple. We&apos;ve stripped away the clutter of traditional e-commerce to give your social media traffic exactly what they want: a direct path to purchase.
             </p>
           </ScrollAnimation>

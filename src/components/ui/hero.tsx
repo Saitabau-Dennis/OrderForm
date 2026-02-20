@@ -67,7 +67,7 @@ const Hero = React.forwardRef<HTMLDivElement, HeroProps>(
         )}
 
         <h1
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[1.04] text-center px-4 md:px-6 max-w-5xl text-foreground font-heading font-semibold animate-appear opacity-0 delay-100 tracking-[-0.03em]"
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-[1.05] sm:leading-[1.05] md:leading-[1.05] lg:leading-[1.05] xl:leading-[1.05] text-center px-4 md:px-6 max-w-[90rem] w-full text-foreground font-heading font-medium animate-appear opacity-0 delay-100 tracking-[-0.04em]"
         >
           {title}
         </h1>
