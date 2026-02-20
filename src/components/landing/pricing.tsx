@@ -56,7 +56,7 @@ const plans: Plan[] = [
   {
     key: "business",
     name: "Business",
-    price: "KES 990",
+    price: "KES 1547",
     period: "/ month",
     description: "For growing businesses ready to scale with no limits.",
     features: [

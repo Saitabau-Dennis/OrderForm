@@ -16,14 +16,14 @@ export default function Home() {
       <Navbar />
 
       <Hero
-        className="pt-28 pb-8 md:pt-32 md:pb-12"
+        className="pt-28 pb-2 md:pt-32 md:pb-12"
         badge={
           <AnimatedBadge text="Introducing OrderForm" />
         }
         title={
           <>
             Turn social media traffic into{" "}
-            clean <span className="font-heading italic font-semibold">WhatsApp orders</span>
+            clean <span className="font-heading italic font-medium">WhatsApp orders</span>
           </>
         }
         subtitle={

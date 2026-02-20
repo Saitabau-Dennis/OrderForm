@@ -72,7 +72,7 @@ export function Navbar() {
       >
         <Link 
             href="/" 
-            className="flex items-center gap-2 relative z-10 shrink-0" 
+            className="flex items-center gap-1 relative z-10 shrink-0" 
             onClick={() => setIsMobileMenuOpen(false)}
         >
             <span className="relative inline-flex h-9 w-9 items-center justify-center overflow-hidden">
