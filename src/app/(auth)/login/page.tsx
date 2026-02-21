@@ -41,8 +41,9 @@ export default function LoginPage() {
             ? callbackUrl
             : "/dashboard"
 
-        toast.success("Logged in successfully")
-        router.push(safeRedirect)
+        const redirectUrl = safeRedirect + (safeRedirect.includes("?") ? "&" : "?") + "loggedIn=true"
+
+        router.push(redirectUrl)
         router.refresh()
       }
     } catch (err) {

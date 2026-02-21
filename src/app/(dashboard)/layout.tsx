@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import db from "@/lib/db";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { DashboardFontScope } from "@/components/dashboard/dashboard-font-scope";
+import { LoginToast } from "@/components/dashboard/login-toast";
 
 export default async function DashboardLayout({
   children,
@@ -44,6 +45,7 @@ export default async function DashboardLayout({
       <DashboardShell user={session.user} store={storeData}>
         {children}
       </DashboardShell>
+      <LoginToast />
     </DashboardFontScope>
   );
 }
