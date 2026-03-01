@@ -28,7 +28,7 @@ export default function ForgotPasswordPage() {
         toast.success("Reset code sent to your email");
         router.push(`/reset-password?email=${encodeURIComponent(email)}`);
       }
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong");
     } finally {
       setLoading(false);
@@ -36,18 +36,18 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="w-full max-w-3xl bg-background rounded-3xl md:rounded-[2.5rem] shadow-2xl ring-4 md:ring-[12px] ring-primary/20 border border-black/5 overflow-hidden flex flex-col md:flex-row min-h-[360px] md:min-h-[480px]">
+    <div className="w-full max-w-3xl bg-background rounded-none md:rounded-[2.5rem] shadow-none md:shadow-2xl ring-0 md:ring-[12px] ring-primary/20 border-x-0 border-y-0 md:border border-black/5 overflow-hidden flex flex-col md:flex-row min-h-screen md:min-h-[480px]">
       {/* Left Side - Text */}
       <div className="w-full hidden md:flex md:w-1/2 bg-primary p-10 flex-col justify-between text-primary-foreground relative overflow-hidden">
         <div className="relative z-10">
           <Link href="/" className="[font-family:var(--font-instrument-serif)] text-3xl font-normal tracking-tight mb-12 block mt-1">
             Orderform
           </Link>
-                    <h1 className="font-heading text-4xl md:text-5xl font-semibold tracking-tight leading-tight mb-6">
+          <h1 className="font-heading text-4xl md:text-5xl font-semibold tracking-tight leading-tight mb-6">
             Reset your password.
           </h1>
           <p className="font-sans text-primary-foreground/75 text-base md:text-lg leading-relaxed">
-            Don't worry, we'll help you get back to managing your store in no time.
+            Don&apos;t worry, we&apos;ll help you get back to managing your store in no time.
           </p>
         </div>
 
@@ -63,12 +63,13 @@ export default function ForgotPasswordPage() {
       </div>
 
       {/* Right Side - Form */}
-      <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col justify-center bg-background">
+      <div className="w-full md:w-1/2 px-5 pb-8 pt-7 sm:px-6 md:p-10 flex flex-col justify-center bg-background">
         <div className="max-w-sm mx-auto w-full">
-          <div className="md:hidden mb-6 text-center">
-             <Link href="/" className="[font-family:var(--font-instrument-serif)] text-3xl font-normal tracking-tight text-primary mt-1">
+          <div className="md:hidden mb-6 rounded-2xl border border-primary/30 bg-primary p-4 text-center shadow-lg">
+             <Link href="/" className="[font-family:var(--font-instrument-serif)] text-3xl font-normal tracking-tight text-primary-foreground mt-1">
               Orderform
             </Link>
+            <p className="mt-2 text-xs text-primary-foreground/75">Request a code and reset your password quickly.</p>
           </div>
           <Link
             href="/login"
@@ -78,12 +79,12 @@ export default function ForgotPasswordPage() {
             Back to login
           </Link>
 
-          <h2 className="font-heading text-3xl font-semibold tracking-tight text-foreground mb-2">Forgot password?</h2>
-          <p className="font-sans text-muted-foreground mb-8">
-            Enter your email address and we'll send you a code to reset your password.
+          <h2 className="font-heading text-2xl sm:text-3xl font-semibold tracking-tight text-foreground mb-2">Forgot password?</h2>
+          <p className="font-sans text-sm sm:text-base text-muted-foreground mb-7 sm:mb-8">
+            Enter your email address and we&apos;ll send you a code to reset your password.
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input

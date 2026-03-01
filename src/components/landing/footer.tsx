@@ -1,7 +1,7 @@
-"use client"
-
 import Link from "next/link"
 import { Twitter, Instagram, Mail } from "lucide-react"
+
+const currentYear = new Date().getFullYear()
 
 export function Footer() {
   return (
@@ -47,7 +47,7 @@ export function Footer() {
 
       <div className="max-w-7xl mx-auto px-6 mt-12 pt-8 border-t border-border">
          <p className="text-base text-muted-foreground text-center md:text-left">
-            &copy; {new Date().getFullYear()} OrderForm, Made with ❤️ for better social commerce.
+            &copy; {currentYear} OrderForm, Made with ❤️ for better social commerce.
          </p>
       </div>
     </footer>

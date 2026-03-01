@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter, Sora, Outfit, Signika, DM_Sans, Instrument_Serif, Poppins, Plus_Jakarta_Sans, Bungee, Montserrat } from "next/font/google";
 import { GeistSans } from "geist/font/sans";
 import "./globals.css";
-import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const sora = Sora({ subsets: ["latin"], variable: "--font-sora" });
@@ -47,7 +46,6 @@ export const metadata: Metadata = {
   },
 };
 
-import NextTopLoader from "nextjs-toploader";
 import { Providers } from "@/components/providers";
 
 export default function RootLayout({
@@ -56,21 +54,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${sora.variable} ${outfit.variable} ${signika.variable} ${dmSans.variable} ${instrumentSerif.variable} ${poppins.variable} ${jakarta.variable} ${bungee.variable} ${montserrat.variable} ${GeistSans.variable} font-sans antialiased`}>
-        <NextTopLoader color="#00311F" showSpinner={false} height={4} shadow="0 0 10px #00311F,0 0 5px #00311F" />
         <Providers>
           {children}
         </Providers>
-        <Toaster
-          position="bottom-right"
-          toastOptions={{
-            classNames: {
-              success: '!bg-green-600 !text-white !border-green-600',
-              error: '!bg-red-600 !text-white !border-red-600',
-            }
-          }}
-        />
       </body>
     </html>
   );

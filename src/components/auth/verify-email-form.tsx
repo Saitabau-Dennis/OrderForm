@@ -36,7 +36,7 @@ export function VerifyEmailForm() {
         toast.success("Email verified successfully");
         router.push("/login");
       }
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong");
       setLoading(false);
     }
@@ -62,7 +62,7 @@ export function VerifyEmailForm() {
       } else {
         toast.success("Verification code sent");
       }
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong");
     } finally {
       setResending(false);
@@ -81,21 +81,22 @@ export function VerifyEmailForm() {
   }
 
   return (
-    <div className="w-full max-w-md mx-auto space-y-8">
+    <div className="w-full max-w-md mx-auto space-y-6 sm:space-y-8">
       <div className="text-center space-y-2">
-        <h2 className="font-heading text-3xl md:text-4xl font-semibold tracking-tight">Check your email</h2>
-        <p className="text-base text-muted-foreground">
+        <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">Check your email</h2>
+        <p className="text-sm sm:text-base text-muted-foreground">
           We sent a verification code to <span className="font-medium text-foreground">{email}</span>
         </p>
       </div>
 
-      <div className="space-y-8">
-        <div className="flex justify-center">
+      <div className="space-y-6 sm:space-y-8">
+        <div className="w-full overflow-x-auto pb-1">
           <OTPInput
             value={code}
             onChange={setCode}
             length={6}
             disabled={loading}
+            className="min-w-max mx-auto"
           />
         </div>
 
@@ -109,7 +110,7 @@ export function VerifyEmailForm() {
 
       <div className="text-center text-sm">
         <p className="text-muted-foreground">
-          Didn't receive the code?{" "}
+          Didn&apos;t receive the code?{" "}
           <button
             onClick={handleResend}
             disabled={resending || loading}

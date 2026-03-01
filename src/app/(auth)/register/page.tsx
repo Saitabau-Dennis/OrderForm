@@ -88,8 +88,9 @@ export default function RegisterPage() {
       setTimeout(() => {
         window.location.href = `/verify-email?email=${encodeURIComponent(formData.email)}`
       }, 1500)
-    } catch (err: any) {
-      toast.error(err.message)
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Something went wrong"
+      toast.error(errorMessage)
       setLoading(false)
     }
   }
@@ -141,7 +142,7 @@ export default function RegisterPage() {
           <div className="space-y-2">
             <h2 className="font-heading text-2xl font-semibold tracking-tight text-foreground">Registration Successful!</h2>
             <p className="font-sans text-muted-foreground text-lg leading-relaxed">
-              We've sent a verification link to <strong className="text-foreground">{formData.email}</strong>.
+              We&apos;ve sent a verification link to <strong className="text-foreground">{formData.email}</strong>.
               Please check your inbox to activate your account.
             </p>
           </div>
@@ -161,7 +162,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="w-full max-w-3xl bg-background rounded-3xl md:rounded-[2.5rem] shadow-2xl ring-4 md:ring-[12px] ring-primary/20 border border-black/5 overflow-hidden flex flex-col md:flex-row min-h-[360px] md:min-h-[480px]">
+    <div className="w-full max-w-3xl bg-background rounded-none md:rounded-[2.5rem] shadow-none md:shadow-2xl ring-0 md:ring-[12px] ring-primary/20 border-x-0 border-y-0 md:border border-black/5 overflow-hidden flex flex-col md:flex-row min-h-screen md:min-h-[480px]">
       {/* Left Side - Text */}
       <div className="w-full hidden md:flex md:w-1/2 bg-primary p-10 flex-col justify-between text-primary-foreground relative overflow-hidden">
         <div className="relative z-10">
@@ -196,30 +197,30 @@ export default function RegisterPage() {
       </div>
 
       {/* Right Side - Form */}
-      <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col justify-center bg-background">
+      <div className="w-full md:w-1/2 px-5 pb-8 pt-7 sm:px-6 md:p-10 flex flex-col justify-center bg-background">
         <div className="max-w-sm mx-auto w-full">
-          <div className="md:hidden mb-6 text-center">
-             <Link href="/" className="[font-family:var(--font-instrument-serif)] text-3xl font-normal tracking-tight text-primary mt-1">
+          <div className="md:hidden mb-6 rounded-2xl border border-primary/30 bg-primary p-4 text-center shadow-lg">
+             <Link href="/" className="[font-family:var(--font-instrument-serif)] text-3xl font-normal tracking-tight text-primary-foreground mt-1">
               Orderform
             </Link>
             <div className="flex gap-2 justify-center mt-4 mb-2" role="progressbar" aria-valuemin={1} aria-valuemax={3} aria-valuenow={step} aria-label={`Step ${step} of 3`}>
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className={`h-1 w-8 rounded-full transition-colors ${step >= i ? "bg-primary" : "bg-primary/20"}`}
+                className={`h-1 w-8 rounded-full transition-colors ${step >= i ? "bg-primary-foreground" : "bg-primary-foreground/30"}`}
               />
             ))}
             </div>
-            <p className="font-sans text-muted-foreground text-xs">
+            <p className="font-sans text-primary-foreground/75 text-xs">
               Step {step} of 3
             </p>
           </div>
-          <h2 className="font-heading text-3xl font-semibold tracking-tight text-foreground mb-2">Create account</h2>
-          <p className="font-sans text-muted-foreground mb-8">
+          <h2 className="font-heading text-2xl sm:text-3xl font-semibold tracking-tight text-foreground mb-2">Create account</h2>
+          <p className="font-sans text-sm sm:text-base text-muted-foreground mb-7 sm:mb-8">
             {getStepDescription()}
           </p>
 
-          <form className="space-y-6" onSubmit={step < 3 ? handleNext : handleSubmit}>
+          <form className="space-y-5 sm:space-y-6" onSubmit={step < 3 ? handleNext : handleSubmit}>
             {step === 1 && (
               <div className="space-y-2 animate-in fade-in slide-in-from-right-4 duration-300">
                 <Label htmlFor="storeName">Store Name</Label>
@@ -338,7 +339,7 @@ export default function RegisterPage() {
             </div>
           </form>
 
-          <div className="mt-8 text-center">
+          <div className="mt-7 sm:mt-8 text-center">
             <p className="text-sm text-muted-foreground">
               Already have an account?{" "}
               <Link href="/login" className="font-medium text-foreground hover:underline">

@@ -56,12 +56,12 @@ export function CTA() {
                   Demo
                 </Button>
               </Link> */}
-              <Link href="/register" target="_blank">
-                <Button size="lg" className="group flex w-full sm:w-auto items-center justify-center gap-2 rounded-full px-8 font-semibold">
+              <Button asChild size="lg" className="group flex w-full sm:w-auto items-center justify-center gap-2 rounded-full px-8 font-semibold">
+                <Link href="/register" target="_blank">
                   Get Started
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
           </div>
         </ScrollAnimation>

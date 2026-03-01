@@ -49,11 +49,16 @@ const Hero = React.forwardRef<HTMLDivElement, HeroProps>(
     return (
       <div
         ref={ref}
-        className={cn("flex flex-col items-center", className)}
+        className={cn("relative flex flex-col items-center", className)}
         {...props}
       >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-6 -top-10 h-36 rounded-[2rem] bg-gradient-to-b from-primary/12 via-primary/6 to-transparent blur-2xl md:hidden"
+        />
+
         {badge && (
-          <div className="mb-8 animate-appear opacity-0">
+          <div className="animate-appear opacity-0">
             {badge}
           </div>
         )}
@@ -67,44 +72,44 @@ const Hero = React.forwardRef<HTMLDivElement, HeroProps>(
         )}
 
         <h1
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-[1.05] sm:leading-[1.05] md:leading-[1.05] lg:leading-[1.05] xl:leading-[1.05] text-center px-4 md:px-6 max-w-[90rem] w-full text-foreground font-heading font-medium animate-appear opacity-0 delay-100 tracking-[-0.04em]"
+          className="text-[1.8rem] sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-[1.08] sm:leading-[1.05] md:leading-[1.05] lg:leading-[1.05] xl:leading-[1.05] text-center px-3 sm:px-4 md:px-6 max-w-none sm:max-w-[90rem] w-full text-foreground font-heading font-semibold animate-appear opacity-0 delay-100 tracking-[-0.03em] sm:tracking-[-0.04em]"
         >
           {title}
         </h1>
 
         {subtitle && (
           <p
-            className="text-base md:text-xl text-center font-sans px-6 max-w-3xl mt-6 mb-12 leading-relaxed text-muted-foreground animate-appear opacity-0 delay-300"
+            className="text-[1.02rem] md:text-xl text-center font-sans px-4 sm:px-6 max-w-md md:max-w-3xl mt-5 md:mt-6 mb-9 md:mb-12 leading-relaxed text-muted-foreground animate-appear opacity-0 delay-300"
           >
             {subtitle}
           </p>
         )}
 
         {(ctaText && ctaLink) || (secondaryCtaText && secondaryCtaLink) ? (
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 animate-appear opacity-0 delay-500 w-full sm:w-auto px-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3 animate-appear opacity-0 delay-500 w-full sm:w-auto max-w-sm sm:max-w-none px-4">
             {ctaText && ctaLink && (
-              <Link href={ctaLink} target={ctaTarget} rel={ctaTarget === "_blank" ? "noopener noreferrer" : undefined} className="w-full sm:w-auto">
-                 <Button size="lg" className="w-full sm:w-auto rounded-full px-8 text-base font-semibold">
+                 <Button asChild size="lg" className="h-11 md:h-12 w-full sm:w-auto rounded-xl sm:rounded-full px-6 sm:px-8 text-[0.98rem] sm:text-base font-semibold">
+                  <Link href={ctaLink} target={ctaTarget} rel={ctaTarget === "_blank" ? "noopener noreferrer" : undefined}>
                     <span className="relative z-10">{ctaText}</span>
+                  </Link>
                  </Button>
-              </Link>
             )}
 
             {secondaryCtaText && secondaryCtaLink && (
-              <Link href={secondaryCtaLink} target={secondaryCtaTarget} rel={secondaryCtaTarget === "_blank" ? "noopener noreferrer" : undefined} className="w-full sm:w-auto">
-                <Button variant="outline" size="lg" className="w-full sm:w-auto rounded-full px-8 text-base font-semibold group">
+                <Button asChild variant="outline" size="lg" className="h-11 md:h-12 w-full sm:w-auto rounded-xl sm:rounded-full px-6 sm:px-8 text-[0.98rem] sm:text-base font-semibold group">
+                  <Link href={secondaryCtaLink} target={secondaryCtaTarget} rel={secondaryCtaTarget === "_blank" ? "noopener noreferrer" : undefined}>
                   <span>{secondaryCtaText}</span>
                   <ChevronRight className="h-4 w-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
+                  </Link>
                 </Button>
-              </Link>
             )}
           </div>
         ) : null}
 
         {mockupImage && (
-          <div className="mt-16 w-full max-w-6xl mx-auto relative animate-appear opacity-0 delay-700 px-4 md:px-0">
-            <MockupFrame className="p-0 rounded-[2rem] md:rounded-[3rem] border-none ring-[6px] md:ring-[12px] ring-primary/15 shadow-2xl shadow-primary/10 bg-transparent">
-              <Mockup type="responsive" className="rounded-[2rem] md:rounded-[3rem] border border-stone-200/50 shadow-sm">
+          <div className="mt-10 md:mt-16 w-full max-w-6xl mx-auto relative animate-appear opacity-0 delay-700 px-4 sm:px-4 md:px-0">
+            <MockupFrame className="mx-auto w-[92%] sm:w-full p-0 rounded-[1rem] sm:rounded-[1.5rem] md:rounded-[2.25rem] border-none ring-[10px] sm:ring-[14px] md:ring-[20px] ring-primary/15 shadow-2xl shadow-primary/10 bg-transparent">
+              <Mockup type="responsive" className="rounded-[1rem] sm:rounded-[1.5rem] md:rounded-[2.25rem] border border-stone-200/50 shadow-sm">
                 <Image
                   src={mockupImage.src}
                   alt={mockupImage.alt}

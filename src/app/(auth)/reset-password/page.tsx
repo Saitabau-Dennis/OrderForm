@@ -150,14 +150,14 @@ function ResetPasswordForm() {
 
   return (
     <div className="max-w-sm mx-auto w-full animate-in fade-in slide-in-from-right-8 duration-500">
-      <div className="mb-8">
+      <div className="mb-7 sm:mb-8">
         <div className="w-12 h-12 bg-primary/5 rounded-xl flex items-center justify-center mb-6 text-primary">
           <LockKeyhole className="w-6 h-6" />
         </div>
-        <h2 className="font-heading text-3xl font-semibold tracking-tight text-foreground mb-2">
+        <h2 className="font-heading text-2xl sm:text-3xl font-semibold tracking-tight text-foreground mb-2">
           {step === 1 ? "Enter Code" : "Reset Password"}
         </h2>
-        <p className="font-sans text-muted-foreground">
+        <p className="font-sans text-sm sm:text-base text-muted-foreground">
           {step === 1
             ? <span>Enter the verification code sent to <span className="font-medium text-foreground">{email}</span></span>
             : "Create a new strong password for your account."
@@ -165,15 +165,16 @@ function ResetPasswordForm() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
         {step === 1 && (
           <div className="space-y-4">
-            <div className="flex justify-center">
+            <div className="w-full overflow-x-auto pb-1">
               <OTPInput
                 value={code}
                 onChange={setCode}
                 length={6}
                 disabled={loading}
+                className="min-w-max mx-auto"
               />
             </div>
             {loading && (
@@ -269,7 +270,7 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="w-full max-w-3xl bg-background rounded-3xl md:rounded-[2.5rem] shadow-2xl ring-4 md:ring-[12px] ring-primary/20 border border-black/5 overflow-hidden flex flex-col md:flex-row min-h-[360px] md:min-h-[480px]">
+    <div className="w-full max-w-3xl bg-background rounded-none md:rounded-[2.5rem] shadow-none md:shadow-2xl ring-0 md:ring-[12px] ring-primary/20 border-x-0 border-y-0 md:border border-black/5 overflow-hidden flex flex-col md:flex-row min-h-screen md:min-h-[480px]">
       {/* Left Side - Text */}
       <div className="w-full hidden md:flex md:w-1/2 bg-primary p-10 flex-col justify-between text-primary-foreground relative overflow-hidden">
         <div className="relative z-10">
@@ -299,11 +300,12 @@ export default function ResetPasswordPage() {
       </div>
 
       {/* Right Side - Form */}
-      <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col justify-center bg-background">
-         <div className="md:hidden mb-6 text-center max-w-sm mx-auto w-full">
-             <Link href="/" className="[font-family:var(--font-instrument-serif)] text-3xl font-normal tracking-tight text-primary mt-1">
+      <div className="w-full md:w-1/2 px-5 pb-8 pt-7 sm:px-6 md:p-10 flex flex-col justify-center bg-background">
+         <div className="md:hidden mb-6 rounded-2xl border border-primary/30 bg-primary p-4 text-center shadow-lg max-w-sm mx-auto w-full">
+             <Link href="/" className="[font-family:var(--font-instrument-serif)] text-3xl font-normal tracking-tight text-primary-foreground mt-1">
               Orderform
             </Link>
+            <p className="mt-2 text-xs text-primary-foreground/75">Use your verification code to secure your account again.</p>
           </div>
         <Suspense
           fallback={

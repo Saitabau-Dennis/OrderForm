@@ -66,7 +66,7 @@ export function OTPInput({ length = 6, value, onChange, className, disabled }: O
   };
 
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={cn("flex items-center gap-1.5 sm:gap-2", className)}>
       {Array.from({ length }).map((_, index) => (
         <React.Fragment key={index}>
           <input
@@ -80,7 +80,7 @@ export function OTPInput({ length = 6, value, onChange, className, disabled }: O
             onPaste={handlePaste}
             disabled={disabled}
             className={cn(
-              "w-11 h-12 text-center text-xl font-semibold rounded-3xl transition-all duration-150 outline-none",
+              "w-9 h-11 sm:w-11 sm:h-12 text-center text-lg sm:text-xl font-semibold rounded-2xl sm:rounded-3xl transition-all duration-150 outline-none",
               "bg-muted/40 border border-border/60",
               "focus:border-primary focus:ring-2 focus:ring-primary/20 focus:bg-background",
               "hover:border-primary/40 hover:bg-muted/60",
@@ -92,7 +92,7 @@ export function OTPInput({ length = 6, value, onChange, className, disabled }: O
           />
           {/* Separator dash after the 3rd digit */}
           {index === 2 && (
-            <span className="text-muted-foreground/40 font-medium text-lg px-0.5">–</span>
+            <span className="text-muted-foreground/40 font-medium text-base sm:text-lg px-0">–</span>
           )}
         </React.Fragment>
       ))}

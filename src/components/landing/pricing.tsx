@@ -180,18 +180,17 @@ export function Pricing() {
                         </span>
                       )}
                     </div>
-                    <Link href={plan.href}>
-                      <Button
-                        variant={plan.popular ? "default" : "outline"}
-                        size="sm"
-                        className={cn(
-                          "h-9 rounded-full px-4 text-sm font-semibold",
-                          !plan.popular && "bg-background"
-                        )}
-                      >
-                        {plan.cta}
-                      </Button>
-                    </Link>
+                    <Button
+                      asChild
+                      variant={plan.popular ? "default" : "outline"}
+                      size="sm"
+                      className={cn(
+                        "h-9 rounded-full px-4 text-sm font-semibold",
+                        !plan.popular && "bg-background"
+                      )}
+                    >
+                      <Link href={plan.href}>{plan.cta}</Link>
+                    </Button>
                   </div>
                 ))}
               </div>

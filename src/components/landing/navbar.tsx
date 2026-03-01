@@ -147,14 +147,15 @@ export function Navbar() {
             >
             Log in
             </Link>
-            <Link href={session ? "/dashboard" : "/register"} target="_blank" className="hidden md:block">
-                <Button
-                    size="sm"
-                    className="rounded-full px-4 font-semibold"
-                >
+            <Button
+                asChild
+                size="sm"
+                className="hidden md:inline-flex rounded-full px-4 font-semibold"
+            >
+                <Link href={session ? "/dashboard" : "/register"} target="_blank">
                     Get Started
-                </Button>
-            </Link>
+                </Link>
+            </Button>
 
             {/* Mobile Menu */}
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
@@ -163,29 +164,34 @@ export function Navbar() {
                    <Menu className="h-5 w-5" />
                 </Button>
             </SheetTrigger>
-            <SheetContent side="right" className=" w-[85vw] max-w-xs p-0 flex flex-col border-l border-border/50 bg-background/95 backdrop-blur-xl">
-                <SheetHeader className="px-6 pt-8 pb-4 text-left border-b border-border/10">
-                <div className="flex items-center gap-2 mb-2">
-                    <span className="relative inline-flex h-9 w-9 items-center justify-center overflow-hidden">
+            <SheetContent
+                side="right"
+                className="w-[86vw] max-w-[22rem] p-0 flex flex-col border-l border-border/80 bg-white shadow-[-14px_0_34px_rgba(0,0,0,0.1)] [&>button]:right-4 [&>button]:top-4 [&>button]:h-8 [&>button]:w-8 [&>button]:rounded-full [&>button]:p-2 [&>button]:text-foreground/40 [&>button]:hover:text-foreground [&>button]:hover:bg-muted/70"
+            >
+                <SheetHeader className="px-5 pt-7 pb-3 text-left border-b-0">
+                  <div className="pt-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="relative inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-primary/10 ring-1 ring-primary/10">
                         <Image
-                            src="/images/logo-of.png"
-                            alt="OrderForm logo"
-                            width={661}
-                            height={377}
-                            className="h-6 w-6 object-cover scale-[3]"
+                          src="/images/logo-of.png"
+                          alt="OrderForm logo"
+                          width={661}
+                          height={377}
+                          className="h-5 w-5 object-cover scale-[3]"
                         />
-                    </span>
-                    <SheetTitle className="[font-family:var(--font-instrument-serif)] tracking-tight text-2xl mb-0 font-normal text-foreground mt-1">
+                      </span>
+                      <SheetTitle className="[font-family:var(--font-instrument-serif)] tracking-tight text-[1.9rem] leading-none mb-0 font-normal text-primary mt-1">
                         OrderForm
-                    </SheetTitle>
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                    Turn social traffic into clean WhatsApp orders.
-                </p>
+                      </SheetTitle>
+                    </div>
+                    <p className="max-w-[15rem] text-[0.97rem] leading-snug text-foreground/65">
+                      Turn social traffic into clean WhatsApp orders.
+                    </p>
+                  </div>
                 </SheetHeader>
 
-                <ScrollArea className="flex-1 px-4 py-4">
-                <div className="flex flex-col gap-2">
+                <ScrollArea className="flex-1 px-5 py-4">
+                <div className="px-1">
                     <MobileNavLink href="#about" onClick={(e) => handleScroll(e, "#about")}>About</MobileNavLink>
                     <MobileNavLink href="#features" onClick={(e) => handleScroll(e, "#features")}>Features</MobileNavLink>
                     <MobileNavLink href="#pricing" onClick={(e) => handleScroll(e, "#pricing")}>Pricing</MobileNavLink>
@@ -193,18 +199,18 @@ export function Navbar() {
                 </div>
                 </ScrollArea>
 
-                <div className="p-6 mt-auto border-t border-border/10 bg-muted/20">
+                <div className="p-5 mt-auto border-t border-border/70 bg-white">
                     <div className="flex flex-col gap-3">
-                    <Link href={session ? "/dashboard" : "/register"} target="_blank" onClick={() => setIsMobileMenuOpen(false)}>
-                        <Button size="lg" className="w-full rounded-full text-base font-semibold">
+                    <Button asChild size="lg" className="h-11 w-full rounded-xl text-base font-semibold bg-primary text-primary-foreground shadow-[0_8px_18px_rgba(0,49,31,0.22)] hover:bg-primary/95">
+                        <Link href={session ? "/dashboard" : "/register"} target="_blank" onClick={() => setIsMobileMenuOpen(false)}>
                         Get Started
-                        </Button>
-                    </Link>
-                    <Link href={session ? "/dashboard" : "/login"} target="_blank" onClick={() => setIsMobileMenuOpen(false)}>
-                        <Button variant="outline" size="lg" className="w-full rounded-full text-base font-medium">
+                        </Link>
+                    </Button>
+                    <Button asChild variant="outline" size="lg" className="h-11 w-full rounded-xl border-border bg-background text-primary text-base font-medium hover:bg-muted/50">
+                        <Link href={session ? "/dashboard" : "/login"} target="_blank" onClick={() => setIsMobileMenuOpen(false)}>
                         Log in
-                        </Button>
-                    </Link>
+                        </Link>
+                    </Button>
                     </div>
                 </div>
             </SheetContent>
@@ -233,10 +239,10 @@ function MobileNavLink({ href, onClick, children }: { href: string, onClick: (e:
       <a
         href={href}
         onClick={onClick}
-        className="flex items-center justify-between p-4 rounded-2xl hover:bg-muted/60 active:bg-muted transition-all group cursor-pointer"
+        className="flex items-center justify-between rounded-xl px-2.5 py-3.5 hover:bg-white active:bg-muted/50 transition-colors group cursor-pointer"
       >
-        <span className="text-base font-semibold text-foreground/90 group-hover:text-primary transition-colors">{children}</span>
-        <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+        <span className="text-[1.03rem] font-medium text-foreground/85 group-hover:text-primary transition-colors">{children}</span>
+        <ChevronRight className="w-4 h-4 text-foreground/30 group-hover:text-primary/60 transition-colors" />
       </a>
     )
   }

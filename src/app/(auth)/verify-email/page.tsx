@@ -5,7 +5,7 @@ import { WaveLoader } from "@/components/ui/wave-loader";
 
 export default function VerifyEmailPage() {
   return (
-    <div className="w-full max-w-3xl bg-background rounded-3xl md:rounded-[2.5rem] shadow-2xl ring-4 md:ring-[12px] ring-primary/20 border border-black/5 overflow-hidden flex flex-col md:flex-row min-h-[360px] md:min-h-[480px]">
+    <div className="w-full max-w-3xl bg-background rounded-none md:rounded-[2.5rem] shadow-none md:shadow-2xl ring-0 md:ring-[12px] ring-primary/20 border-x-0 border-y-0 md:border border-black/5 overflow-hidden flex flex-col md:flex-row min-h-screen md:min-h-[480px]">
       {/* Left Side - Text */}
       <div className="w-full hidden md:flex md:w-1/2 bg-primary p-10 flex-col justify-between text-primary-foreground relative overflow-hidden">
         <div className="relative z-10">
@@ -32,11 +32,12 @@ export default function VerifyEmailPage() {
       </div>
 
       {/* Right Side - Form */}
-      <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col justify-center bg-background">
-         <div className="md:hidden mb-6 text-center max-w-sm mx-auto w-full">
-             <Link href="/" className="[font-family:var(--font-instrument-serif)] text-3xl font-normal tracking-tight text-primary mt-1">
+      <div className="w-full md:w-1/2 px-5 pb-8 pt-7 sm:px-6 md:p-10 flex flex-col justify-center bg-background">
+         <div className="md:hidden mb-6 rounded-2xl border border-primary/30 bg-primary p-4 text-center shadow-lg max-w-sm mx-auto w-full">
+             <Link href="/" className="[font-family:var(--font-instrument-serif)] text-3xl font-normal tracking-tight text-primary-foreground mt-1">
               Orderform
             </Link>
+            <p className="mt-2 text-xs text-primary-foreground/75">Enter the 6-digit code to complete setup.</p>
           </div>
         <Suspense
           fallback={

@@ -46,7 +46,7 @@ export default function LoginPage() {
         router.push(redirectUrl)
         router.refresh()
       }
-    } catch (err) {
+    } catch {
       toast.error("Something went wrong!!")
     } finally {
       setLoading(false)
@@ -54,7 +54,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="w-full max-w-3xl bg-background rounded-3xl md:rounded-[2.5rem] shadow-2xl ring-4 md:ring-[12px] ring-primary/20 border border-black/5 overflow-hidden flex flex-col md:flex-row min-h-[360px] md:min-h-[480px]">
+    <div className="w-full max-w-3xl bg-background rounded-none md:rounded-[2.5rem] shadow-none md:shadow-2xl ring-0 md:ring-[12px] ring-primary/20 border-x-0 border-y-0 md:border border-black/5 overflow-hidden flex flex-col md:flex-row min-h-screen md:min-h-[480px]">
       {/* Left Side - Text */}
       <div className="w-full hidden md:flex md:w-1/2 bg-primary p-10 flex-col justify-between text-primary-foreground relative overflow-hidden">
         <div className="relative z-10">
@@ -81,19 +81,20 @@ export default function LoginPage() {
       </div>
 
       {/* Right Side - Form */}
-      <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col justify-center bg-background">
+      <div className="w-full md:w-1/2 px-5 pb-8 pt-7 sm:px-6 md:p-10 flex flex-col justify-center bg-background">
         <div className="max-w-sm mx-auto w-full">
-          <div className="md:hidden mb-6 text-center">
-            <Link href="/" className="[font-family:var(--font-instrument-serif)] text-3xl font-normal tracking-tight text-primary mt-1">
+          <div className="md:hidden mb-6 rounded-2xl border border-primary/30 bg-primary p-4 text-center shadow-lg">
+            <Link href="/" className="[font-family:var(--font-instrument-serif)] text-3xl font-normal tracking-tight text-primary-foreground mt-1">
               Orderform
             </Link>
+            <p className="mt-2 text-xs text-primary-foreground/75">Log in to manage your store on the go.</p>
           </div>
-          <h2 className="font-heading text-3xl font-semibold tracking-tight text-foreground mb-2">Log in</h2>
-          <p className="font-sans text-muted-foreground mb-8">
+          <h2 className="font-heading text-2xl sm:text-3xl font-semibold tracking-tight text-foreground mb-2">Log in</h2>
+          <p className="font-sans text-sm sm:text-base text-muted-foreground mb-7 sm:mb-8">
             Enter your details to access your account.
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -112,7 +113,7 @@ export default function LoginPage() {
                 <Label htmlFor="password">Password</Label>
                 <Link
                   href="/forgot-password"
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Forgot password?
                 </Link>
@@ -152,9 +153,9 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="mt-8 text-center">
+          <div className="mt-7 sm:mt-8 text-center">
             <p className="text-sm text-muted-foreground">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link href="/register" className="font-medium text-foreground hover:underline">
                 Sign up
               </Link>

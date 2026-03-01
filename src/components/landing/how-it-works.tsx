@@ -56,12 +56,12 @@ export function HowItWorks() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Link href="/register">
-                <Button size="lg" className="w-full sm:w-auto rounded-full px-8 text-base font-semibold">
+                <Button asChild size="lg" className="w-full sm:w-auto rounded-full px-8 text-base font-semibold">
+                  <Link href="/register">
                   Start Selling Now
                   <ArrowRight className="ml-2 w-4 h-4" />
+                  </Link>
                 </Button>
-              </Link>
             </div>
 
             {/* Decorative elements */}

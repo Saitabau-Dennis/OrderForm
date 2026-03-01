@@ -33,12 +33,12 @@ export function AboutUs() {
                 </div>
 
                 <div className="mt-8">
-                   <Link href="/register" target="_blank" rel="noopener noreferrer">
-                      <Button size="lg" className="group rounded-full px-8 text-sm md:text-base font-semibold">
+                      <Button asChild size="lg" className="group rounded-full px-8 text-sm md:text-base font-semibold">
+                       <Link href="/register" target="_blank" rel="noopener noreferrer">
                          Get Started
                          <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                       </Link>
                       </Button>
-                   </Link>
                 </div>
              </ScrollAnimation>
           </div>
