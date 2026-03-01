@@ -18,7 +18,6 @@ const checkoutSchema = z.object({
   address: z.string().min(5, "Please enter a valid delivery address"),
   notes: z.string().optional(),
   discountCode: z.string().optional(),
-  paymentMethod: z.literal("whatsapp"),
 });
 
 export type CheckoutFormData = z.infer<typeof checkoutSchema>;
@@ -42,7 +41,6 @@ export function CheckoutForm({ onSubmit, isLoading, totalAmount, currency }: Che
       address: "",
       notes: "",
       discountCode: "",
-      paymentMethod: "whatsapp",
     },
   });
 

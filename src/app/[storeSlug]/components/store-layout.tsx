@@ -76,7 +76,7 @@ export function StoreContent({ store, products }: StoreLayoutProps) {
                   <div>
                     <h3 className="font-bold text-stone-900 text-sm">Share your purchase, get featured</h3>
                     <p className="text-[13px] text-stone-500 mt-0.5">
-                      Upload a photo review. Approved posts get an SMS discount code.
+                      Upload a photo review. Approved posts get a one-time discount code.
                     </p>
                   </div>
                 </div>

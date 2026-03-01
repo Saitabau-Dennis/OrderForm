@@ -62,62 +62,31 @@ export default function CheckoutPage() {
       const orderDiscount = result.pricing?.discountAmount ?? 0;
       const orderTotal = result.pricing?.totalAmount ?? cartTotal;
 
-      if (data.paymentMethod === "mpesa") {
-        const mpesaResponse = await fetch("/api/payments/mpesa/stkpush", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            orderId: result.id,
-          }),
-        });
+      const message = `*NEW ORDER: ${storeName.toUpperCase()}*\n\n` +
+        `*Order ID:* #${orderId}\n\n` +
+        `*CUSTOMER DETAILS*\n` +
+        `Name: ${data.name}\n` +
+        `Phone: ${data.phone}\n` +
+        `Address: ${data.address}\n` +
+        `${data.notes ? `Notes: ${data.notes}\n` : ''}\n` +
+        `*ORDER SUMMARY*\n` +
+        `${cart.map(item =>
+          `- ${item.name} x${item.quantity}${item.variant ? ` (${item.variant})` : ''} (${currency} ${(item.price * item.quantity).toLocaleString()})`
+        ).join('\n')}\n\n` +
+        `Subtotal: ${currency} ${orderSubtotal.toLocaleString()}\n` +
+        `${orderDiscount > 0 ? `Discount: -${currency} ${orderDiscount.toLocaleString()}${result.appliedDiscountCode ? ` (${result.appliedDiscountCode})` : ''}\n` : ''}` +
+        `*TOTAL AMOUNT: ${currency} ${orderTotal.toLocaleString()}*\n\n` +
+        `_Please confirm my order_`;
 
-        const mpesaResult = (await mpesaResponse.json()) as {
-          success?: boolean;
-          error?: string;
-          customerMessage?: string;
-        };
-
-        if (!mpesaResponse.ok || !mpesaResult.success) {
-          toast.error(mpesaResult.error || "Failed to initiate M-Pesa payment.");
-          return;
-        }
-
-        toast.success(
-          mpesaResult.customerMessage ||
-            "M-Pesa prompt sent. Complete payment on your phone."
-        );
-        return;
+      let cleanPhone = whatsappNumber.replace(/\D/g, '');
+      if (cleanPhone.startsWith('0')) {
+        cleanPhone = '254' + cleanPhone.substring(1);
       }
 
-      if (data.paymentMethod === 'whatsapp') {
-        const message = `*NEW ORDER: ${storeName.toUpperCase()}*\n\n` +
-          `*Order ID:* #${orderId}\n\n` +
-          `*CUSTOMER DETAILS*\n` +
-          `Name: ${data.name}\n` +
-          `Phone: ${data.phone}\n` +
-          `Address: ${data.address}\n` +
-          `${data.notes ? `Notes: ${data.notes}\n` : ''}\n` +
-          `*ORDER SUMMARY*\n` +
-          `${cart.map(item =>
-            `- ${item.name} x${item.quantity}${item.variant ? ` (${item.variant})` : ''} (${currency} ${(item.price * item.quantity).toLocaleString()})`
-          ).join('\n')}\n\n` +
-          `Subtotal: ${currency} ${orderSubtotal.toLocaleString()}\n` +
-          `${orderDiscount > 0 ? `Discount: -${currency} ${orderDiscount.toLocaleString()}${result.appliedDiscountCode ? ` (${result.appliedDiscountCode})` : ''}\n` : ''}` +
-          `*TOTAL AMOUNT: ${currency} ${orderTotal.toLocaleString()}*\n\n` +
-          `_Please confirm my order_`;
-
-        let cleanPhone = whatsappNumber.replace(/\D/g, '');
-        if (cleanPhone.startsWith('0')) {
-          cleanPhone = '254' + cleanPhone.substring(1);
-        }
-
-        const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
-        const newWindow = window.open(url, '_blank');
-        if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
-          window.location.href = url;
-        }
+      const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+      const newWindow = window.open(url, '_blank');
+      if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+        window.location.href = url;
       }
     } catch (error) {
       console.error("Checkout Error:", error);

@@ -2,7 +2,6 @@
 
 import { auth } from "@/lib/auth";
 import db from "@/lib/db";
-import { sendTiaraConnectSms } from "@/lib/sms";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -198,10 +197,6 @@ export async function approveReview(reviewId: string) {
       return { error: "Review not found" };
     }
 
-    if (!review.customerPhone) {
-      return { error: "Review has no phone number to send reward SMS." };
-    }
-
     if (review.approvalStatus === "approved" && review.discountCode) {
       return {
         success: true,
@@ -241,33 +236,10 @@ export async function approveReview(reviewId: string) {
       return updatedReview;
     });
 
-    const customerName = review.customerName?.trim() || "there";
-    const message = `Hi ${customerName}, thanks for your review at ${store.name}. Your ${DEFAULT_PERCENT_OFF}% OFF code is ${code}. Valid for ${DEFAULT_EXPIRY_DAYS} days and one use.`;
-    const smsResult = await sendTiaraConnectSms({
-      to: review.customerPhone,
-      message,
-    });
-
-    if (smsResult.success) {
-      await db.review.update({
-        where: { id: review.id },
-        data: { rewardSmsSentAt: new Date() },
-      });
-    }
-
     revalidatePath("/reviews");
     revalidatePath("/dashboard");
     revalidatePath(`/${store.slug}`);
     revalidatePath(`/${store.slug}/share`);
-
-    if (!smsResult.success) {
-      return {
-        success: true,
-        review: approvedReview,
-        code,
-        warning: smsResult.error || "Approved, but failed to send SMS.",
-      };
-    }
 
     return { success: true, review: approvedReview, code };
   } catch (error) {

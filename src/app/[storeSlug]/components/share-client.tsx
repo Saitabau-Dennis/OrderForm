@@ -90,7 +90,7 @@ export function ShareClient({ store, products }: ShareClientProps) {
         <CheckCircle2 className="h-12 w-12 mb-6" style={{ color: brandColor }} />
         <h1 className="text-3xl font-extrabold text-stone-900 font-dm-sans mb-3">Thank you!</h1>
         <p className="text-stone-500 max-w-sm mx-auto mb-8 leading-relaxed">
-          Your review is pending approval. Once approved, we will send your discount code via SMS.
+          Your review is pending approval. Once approved, your discount code will be available in your review confirmation.
         </p>
 
         <Button
@@ -120,7 +120,7 @@ export function ShareClient({ store, products }: ShareClientProps) {
             Share your purchase
           </h1>
           <p className="text-stone-500 leading-relaxed">
-            Upload a photo from your purchase. After approval, your discount code is sent by SMS.
+            Upload a photo from your purchase. After approval, you'll get a discount code for your next order.
           </p>
         </div>
 

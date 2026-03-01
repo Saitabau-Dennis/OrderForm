@@ -11,7 +11,7 @@ import { ScrollAnimation } from "@/components/ui/scroll-animation"
 const faqs = [
   {
     question: "How do I get paid?",
-    answer: "Directly to your pocket. You arrange payment (M-Pesa, Cash, Bank Transfer) directly with the customer on WhatsApp. We take 0% commission on your sales."
+    answer: "Directly to your pocket. You arrange payment (Cash, Bank Transfer, Mobile Money) directly with the customer on WhatsApp. We take 0% commission on your sales."
   },
   {
     question: "Do my customers need to download an app?",
