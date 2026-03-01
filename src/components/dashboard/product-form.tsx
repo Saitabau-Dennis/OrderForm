@@ -41,7 +41,8 @@ export const productSchema = z.object({
   sizes: z.string().min(1, "At least one size/variant is required"),
 });
 
-export type ProductValues = z.infer<typeof productSchema>;
+type ProductFormInput = z.input<typeof productSchema>;
+export type ProductValues = z.output<typeof productSchema>;
 type ProductInitialData = Partial<ProductValues> & { id: string };
 
 interface ProductFormProps {
@@ -54,7 +55,7 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
   const [loading, setLoading] = useState(false);
   const isSheet = layout === "sheet";
 
-  const form = useForm<ProductValues>({
+  const form = useForm<ProductFormInput, unknown, ProductValues>({
     resolver: zodResolver(productSchema),
     defaultValues: {
       name: initialData?.name || "",

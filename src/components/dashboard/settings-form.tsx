@@ -75,7 +75,8 @@ const settingsSchema = z.object({
   ),
 });
 
-type SettingsValues = z.infer<typeof settingsSchema>;
+type SettingsFormInput = z.input<typeof settingsSchema>;
+type SettingsValues = z.output<typeof settingsSchema>;
 
 interface InitialDeliveryZone {
   name: string;
@@ -113,7 +114,7 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
     avatarSeed
   )}&backgroundColor=e9c46a,2a9d8f,264653`;
 
-  const form = useForm<SettingsValues>({
+  const form = useForm<SettingsFormInput, unknown, SettingsValues>({
     resolver: zodResolver(settingsSchema),
     defaultValues: {
       name: initialData?.name || "",

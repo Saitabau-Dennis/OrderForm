@@ -21,6 +21,8 @@ interface StoreLayoutProps {
   products: Array<{
     id: string;
     name: string;
+    price: number;
+    imageUrl?: string | null;
     category?: string | null;
     description?: string | null;
     [key: string]: unknown;
@@ -33,7 +35,13 @@ export function StoreContent({ store, products }: StoreLayoutProps) {
   const params = useParams();
   const normalizedQuery = searchQuery.toLowerCase();
 
-  const categories = Array.from(new Set(products.map((p) => p.category).filter(Boolean)));
+  const categories = Array.from(
+    new Set(
+      products
+        .map((p) => p.category)
+        .filter((category): category is string => Boolean(category))
+    )
+  );
 
   const filteredProducts = products.filter((product) => {
     const plainDescription = (product.description || "")
@@ -52,7 +60,7 @@ export function StoreContent({ store, products }: StoreLayoutProps) {
       <StoreHeader name={store.name} logoUrl={store.logoUrl || undefined} />
 
       <main>
-        <StoreHero name={store.name} description={store.description} />
+        <StoreHero name={store.name} description={store.description ?? undefined} />
 
         {/* ===== Products Card — curved top, overlaps the hero ===== */}
         <section
