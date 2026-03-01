@@ -18,13 +18,18 @@ OrderForm is a specialized e-commerce platform designed for social media sellers
 
 - **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Database**: [MongoDB](https://www.mongodb.com/) with [Mongoose](https://mongoosejs.com/)
+- **Database**: [PostgreSQL](https://www.postgresql.org/) with [Prisma](https://www.prisma.io/)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **Components**: [Radix UI](https://www.radix-ui.com/), [Lucide React](https://lucide.dev/)
 - **Animations**: [Motion](https://motion.dev/) (Framer Motion)
 - **Forms**: [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/)
 - **Auth**: [NextAuth.js](https://next-auth.js.org/)
 - **Email**: [Resend](https://resend.com/)
+
+## Environment Variables (Database)
+
+- `DATABASE_URL` - Pooled Postgres connection string used by the running app.
+- `DIRECT_URL` - Direct Postgres connection string used by Prisma migrations (`migrate deploy`).
 
 
 ##  License
