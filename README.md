@@ -30,3 +30,27 @@ OrderForm is a specialized e-commerce platform designed for social media sellers
 ##  License
 
 This project is licensed under the [MIT License](LICENSE).
+
+## Environment Variables (Reviews + Rewards)
+
+To enable SMS discount rewards after review approval, configure:
+
+- `TIARA_CONNECT_SMS_ENDPOINT` - Full Tiara Connect SMS endpoint URL.
+- `TIARA_CONNECT_API_KEY` - Tiara Connect API key/token.
+- `TIARA_CONNECT_SENDER_ID` - Sender ID used for SMS (optional, based on provider account rules).
+- `TIARA_CONNECT_AUTH_HEADER` - Auth header name (default: `Authorization`).
+- `TIARA_CONNECT_AUTH_SCHEME` - Auth scheme prefix (default: `Bearer`).
+- `SMS_DEFAULT_COUNTRY_CODE` - Used when customer numbers start with `0` (default: `254`).
+- `REVIEW_REWARD_PERCENT_OFF` - Percent discount for approved reviews (default: `10`).
+- `REVIEW_REWARD_EXPIRY_DAYS` - Discount code validity in days (default: `30`).
+
+## Environment Variables (M-Pesa)
+
+- `MPESA_ENVIRONMENT` - `sandbox` or `live`.
+- `MPESA_CONSUMER_KEY` - Daraja app consumer key.
+- `MPESA_CONSUMER_SECRET` - Daraja app consumer secret.
+- `MPESA_SHORTCODE` - PayBill/Till shortcode.
+- `MPESA_PASSKEY` - STK passkey.
+- `MPESA_CALLBACK_URL` - Optional explicit callback URL (overrides auto-build).
+- `MPESA_CALLBACK_TOKEN` - Optional token query guard for callback endpoint.
+- `APP_URL` or `NEXTAUTH_URL` - Used to auto-build callback URL when `MPESA_CALLBACK_URL` is not set.

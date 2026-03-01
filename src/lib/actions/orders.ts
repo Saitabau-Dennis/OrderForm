@@ -5,10 +5,16 @@ import { revalidatePath } from "next/cache";
 import db from "@/lib/db";
 import { z } from "zod";
 
+const rewardPercentFromEnv = Number(process.env.REVIEW_REWARD_PERCENT_OFF || "10");
+const DEFAULT_PERCENT_OFF =
+  Number.isFinite(rewardPercentFromEnv) && rewardPercentFromEnv > 0
+    ? rewardPercentFromEnv
+    : 10;
+
 const CreateOrderSchema = z.object({
   storeId: z.string(),
   customerName: z.string().min(1, "Name is required"),
-  customerPhone: z.string().min(1, "Phone is required"),
+  customerPhone: z.string().min(7, "Phone is required"),
   deliveryAddress: z.string().min(1, "Address is required"),
   deliveryZone: z.string().optional(),
   items: z.array(z.object({
@@ -18,9 +24,19 @@ const CreateOrderSchema = z.object({
     price: z.number(),
     variant: z.string().optional()
   })),
-  totalAmount: z.number(),
+  totalAmount: z.number().optional(),
+  discountCode: z.string().trim().optional(),
   notes: z.string().optional()
 });
+
+const normalizePhone = (phone: string) => phone.replace(/\D/g, "");
+const normalizePhoneForKey = (phone: string) => {
+  const digits = normalizePhone(phone);
+  if (digits) return digits;
+  return phone.trim().toLowerCase().replace(/\s+/g, "");
+};
+
+const roundMoney = (amount: number) => Math.round(amount * 100) / 100;
 
 export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
   try {
@@ -43,40 +59,182 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
     // Note: In a high-volume prod app, we'd handle collisions with a retry loop here.
     // For now, the probability is low enough for this scale.
 
-    // Verify products exist to prevent foreign key errors
-    const productIds = validatedData.items.map(i => i.productId);
-    const existingProducts = await db.product.findMany({
-      where: { id: { in: productIds } },
-      select: { id: true }
+    // Load products from DB so totals cannot be tampered with on the client.
+    const productIds = validatedData.items.map((item) => item.productId);
+    const products = await db.product.findMany({
+      where: {
+        id: { in: productIds },
+        storeId: store.id,
+      },
+      select: {
+        id: true,
+        name: true,
+        price: true,
+      },
     });
-    const existingProductIds = new Set(existingProducts.map(p => p.id));
+    const productMap = new Map(products.map((p) => [p.id, p]));
 
-    const order = await db.order.create({
-      data: {
-        storeId: validatedData.storeId,
-        displayId: displayId,
-        customerName: validatedData.customerName,
-        customerPhone: validatedData.customerPhone,
-        deliveryAddress: validatedData.deliveryAddress,
-        deliveryZone: validatedData.deliveryZone,
-        totalAmount: validatedData.totalAmount,
-        subtotal: validatedData.totalAmount,
-        notes: validatedData.notes,
-        items: {
-          create: validatedData.items.map(item => ({
-            productId: existingProductIds.has(item.productId) ? item.productId : null, // Set to null if product doesn't exist
-            name: item.name,
-            quantity: item.quantity,
-            price: item.price,
-            variant: item.variant
-          }))
+    const lineItems = validatedData.items.map((item) => {
+      const product = productMap.get(item.productId);
+      if (!product) {
+        throw new Error(`Product not found: ${item.productId}`);
+      }
+
+      const unitPrice = Number(product.price);
+      return {
+        productId: product.id,
+        name: product.name,
+        quantity: item.quantity,
+        price: unitPrice,
+        variant: item.variant,
+        lineTotal: unitPrice * item.quantity,
+      };
+    });
+
+    const subtotal = roundMoney(
+      lineItems.reduce((sum, item) => sum + item.lineTotal, 0)
+    );
+
+    const requestedCode = validatedData.discountCode?.toUpperCase().trim();
+    let appliedDiscountCode: {
+      id: string;
+      code: string;
+      percentOff: number;
+      usedCount: number;
+      maxUses: number;
+      isActive: boolean;
+      expiresAt: Date;
+      customerPhone: string | null;
+    } | null = null;
+    let discountAmount = 0;
+
+    if (requestedCode) {
+      const discountCode = await db.discountCode.findUnique({
+        where: { code: requestedCode },
+      });
+
+      const now = new Date();
+      const validForStore = discountCode?.storeId === store.id;
+      const stillUsable =
+        !!discountCode &&
+        discountCode.isActive &&
+        discountCode.expiresAt > now &&
+        discountCode.usedCount < discountCode.maxUses;
+      const sameCustomer =
+        !!discountCode &&
+        (!discountCode.customerPhone ||
+          normalizePhone(discountCode.customerPhone) ===
+            normalizePhone(validatedData.customerPhone));
+
+      if (!validForStore || !stillUsable || !sameCustomer) {
+        return { error: "Invalid or expired discount code." };
+      }
+
+      appliedDiscountCode = discountCode;
+      const safePercent =
+        discountCode.percentOff > 0 ? discountCode.percentOff : DEFAULT_PERCENT_OFF;
+      discountAmount = roundMoney((subtotal * safePercent) / 100);
+    }
+
+    const totalAmount = roundMoney(Math.max(0, subtotal - discountAmount));
+
+    const order = await db.$transaction(async (tx) => {
+      const normalizedPhone = normalizePhoneForKey(validatedData.customerPhone);
+      const customer = await tx.customer.upsert({
+        where: {
+          storeId_phoneNormalized: {
+            storeId: validatedData.storeId,
+            phoneNormalized: normalizedPhone,
+          },
+        },
+        update: {
+          name: validatedData.customerName,
+          phone: validatedData.customerPhone.trim(),
+          defaultAddress: validatedData.deliveryAddress,
+        },
+        create: {
+          storeId: validatedData.storeId,
+          name: validatedData.customerName,
+          phone: validatedData.customerPhone.trim(),
+          phoneNormalized: normalizedPhone,
+          defaultAddress: validatedData.deliveryAddress,
+        },
+        select: { id: true },
+      });
+
+      const createdOrder = await tx.order.create({
+        data: {
+          storeId: validatedData.storeId,
+          customerId: customer.id,
+          displayId: displayId,
+          customerName: validatedData.customerName,
+          customerPhone: validatedData.customerPhone,
+          deliveryAddress: validatedData.deliveryAddress,
+          deliveryZone: validatedData.deliveryZone,
+          totalAmount,
+          subtotal,
+          discountAmount,
+          discountCodeUsed: appliedDiscountCode?.code,
+          notes: validatedData.notes,
+          items: {
+            create: lineItems.map((item) => ({
+              productId: item.productId,
+              name: item.name,
+              quantity: item.quantity,
+              price: item.price,
+              variant: item.variant,
+            })),
+          },
+        },
+      });
+
+      if (appliedDiscountCode) {
+        const redemption = await tx.discountCode.updateMany({
+          where: {
+            id: appliedDiscountCode.id,
+            isActive: true,
+            expiresAt: { gt: new Date() },
+            usedCount: { lt: appliedDiscountCode.maxUses },
+          },
+          data: { usedCount: { increment: 1 } },
+        });
+
+        if (redemption.count === 0) {
+          throw new Error("Discount code is no longer available.");
+        }
+
+        const refreshedCode = await tx.discountCode.findUnique({
+          where: { id: appliedDiscountCode.id },
+          select: { usedCount: true, maxUses: true },
+        });
+
+        if (refreshedCode && refreshedCode.usedCount >= refreshedCode.maxUses) {
+          await tx.discountCode.update({
+            where: { id: appliedDiscountCode.id },
+            data: { isActive: false },
+          });
         }
       }
+
+      return createdOrder;
     });
 
-    return { success: true, orderId: order.displayId || order.orderNumber, id: order.id };
+    return {
+      success: true,
+      orderId: order.displayId || order.orderNumber,
+      id: order.id,
+      pricing: {
+        subtotal,
+        discountAmount,
+        totalAmount,
+      },
+      appliedDiscountCode: appliedDiscountCode?.code ?? null,
+    };
   } catch (error) {
     console.error("Error creating order:", error);
+    if (error instanceof Error && error.message.includes("Discount code is no longer available")) {
+      return { error: "Discount code is no longer available." };
+    }
     return { error: "Failed to create order" };
   }
 }

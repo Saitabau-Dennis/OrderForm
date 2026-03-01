@@ -70,14 +70,14 @@ export function Navbar() {
       <nav
         className="flex items-center justify-between w-full max-w-7xl py-1 px-2"
       >
-        <Link 
-            href="/" 
-            className="flex items-center gap-1 relative z-10 shrink-0" 
+        <Link
+            href="/"
+            className="flex items-center gap-1 relative z-10 shrink-0"
             onClick={() => setIsMobileMenuOpen(false)}
         >
             <span className="relative inline-flex h-9 w-9 items-center justify-center overflow-hidden">
                 <Image
-                    src="/images/Logo-OF.png"
+                    src="/images/logo-of.png"
                     alt="OrderForm logo"
                     width={661}
                     height={377}
@@ -85,7 +85,7 @@ export function Navbar() {
                     className="h-6 w-6 object-cover scale-[3]"
                 />
             </span>
-            <span className="[font-family:var(--font-signika)] text-xl md:text-2xl font-medium [font-style:oblique_18deg] text-foreground tracking-tight">
+            <span className="[font-family:var(--font-instrument-serif)] text-lg md:text-xl font-normal text-foreground tracking-tight mt-1">
               Orderform
             </span>
         </Link>
@@ -93,42 +93,42 @@ export function Navbar() {
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
             <NavLink href="#about" onClick={(e) => handleScroll(e, "#about")}>About</NavLink>
-            
+
             <div className="relative group">
-                <button 
+                <button
                     className="flex items-center gap-1 relative px-4 py-2 text-[15px] font-semibold text-foreground/70 hover:text-primary transition-colors rounded-full hover:bg-gray-50 cursor-pointer outline-none"
                     onClick={(e) => handleScroll(e, "#features")}
                 >
                     Features
                     <ChevronDown className="w-3 h-3 transition-transform duration-200 group-hover:rotate-180 opacity-70" />
                 </button>
-                
+
                 {/* Dropdown Content */}
                 <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 w-72 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top scale-95 group-hover:scale-100">
                     <div className="bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden p-3 backdrop-blur-xl">
-                        <FeatureItem 
-                            href="#features" 
-                            title="Store Link" 
+                        <FeatureItem
+                            href="#features"
+                            title="Store Link"
                             description="A professional link for your social bio."
-                            onClick={(e) => handleScroll(e, "#features")} 
+                            onClick={(e) => handleScroll(e, "#features")}
                         />
-                        <FeatureItem 
-                            href="#features" 
-                            title="Product Catalog" 
+                        <FeatureItem
+                            href="#features"
+                            title="Product Catalog"
                             description="Organize and showcase your items."
-                            onClick={(e) => handleScroll(e, "#features")} 
+                            onClick={(e) => handleScroll(e, "#features")}
                         />
-                        <FeatureItem 
-                            href="#features" 
-                            title="WhatsApp Checkout" 
+                        <FeatureItem
+                            href="#features"
+                            title="WhatsApp Checkout"
                             description="Receive structured orders in chat."
-                            onClick={(e) => handleScroll(e, "#features")} 
+                            onClick={(e) => handleScroll(e, "#features")}
                         />
-                        <FeatureItem 
-                            href="#mini-store" 
-                            title="Mini Store" 
+                        <FeatureItem
+                            href="#mini-store"
+                            title="Mini Store"
                             description="Mobile-first preview for customers."
-                            onClick={(e) => handleScroll(e, "#mini-store")} 
+                            onClick={(e) => handleScroll(e, "#mini-store")}
                         />
                     </div>
                 </div>
@@ -140,7 +140,7 @@ export function Navbar() {
 
         {/* Right Actions */}
         <div className="flex items-center gap-2 shrink-0">
-            <Link 
+            <Link
                 href={session ? "/dashboard" : "/login"}
                 target="_blank"
                 className="hidden md:block text-[15px] font-semibold text-foreground/70 hover:text-primary transition-colors px-4"
@@ -148,7 +148,7 @@ export function Navbar() {
             Log in
             </Link>
             <Link href={session ? "/dashboard" : "/register"} target="_blank" className="hidden md:block">
-                <Button 
+                <Button
                     size="sm"
                     className="rounded-full px-4 font-semibold"
                 >
@@ -168,14 +168,14 @@ export function Navbar() {
                 <div className="flex items-center gap-2 mb-2">
                     <span className="relative inline-flex h-9 w-9 items-center justify-center overflow-hidden">
                         <Image
-                            src="/images/Logo-OF.png"
+                            src="/images/logo-of.png"
                             alt="OrderForm logo"
                             width={661}
                             height={377}
                             className="h-6 w-6 object-cover scale-[3]"
                         />
                     </span>
-                    <SheetTitle className="[font-family:var(--font-signika)] tracking-tight text-xl mb-0 font-bold [font-style:oblique_18deg] text-foreground">
+                    <SheetTitle className="[font-family:var(--font-instrument-serif)] tracking-tight text-2xl mb-0 font-normal text-foreground mt-1">
                         OrderForm
                     </SheetTitle>
                 </div>
@@ -218,7 +218,7 @@ Navbar.displayName = "Navbar"
 
 function NavLink({ href, onClick, children }: { href: string, onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void, children: React.ReactNode }) {
     return (
-        <a 
+        <a
             href={href}
             onClick={onClick}
             className="relative px-4 py-2 text-[15px] font-semibold text-foreground/70 hover:text-primary transition-all rounded-full hover:bg-gray-50 cursor-pointer"
@@ -243,7 +243,7 @@ function MobileNavLink({ href, onClick, children }: { href: string, onClick: (e:
 
 function FeatureItem({ href, title, description, onClick }: { href: string, title: string, description: string, onClick: (e: React.MouseEvent<HTMLAnchorElement>) => void }) {
     return (
-        <a 
+        <a
             href={href}
             onClick={onClick}
             className="flex flex-col gap-0.5 p-3 rounded-xl hover:bg-gray-50 transition-all group/item"

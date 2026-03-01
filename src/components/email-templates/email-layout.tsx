@@ -86,15 +86,17 @@ export function EmailLayout({ preview, children }: EmailLayoutProps) {
           >
             <Text
               style={{
-                fontSize: "16px",
-                lineHeight: "24px",
-                fontWeight: 700,
+                fontFamily: "var(--font-instrument-serif), Georgia, serif",
+                fontSize: "24px",
+                lineHeight: "28px",
+                fontWeight: 400,
                 color: EMAIL_THEME.colors.primary,
                 margin: "0 0 20px",
                 textAlign: "center",
+                fontStyle: "italic",
               }}
             >
-              OrderForm
+              Orderform
             </Text>
             <Section>{children}</Section>
           </Section>

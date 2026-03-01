@@ -10,8 +10,8 @@ export function Footer() {
 
         {/* Brand Section */}
         <div className="flex flex-col gap-4 max-w-xs">
-            <div className="flex items-center gap-1">
-                 <span className="[font-family:var(--font-signika)] text-xl md:text-2xl font-medium [font-style:oblique_18deg] text-foreground tracking-tight">
+             <div className="flex items-center gap-1">
+                 <span className="[font-family:var(--font-instrument-serif)] text-2xl md:text-3xl font-normal text-foreground tracking-tight mt-1">
               Orderform
             </span>
             </div>

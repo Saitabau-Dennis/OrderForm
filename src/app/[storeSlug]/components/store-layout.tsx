@@ -76,8 +76,7 @@ export function StoreContent({ store, products }: StoreLayoutProps) {
                   <div>
                     <h3 className="font-bold text-stone-900 text-sm">Share your purchase, get featured</h3>
                     <p className="text-[13px] text-stone-500 mt-0.5">
-                      Upload a photo and join our gallery
-                      {store.rewardConfig?.isEnabled && " — plus earn rewards"}
+                      Upload a photo review. Approved posts get an SMS discount code.
                     </p>
                   </div>
                 </div>
@@ -147,7 +146,7 @@ export function StoreContent({ store, products }: StoreLayoutProps) {
                 <span className="font-semibold text-white text-sm">{store.name}</span>
               </div>
               <p className="text-xs text-stone-500">
-                Powered by <span className="font-semibold text-stone-400">OrderForm</span>
+                Powered by <span className="[font-family:var(--font-instrument-serif)] text-[15px] font-normal tracking-tight text-stone-400">Orderform</span>
               </p>
             </div>
           </div>

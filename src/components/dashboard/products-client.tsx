@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Plus, Filter, FileDown, Settings } from "lucide-react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/dashboard/button";
+import { Button } from "@/components/dashboard/dashboard-button";
 import {
   Sheet,
   SheetContent,

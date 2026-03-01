@@ -3,9 +3,27 @@
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import db from "@/lib/db";
+import { z } from "zod";
 
-export async function createProduct(data: any) {
+const ProductInputSchema = z.object({
+  name: z.string().min(1, "Product name is required"),
+  description: z.string().optional().nullable(),
+  price: z.coerce.number().positive("Price must be greater than 0"),
+  imageUrl: z.string().optional().nullable(),
+  category: z.string().optional().nullable(),
+  sizes: z.string().optional().nullable(),
+  isAvailable: z.boolean().optional(),
+  variants: z.unknown().optional(),
+});
+
+type ProductInput = z.infer<typeof ProductInputSchema>;
+
+const normalizeProductPayload = (raw: unknown): ProductInput =>
+  ProductInputSchema.parse(raw);
+
+export async function createProduct(data: unknown) {
   try {
+    const payload = normalizeProductPayload(data);
     const session = await auth();
 
     if (!session) {
@@ -28,14 +46,14 @@ export async function createProduct(data: any) {
     const product = await db.product.create({
       data: {
         storeId: store.id,
-        name: data.name,
-        description: data.description,
-        price: parseFloat(data.price),
-        imageUrl: data.imageUrl,
-        category: data.category,
-        sizes: data.sizes,
-        isAvailable: data.isAvailable,
-        variants: data.variants || [], // Store as JSON
+        name: payload.name,
+        description: payload.description ?? null,
+        price: payload.price,
+        imageUrl: payload.imageUrl ?? null,
+        category: payload.category ?? null,
+        sizes: payload.sizes ?? null,
+        isAvailable: payload.isAvailable ?? true,
+        variants: payload.variants ?? [], // Store as JSON
       }
     });
 
@@ -50,8 +68,9 @@ export async function createProduct(data: any) {
   }
 }
 
-export async function updateProduct(id: string, data: any) {
+export async function updateProduct(id: string, data: unknown) {
   try {
+    const payload = normalizeProductPayload(data);
     const session = await auth();
 
     if (!session) {
@@ -78,14 +97,14 @@ export async function updateProduct(id: string, data: any) {
     const updatedProduct = await db.product.update({
       where: { id: id },
       data: {
-        name: data.name,
-        description: data.description,
-        price: parseFloat(data.price),
-        imageUrl: data.imageUrl,
-        category: data.category,
-        sizes: data.sizes,
-        isAvailable: data.isAvailable,
-        variants: data.variants || [],
+        name: payload.name,
+        description: payload.description ?? null,
+        price: payload.price,
+        imageUrl: payload.imageUrl ?? null,
+        category: payload.category ?? null,
+        sizes: payload.sizes ?? null,
+        isAvailable: payload.isAvailable ?? true,
+        variants: payload.variants ?? [],
       }
     });
 

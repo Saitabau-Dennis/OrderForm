@@ -18,51 +18,51 @@ type FeatureItem = {
 
 const featureItems: FeatureItem[] = [
     {
-        title: "Store link for your bio",
+        title: "Shareable Store Link",
         description:
-            "Ditch the messy DMs. Create one professional, shareable link that showcases your entire catalog. It’s perfect for Instagram, TikTok, and WhatsApp bios, giving your customers a seamless way to browse and shop 24/7.",
+            "Share one clean storefront link in your Instagram, TikTok, or WhatsApp bio. Customers can browse your products and place orders anytime without asking for prices in DMs.",
         src: "/images/dashboard-v2.png",
-        alt: "Store link for your bio",
+        alt: "Bio link storefront preview",
         width: 1207,
         height: 929,
         cardClassName: "border-b lg:border-r border-border/60",
     },
     {
-        title: "Product catalog management",
+        title: "Easy Product Catalog",
         description:
-            "Effortlessly organize your inventory. Add high-quality photos, set clear prices, manage stock levels, and offer product variations like size or color. Update everything instantly from your dashboard.",
+            "Manage products from one dashboard. Add photos, update prices, track stock, and set variations like size or color so your catalog stays accurate and easy to shop.",
         src: "/images/dashboard-v2.png",
-        alt: "Inventory Management",
+        alt: "Catalog management dashboard",
         width: 1207,
         height: 929,
         cardClassName: "border-b border-border/60",
     },
     {
-        title: "Cart & WhatsApp checkout",
+        title: "WhatsApp Cart Checkout",
         description:
-            "Streamline the buying process. Customers build a cart with their favorite items and checkout instantly. OrderForm generates a structured WhatsApp message with all order details, ready for them to send to you.",
+            "Let shoppers build a cart, then send the order via WhatsApp in one step. OrderForm prepares a complete pre-filled message with item, quantity, and customer details.",
         src: "/images/dashboard-v2.png",
-        alt: "Cart and WhatsApp checkout",
+        alt: "Cart and WhatsApp checkout flow",
         width: 1207,
         height: 929,
         cardClassName: "border-b lg:border-b-0 lg:border-r border-border/60",
     },
     {
-        title: "No accounts or apps",
+        title: "No Sign-Up or App Needed",
         description:
-            "Remove friction from sales. Your customers don’t need to download another app or remember another password. The entire shopping experience happens directly in their browser and ends in the chat app they already use.",
+            "Remove buying friction completely. Customers do not need to register or install anything; they browse in the browser and finish checkout in the chat app they already use.",
         src: "/images/dashboard-v2.png",
-        alt: "No accounts or apps",
+        alt: "Browser-first shopping experience",
         width: 1207,
         height: 929,
         cardClassName: "border-b lg:border-b-0 border-border/60",
     },
     {
-        title: "Customer engagement & loyalty",
+        title: "Customer Reviews and Rewards",
         description:
-            "Turn one-time buyers into repeat customers. Allow satisfied shoppers to upload photos of their purchases. Approve their posts to build social proof and automatically reward them with discount codes for their next order.",
+            "Turn happy buyers into repeat customers. Collect customer photos as social proof and reward approved submissions with automatic discount codes for their next purchase.",
         src: "/images/dashboard-v2.png",
-        alt: "Customer photos and discounts",
+        alt: "Customer reviews and loyalty rewards",
         width: 1207,
         height: 929,
         cardClassName: "lg:col-span-2 border-t border-border/60",
@@ -156,7 +156,7 @@ const DualModeImage = ({ src, alt, width, height, className }: DualModeImageProp
         width={width}
         height={height}
         className={cn(
-            "block h-auto w-full rounded-lg border border-border/60 bg-background shadow-[0_10px_24px_rgba(0,0,0,0.08)]",
+            "block h-auto w-full rounded-lg border border-border/60 bg-background shadow-[0_28px_60px_-24px_rgba(0,0,0,0.65),0_14px_28px_-18px_rgba(0,0,0,0.55)]",
             className
         )}
     />

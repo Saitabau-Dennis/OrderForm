@@ -7,24 +7,21 @@ import {
   Package,
   Settings,
   ShoppingCart,
-  LogOut,
   Menu,
   ChevronRight,
   ChevronDown,
   ChevronUp,
-  LifeBuoy,
   Plus,
 
   Users,
   Store,
-  ExternalLink,
   Home,
   MoreHorizontal,
   Check,
   CircleAlert
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Button } from "@/components/dashboard/button";
+import { Button } from "@/components/dashboard/dashboard-button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,

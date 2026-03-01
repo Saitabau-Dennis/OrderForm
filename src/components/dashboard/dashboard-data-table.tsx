@@ -15,7 +15,7 @@ import {
 } from "@tanstack/react-table"
 import { ArrowUpDown, ChevronDown, Search, ChevronLeft, ChevronRight } from "lucide-react"
 
-import { Button } from "@/components/dashboard/button"
+import { Button } from "@/components/dashboard/dashboard-button"
 import { Input } from "@/components/ui/input"
 import {
   Table,

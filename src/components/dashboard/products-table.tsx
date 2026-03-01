@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { ColumnDef } from "@tanstack/react-table";
 import { formatDistanceToNow } from "date-fns";
 
-import { Button } from "@/components/dashboard/button";
+import { Button } from "@/components/dashboard/dashboard-button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { DataTable } from "@/components/ui/data-table";
+import { DataTable } from "@/components/dashboard/dashboard-data-table";
 
 interface Product {
   id: string;

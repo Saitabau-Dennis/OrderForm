@@ -1,9 +1,9 @@
-import { WaveLoader } from "@/components/ui/wave-loader";
+import { StorefrontLoader } from "@/app/[storeSlug]/components/storefront-loader";
 
 export default function StorefrontLoading() {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-white">
-      <WaveLoader className="h-12" />
+    <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center bg-background">
+      <StorefrontLoader className="scale-110" />
     </div>
   );
 }

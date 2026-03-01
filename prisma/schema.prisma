@@ -9,6 +9,50 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum CampaignStatus {
+  DRAFT
+  SCHEDULED
+  ACTIVE
+  PAUSED
+  ENDED
+}
+
+enum CampaignAudience {
+  ALL
+  NEW_CUSTOMERS
+  RETURNING_CUSTOMERS
+  VIP
+}
+
+enum DiscountType {
+  PERCENT
+  FIXED
+  FREE_SHIPPING
+}
+
+enum BannerPlacement {
+  HOME_TOP
+  HOME_MID
+  CHECKOUT
+}
+
+enum DomainStatus {
+  PENDING
+  VERIFIED
+  FAILED
+}
+
+enum PaymentProvider {
+  MPESA
+}
+
+enum PaymentTransactionStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  CANCELLED
+}
+
 // --- NextAuth Models ---
 
 model VerificationToken {
@@ -35,133 +79,372 @@ model User {
   resetToken               String?
   resetTokenExpiry         DateTime?
 
-  stores        Store[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  stores           Store[]
+  campaignsCreated Campaign[]
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
 }
 
 model Store {
-  id              String    @id @default(cuid())
-  slug            String    @unique
-  name            String
-  description     String?
-  whatsappNumber  String?
-  currency        String    @default("KES")
+  id             String  @id @default(cuid())
+  slug           String  @unique
+  name           String
+  description    String?
+  whatsappNumber String?
+  currency       String  @default("KES")
 
   // Branding
-  logoUrl         String?
-  brandColor      String    @default("#30382F")
-  secondaryColor  String    @default("#95D5B2")
-  theme           String    @default("Modern Minimalist")
+  logoUrl        String?
+  brandColor     String  @default("#30382F")
+  secondaryColor String  @default("#95D5B2")
+  theme          String  @default("Modern Minimalist")
 
   // Business Logic
-  subscriptionPlan String   @default("free") // "free" | "pro"
-  isActive        Boolean   @default(true)
+  subscriptionPlan String  @default("free") // "free" | "pro"
+  isActive         Boolean @default(true)
 
   // Relations
-  userId          String
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  products        Product[]
-  orders          Order[]
-  reviews         Review[]
-  deliveryZones   DeliveryZone[]
+  userId              String
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customers           Customer[]
+  products            Product[]
+  orders              Order[]
+  reviews             Review[]
+  campaigns           Campaign[]
+  campaignBanners     CampaignBanner[]
+  discountCodes       DiscountCode[]
+  discountRedemptions DiscountRedemption[]
+  domains             StoreDomain[]
+  payments            Payment[]
+  paymentEvents       PaymentEvent[]
+  deliveryZones       DeliveryZone[]
 
   // Rewards (Json for flexibility)
-  rewardConfig    Json?     // { isEnabled: boolean, couponCode: string, successMessage: string }
+  rewardConfig Json? // { isEnabled: boolean, couponCode: string, successMessage: string }
 
   // Analytics
-  totalViews      Int       @default(0)
-  whatsappClicks  Int       @default(0)
+  totalViews     Int @default(0)
+  whatsappClicks Int @default(0)
 
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model DeliveryZone {
-  id        String   @id @default(cuid())
-  name      String
-  price     Decimal
-  storeId   String
-  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  id      String  @id @default(cuid())
+  name    String
+  price   Decimal
+  storeId String
+  store   Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
 }
 
 model Product {
-  id            String   @id @default(cuid())
-  name          String
-  description   String?
-  price         Decimal
-  imageUrl      String?
-  category      String?
-  sizes         String?  // Comma separated
-  isAvailable   Boolean  @default(true)
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  price       Decimal
+  imageUrl    String?
+  category    String?
+  sizes       String? // Comma separated
+  isAvailable Boolean @default(true)
 
   // Variants (stored as JSON)
-  variants      Json?    // [{ name: "Size", options: ["S", "M"] }]
+  variants Json? // [{ name: "Size", options: ["S", "M"] }]
 
   // Stats
-  averageRating Float    @default(0)
-  reviewCount   Int      @default(0)
+  averageRating Float @default(0)
+  reviewCount   Int   @default(0)
 
-  storeId       String
-  store         Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  orderItems    OrderItem[]
-  reviews       Review[]
+  storeId          String
+  store            Store             @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  orderItems       OrderItem[]
+  reviews          Review[]
+  campaignProducts CampaignProduct[]
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Order {
-  id              String   @id @default(cuid())
-  orderNumber     Int      @default(autoincrement())
-  displayId       String?  @unique
+  id          String  @id @default(cuid())
+  orderNumber Int     @default(autoincrement())
+  displayId   String? @unique
 
   customerName    String
   customerPhone   String
   deliveryAddress String
   deliveryZone    String?
 
-  subtotal        Decimal
-  deliveryFee     Decimal  @default(0)
-  totalAmount     Decimal
+  subtotal    Decimal
+  deliveryFee Decimal @default(0)
+  totalAmount Decimal
 
-  status          String   @default("pending") // pending, processing, shipped, delivered, cancelled
-  paymentStatus   String   @default("pending") // pending, paid, failed
-  notes           String?
+  status           String  @default("pending") // pending, processing, shipped, delivered, cancelled
+  paymentStatus    String  @default("pending") // pending, paid, failed
+  notes            String?
+  discountCodeUsed String?
+  discountAmount   Decimal @default(0)
 
-  storeId         String
-  store           Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  items           OrderItem[]
+  storeId             String
+  store               Store                @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  customerId          String?
+  customer            Customer?            @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  campaignId          String?
+  campaign            Campaign?            @relation("CampaignOrders", fields: [campaignId], references: [id], onDelete: SetNull)
+  items               OrderItem[]
+  reviews             Review[]
+  payments            Payment[]
+  discountRedemptions DiscountRedemption[]
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model OrderItem {
-  id        String  @id @default(cuid())
-  name      String
-  quantity  Int
-  price     Decimal
-  variant   String? // e.g., "Size: M"
+  id       String  @id @default(cuid())
+  name     String
+  quantity Int
+  price    Decimal
+  variant  String? // e.g., "Size: M"
 
   orderId   String
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productId String?
   product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
 }
 
 model Review {
-  id           String   @id @default(cuid())
-  customerName String?
-  rating       Int
-  comment      String?
-  imageUrl     String?
-  isApproved   Boolean  @default(false)
+  id              String    @id @default(cuid())
+  customerName    String?
+  customerPhone   String?
+  rating          Int
+  comment         String?
+  imageUrl        String?
+  isApproved      Boolean   @default(false)
+  approvalStatus  String    @default("pending") // pending, approved, rejected
+  orderRef        String?
+  approvedAt      DateTime?
+  rewardSmsSentAt DateTime?
 
   storeId      String
-  store        Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  store        Store         @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  customerId   String?
+  customer     Customer?     @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  orderId      String?
+  order        Order?        @relation(fields: [orderId], references: [id], onDelete: SetNull)
   productId    String?
-  product      Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product      Product?      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  discountCode DiscountCode?
 
-  createdAt    DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  @@index([storeId, approvalStatus, createdAt])
+}
+
+model DiscountCode {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  percentOff    Int
+  maxUses       Int      @default(1)
+  usedCount     Int      @default(0)
+  isActive      Boolean  @default(true)
+  expiresAt     DateTime
+  customerPhone String?
+
+  storeId     String
+  store       Store                @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  customerId  String?
+  customer    Customer?            @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  campaignId  String?
+  campaign    Campaign?            @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  reviewId    String?              @unique
+  review      Review?              @relation(fields: [reviewId], references: [id], onDelete: SetNull)
+  redemptions DiscountRedemption[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([storeId, isActive, expiresAt])
+}
+
+model Customer {
+  id              String  @id @default(cuid())
+  name            String?
+  phone           String
+  phoneNormalized String
+  email           String?
+  defaultAddress  String?
+  notes           String?
+  isActive        Boolean @default(true)
+
+  storeId       String
+  store         Store                @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  orders        Order[]
+  reviews       Review[]
+  discountCodes DiscountCode[]
+  redemptions   DiscountRedemption[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([storeId, phoneNormalized])
+  @@index([storeId, createdAt])
+}
+
+model Campaign {
+  id                    String           @id @default(cuid())
+  name                  String
+  slug                  String
+  description           String?
+  status                CampaignStatus   @default(DRAFT)
+  startsAt              DateTime?
+  endsAt                DateTime?
+  priority              Int              @default(0)
+  discountType          DiscountType     @default(PERCENT)
+  discountValue         Decimal          @default(0)
+  minOrderAmount        Decimal?
+  maxDiscountAmount     Decimal?
+  isAutoApply           Boolean          @default(false)
+  audience              CampaignAudience @default(ALL)
+  usageLimitTotal       Int?
+  usageLimitPerCustomer Int?
+  isVisible             Boolean          @default(true)
+
+  storeId         String
+  store           Store                @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  createdByUserId String?
+  createdByUser   User?                @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
+  banners         CampaignBanner[]
+  products        CampaignProduct[]
+  discountCodes   DiscountCode[]
+  redemptions     DiscountRedemption[]
+  orders          Order[]              @relation("CampaignOrders")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([storeId, slug])
+  @@index([storeId, status, startsAt, endsAt])
+}
+
+model CampaignBanner {
+  id              String          @id @default(cuid())
+  title           String
+  subtitle        String?
+  ctaLabel        String?
+  ctaUrl          String?
+  imageUrl        String?
+  backgroundColor String?
+  textColor       String?
+  placement       BannerPlacement @default(HOME_TOP)
+  isVisible       Boolean         @default(true)
+  startsAt        DateTime?
+  endsAt          DateTime?
+  sortOrder       Int             @default(0)
+
+  storeId    String
+  store      Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([storeId, placement, isVisible, startsAt, endsAt])
+}
+
+model CampaignProduct {
+  campaignId String
+  productId  String
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@id([campaignId, productId])
+  @@index([productId])
+}
+
+model DiscountRedemption {
+  id               String  @id @default(cuid())
+  amountDiscounted Decimal
+  codeSnapshot     String?
+
+  storeId        String
+  store          Store        @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  discountCodeId String
+  discountCode   DiscountCode @relation(fields: [discountCodeId], references: [id], onDelete: Cascade)
+  campaignId     String?
+  campaign       Campaign?    @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  customerId     String?
+  customer       Customer?    @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  orderId        String
+  order          Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([orderId, discountCodeId])
+  @@index([storeId, createdAt])
+}
+
+model StoreDomain {
+  id                String       @id @default(cuid())
+  domain            String       @unique
+  isPrimary         Boolean      @default(false)
+  status            DomainStatus @default(PENDING)
+  verificationToken String?
+  dnsTarget         String?
+  verifiedAt        DateTime?
+
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([storeId, status])
+}
+
+model Payment {
+  id                 String                   @id @default(cuid())
+  provider           PaymentProvider          @default(MPESA)
+  status             PaymentTransactionStatus @default(PENDING)
+  amount             Decimal
+  currency           String                   @default("KES")
+  phone              String
+  checkoutRequestId  String?                  @unique
+  merchantRequestId  String?
+  mpesaReceiptNumber String?                  @unique
+  providerReference  String?
+  failureReason      String?
+  requestPayload     Json?
+  callbackPayload    Json?
+  paidAt             DateTime?
+
+  storeId String
+  store   Store          @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  orderId String
+  order   Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  events  PaymentEvent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([storeId, status, createdAt])
+  @@index([orderId])
+}
+
+model PaymentEvent {
+  id        String @id @default(cuid())
+  eventType String
+  payload   Json?
+
+  storeId   String
+  store     Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  paymentId String
+  payment   Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([storeId, createdAt])
+  @@index([paymentId, createdAt])
 }

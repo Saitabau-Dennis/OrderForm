@@ -4,8 +4,8 @@ import { ColumnDef } from "@tanstack/react-table";
 import { formatDistanceToNow } from "date-fns";
 import { ArrowUpDown, Mail, Package, Users } from "lucide-react";
 
-import { Button } from "@/components/dashboard/button";
-import { DataTable } from "@/components/ui/data-table";
+import { Button } from "@/components/dashboard/dashboard-button";
+import { DataTable } from "@/components/dashboard/dashboard-data-table";
 
 export type CustomerColumn = {
   id: string;

@@ -165,7 +165,7 @@ export default function RegisterPage() {
       {/* Left Side - Text */}
       <div className="w-full hidden md:flex md:w-1/2 bg-primary p-10 flex-col justify-between text-primary-foreground relative overflow-hidden">
         <div className="relative z-10">
-          <Link href="/" className="font-logo text-2xl font-semibold tracking-tight mb-12 block">
+          <Link href="/" className="[font-family:var(--font-instrument-serif)] text-3xl font-normal tracking-tight mb-12 block mt-1">
             Orderform
           </Link>
           <h1 className="font-heading text-4xl md:text-5xl font-semibold tracking-tight leading-tight mb-6">
@@ -199,7 +199,7 @@ export default function RegisterPage() {
       <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col justify-center bg-background">
         <div className="max-w-sm mx-auto w-full">
           <div className="md:hidden mb-6 text-center">
-             <Link href="/" className="font-logo text-2xl font-semibold tracking-tight text-primary">
+             <Link href="/" className="[font-family:var(--font-instrument-serif)] text-3xl font-normal tracking-tight text-primary mt-1">
               Orderform
             </Link>
             <div className="flex gap-2 justify-center mt-4 mb-2" role="progressbar" aria-valuemin={1} aria-valuemax={3} aria-valuenow={step} aria-label={`Step ${step} of 3`}>

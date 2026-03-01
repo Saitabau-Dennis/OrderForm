@@ -18,6 +18,7 @@ const checkoutSchema = z.object({
   phone: z.string().min(10, "Please enter a valid phone number"),
   address: z.string().min(5, "Please enter a valid delivery address"),
   notes: z.string().optional(),
+  discountCode: z.string().optional(),
   paymentMethod: z.enum(["whatsapp", "mpesa"]),
 });
 
@@ -28,10 +29,9 @@ interface CheckoutFormProps {
   isLoading: boolean;
   totalAmount: number;
   currency: string;
-  hideSummary?: boolean;
 }
 
-export function CheckoutForm({ onSubmit, isLoading, totalAmount, currency, hideSummary = false }: CheckoutFormProps) {
+export function CheckoutForm({ onSubmit, isLoading, totalAmount, currency }: CheckoutFormProps) {
   const { brandColor } = useStore();
 
   const form = useForm<CheckoutFormData>({
@@ -42,6 +42,7 @@ export function CheckoutForm({ onSubmit, isLoading, totalAmount, currency, hideS
       phone: "",
       address: "",
       notes: "",
+      discountCode: "",
       paymentMethod: "whatsapp",
     },
   });
@@ -123,6 +124,20 @@ export function CheckoutForm({ onSubmit, isLoading, totalAmount, currency, hideS
               className="min-h-[60px] rounded-xl border-stone-200 bg-white font-dm-sans resize-none focus:border-stone-400 transition-colors"
             />
           </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="discountCode" className="text-sm font-medium text-stone-700">
+              Discount Code <span className="text-stone-400 font-normal">(optional)</span>
+            </Label>
+            <Input
+              id="discountCode"
+              placeholder="Enter your reward code"
+              {...register("discountCode")}
+              className="h-12 rounded-xl border-stone-200 bg-white font-dm-sans uppercase focus:border-stone-400 transition-colors"
+            />
+            <p className="text-xs text-stone-400">
+              Reward codes are one-time and tied to your phone number.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -151,16 +166,21 @@ export function CheckoutForm({ onSubmit, isLoading, totalAmount, currency, hideS
 
           <Label
             htmlFor="mpesa"
-            className="flex items-center justify-between p-4 rounded-xl border-2 border-stone-200 bg-stone-50 opacity-50 cursor-not-allowed"
+            className={cn(
+              "flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all",
+              paymentMethod === "mpesa"
+                ? "border-stone-900 bg-stone-50"
+                : "border-stone-200 bg-white hover:border-stone-300"
+            )}
           >
             <div className="flex items-center gap-3">
-              <RadioGroupItem value="mpesa" id="mpesa" disabled className="border-stone-300" />
-              <div className="flex items-center gap-2">
+              <RadioGroupItem value="mpesa" id="mpesa" className="border-stone-300" />
+              <div>
                 <span className="font-semibold text-stone-900 text-sm">M-Pesa</span>
-                <span className="text-[9px] px-1.5 py-0.5 bg-stone-200 rounded font-bold uppercase text-stone-500">Soon</span>
+                <p className="text-xs text-stone-400">Receive an STK push on your phone</p>
               </div>
             </div>
-            <CreditCard className="h-5 w-5 text-stone-300" />
+            <CreditCard className={cn("h-5 w-5", paymentMethod === "mpesa" ? "text-stone-900" : "text-stone-300")} />
           </Label>
         </RadioGroup>
       </div>
@@ -181,7 +201,7 @@ export function CheckoutForm({ onSubmit, isLoading, totalAmount, currency, hideS
         </Button>
         <div className="flex items-center justify-center gap-2 text-xs text-stone-400">
           <ShieldCheck className="h-3.5 w-3.5" />
-          Secure checkout by OrderForm
+          Secure checkout by <span className="[font-family:var(--font-instrument-serif)] text-base font-normal tracking-tight ml-0.5">Orderform</span>
         </div>
       </div>
     </form>

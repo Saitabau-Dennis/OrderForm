@@ -6,8 +6,7 @@ import {
   Star,
   CheckCircle2,
   Sparkles,
-  Loader2,
-  Gift
+  Loader2
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -28,8 +27,14 @@ import { submitReview } from "@/lib/actions/reviews";
 import { toast } from "sonner";
 
 interface ShareClientProps {
-  store: any;
-  products: any[];
+  store: {
+    id: string;
+    slug: string;
+  };
+  products: Array<{
+    id: string;
+    name: string;
+  }>;
 }
 
 export function ShareClient({ store, products }: ShareClientProps) {
@@ -41,6 +46,8 @@ export function ShareClient({ store, products }: ShareClientProps) {
   const [formData, setFormData] = useState({
     productId: "",
     customerName: "",
+    customerPhone: "",
+    orderRef: "",
     comment: "",
     rating: 5,
     imageUrl: ""
@@ -58,17 +65,19 @@ export function ShareClient({ store, products }: ShareClientProps) {
         storeId: store.id,
         productId: formData.productId || undefined,
         customerName: formData.customerName,
+        customerPhone: formData.customerPhone,
+        orderRef: formData.orderRef,
         rating: formData.rating,
         comment: formData.comment,
         imageUrl: formData.imageUrl
       });
       if (res.success) {
         setSuccess(true);
-        toast.success("Thank you for sharing!");
+        toast.success("Review submitted for approval");
       } else {
         toast.error(res.error);
       }
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
@@ -81,17 +90,8 @@ export function ShareClient({ store, products }: ShareClientProps) {
         <CheckCircle2 className="h-12 w-12 mb-6" style={{ color: brandColor }} />
         <h1 className="text-3xl font-extrabold text-stone-900 font-dm-sans mb-3">Thank you!</h1>
         <p className="text-stone-500 max-w-sm mx-auto mb-8 leading-relaxed">
-          Your photo has been submitted and will be featured once approved.
+          Your review is pending approval. Once approved, we will send your discount code via SMS.
         </p>
-
-        {store.rewardConfig?.isEnabled && (
-          <div className="bg-stone-900 text-white p-8 rounded-2xl w-full max-w-sm mb-8 text-center">
-            <Gift className="h-6 w-6 text-amber-400 mx-auto mb-3" />
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-white/50 mb-2">Your Reward Code</p>
-            <h2 className="text-2xl font-extrabold font-dm-sans tracking-widest mb-2">{store.rewardConfig.couponCode}</h2>
-            <p className="text-sm text-stone-400">{store.rewardConfig.successMessage || "Use this on your next order."}</p>
-          </div>
-        )}
 
         <Button
           onClick={() => router.push(`/${store.slug}`)}
@@ -120,7 +120,7 @@ export function ShareClient({ store, products }: ShareClientProps) {
             Share your purchase
           </h1>
           <p className="text-stone-500 leading-relaxed">
-            Upload a photo and get featured in our gallery.
+            Upload a photo from your purchase. After approval, your discount code is sent by SMS.
           </p>
         </div>
 
@@ -144,6 +144,29 @@ export function ShareClient({ store, products }: ShareClientProps) {
                 placeholder="Sarah J."
                 value={formData.customerName}
                 onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
+                className="h-12 rounded-xl border-stone-200 bg-white font-dm-sans"
+                required
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium text-stone-700">Phone Number</Label>
+              <Input
+                placeholder="0712 345 678"
+                value={formData.customerPhone}
+                onChange={(e) => setFormData({ ...formData, customerPhone: e.target.value })}
+                className="h-12 rounded-xl border-stone-200 bg-white font-dm-sans"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium text-stone-700">Order Reference</Label>
+              <Input
+                placeholder="e.g. FASH1234"
+                value={formData.orderRef}
+                onChange={(e) => setFormData({ ...formData, orderRef: e.target.value })}
                 className="h-12 rounded-xl border-stone-200 bg-white font-dm-sans"
                 required
               />

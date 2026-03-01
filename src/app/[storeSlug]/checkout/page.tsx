@@ -4,7 +4,7 @@ import { useStore } from "../components/store-context";
 import { CheckoutForm, CheckoutFormData } from "../components/checkout-form";
 import { ArrowLeft, ShoppingBag } from "lucide-react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { createOrder } from "@/lib/actions/orders";
@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 
 export default function CheckoutPage() {
   const { storeSlug } = useParams();
-  const router = useRouter();
   const { cart, cartTotal, currency, brandColor, whatsappNumber, storeId, storeName } = useStore();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -40,6 +39,7 @@ export default function CheckoutPage() {
         customerPhone: data.phone,
         deliveryAddress: data.address,
         totalAmount: cartTotal,
+        discountCode: data.discountCode,
         notes: data.notes,
         items: cart.map(item => ({
           productId: item.id,
@@ -58,6 +58,38 @@ export default function CheckoutPage() {
       }
 
       const orderId = result.orderId;
+      const orderSubtotal = result.pricing?.subtotal ?? cartTotal;
+      const orderDiscount = result.pricing?.discountAmount ?? 0;
+      const orderTotal = result.pricing?.totalAmount ?? cartTotal;
+
+      if (data.paymentMethod === "mpesa") {
+        const mpesaResponse = await fetch("/api/payments/mpesa/stkpush", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            orderId: result.id,
+          }),
+        });
+
+        const mpesaResult = (await mpesaResponse.json()) as {
+          success?: boolean;
+          error?: string;
+          customerMessage?: string;
+        };
+
+        if (!mpesaResponse.ok || !mpesaResult.success) {
+          toast.error(mpesaResult.error || "Failed to initiate M-Pesa payment.");
+          return;
+        }
+
+        toast.success(
+          mpesaResult.customerMessage ||
+            "M-Pesa prompt sent. Complete payment on your phone."
+        );
+        return;
+      }
 
       if (data.paymentMethod === 'whatsapp') {
         const message = `*NEW ORDER: ${storeName.toUpperCase()}*\n\n` +
@@ -71,7 +103,9 @@ export default function CheckoutPage() {
           `${cart.map(item =>
             `- ${item.name} x${item.quantity}${item.variant ? ` (${item.variant})` : ''} (${currency} ${(item.price * item.quantity).toLocaleString()})`
           ).join('\n')}\n\n` +
-          `*TOTAL AMOUNT: ${currency} ${cartTotal.toLocaleString()}*\n\n` +
+          `Subtotal: ${currency} ${orderSubtotal.toLocaleString()}\n` +
+          `${orderDiscount > 0 ? `Discount: -${currency} ${orderDiscount.toLocaleString()}${result.appliedDiscountCode ? ` (${result.appliedDiscountCode})` : ''}\n` : ''}` +
+          `*TOTAL AMOUNT: ${currency} ${orderTotal.toLocaleString()}*\n\n` +
           `_Please confirm my order_`;
 
         let cleanPhone = whatsappNumber.replace(/\D/g, '');

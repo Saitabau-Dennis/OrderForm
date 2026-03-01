@@ -1,7 +1,7 @@
 "use client";
 
 import { FileText } from "lucide-react";
-import { Button } from "@/components/dashboard/button";
+import { Button } from "@/components/dashboard/dashboard-button";
 import { Separator } from "@/components/ui/separator";
 import { CustomersTable, CustomerColumn } from "@/components/dashboard/customers-table";
 

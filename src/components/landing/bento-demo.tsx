@@ -10,8 +10,6 @@ import {
 
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid"
 
-import Image from "next/image"
-
 const backgroundLayer = () => (
   <>
     <div
@@ -78,7 +76,7 @@ const features = [
   },
 ]
 
-function BentoDemo() {
+function MiniStoreBento() {
   return (
     <BentoGrid className="lg:grid-rows-3">
       {features.map((feature) => (
@@ -88,4 +86,4 @@ function BentoDemo() {
   )
 }
 
-export { BentoDemo }
+export { MiniStoreBento }

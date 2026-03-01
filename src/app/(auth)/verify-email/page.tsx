@@ -9,7 +9,7 @@ export default function VerifyEmailPage() {
       {/* Left Side - Text */}
       <div className="w-full hidden md:flex md:w-1/2 bg-primary p-10 flex-col justify-between text-primary-foreground relative overflow-hidden">
         <div className="relative z-10">
-          <Link href="/" className="font-logo text-2xl font-semibold tracking-tight mb-12 block">
+          <Link href="/" className="[font-family:var(--font-instrument-serif)] text-3xl font-normal tracking-tight mb-12 block mt-1">
             Orderform
           </Link>
           <h1 className="font-heading text-4xl md:text-5xl font-semibold tracking-tight leading-tight mb-6">
@@ -34,7 +34,7 @@ export default function VerifyEmailPage() {
       {/* Right Side - Form */}
       <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col justify-center bg-background">
          <div className="md:hidden mb-6 text-center max-w-sm mx-auto w-full">
-             <Link href="/" className="font-logo text-2xl font-semibold tracking-tight text-primary">
+             <Link href="/" className="[font-family:var(--font-instrument-serif)] text-3xl font-normal tracking-tight text-primary mt-1">
               Orderform
             </Link>
           </div>

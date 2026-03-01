@@ -1,7 +1,7 @@
 "use client"
 
 import { ScrollAnimation } from "@/components/ui/scroll-animation"
-import { BentoDemo } from "@/components/ui/demo"
+import { MiniStoreBento } from "@/components/landing/bento-demo"
 
 export function MiniStorePreview() {
   return (
@@ -26,7 +26,7 @@ export function MiniStorePreview() {
         </div>
 
         <ScrollAnimation variant="fade-up" delay={0.15}>
-          <BentoDemo />
+          <MiniStoreBento />
         </ScrollAnimation>
       </div>
     </section>

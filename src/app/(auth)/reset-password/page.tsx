@@ -275,7 +275,7 @@ export default function ResetPasswordPage() {
         <div className="relative z-10">
           <Link
             href="/"
-            className="font-logo text-2xl font-semibold tracking-tight mb-12 block"
+            className="[font-family:var(--font-instrument-serif)] text-3xl font-normal tracking-tight mb-12 block mt-1"
           >
             Orderform
           </Link>
@@ -301,7 +301,7 @@ export default function ResetPasswordPage() {
       {/* Right Side - Form */}
       <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col justify-center bg-background">
          <div className="md:hidden mb-6 text-center max-w-sm mx-auto w-full">
-             <Link href="/" className="font-logo text-2xl font-semibold tracking-tight text-primary">
+             <Link href="/" className="[font-family:var(--font-instrument-serif)] text-3xl font-normal tracking-tight text-primary mt-1">
               Orderform
             </Link>
           </div>
