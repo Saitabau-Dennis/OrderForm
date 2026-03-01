@@ -1,13 +1,12 @@
 "use client";
 
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, MessageCircle, CreditCard, ShieldCheck } from "lucide-react";
+import { Loader2, MessageCircle, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useStore } from "./store-context";
 import { cn } from "@/lib/utils";
@@ -19,7 +18,7 @@ const checkoutSchema = z.object({
   address: z.string().min(5, "Please enter a valid delivery address"),
   notes: z.string().optional(),
   discountCode: z.string().optional(),
-  paymentMethod: z.enum(["whatsapp", "mpesa"]),
+  paymentMethod: z.literal("whatsapp"),
 });
 
 export type CheckoutFormData = z.infer<typeof checkoutSchema>;
@@ -47,8 +46,7 @@ export function CheckoutForm({ onSubmit, isLoading, totalAmount, currency }: Che
     },
   });
 
-  const { register, handleSubmit, setValue, formState: { errors } } = form;
-  const paymentMethod = useWatch({ control: form.control, name: "paymentMethod" });
+  const { register, handleSubmit, formState: { errors } } = form;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-10 font-dm-sans">
@@ -146,43 +144,22 @@ export function CheckoutForm({ onSubmit, isLoading, totalAmount, currency }: Che
         <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-stone-400 pb-3 border-b border-stone-100">
           Payment
         </h3>
-        <RadioGroup value={paymentMethod} onValueChange={(val) => setValue("paymentMethod", val as "whatsapp" | "mpesa")} className="space-y-3">
+        <div className="space-y-3">
           <Label
             htmlFor="whatsapp"
             className={cn(
-              "flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all",
-              paymentMethod === "whatsapp" ? "border-stone-900 bg-stone-50" : "border-stone-200 bg-white hover:border-stone-300"
+              "flex items-center justify-between p-4 rounded-xl border-2 transition-all border-stone-900 bg-stone-50"
             )}
           >
             <div className="flex items-center gap-3">
-              <RadioGroupItem value="whatsapp" id="whatsapp" className="border-stone-300" />
               <div>
                 <span className="font-semibold text-stone-900 text-sm">WhatsApp</span>
                 <p className="text-xs text-stone-400">Complete order via chat</p>
               </div>
             </div>
-            <MessageCircle className={cn("h-5 w-5", paymentMethod === "whatsapp" ? "text-stone-900" : "text-stone-300")} />
+            <MessageCircle className="h-5 w-5 text-stone-900" />
           </Label>
-
-          <Label
-            htmlFor="mpesa"
-            className={cn(
-              "flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all",
-              paymentMethod === "mpesa"
-                ? "border-stone-900 bg-stone-50"
-                : "border-stone-200 bg-white hover:border-stone-300"
-            )}
-          >
-            <div className="flex items-center gap-3">
-              <RadioGroupItem value="mpesa" id="mpesa" className="border-stone-300" />
-              <div>
-                <span className="font-semibold text-stone-900 text-sm">M-Pesa</span>
-                <p className="text-xs text-stone-400">Receive an STK push on your phone</p>
-              </div>
-            </div>
-            <CreditCard className={cn("h-5 w-5", paymentMethod === "mpesa" ? "text-stone-900" : "text-stone-300")} />
-          </Label>
-        </RadioGroup>
+        </div>
       </div>
 
       {/* Submit */}
