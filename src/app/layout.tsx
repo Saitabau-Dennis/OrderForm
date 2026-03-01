@@ -40,6 +40,11 @@ const instrumentSerif = Instrument_Serif({
 export const metadata: Metadata = {
   title: "OrderForm.store",
   description: "Turn Instagram Comments into WhatsApp Orders.",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 import NextTopLoader from "nextjs-toploader";
