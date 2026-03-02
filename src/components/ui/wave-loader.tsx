@@ -2,55 +2,62 @@
 
 import { cn } from "@/lib/utils";
 
-export function WaveLoader({ className, color = "#00311F" }: { className?: string, color?: string }) {
-  const bars = [0, 1, 2, 3, 4];
+export function WaveLoader({
+  className,
+  color = "#00311F",
+}: {
+  className?: string;
+  color?: string;
+}) {
+  const dots = [0, 1, 2, 3, 4];
+
   return (
-    <div className={cn("flex w-full items-center justify-center p-2", className)}>
-      <div
-        className="relative flex h-8 items-end gap-1.5"
-        role="status"
-        aria-label="Loading"
-      >
-        {bars.map((bar) => (
+    <div className={cn("flex w-full items-center justify-center p-4", className)}>
+      <div className="wl-root" role="status" aria-label="Loading">
+        {dots.map((i) => (
           <span
-            key={bar}
-            className="wave-bar block h-3 w-1.5 rounded-full"
-            style={{
-              backgroundColor: color,
-              animationDelay: `${bar * 0.12}s`,
-            }}
+            key={i}
+            className="wl-dot"
+            style={{ animationDelay: `${i * 0.13}s` }}
           />
         ))}
-        <span
-          className="pointer-events-none absolute -bottom-2 left-1/2 h-1 w-14 -translate-x-1/2 rounded-full opacity-25 blur-sm"
-          style={{ backgroundColor: color }}
-        />
       </div>
 
       <style jsx>{`
-        .wave-bar {
-          transform-origin: center bottom;
-          animation: wave-rise 0.85s ease-in-out infinite;
-          opacity: 0.35;
+        .wl-root {
+          display: flex;
+          align-items: center;
+          gap: 8px;
         }
 
-        @keyframes wave-rise {
-          0%,
-          100% {
-            transform: scaleY(0.45);
-            opacity: 0.35;
+        .wl-dot {
+          display: block;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: ${color};
+          animation: wl-bounce 1s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+        }
+
+        @keyframes wl-bounce {
+          0%, 100% {
+            transform: translateY(0) scale(1);
+            opacity: 0.3;
           }
-          50% {
-            transform: scaleY(1.55);
+          45% {
+            transform: translateY(-14px) scale(0.85);
+            opacity: 1;
+          }
+          60% {
+            transform: translateY(-14px) scale(0.85);
             opacity: 1;
           }
         }
 
         @media (prefers-reduced-motion: reduce) {
-          .wave-bar {
+          .wl-dot {
             animation: none;
             opacity: 0.7;
-            transform: scaleY(1);
           }
         }
       `}</style>

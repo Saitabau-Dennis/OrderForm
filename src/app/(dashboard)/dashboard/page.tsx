@@ -263,11 +263,15 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-0 animate-appear">
-      <SetupChecklist
-        storeName={store?.name}
-        isStoreConfigured={isStoreConfigured}
-        hasFirstProduct={hasFirstProduct}
-      />
+      {!onboardingComplete && (
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <SetupChecklist
+            storeName={store?.name}
+            isStoreConfigured={isStoreConfigured}
+            hasFirstProduct={hasFirstProduct}
+          />
+        </div>
+      )}
 
       {onboardingComplete ? (
         <>
