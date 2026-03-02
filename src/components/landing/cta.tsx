@@ -38,16 +38,16 @@ export function CTA() {
                     <Star key={i} className="w-4 h-4 md:w-5 md:h-5 fill-current" />
                   ))}
                 </div>
-                <span className="text-emerald-100 text-sm md:text-base font-semibold">140+ happy partners</span>
+                <span className="text-emerald-100 text-sm md:text-base font-semibold">Built for social-first sellers</span>
               </div>
             </div>
 
             <h2 className="text-4xl md:text-6xl font-heading font-semibold text-white mb-6 leading-[1.05] tracking-[-0.02em] max-w-4xl mx-auto">
-              Ready to <span className="font-heading italic text-emerald-50 relative inline-block">boost<svg className="absolute -bottom-2 left-0 w-full h-2 text-emerald-400/30" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="4" fill="none" /></svg></span> your growth with OrderForm?
+              Ready to make ordering <span className="font-heading italic text-emerald-50 relative inline-block">easier<svg className="absolute -bottom-2 left-0 w-full h-2 text-emerald-400/30" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="4" fill="none" /></svg></span> for your customers?
             </h2>
 
             <p className="text-lg md:text-xl text-emerald-100/80 font-sans max-w-2xl mx-auto mb-10 leading-relaxed">
-              Create your store, add your products, and turn your bio link into a simple, professional ordering system. Join hundreds of growing brands today.
+              Launch your store, publish your products, and start receiving clean WhatsApp orders with customer and sales tracking in one dashboard.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
@@ -58,7 +58,7 @@ export function CTA() {
               </Link> */}
               <Button asChild size="lg" className="group flex w-full sm:w-auto items-center justify-center gap-2 rounded-full px-8 font-semibold">
                 <Link href="/register" target="_blank">
-                  Get Started
+                  Create my store
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>

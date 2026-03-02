@@ -28,7 +28,7 @@ const features = [
     Icon: Zap,
     name: "One-Click Checkout",
     description:
-      "Frictionless ordering. No forms to fill out. One tap generates a complete order summary and opens WhatsApp to send it directly to you.",
+      "Customers enter quick checkout details, then one tap opens WhatsApp with a complete order summary ready to send.",
     href: "/register",
     cta: "Start now",
     background: backgroundLayer(),
@@ -38,7 +38,7 @@ const features = [
     Icon: ShoppingBag,
     name: "Browse Products",
     description:
-      "A clean, mobile-first catalog. Customers can easily scroll through your items, view high-res photos, check prices, and select variants like size or color without any distractions.",
+      "A clean mobile-first catalog where customers can explore products, open details, and select options like size or color.",
     href: "/register",
     cta: "Explore stores",
     background: backgroundLayer(),
@@ -48,7 +48,7 @@ const features = [
     Icon: ShoppingCart,
     name: "Review Cart",
     description:
-      "A transparent cart experience. Customers can double-check their selections, adjust quantities, and see their total cost instantly before they commit to buy.",
+      "A transparent cart flow where buyers adjust quantities, apply discount codes, and confirm totals before placing an order.",
     href: "/register",
     cta: "See checkout",
     background: backgroundLayer(),
@@ -56,9 +56,9 @@ const features = [
   },
   {
     Icon: Upload,
-    name: "Share & Earn",
+    name: "Share & Review",
     description:
-      "Turn customers into advocates. Shoppers can upload photos of their purchase. Once you approve it, they get rewarded, and you get authentic social proof.",
+      "Shoppers can upload purchase photos and reviews tied to their order reference so you can collect authentic social proof.",
     href: "/register",
     cta: "Build trust",
     background: backgroundLayer(),
@@ -66,9 +66,9 @@ const features = [
   },
   {
     Icon: TicketPercent,
-    name: "Redeem Discounts",
+    name: "Reward Discounts",
     description:
-      "Drive repeat business. Approved photo uploads automatically send a unique discount code to the customer, incentivizing their next purchase.",
+      "Approve a review and generate a one-time discount code tied to the customer phone number to encourage repeat orders.",
     href: "/register",
     cta: "Boost repeat sales",
     background: backgroundLayer(),

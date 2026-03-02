@@ -20,22 +20,22 @@ export function AboutUs() {
                 </div>
                 
                 <h2 className="text-3xl md:text-5xl font-heading font-semibold text-foreground mb-6 leading-[1.06] tracking-[-0.02em]">
-                  Empowering social sellers to scale <span className="text-primary italic font-heading">without the chaos.</span>
+                  Built for sellers who grow on social media, <span className="text-primary italic font-heading">not complex storefront tools.</span>
                 </h2>
                 
                 <div className="space-y-6 text-muted-foreground font-sans text-base md:text-lg leading-relaxed">
                    <p>
-                      We’re on a mission to replace messy DM back-and-forths with a streamlined checkout. OrderForm gives solo entrepreneurs and small businesses a professional store link, automated order tracking, and a direct line to customers on WhatsApp.
+                      OrderForm helps you move from price questions in DMs to a structured ordering flow. You get a branded store link where customers can browse products, add to cart, and send complete orders to WhatsApp.
                    </p>
                    <p>
-                      By simplifying the bridge between social traffic and paid orders, we help you focus on what you do best: creating and selling great products, not managing spreadsheets and manual messages.
+                      Behind the scenes, your dashboard keeps products, orders, customers, and sales insights in one place so you can spend less time organizing chats and more time fulfilling orders.
                    </p>
                 </div>
 
                 <div className="mt-8">
                       <Button asChild size="lg" className="group rounded-full px-8 text-sm md:text-base font-semibold">
                        <Link href="/register" target="_blank" rel="noopener noreferrer">
-                         Get Started
+                         Launch your store
                          <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                        </Link>
                       </Button>

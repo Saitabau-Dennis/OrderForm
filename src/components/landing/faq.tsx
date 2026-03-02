@@ -19,15 +19,15 @@ const faqs = [
   },
   {
     question: "How do I receive orders?",
-    answer: "Instantly on WhatsApp. When a customer places an order, you receive a pre-filled message with their details, items, total price, and location. You can reply immediately to confirm."
+    answer: "Orders are sent to your WhatsApp as a structured message with customer details, items, variants, notes, and totals. The same order is also saved in your dashboard for tracking."
   },
   {
-    question: "Is there a limit on how many orders I can get?",
-    answer: "Zero limits. You can receive unlimited orders on both the Starter (Free) and Business plans. We want you to grow as big as possible."
+    question: "Can I track and update order status?",
+    answer: "Yes. You can open order details in your dashboard, update status (pending, processing, completed, or cancelled), and export orders when needed."
   },
   {
-    question: "What happens if I stop paying for the Business plan?",
-    answer: "No stress. Your store will automatically stay online on the Free plan. You'll just be limited to 5 visible products until you decide to upgrade again."
+    question: "How do review rewards and discount codes work?",
+    answer: "Customers can submit a photo review with their order reference. Once approved, OrderForm generates a one-time discount code linked to that customer for future checkout use."
   }
 ]
 

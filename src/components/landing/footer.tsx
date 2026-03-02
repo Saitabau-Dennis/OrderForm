@@ -16,7 +16,7 @@ export function Footer() {
             </span>
             </div>
             <p className="text-base text-muted-foreground leading-relaxed">
-                Simplifying commerce for the modern entrepreneur. Built for growth.
+                Built for social commerce: storefront links, clean checkout, and WhatsApp-ready orders.
             </p>
              <div className="flex items-center gap-4 text-muted-foreground">
                 <Link href="#" className="hover:text-foreground transition-colors"><Twitter className="w-4 h-4" /></Link>
@@ -47,7 +47,7 @@ export function Footer() {
 
       <div className="max-w-7xl mx-auto px-6 mt-12 pt-8 border-t border-border">
          <p className="text-base text-muted-foreground text-center md:text-left">
-            &copy; {currentYear} OrderForm, Made with ❤️ for better social commerce.
+            &copy; {currentYear} OrderForm. Built for modern social selling.
          </p>
       </div>
     </footer>

@@ -20,7 +20,7 @@ export function MiniStorePreview() {
 
           <ScrollAnimation variant="fade-up" delay={0.1}>
             <p className="mt-6 text-lg md:text-xl text-muted-foreground font-sans leading-relaxed">
-              Fast, visual, and incredibly simple. We&apos;ve stripped away the clutter of traditional e-commerce to give your social media traffic exactly what they want: a direct path to purchase.
+              Fast, visual, and built for mobile buyers. Customers can search products, filter categories, adjust cart quantities, and checkout in a few taps.
             </p>
           </ScrollAnimation>
         </div>

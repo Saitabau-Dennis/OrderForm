@@ -10,26 +10,26 @@ import { ScrollAnimation } from "@/components/ui/scroll-animation"
 const steps = [
   {
     icon: Store,
-    title: "Create Your Store",
-    description: "Sign up in seconds and set up your store details. Choose a theme that matches your brand and configure your currency and delivery zones.",
+    title: "Set Up Your Store",
+    description: "Create your store profile with logo, brand style, WhatsApp number, and delivery zones so you are ready to receive complete orders.",
     color: "bg-primary/5 text-primary border-primary/10",
   },
   {
     icon: ShoppingBag,
-    title: "Add Products",
-    description: "Upload your product photos, descriptions, and prices. Organize them into categories to make shopping easy for your customers.",
+    title: "Add Products Fast",
+    description: "Upload product photos, set prices, organize categories, and add variants so customers can quickly find and choose what they need.",
     color: "bg-primary/5 text-primary border-primary/10",
   },
   {
     icon: Share2,
-    title: "Share Your Link",
-    description: "Get your unique store link (orderform.store/yourname) and paste it in your Instagram bio, TikTok, or send it directly to customers.",
+    title: "Share Your Store Link",
+    description: "Publish your unique OrderForm URL in your bio, stories, posts, or WhatsApp status and let customers shop directly from one link.",
     color: "bg-primary/5 text-primary border-primary/10",
   },
   {
     icon: MessageCircle,
-    title: "Receive WhatsApp Orders",
-    description: "Customers browse your store, build a cart, and hit 'Send Order'. You receive a perfectly formatted message on WhatsApp with all the details.",
+    title: "Receive and Manage Orders",
+    description: "Customers send structured WhatsApp orders from checkout, and you manage statuses, customer history, and sales performance from the dashboard.",
     color: "bg-primary/5 text-primary border-primary/10",
   }
 ]
@@ -51,14 +51,14 @@ export function HowItWorks() {
                 <span className="text-primary">order in seconds.</span>
               </h2>
               <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-md mx-auto lg:mx-0 font-sans">
-                Stop going back and forth in DMs. Give your customers a professional shopping experience without the complexity of a full website.
+                Turn social traffic into confirmed orders without building a full e-commerce site or handling every sale manually in DMs.
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Button asChild size="lg" className="w-full sm:w-auto rounded-full px-8 text-base font-semibold">
                   <Link href="/register">
-                  Start Selling Now
+                  Start your store
                   <ArrowRight className="ml-2 w-4 h-4" />
                   </Link>
                 </Button>

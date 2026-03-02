@@ -19,19 +19,18 @@ export default function Home() {
       <Hero
         className="pt-24 pb-6 md:pt-32 md:pb-12"
         badge={
-          <AnimatedBadge text="Introducing OrderForm" />
+          <AnimatedBadge text="Built for Social Sellers" />
         }
         title={
           <>
-            Turn social media traffic <br />
-            into clean <TextHighlight color="yellow" className="[font-family:var(--font-sora)] italic text-foreground font-light tracking-tight px-1">WhatsApp orders</TextHighlight>
+            The fastest way to turn <br />
+            <TextHighlight color="yellow" className="[font-family:var(--font-sora)] italic text-foreground font-light tracking-tight px-1">DMs into real orders</TextHighlight>
           </>
         }
         subtitle={
           <>
-            Organize your social media sales with a{" "}
-            <span className="text-foreground font-medium">professional one-click store</span>{" "}
-            that sends orders directly to your WhatsApp.
+            OrderForm gives your customers a fast storefront, cart, and checkout that sends complete order details to WhatsApp.
+            <span className="text-foreground font-medium"> No app downloads, no messy DM back-and-forth.</span>
           </>
         }
         ctaText="Create your store"

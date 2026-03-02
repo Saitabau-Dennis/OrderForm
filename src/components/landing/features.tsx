@@ -18,9 +18,9 @@ type FeatureItem = {
 
 const featureItems: FeatureItem[] = [
     {
-        title: "Shareable Store Link",
+        title: "Bio Link Storefront",
         description:
-            "Share one clean storefront link in your Instagram, TikTok, or WhatsApp bio. Customers can browse your products and place orders anytime without asking for prices in DMs.",
+            "Create one branded store link for Instagram, TikTok, and WhatsApp. Customers can browse products instantly instead of requesting prices in DMs.",
         src: "/images/dashboard-v2.png",
         alt: "Bio link storefront preview",
         width: 1207,
@@ -28,9 +28,9 @@ const featureItems: FeatureItem[] = [
         cardClassName: "border-b lg:border-r border-border/60",
     },
     {
-        title: "Easy Product Catalog",
+        title: "Catalog and Variants",
         description:
-            "Manage products from one dashboard. Add photos, update prices, track stock, and set variations like size or color so your catalog stays accurate and easy to shop.",
+            "Manage products from one dashboard with photos, pricing, categories, and options like size or color so customers can order the right item confidently.",
         src: "/images/dashboard-v2.png",
         alt: "Catalog management dashboard",
         width: 1207,
@@ -38,9 +38,9 @@ const featureItems: FeatureItem[] = [
         cardClassName: "border-b border-border/60",
     },
     {
-        title: "WhatsApp Cart Checkout",
+        title: "Cart to WhatsApp Checkout",
         description:
-            "Let shoppers build a cart, then send the order via WhatsApp in one step. OrderForm prepares a complete pre-filled message with item, quantity, and customer details.",
+            "Customers build a cart, enter delivery details, and send a structured order to WhatsApp in one step with items, quantities, variants, notes, and totals.",
         src: "/images/dashboard-v2.png",
         alt: "Cart and WhatsApp checkout flow",
         width: 1207,
@@ -48,19 +48,19 @@ const featureItems: FeatureItem[] = [
         cardClassName: "border-b lg:border-b-0 lg:border-r border-border/60",
     },
     {
-        title: "No Sign-Up or App Needed",
+        title: "Orders and Customers",
         description:
-            "Remove buying friction completely. Customers do not need to register or install anything; they browse in the browser and finish checkout in the chat app they already use.",
+            "Track order status, open detailed order views, and keep customer history in one place so your operations stay organized as order volume grows.",
         src: "/images/dashboard-v2.png",
-        alt: "Browser-first shopping experience",
+        alt: "Order and customer dashboard",
         width: 1207,
         height: 929,
         cardClassName: "border-b lg:border-b-0 border-border/60",
     },
     {
-        title: "Customer Reviews and Rewards",
+        title: "Photo Reviews and Rewards",
         description:
-            "Turn happy buyers into repeat customers. Collect customer photos as social proof and reward approved submissions with automatic discount codes for their next purchase.",
+            "Collect customer purchase photos and reviews, approve submissions, then generate one-time discount codes to drive repeat purchases.",
         src: "/images/dashboard-v2.png",
         alt: "Customer reviews and loyalty rewards",
         width: 1207,
@@ -83,7 +83,7 @@ export function Features() {
                         to <span className="text-primary">run your store.</span>
                     </h2>
                     <p className="text-base md:text-lg text-muted-foreground font-sans leading-relaxed">
-                        OrderForm packs powerful e-commerce tools into a simple interface. From inventory management to automated customer updates, we handle the heavy lifting so you can focus on fulfilling orders.
+                        From storefront setup to checkout, order management, and repeat-purchase tools, OrderForm gives social sellers one streamlined workflow.
                     </p>
                 </div>
 
