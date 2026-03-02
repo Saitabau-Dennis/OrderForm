@@ -54,6 +54,42 @@ const THEMES = [
     secondary: "#E1E8EE",
     description: "Modern neutral look.",
   },
+  {
+    name: "Coral Bloom",
+    primary: "#E8402A",
+    secondary: "#FFE4DF",
+    description: "Warm and energetic.",
+  },
+  {
+    name: "Electric Violet",
+    primary: "#6929C4",
+    secondary: "#E8DAFF",
+    description: "Bold and creative.",
+  },
+  {
+    name: "Tropical Teal",
+    primary: "#0077B6",
+    secondary: "#C8F0FB",
+    description: "Fresh and vibrant.",
+  },
+  {
+    name: "Sunset Orange",
+    primary: "#D9650A",
+    secondary: "#FFF0E0",
+    description: "Bright and inviting.",
+  },
+  {
+    name: "Berry Pop",
+    primary: "#C0175D",
+    secondary: "#FFD6EA",
+    description: "Playful and eye-catching.",
+  },
+  {
+    name: "Forest Fresh",
+    primary: "#1A7F4B",
+    secondary: "#CFFAE0",
+    description: "Lively and fresh.",
+  },
 ];
 
 const settingsSchema = z.object({
