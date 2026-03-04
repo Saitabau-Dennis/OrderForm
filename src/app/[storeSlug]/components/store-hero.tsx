@@ -1,54 +1,47 @@
-"use client";
+import { StoreTextHighlight } from "./store-text-highlight"
 
-import { useStore } from "./store-context";
-
-interface StoreHeroProps {
-  name: string;
-  description?: string;
+type StoreHeroProps = {
+  store: {
+    name: string
+    description: string | null
+    brandColor: string
+    secondaryColor: string
+    slug: string
+  }
 }
 
-export function StoreHero({ name, description }: StoreHeroProps) {
-  const { brandColor } = useStore();
+export function StoreHero({ store }: StoreHeroProps) {
+  const brandColor = store.brandColor || "#1A1A1A"
+
+  const defaultDescription = `Welcome to ${store.name}. Discover carefully curated products, made to feel effortless to browse, compare, and buy in minutes.`
+
+  const displayDescription = store.description && store.description.trim() !== ""
+    ? store.description
+    : defaultDescription
 
   return (
-    <section className="relative overflow-hidden font-jakarta" style={{ backgroundColor: "#F8F6F3" }}>
-      {/* Gradient orbs */}
-      <div
-        className="absolute top-[-30%] right-[-15%] w-[60vw] h-[60vw] rounded-full opacity-[0.07] blur-[120px]"
-        style={{ backgroundColor: brandColor }}
-      />
-      <div
-        className="absolute bottom-[-30%] left-[-15%] w-[40vw] h-[40vw] rounded-full opacity-[0.05] blur-[100px]"
-        style={{ backgroundColor: brandColor }}
-      />
+    <section className="w-full bg-[#F7F7F5] px-4 py-14 sm:px-6 md:py-16 lg:px-8">
+      <div className="mx-auto w-full max-w-7xl">
+        {/* <p className="mb-4 text-xs font-bold uppercase tracking-[0.3em]" style={{ color: brandColor }}>
+          Curated Storefront
+        </p> */}
+        <h1 className="max-w-4xl text-2xl font-semibold leading-[1.08] tracking-tight text-[#1A1A1A] md:text-4xl">
+          {store.name}
+        </h1>
+        <p className="mt-6 max-w-4xl text-xl font-medium leading-relaxed text-[#31312D] md:text-3xl">
+          <StoreTextHighlight text={displayDescription} highlightColor={brandColor} />
+        </p>
 
-      <div className="container mx-auto px-5 md:px-8 relative z-10 pt-36 pb-28 md:pt-44 md:pb-36">
-        <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold text-stone-900 leading-[0.9] tracking-[-0.04em] font-jakarta mb-8">
-            {name}
-          </h1>
-
-          <div className="flex items-center gap-2 mb-8">
-            <div className="h-[2px] w-6 rounded-full" style={{ backgroundColor: brandColor, opacity: 0.3 }} />
-            <div className="h-[2px] w-12 rounded-full" style={{ backgroundColor: brandColor, opacity: 0.6 }} />
-            <div className="h-[2px] w-6 rounded-full" style={{ backgroundColor: brandColor, opacity: 0.3 }} />
-          </div>
-
-          <div className="max-w-lg">
-            {description ? (
-              <div
-                className="text-base md:text-[17px] text-stone-400 leading-relaxed prose prose-p:my-0"
-                dangerouslySetInnerHTML={{ __html: description }}
-              />
-            ) : (
-              <p className="text-base md:text-[17px] text-stone-400 leading-relaxed">
-                Explore our curated collection of quality products,
-                designed for people who appreciate the finer things.
-              </p>
-            )}
-          </div>
+        <div className="mt-8">
+          <a
+            href="#products"
+            className="inline-flex h-12 items-center rounded-xl px-6 text-base font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+            style={{ backgroundColor: brandColor }}
+          >
+            Shop now
+          </a>
         </div>
       </div>
     </section>
-  );
+  )
 }
