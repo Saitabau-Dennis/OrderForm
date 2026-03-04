@@ -179,6 +179,25 @@ html::-webkit-scrollbar {
   --font-heading: var(--font-poppins);
 }
 
+.theme-store {
+  font-family: var(--font-jakarta), sans-serif;
+  --font-sans: var(--font-jakarta);
+  --font-heading: var(--font-sora);
+  --background: #F7F7F5;
+  --foreground: #1A1A1A;
+  --muted-foreground: #737373;
+  --border: #E8E8E5;
+  --card: #FFFFFF;
+}
+
+.theme-store :is(button, input, textarea, select) {
+  font-family: var(--font-jakarta), sans-serif;
+}
+
+.theme-store :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-sora), sans-serif;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
