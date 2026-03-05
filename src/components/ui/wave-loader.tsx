@@ -9,7 +9,7 @@ export function WaveLoader({
   className?: string;
   color?: string;
 }) {
-  const dots = [0, 1, 2, 3, 4];
+  const dots = [0, 1, 2,3];
 
   return (
     <div className={cn("flex w-full items-center justify-center p-4", className)}>
@@ -27,13 +27,13 @@ export function WaveLoader({
         .wl-root {
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 12px;
         }
 
         .wl-dot {
           display: block;
-          width: 8px;
-          height: 8px;
+          width: 16px;
+          height: 16px;
           border-radius: 50%;
           background: ${color};
           animation: wl-bounce 1s cubic-bezier(0.45, 0, 0.55, 1) infinite;
@@ -45,11 +45,11 @@ export function WaveLoader({
             opacity: 0.3;
           }
           45% {
-            transform: translateY(-14px) scale(0.85);
+            transform: translateY(-22px) scale(0.9);
             opacity: 1;
           }
           60% {
-            transform: translateY(-14px) scale(0.85);
+            transform: translateY(-22px) scale(0.9);
             opacity: 1;
           }
         }
