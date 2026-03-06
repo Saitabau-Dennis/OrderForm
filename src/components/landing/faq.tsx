@@ -38,7 +38,7 @@ export function FAQ() {
         <ScrollAnimation variant="fade-up">
           <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-14">
             <div className="space-y-5">
-              <h2 className="font-heading text-3xl md:text-5xl font-semibold tracking-[-0.02em] text-foreground">
+              <h2 className="font-heading text-3xl md:text-5xl font-normal tracking-[-0.02em] text-foreground">
                 FAQs
               </h2>
               <p className="text-base md:text-lg font-semibold text-muted-foreground">
@@ -66,7 +66,7 @@ export function FAQ() {
                   value={`item-${index}`}
                   className="border-b border-black/10 last:border-b"
                 >
-                  <AccordionTrigger className="py-5 text-left font-heading text-lg md:text-xl font-semibold tracking-[-0.01em] text-foreground hover:no-underline [&>svg]:text-muted-foreground">
+                  <AccordionTrigger className="py-5 text-left font-heading text-lg md:text-xl font-medium tracking-[-0.01em] text-foreground hover:no-underline [&>svg]:text-muted-foreground">
                     {faq.question}
                   </AccordionTrigger>
                   <AccordionContent className="pb-5 pr-6 font-sans text-base leading-relaxed text-muted-foreground">

@@ -1,3 +1,4 @@
+import { auth } from "@/lib/auth"
 import { Navbar } from "@/components/landing/navbar"
 import { Hero } from "@/components/ui/hero"
 import { AboutUs } from "@/components/landing/about-us"
@@ -9,12 +10,13 @@ import { FAQ } from "@/components/landing/faq"
 import { CTA } from "@/components/landing/cta"
 import { Footer } from "@/components/landing/footer"
 import { AnimatedBadge } from "@/components/ui/animated-badge"
-import { TextHighlight } from "@/components/ui/text-highlight"
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth()
+
   return (
     <main className="min-h-screen flex flex-col theme-landing font-sans bg-background text-foreground">
-      <Navbar />
+      <Navbar isAuthenticated={!!session} />
 
       <Hero
         className="pt-24 pb-6 md:pt-32 md:pb-12"
@@ -23,8 +25,8 @@ export default function Home() {
         }
         title={
           <>
-            The fastest way to turn <br />
-            <TextHighlight color="yellow" className="[font-family:var(--font-sora)] italic text-foreground font-light tracking-tight px-1">DMs into real orders</TextHighlight>
+            The fastest way to turn{" "}
+            <span className="[font-family:var(--font-sora)] italic text-foreground font-light tracking-tight px-1">DMs into real orders</span>
           </>
         }
         subtitle={

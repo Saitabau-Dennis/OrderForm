@@ -2,6 +2,9 @@
 
 import { format } from "date-fns";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/dashboard/dashboard-button";
+import { Printer, X } from "lucide-react";
+import { formatOrderId } from "@/lib/utils";
 
 export function OrderDetails({
   order,
@@ -20,20 +23,20 @@ export function OrderDetails({
       <div className="relative px-6 pt-6 pb-5">
         <p className="mb-1 text-[11px] uppercase tracking-widest text-muted-foreground">{storeName}</p>
         <h2 className="text-[30px] font-normal leading-tight text-foreground">
-          Order ID: {order.displayId || order.orderNumber}
+          Order ID: {formatOrderId(order.displayId || order.orderNumber || order.id)}
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
           {format(new Date(order.createdAt), "MMM d, yyyy · h:mm a")}
         </p>
         {onClose && (
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-md border bg-background hover:bg-muted transition-colors no-print"
+            className="absolute right-4 top-4 h-8 w-8 rounded-xl border bg-background hover:bg-muted no-print"
           >
-            <svg className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+            <X className="h-4 w-4 text-muted-foreground" />
+          </Button>
         )}
       </div>
 
@@ -153,15 +156,15 @@ export function OrderDetails({
             <SelectItem value="cancelled">Cancelled</SelectItem>
           </SelectContent>
         </Select>
-        <button
+        <Button
           onClick={() => window.print()}
-          className="h-8 px-3 text-xs font-normal border rounded-md hover:bg-muted/50 transition-colors flex items-center gap-1.5 shrink-0"
+          variant="outline"
+          size="sm"
+          className="h-8 rounded-xl font-normal shrink-0"
         >
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-          </svg>
+          <Printer className="w-3.5 h-3.5 mr-1.5" />
           Print
-        </button>
+        </Button>
       </div>
     </div>
   );

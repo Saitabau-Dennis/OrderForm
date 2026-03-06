@@ -23,6 +23,11 @@ import {
 } from "@/components/ui/select";
 import { updateStoreSettings } from "@/lib/actions/store";
 
+const ROOT_DOMAIN = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || process.env.NEXT_PUBLIC_VERCEL_URL || "")
+  .replace(/^https?:\/\//i, "")
+  .replace(/\/.*$/, "")
+  .toLowerCase();
+
 const THEMES = [
   {
     name: "Modern Minimalist",
@@ -239,31 +244,29 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
           Manage your store identity, ordering details, and delivery setup.
         </p>
 
-        <div className="mt-5 inline-flex rounded-lg border border-border p-1">
-          <button
+        <div className="mt-5 inline-flex rounded-xl border border-border p-1">
+          <Button
             type="button"
+            variant={activeTab === "config" ? "default" : "ghost"}
             onClick={() => setActiveTab("config")}
             className={cn(
-              "rounded-md px-4 py-2 text-sm font-medium transition-colors",
-              activeTab === "config"
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:text-foreground"
+              "rounded-xl h-9 px-4 py-2 text-sm font-normal transition-colors shadow-none hover:translate-y-0",
+              activeTab !== "config" && "text-muted-foreground hover:text-foreground hover:bg-muted/50"
             )}
           >
             Configuration
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant={activeTab === "account" ? "default" : "ghost"}
             onClick={() => setActiveTab("account")}
             className={cn(
-              "rounded-md px-4 py-2 text-sm font-medium transition-colors",
-              activeTab === "account"
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:text-foreground"
+              "rounded-xl h-9 px-4 py-2 text-sm font-normal transition-colors shadow-none hover:translate-y-0",
+              activeTab !== "account" && "text-muted-foreground hover:text-foreground hover:bg-muted/50"
             )}
           >
             Account
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -296,19 +299,36 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
                     <Input
                       {...form.register("name")}
                       placeholder="e.g. My Awesome Store"
-                      className="h-11 rounded-lg"
+                      className="h-11 rounded-xl"
                     />
                   </FieldGroup>
 
                   <FieldGroup label="Store URL" error={form.formState.errors.slug?.message}>
-                    <div className="flex overflow-hidden rounded-lg border border-input focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1">
-                      <span className="inline-flex items-center border-r border-input bg-muted/30 px-3 text-xs text-muted-foreground">
-                        orderform.store/
-                      </span>
-                      <Input
-                        {...form.register("slug")}
-                        className="h-11 rounded-none border-0 focus-visible:ring-0"
-                      />
+                    <div className="flex overflow-hidden rounded-xl border border-input focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1">
+                      {ROOT_DOMAIN ? (
+                        <>
+                          <span className="inline-flex items-center border-r border-input bg-muted/30 px-3 text-xs text-muted-foreground">
+                            https://
+                          </span>
+                          <Input
+                            {...form.register("slug")}
+                            className="h-11 rounded-none border-0 focus-visible:ring-0"
+                          />
+                          <span className="inline-flex items-center border-l border-input bg-muted/30 px-3 text-xs text-muted-foreground">
+                            .{ROOT_DOMAIN}
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="inline-flex items-center border-r border-input bg-muted/30 px-3 text-xs text-muted-foreground">
+                            orderform.store/
+                          </span>
+                          <Input
+                            {...form.register("slug")}
+                            className="h-11 rounded-none border-0 focus-visible:ring-0"
+                          />
+                        </>
+                      )}
                     </div>
                   </FieldGroup>
                 </div>
@@ -344,13 +364,13 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
                 <div className="flex gap-2">
                   <Input
                     {...form.register("whatsappNumber")}
-                    className="h-11 rounded-lg"
+                    className="h-11 rounded-xl"
                     placeholder="254..."
                   />
                   <Button
                     type="button"
                     variant="outline"
-                    className="h-11 rounded-lg px-4"
+                    className="h-11 rounded-xl px-4"
                     onClick={handleTestWhatsApp}
                   >
                     Test
@@ -360,7 +380,7 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
 
               <FieldGroup label="Currency">
                 <Select disabled value="KES">
-                  <SelectTrigger className="h-11 rounded-lg">
+                  <SelectTrigger className="h-11 rounded-xl">
                     <SelectValue placeholder="Select currency" />
                   </SelectTrigger>
                   <SelectContent>
@@ -386,32 +406,34 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
                   const isSelected = selectedThemeName === theme.name;
 
                   return (
-                    <button
+                    <Button
                       key={theme.name}
                       type="button"
+                      variant="ghost"
+                      size="sm"
                       onClick={() => applyTheme(theme.name)}
                       className={cn(
-                        "rounded-lg border p-3 text-left transition-colors",
+                        "h-auto w-full flex-col items-stretch rounded-xl border p-3 text-left transition-colors",
                         isSelected
                           ? "border-primary bg-primary/5"
                           : "border-border hover:border-primary/30"
                       )}
                     >
-                      <div className="overflow-hidden rounded-md border border-border">
+                      <div className="overflow-hidden rounded-xl border border-border">
                         <div className="h-8" style={{ backgroundColor: theme.primary }} />
                         <div className="h-8" style={{ backgroundColor: theme.secondary }} />
                       </div>
 
                       <div className="mt-3 flex items-center justify-between gap-2">
-                        <p className="text-sm font-medium text-foreground">{theme.name}</p>
+                        <p className="text-sm font-normal text-foreground">{theme.name}</p>
                         {isSelected ? (
-                          <span className="text-[11px] font-medium text-primary">Selected</span>
+                          <span className="text-[11px] font-normal text-primary">Selected</span>
                         ) : null}
                       </div>
                       <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
                         {theme.description}
                       </p>
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
@@ -425,7 +447,7 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
               <Button
                 type="button"
                 variant="outline"
-                className="h-9 rounded-lg px-3"
+                className="h-9 rounded-xl px-3"
                 onClick={() => append({ name: "", price: 0 })}
               >
                 <Plus className="mr-1.5 h-3.5 w-3.5" />
@@ -434,7 +456,7 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
             }
           >
             {fields.length === 0 ? (
-              <div className="rounded-lg border border-dashed border-border p-8 text-center">
+              <div className="rounded-xl border border-dashed border-border p-8 text-center">
                 <p className="text-sm font-medium text-foreground">No zones added yet</p>
                 <p className="mt-1 text-xs text-muted-foreground">
                   Add your first delivery zone to start charging delivery fees.
@@ -442,7 +464,7 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
                 <Button
                   type="button"
                   variant="outline"
-                  className="mt-4 h-9 rounded-lg px-3"
+                  className="mt-4 h-9 rounded-xl px-3"
                   onClick={() => append({ name: "", price: 0 })}
                 >
                   Add First Zone
@@ -453,14 +475,14 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
                 {fields.map((field, index) => (
                   <div
                     key={field.id}
-                    className="grid items-start gap-3 rounded-lg border border-border p-3 md:grid-cols-[minmax(0,1fr)_140px_auto]"
+                    className="grid items-start gap-3 rounded-xl border border-border p-3 md:grid-cols-[minmax(0,1fr)_140px_auto]"
                   >
                     <div>
                       <Label className="text-xs font-normal text-muted-foreground">Region</Label>
                       <Input
                         placeholder="e.g. Nairobi CBD"
                         {...form.register(`deliveryZones.${index}.name` as const)}
-                        className="mt-1 h-10 rounded-lg"
+                        className="mt-1 h-10 rounded-xl"
                       />
                       {form.formState.errors.deliveryZones?.[index]?.name ? (
                         <p className="mt-1 text-xs text-destructive">
@@ -475,7 +497,7 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
                         type="number"
                         placeholder="0"
                         {...form.register(`deliveryZones.${index}.price` as const)}
-                        className="mt-1 h-10 rounded-lg"
+                        className="mt-1 h-10 rounded-xl"
                       />
                       {form.formState.errors.deliveryZones?.[index]?.price ? (
                         <p className="mt-1 text-xs text-destructive">
@@ -488,7 +510,7 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
                       <Button
                         type="button"
                         variant="ghost"
-                        className="h-10 rounded-lg px-3 text-muted-foreground hover:text-destructive"
+                        className="h-10 rounded-xl px-3 text-muted-foreground hover:text-destructive"
                         onClick={() => remove(index)}
                       >
                         <Trash2 className="mr-1 h-3.5 w-3.5" />
@@ -502,7 +524,7 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
           </SectionBlock>
 
           <div className="flex justify-end border-t border-border/70 pt-5">
-            <Button type="submit" disabled={loading} className="h-10 rounded-lg px-5">
+            <Button type="submit" disabled={loading} className="h-10 rounded-xl px-5">
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Changes"}
             </Button>
           </div>
@@ -512,10 +534,10 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
           <SectionBlock title="Account" description="Basic account information.">
             <div className="space-y-5">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                <div className="h-20 w-20 overflow-hidden rounded-lg border border-border bg-muted/20">
-                  <Avatar className="h-20 w-20 rounded-lg">
+                <div className="h-20 w-20 overflow-hidden rounded-xl border border-border bg-muted/20">
+                  <Avatar className="h-20 w-20 rounded-xl">
                     <AvatarImage src={diceAvatarSrc} alt="Profile" className="object-cover" />
-                    <AvatarFallback className="rounded-lg bg-muted/20 text-xl font-semibold text-primary/60">
+                    <AvatarFallback className="rounded-xl bg-muted/20 text-xl font-semibold text-primary/60">
                       {userData?.name?.charAt(0).toUpperCase() || "U"}
                     </AvatarFallback>
                   </Avatar>
@@ -527,7 +549,7 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
                 </div>
               </div>
 
-              <div className="rounded-lg border border-dashed border-border px-4 py-3">
+              <div className="rounded-xl border border-dashed border-border px-4 py-3">
                 <p className="text-sm text-muted-foreground">
                   Password, notification, and security controls are coming soon.
                 </p>

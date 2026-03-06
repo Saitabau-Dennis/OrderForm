@@ -87,7 +87,7 @@ export function StoreCartSheet({ storeSlug, currency }: { storeSlug: string; cur
                 <div key={`${item.productId}-${item.variant}`} className="rounded-sm border border-[#E8E8E5] bg-white p-3">
                   <div className="flex gap-3">
                     <Link
-                      href={`/${storeSlug}/product/${item.productId}`}
+                      href={`/${storeSlug}/products/${item.productId}`}
                       onClick={() => setIsCartOpen(false)}
                       className="relative h-20 w-20 bg-[#EEECEA] rounded-sm overflow-hidden shrink-0 border border-[#E8E8E5] block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
                     >
@@ -98,7 +98,7 @@ export function StoreCartSheet({ storeSlug, currency }: { storeSlug: string; cur
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <Link
-                          href={`/${storeSlug}/product/${item.productId}`}
+                          href={`/${storeSlug}/products/${item.productId}`}
                           onClick={() => setIsCartOpen(false)}
                           className="text-sm font-semibold text-[#1A1A1A] leading-tight hover:underline line-clamp-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-1"
                         >

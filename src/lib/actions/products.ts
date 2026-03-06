@@ -155,3 +155,44 @@ export async function deleteProduct(id: string) {
     return { error: "Something went wrong" };
   }
 }
+
+export async function getStoreCategories() {
+  try {
+    const session = await auth();
+
+    if (!session) {
+      return { error: "Unauthorized" };
+    }
+
+    const store = await db.store.findFirst({
+      where: { userId: session.user.id }
+    });
+
+    if (!store) {
+      return { error: "Store not found" };
+    }
+
+    const products = await db.product.findMany({
+      where: {
+        storeId: store.id,
+        category: {
+          not: null
+        }
+      },
+      select: {
+        category: true
+      },
+      distinct: ["category"]
+    });
+
+    const categories = products
+      .map(p => p.category)
+      .filter((c): c is string => typeof c === "string" && c.trim().length > 0)
+      .sort((a, b) => a.localeCompare(b));
+
+    return { success: true, categories };
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    return { error: "Something went wrong" };
+  }
+}

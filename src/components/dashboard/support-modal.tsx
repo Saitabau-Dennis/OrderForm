@@ -104,12 +104,12 @@ export function SupportModal({ open, onOpenChange }: SupportModalProps) {
             <Button
               type="button"
               variant="outline"
-              className="h-10 rounded-lg px-4"
+              size="sm"
               onClick={() => handleOpenChange(false)}
             >
               Cancel
             </Button>
-            <Button type="submit" className="h-10 rounded-lg px-5">
+            <Button type="submit">
               Send Message
             </Button>
           </div>

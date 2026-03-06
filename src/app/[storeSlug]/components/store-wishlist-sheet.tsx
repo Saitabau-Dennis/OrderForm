@@ -10,7 +10,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import { ShoppingBag, Trash2 } from "lucide-react"
+import { Trash2 } from "lucide-react"
 
 // Same product interface exported or redefined here for the component
 type ProductInfo = {
@@ -19,6 +19,7 @@ type ProductInfo = {
   price: number
   imageUrl: string | null
   category: string | null
+  hasOptions?: boolean
 }
 
 export function StoreWishlistSheet({ storeSlug, currency, allProducts }: { storeSlug: string; currency: string; allProducts: ProductInfo[] }) {
@@ -49,12 +50,14 @@ export function StoreWishlistSheet({ storeSlug, currency, allProducts }: { store
 
   // Quick Add function from Wishlist to Cart
   const handleQuickAdd = (product: ProductInfo) => {
+    if (product.hasOptions) return
+
     addToCart({
       productId: product.id,
       name: product.name,
       price: product.price,
       imageUrl: product.imageUrl,
-      variant: null, // Since we don't know the size, we add it bare or they can configure it later
+      variant: null,
       quantity: 1,
     })
     setIsWishlistOpen(false)
@@ -109,7 +112,7 @@ export function StoreWishlistSheet({ storeSlug, currency, allProducts }: { store
 
                   <div className="flex gap-3">
                     <Link
-                      href={`/${storeSlug}/product/${product.id}`}
+                      href={`/${storeSlug}/products/${product.id}`}
                       onClick={() => setIsWishlistOpen(false)}
                       className="rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
                     >
@@ -123,7 +126,7 @@ export function StoreWishlistSheet({ storeSlug, currency, allProducts }: { store
                     <div className="min-w-0 flex-1">
                       <p className="text-[11px] text-[#737373] line-clamp-1 uppercase tracking-wide">{product.category || "Featured"}</p>
                       <Link
-                        href={`/${storeSlug}/product/${product.id}`}
+                        href={`/${storeSlug}/products/${product.id}`}
                         onClick={() => setIsWishlistOpen(false)}
                         className="mt-0.5 block text-[13px] font-semibold text-[#1A1A1A] leading-snug line-clamp-2 hover:underline rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-1"
                       >
@@ -133,20 +136,29 @@ export function StoreWishlistSheet({ storeSlug, currency, allProducts }: { store
 
                       <div className="mt-3 flex gap-2">
                         <Link
-                          href={`/${storeSlug}/product/${product.id}`}
+                          href={`/${storeSlug}/products/${product.id}`}
                           onClick={() => setIsWishlistOpen(false)}
                           className="inline-flex h-9 items-center justify-center rounded-sm border border-[#DADAD5] px-3 text-[11px] font-semibold uppercase tracking-wide text-[#5D5D57] transition-colors hover:border-[#1A1A1A] hover:text-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-1"
                         >
                           View
                         </Link>
-                        <button
-                          type="button"
-                          onClick={() => handleQuickAdd(product)}
-                          className="inline-flex h-9 flex-1 items-center justify-center gap-1 rounded-sm border border-[#1A1A1A] bg-[#1A1A1A] px-3 text-[11px] font-semibold uppercase tracking-wide text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-1"
-                        >
-                          
-                          Move to Cart
-                        </button>
+                        {product.hasOptions ? (
+                          <Link
+                            href={`/${storeSlug}/products/${product.id}`}
+                            onClick={() => setIsWishlistOpen(false)}
+                            className="inline-flex h-9 flex-1 items-center justify-center gap-1 rounded-sm border border-[#1A1A1A] bg-[#1A1A1A] px-3 text-[11px] font-semibold uppercase tracking-wide text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-1"
+                          >
+                            Add to cart
+                          </Link>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleQuickAdd(product)}
+                            className="inline-flex h-9 flex-1 items-center justify-center gap-1 rounded-sm border border-[#1A1A1A] bg-[#1A1A1A] px-3 text-[11px] font-semibold uppercase tracking-wide text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-1"
+                          >
+                            Add to cart
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>

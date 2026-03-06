@@ -71,10 +71,10 @@ export function VerifyEmailForm() {
 
   if (!email) {
     return (
-      <div className="text-center">
-        <p className="text-muted-foreground mb-4">Email not found. Please register again.</p>
+      <div className="text-center space-y-4 py-8">
+        <p className="text-muted-foreground">Email not found. Please register again.</p>
         <Link href="/register">
-          <Button>Go to Registration</Button>
+          <Button size="lg" className="w-full sm:w-auto">Go to Registration</Button>
         </Link>
       </div>
     );
@@ -83,7 +83,7 @@ export function VerifyEmailForm() {
   return (
     <div className="w-full max-w-md mx-auto space-y-6 sm:space-y-8">
       <div className="text-center space-y-2">
-        <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">Check your email</h2>
+        <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-normal tracking-tight">Check your email</h2>
         <p className="text-sm sm:text-base text-muted-foreground">
           We sent a verification code to <span className="font-medium text-foreground">{email}</span>
         </p>

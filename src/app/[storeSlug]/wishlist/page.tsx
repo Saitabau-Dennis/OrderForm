@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation"
 import db from "@/lib/db"
+import { hasProductOptions } from "@/lib/has-product-options"
 import { StoreNavbar } from "../components/store-navbar"
 import { StoreFooter } from "../components/store-footer"
 import { WishlistClient } from "../components/wishlist-client"
@@ -31,13 +32,21 @@ export default async function WishlistPage({
       category: true,
       description: true,
       isAvailable: true,
+      sizes: true,
+      variants: true,
     }
   })
 
   // Serialize Decimal
   const serializedProducts = allProducts.map((p) => ({
-    ...p,
+    id: p.id,
+    name: p.name,
     price: Number(p.price),
+    imageUrl: p.imageUrl,
+    category: p.category,
+    description: p.description,
+    isAvailable: p.isAvailable,
+    hasOptions: hasProductOptions(p),
   }))
 
   return (
@@ -53,7 +62,6 @@ export default async function WishlistPage({
           storeSlug={store.slug}
           currency={store.currency}
           allProducts={serializedProducts}
-          brandColor={store.brandColor}
         />
       </main>
 

@@ -56,10 +56,10 @@ export function TargetAudience() {
         
         <div className="text-center mb-16 max-w-3xl mx-auto">
           <ScrollAnimation variant="fade-up">
-            <div className="inline-flex items-center px-3 py-1 rounded-full border border-primary/20 text-primary text-xs font-semibold mb-4 uppercase tracking-[0.16em]">
+            <div className="inline-flex items-center px-2 py-0.5 rounded-none landing-section-tag border border-primary/20 text-primary text-[10px] font-semibold mb-4 uppercase tracking-[0.12em]">
               Who is it for?
             </div>
-            <h2 className="text-3xl md:text-5xl font-heading font-semibold text-foreground mb-6 leading-[1.06] tracking-[-0.02em]">
+            <h2 className="text-3xl md:text-5xl font-heading font-normal text-foreground mb-6 leading-[1.06] tracking-[-0.02em]">
               Built for every kind of <span className="text-primary italic font-heading">social seller.</span>
             </h2>
             <p className="text-base md:text-lg text-muted-foreground font-sans leading-relaxed">
@@ -75,7 +75,7 @@ export function TargetAudience() {
                 <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110", item.bg)}>
                   <item.icon className={cn("w-6 h-6", item.color)} />
                 </div>
-                <h3 className="text-xl font-heading font-semibold text-foreground mb-3 tracking-[-0.01em]">{item.title}</h3>
+                <h3 className="text-xl font-heading font-normal text-foreground mb-3 tracking-[-0.01em]">{item.title}</h3>
                 <p className="text-base text-muted-foreground font-sans leading-relaxed">
                   {item.description}
                 </p>

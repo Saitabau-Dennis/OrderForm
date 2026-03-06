@@ -27,7 +27,7 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
 
   return (
     <header className="bg-[#F7F7F5] border-b border-[#E8E8E5] sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 md:h-16 flex items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 h-14 md:h-16 flex items-center justify-between gap-4">
         {/* Logo + Name */}
         <Link
           href={`/${store.slug}`}

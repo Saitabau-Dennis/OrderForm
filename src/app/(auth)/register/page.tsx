@@ -121,7 +121,7 @@ export default function RegisterPage() {
           <WaveLoader />
         </div>
         <div className="text-center space-y-2">
-          <h2 className="font-heading text-xl font-semibold tracking-tight text-foreground">Account Created!</h2>
+          <h2 className="font-heading text-xl font-normal tracking-tight text-foreground">Account Created!</h2>
           <p className="font-sans text-muted-foreground text-sm">
             Redirecting you to verify your email...
           </p>
@@ -140,7 +140,7 @@ export default function RegisterPage() {
             </svg>
           </div>
           <div className="space-y-2">
-            <h2 className="font-heading text-2xl font-semibold tracking-tight text-foreground">Registration Successful!</h2>
+            <h2 className="font-heading text-2xl font-normal tracking-tight text-foreground">Registration Successful!</h2>
             <p className="font-sans text-muted-foreground text-lg leading-relaxed">
               We&apos;ve sent a verification link to <strong className="text-foreground">{formData.email}</strong>.
               Please check your inbox to activate your account.
@@ -148,13 +148,15 @@ export default function RegisterPage() {
           </div>
 
           <div className="space-y-3 pt-4 border-t border-border">
-            <Link
-              href="/login"
-              className="inline-flex items-center justify-center w-full py-4 px-6 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 transition-all shadow-lg hover:shadow-xl"
+            <Button
+              asChild
+              size="lg"
+              className="w-full h-14 text-base font-semibold"
             >
-              Go to Login
-            </Link>
-
+              <Link href="/login">
+                Go to Login
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
@@ -166,10 +168,10 @@ export default function RegisterPage() {
       {/* Left Side - Text */}
       <div className="w-full hidden md:flex md:w-1/2 bg-primary p-10 flex-col justify-between text-primary-foreground relative overflow-hidden">
         <div className="relative z-10">
-          <Link href="/" className="[font-family:var(--font-instrument-serif)] text-3xl font-normal tracking-tight mb-12 block mt-1">
+          <Link href="/" className="[font-family:var(--font-teknaf)] text-3xl font-semibold tracking-tight mb-12 block mt-1">
             Orderform
           </Link>
-          <h1 className="font-heading text-4xl md:text-5xl font-semibold tracking-tight leading-tight mb-6">
+          <h1 className="font-heading text-4xl md:text-5xl font-normal tracking-tight leading-tight mb-6">
             Start your journey with us.
           </h1>
           <p className="font-sans text-primary-foreground/75 text-base md:text-lg leading-relaxed">
@@ -200,7 +202,7 @@ export default function RegisterPage() {
       <div className="w-full md:w-1/2 px-5 pb-8 pt-7 sm:px-6 md:p-10 flex flex-col justify-center bg-background">
         <div className="max-w-sm mx-auto w-full">
           <div className="md:hidden mb-6 rounded-2xl border border-primary/30 bg-primary p-4 text-center shadow-lg">
-             <Link href="/" className="[font-family:var(--font-instrument-serif)] text-3xl font-normal tracking-tight text-primary-foreground mt-1">
+             <Link href="/" className="[font-family:var(--font-teknaf)] text-3xl font-semibold tracking-tight text-primary-foreground mt-1">
               Orderform
             </Link>
             <div className="flex gap-2 justify-center mt-4 mb-2" role="progressbar" aria-valuemin={1} aria-valuemax={3} aria-valuenow={step} aria-label={`Step ${step} of 3`}>
@@ -215,7 +217,7 @@ export default function RegisterPage() {
               Step {step} of 3
             </p>
           </div>
-          <h2 className="font-heading text-2xl sm:text-3xl font-semibold tracking-tight text-foreground mb-2">Create account</h2>
+          <h2 className="font-heading text-2xl sm:text-3xl font-normal tracking-tight text-foreground mb-2">Create account</h2>
           <p className="font-sans text-sm sm:text-base text-muted-foreground mb-7 sm:mb-8">
             {getStepDescription()}
           </p>
@@ -312,7 +314,8 @@ export default function RegisterPage() {
                   variant="outline"
                   onClick={handleBack}
                   disabled={loading}
-                  className="h-12 px-6 rounded-xl"
+                  size="lg"
+                  className="h-12 px-6"
                 >
                   <ArrowLeft className="w-4 h-4" />
                 </Button>
@@ -321,7 +324,8 @@ export default function RegisterPage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="flex-1 h-12 text-base rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+                size="lg"
+                className="flex-1 h-12 text-base font-semibold"
               >
                 {loading ? (
                   <span className="flex items-center gap-2">

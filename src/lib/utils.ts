@@ -5,16 +5,33 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatOrderId(orderNumber: number | string): string {
-  // If it's a UUID (long string), take the last 6 chars as fallback
-  // ignoring this case if we primarily use orderNumber
-  if (typeof orderNumber === 'string' && orderNumber.length > 10) {
-    return `ORD${orderNumber.substring(orderNumber.length - 6).toUpperCase()}`;
+export function formatOrderId(orderRef: number | string): string {
+  if (typeof orderRef === "number") {
+    return `ORD-${orderRef.toString().padStart(4, "0")}`
   }
 
-  // Otherwise, pad the number
-  const num = typeof orderNumber === 'string' ? parseInt(orderNumber, 10) : orderNumber;
-  if (isNaN(num)) return `ORD${orderNumber}`;
+  const raw = `${orderRef || ""}`.trim().toUpperCase()
+  if (!raw) return "ORD-0000"
 
-  return `ORD${num.toString().padStart(4, '0')}`;
+  if (/^[A-Z]+-\d+$/.test(raw)) {
+    return raw
+  }
+
+  const lettersAndDigits = raw.match(/^([A-Z]+)(\d+)$/)
+  if (lettersAndDigits) {
+    return `${lettersAndDigits[1]}-${lettersAndDigits[2]}`
+  }
+
+  if (/^\d+$/.test(raw)) {
+    return `ORD-${raw.padStart(4, "0")}`
+  }
+
+  const sanitized = raw.replace(/[^A-Z0-9]/g, "")
+  if (!sanitized) return "ORD-0000"
+
+  if (sanitized.length > 10) {
+    return `ORD-${sanitized.substring(sanitized.length - 6)}`
+  }
+
+  return `ORD-${sanitized}`
 }

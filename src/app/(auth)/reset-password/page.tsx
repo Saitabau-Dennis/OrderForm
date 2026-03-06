@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { resetPassword, verifyResetCode } from "@/lib/actions/auth";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { cn } from "@/lib/utils";
 import { OTPInput } from "@/components/ui/otp-input";
 import { WaveLoader } from "@/components/ui/wave-loader";
 import { ButtonLoader } from "@/components/ui/button-loader";
@@ -104,12 +105,12 @@ function ResetPasswordForm() {
         <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
           <ShieldCheck className="w-8 h-8 text-red-500" />
         </div>
-        <h2 className="font-heading text-2xl font-semibold tracking-tight mb-2">Invalid Request</h2>
+        <h2 className="font-heading text-2xl font-normal tracking-tight mb-2">Invalid Request</h2>
         <p className="font-sans text-muted-foreground mb-6">
           We couldnt find your email address in the request. Please start over.
         </p>
         <Link href="/forgot-password">
-          <Button variant="outline" className="rounded-xl h-12 px-8">
+          <Button variant="outline" size="lg" className="px-8">
             Go to Forgot Password
           </Button>
         </Link>
@@ -126,7 +127,7 @@ function ResetPasswordForm() {
           </div>
         </div>
 
-        <h2 className="font-heading text-3xl font-semibold text-foreground mb-4 tracking-tight">
+        <h2 className="font-heading text-3xl font-normal text-foreground mb-4 tracking-tight">
           All Secure!
         </h2>
 
@@ -140,7 +141,7 @@ function ResetPasswordForm() {
         </div>
 
         <Link href="/login">
-          <Button className="w-full h-14 text-base font-medium rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all group">
+          <Button size="lg" className="w-full h-14 text-base font-semibold group">
             Back to Login <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
         </Link>
@@ -154,7 +155,7 @@ function ResetPasswordForm() {
         <div className="w-12 h-12 bg-primary/5 rounded-xl flex items-center justify-center mb-6 text-primary">
           <LockKeyhole className="w-6 h-6" />
         </div>
-        <h2 className="font-heading text-2xl sm:text-3xl font-semibold tracking-tight text-foreground mb-2">
+        <h2 className="font-heading text-2xl sm:text-3xl font-normal tracking-tight text-foreground mb-2">
           {step === 1 ? "Enter Code" : "Reset Password"}
         </h2>
         <p className="font-sans text-sm sm:text-base text-muted-foreground">
@@ -167,22 +168,30 @@ function ResetPasswordForm() {
 
       <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
         {step === 1 && (
-          <div className="space-y-4">
-            <div className="w-full overflow-x-auto pb-1">
-              <OTPInput
-                value={code}
-                onChange={setCode}
-                length={6}
-                disabled={loading}
-                className="min-w-max mx-auto"
-              />
+          <div className="space-y-3">
+            <OTPInput
+              value={code}
+              onChange={setCode}
+              length={6}
+              disabled={loading}
+            />
+
+            {/* Status row */}
+            <div className="h-5 flex items-center justify-center">
+              {loading ? (
+                <span className={cn(
+                  "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium",
+                  "bg-primary/10 text-primary border border-primary/20 animate-pulse"
+                )}>
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                  Verifying…
+                </span>
+              ) : code.length > 0 && code.length < 6 ? (
+                <span className="text-xs text-muted-foreground tabular-nums">
+                  {6 - code.length} digit{6 - code.length !== 1 ? "s" : ""} remaining
+                </span>
+              ) : null}
             </div>
-            {loading && (
-              <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm animate-pulse">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Verifying code...</span>
-              </div>
-            )}
           </div>
         )}
 
@@ -250,7 +259,8 @@ function ResetPasswordForm() {
             <Button
               type="submit"
               disabled={loading || !password || !isPasswordStrong}
-              className="w-full h-12 text-base rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+              size="lg"
+              className="w-full h-12 text-base font-semibold"
             >
               {loading ? (
                 <span className="flex items-center gap-2">
@@ -276,11 +286,11 @@ export default function ResetPasswordPage() {
         <div className="relative z-10">
           <Link
             href="/"
-            className="[font-family:var(--font-instrument-serif)] text-3xl font-normal tracking-tight mb-12 block mt-1"
+            className="[font-family:var(--font-teknaf)] text-3xl font-semibold tracking-tight mb-12 block mt-1"
           >
             Orderform
           </Link>
-          <h1 className="font-heading text-4xl md:text-5xl font-semibold tracking-tight leading-tight mb-6">
+          <h1 className="font-heading text-4xl md:text-5xl font-normal tracking-tight leading-tight mb-6">
             Secure your account.
           </h1>
           <p className="font-sans text-primary-foreground/75 text-base md:text-lg leading-relaxed">
@@ -302,7 +312,7 @@ export default function ResetPasswordPage() {
       {/* Right Side - Form */}
       <div className="w-full md:w-1/2 px-5 pb-8 pt-7 sm:px-6 md:p-10 flex flex-col justify-center bg-background">
          <div className="md:hidden mb-6 rounded-2xl border border-primary/30 bg-primary p-4 text-center shadow-lg max-w-sm mx-auto w-full">
-             <Link href="/" className="[font-family:var(--font-instrument-serif)] text-3xl font-normal tracking-tight text-primary-foreground mt-1">
+             <Link href="/" className="[font-family:var(--font-teknaf)] text-3xl font-semibold tracking-tight text-primary-foreground mt-1">
               Orderform
             </Link>
             <p className="mt-2 text-xs text-primary-foreground/75">Use your verification code to secure your account again.</p>

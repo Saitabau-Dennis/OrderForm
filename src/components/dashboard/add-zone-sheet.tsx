@@ -19,7 +19,7 @@ export function AddZoneSheet() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" size="sm" className="rounded-3xl shadow-sm hover:shadow-md transition-all duration-200">
+        <Button variant="outline" size="sm" className="rounded-xl transition-all duration-200">
             <Plus className="mr-2 h-4 w-4" />
             Add Zone
         </Button>
@@ -47,7 +47,7 @@ export function AddZoneSheet() {
         </div>
         <SheetFooter>
           <SheetClose asChild>
-            <Button type="submit" className="w-full rounded-3xl shadow-md hover:shadow-lg transition-all duration-200">
+            <Button type="submit" className="w-full rounded-xl transition-all duration-200">
               Save Zone
             </Button>
           </SheetClose>

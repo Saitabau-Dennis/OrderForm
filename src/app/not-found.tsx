@@ -164,7 +164,7 @@ export default function NotFound() {
             variants={itemVariants}
           >
             <Link href="/" passHref>
-              <Button size="lg" className="rounded-full px-8 h-12 text-base shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200">
+              <Button size="lg" className="rounded-xl px-8 h-12 text-base shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200">
                 <span>Find shelter</span>
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>

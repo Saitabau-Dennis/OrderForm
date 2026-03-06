@@ -1,6 +1,6 @@
 "use client"
 
-import React, { createContext, useContext, useEffect, useState } from "react"
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react"
 
 export type CartItem = {
   productId: string
@@ -35,37 +35,166 @@ type StoreContextType = {
 
 const StoreContext = createContext<StoreContextType | null>(null)
 
-export function StoreProvider({ children }: { children: React.ReactNode }) {
+const LEGACY_CART_KEY = "orderform_cart"
+const LEGACY_WISHLIST_KEY = "orderform_wishlist"
+
+function getCartStorageKey(storeSlug: string) {
+  return `orderform_cart:${storeSlug}`
+}
+
+function getWishlistStorageKey(storeSlug: string) {
+  return `orderform_wishlist:${storeSlug}`
+}
+
+function parseJson<T>(value: string | null): T | null {
+  if (!value) return null
+  try {
+    return JSON.parse(value) as T
+  } catch {
+    return null
+  }
+}
+
+function sanitizeCart(value: unknown, availableProductIds: Set<string>): CartItem[] {
+  if (!Array.isArray(value)) return []
+
+  const sanitized: CartItem[] = []
+
+  for (const item of value) {
+    if (!item || typeof item !== "object") continue
+
+    const candidate = item as Partial<CartItem>
+    if (typeof candidate.productId !== "string" || candidate.productId.trim() === "") continue
+    if (!availableProductIds.has(candidate.productId)) continue
+    if (typeof candidate.name !== "string" || candidate.name.trim() === "") continue
+    if (typeof candidate.price !== "number" || !Number.isFinite(candidate.price) || candidate.price < 0) continue
+
+    const quantity =
+      typeof candidate.quantity === "number" && Number.isFinite(candidate.quantity)
+        ? Math.max(1, Math.floor(candidate.quantity))
+        : 1
+
+    sanitized.push({
+      productId: candidate.productId,
+      name: candidate.name,
+      price: candidate.price,
+      imageUrl: typeof candidate.imageUrl === "string" ? candidate.imageUrl : null,
+      variant: typeof candidate.variant === "string" ? candidate.variant : null,
+      quantity,
+    })
+  }
+
+  return sanitized
+}
+
+function sanitizeWishlist(value: unknown, availableProductIds: Set<string>): string[] {
+  if (!Array.isArray(value)) return []
+
+  const ids = value
+    .filter((id): id is string => typeof id === "string" && id.trim() !== "")
+    .filter((id) => availableProductIds.has(id))
+
+  return Array.from(new Set(ids))
+}
+
+function areCartEqual(a: CartItem[], b: CartItem[]) {
+  if (a.length !== b.length) return false
+  return a.every((item, index) => {
+    const compare = b[index]
+    return (
+      item.productId === compare.productId &&
+      item.name === compare.name &&
+      item.price === compare.price &&
+      item.imageUrl === compare.imageUrl &&
+      item.variant === compare.variant &&
+      item.quantity === compare.quantity
+    )
+  })
+}
+
+function areStringArraysEqual(a: string[], b: string[]) {
+  if (a.length !== b.length) return false
+  return a.every((value, index) => value === b[index])
+}
+
+export function StoreProvider({
+  children,
+  storeSlug,
+  availableProductIds,
+}: {
+  children: React.ReactNode
+  storeSlug: string
+  availableProductIds: string[]
+}) {
+  const availableProductsSet = useMemo(() => new Set(availableProductIds), [availableProductIds])
+  const cartStorageKey = useMemo(() => getCartStorageKey(storeSlug), [storeSlug])
+  const wishlistStorageKey = useMemo(() => getWishlistStorageKey(storeSlug), [storeSlug])
   const [cart, setCart] = useState<CartItem[]>([])
   const [wishlist, setWishlist] = useState<string[]>([])
-  const [isInitialized, setIsInitialized] = useState(false)
+  const isHydratedRef = useRef(false)
 
   // Load from localStorage on mount
   useEffect(() => {
     try {
-      const savedCart = localStorage.getItem("orderform_cart")
-      const savedWishlist = localStorage.getItem("orderform_wishlist")
-      if (savedCart) setCart(JSON.parse(savedCart))
-      if (savedWishlist) setWishlist(JSON.parse(savedWishlist))
+      const rawScopedCart = localStorage.getItem(cartStorageKey)
+      const rawScopedWishlist = localStorage.getItem(wishlistStorageKey)
+
+      const rawCart = rawScopedCart ?? localStorage.getItem(LEGACY_CART_KEY)
+      const rawWishlist = rawScopedWishlist ?? localStorage.getItem(LEGACY_WISHLIST_KEY)
+
+      const parsedCart = parseJson<unknown>(rawCart)
+      const parsedWishlist = parseJson<unknown>(rawWishlist)
+
+      const nextCart = sanitizeCart(parsedCart, availableProductsSet)
+      const nextWishlist = sanitizeWishlist(parsedWishlist, availableProductsSet)
+
+      // Local storage restoration must happen after mount to keep SSR/client in sync.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setCart(nextCart)
+      setWishlist(nextWishlist)
     } catch (e) {
       console.error("Failed to load store state", e)
     }
-    setIsInitialized(true)
-  }, [])
+    isHydratedRef.current = true
+  }, [availableProductsSet, cartStorageKey, wishlistStorageKey])
 
   // Save to localStorage when state changes
   useEffect(() => {
-    if (!isInitialized) return
-    localStorage.setItem("orderform_cart", JSON.stringify(cart))
-  }, [cart, isInitialized])
+    if (!isHydratedRef.current) return
+    localStorage.setItem(cartStorageKey, JSON.stringify(cart))
+  }, [cart, cartStorageKey])
 
   useEffect(() => {
-    if (!isInitialized) return
-    localStorage.setItem("orderform_wishlist", JSON.stringify(wishlist))
-  }, [wishlist, isInitialized])
+    if (!isHydratedRef.current) return
+    localStorage.setItem(wishlistStorageKey, JSON.stringify(wishlist))
+  }, [wishlist, wishlistStorageKey])
+
+  // Keep multiple tabs/windows synchronized.
+  useEffect(() => {
+    if (!isHydratedRef.current) return
+
+    const handleStorage = (event: StorageEvent) => {
+      if (!event.key) return
+
+      if (event.key === cartStorageKey) {
+        const nextCart = sanitizeCart(parseJson<unknown>(event.newValue), availableProductsSet)
+        setCart((previous) => (areCartEqual(previous, nextCart) ? previous : nextCart))
+      }
+
+      if (event.key === wishlistStorageKey) {
+        const nextWishlist = sanitizeWishlist(parseJson<unknown>(event.newValue), availableProductsSet)
+        setWishlist((previous) => (areStringArraysEqual(previous, nextWishlist) ? previous : nextWishlist))
+      }
+    }
+
+    window.addEventListener("storage", handleStorage)
+    return () => window.removeEventListener("storage", handleStorage)
+  }, [availableProductsSet, cartStorageKey, wishlistStorageKey])
 
   // Cart Actions
   const addToCart = (newItem: Omit<CartItem, "quantity"> & { quantity?: number }) => {
+    if (!availableProductsSet.has(newItem.productId)) return
+
     setCart((prev) => {
       const existingItemIndex = prev.findIndex(
         (item) => item.productId === newItem.productId && item.variant === newItem.variant
@@ -106,6 +235,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   // Wishlist Actions
   const toggleWishlist = (productId: string) => {
+    if (!availableProductsSet.has(productId)) return
+
     setWishlist((prev) => {
       if (prev.includes(productId)) {
         return prev.filter((id) => id !== productId)

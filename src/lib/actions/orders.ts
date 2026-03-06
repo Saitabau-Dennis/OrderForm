@@ -52,9 +52,10 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
     }
 
     // Generate Display ID (e.g., NIK-4821)
-    const prefix = store.name.substring(0, 3).toUpperCase().replace(/[^A-Z]/g, "ORD");
+    const sanitizedStoreName = store.name.replace(/[^A-Za-z]/g, "").toUpperCase();
+    const prefix = sanitizedStoreName.slice(0, 3) || "ORD";
     const randomNum = Math.floor(1000 + Math.random() * 9000); // 1000-9999
-    const displayId = `${prefix}${randomNum}`;
+    const displayId = `${prefix}-${randomNum}`;
 
     // Note: In a high-volume prod app, we'd handle collisions with a retry loop here.
     // For now, the probability is low enough for this scale.

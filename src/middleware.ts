@@ -3,7 +3,16 @@ import { NextResponse } from "next/server";
 import authConfig from "@/auth.config";
 
 const { auth } = NextAuth(authConfig);
-const ROOT_DOMAIN = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || process.env.ROOT_DOMAIN || "").toLowerCase();
+const ROOT_DOMAIN = (
+  process.env.NEXT_PUBLIC_ROOT_DOMAIN ||
+  process.env.ROOT_DOMAIN ||
+  process.env.VERCEL_PROJECT_PRODUCTION_URL ||
+  process.env.VERCEL_URL ||
+  ""
+)
+  .replace(/^https?:\/\//i, "")
+  .replace(/\/.*$/, "")
+  .toLowerCase();
 const RESERVED_SUBDOMAINS = new Set(["www", "app"]);
 const PROTECTED_PATH_REGEX = /^\/(dashboard|settings|products|orders|onboarding)(\/|$)/;
 const APP_PATHS_TO_SKIP_REWRITE = ["/login", "/register", "/forgot-password", "/reset-password"];

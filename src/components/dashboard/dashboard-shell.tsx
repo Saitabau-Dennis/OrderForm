@@ -35,6 +35,16 @@ import { SupportModal } from "@/components/dashboard/support-modal";
 import { signOut } from "next-auth/react";
 import BoringAvatar from "boring-avatars";
 
+const ROOT_DOMAIN = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || process.env.NEXT_PUBLIC_VERCEL_URL || "")
+  .replace(/^https?:\/\//i, "")
+  .replace(/\/.*$/, "")
+  .toLowerCase();
+
+const getStoreUrl = (slug: string, rootDomain: string) => {
+  if (rootDomain) return `https://${slug}.${rootDomain}`;
+  return `/${slug}`;
+};
+
 interface DashboardShellProps {
   children: React.ReactNode;
   user: {
@@ -84,7 +94,10 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen, setShowSupportModal 
       <div className="mb-3">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-3 w-full rounded-lg border p-2.5 hover:bg-foreground/[0.03] transition-all duration-150 cursor-pointer group focus:outline-none">
+            <Button
+              variant="ghost"
+              className="flex items-center gap-3 w-full h-auto p-2.5 rounded-xl border border-border/40 hover:bg-foreground/[0.03] transition-all duration-150 cursor-pointer group focus:outline-none"
+            >
               <div className="shrink-0">
                 <BoringAvatar
                   size={28}
@@ -100,13 +113,13 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen, setShowSupportModal 
                 <ChevronUp className="h-3 w-3 -mb-0.5" />
                 <ChevronDown className="h-3 w-3 -mt-0.5" />
               </div>
-            </button>
+            </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" sideOffset={4} className="w-[240px] bg-white rounded-lg border shadow-md p-1.5 font-poppins">
              <div className="px-2 py-1.5">
-                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Stores</p>
+                <p className="text-[11px] font-normal text-muted-foreground uppercase tracking-wider">Stores</p>
              </div>
-             <DropdownMenuItem className="focus:bg-muted/50 cursor-pointer gap-2.5 px-2.5 py-2.5 rounded-md">
+             <DropdownMenuItem className="focus:bg-muted/50 cursor-pointer gap-2.5 px-2.5 py-2.5 rounded-xl">
                 <div className="shrink-0">
                   <BoringAvatar
                     size={22}
@@ -119,7 +132,7 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen, setShowSupportModal 
                 <Check className="h-3.5 w-3.5 text-primary shrink-0" />
              </DropdownMenuItem>
              <DropdownMenuSeparator className="bg-border/60 my-1" />
-             <DropdownMenuItem className="focus:bg-muted/50 cursor-pointer gap-2.5 px-2.5 py-2.5 rounded-md text-muted-foreground hover:text-foreground">
+             <DropdownMenuItem className="focus:bg-muted/50 cursor-pointer gap-2.5 px-2.5 py-2.5 rounded-xl text-muted-foreground hover:text-foreground">
                 <div className="h-[22px] w-[22px] rounded-full border border-dashed border-muted-foreground/30 flex items-center justify-center">
                   <Plus className="h-3 w-3" />
                 </div>
@@ -136,9 +149,9 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen, setShowSupportModal 
             key={route.label}
             href={route.href}
             className={cn(
-              "flex items-center gap-3 rounded-md px-3.5 py-2.5 text-sm font-normal transition-all duration-200 group relative",
+              "flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-normal transition-all duration-200 group relative",
               route.active
-                ? "bg-primary text-primary-foreground shadow-sm font-medium"
+                ? "bg-primary text-primary-foreground font-normal shadow-none"
                 : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground"
             )}
             onClick={() => {
@@ -155,22 +168,25 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen, setShowSupportModal 
       <div className="mt-auto border-t border-border/60 pt-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="group flex w-full cursor-pointer items-center gap-3 rounded-xl border border-transparent p-2.5 text-left transition-colors hover:border-border/70 hover:bg-muted/40 focus:outline-none">
-              <Avatar className="h-10 w-10 rounded-md bg-muted/50">
+            <Button
+              variant="ghost"
+              className="group flex w-full h-auto cursor-pointer items-center gap-3 rounded-xl border border-transparent p-2.5 text-left transition-colors hover:border-border/70 hover:bg-muted/40 focus:outline-none"
+            >
+              <Avatar className="h-10 w-10 rounded-xl bg-muted/50">
                 <AvatarImage
                   src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${user.name || "User"}&backgroundColor=e9c46a,2a9d8f,264653`}
-                  className="rounded-md object-cover"
+                  className="rounded-xl object-cover"
                 />
-                <AvatarFallback className="rounded-md bg-foreground/10 text-xs font-normal text-foreground">
+                <AvatarFallback className="rounded-xl bg-foreground/10 text-xs font-normal text-foreground">
                   {user.name?.charAt(0).toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 overflow-hidden text-left">
-                <p className="truncate text-sm font-medium leading-tight text-foreground">{user.name || "User"}</p>
+                <p className="truncate text-sm font-normal leading-tight text-foreground">{user.name || "User"}</p>
                 <p className="mt-0.5 truncate text-xs leading-tight text-muted-foreground">{user.email}</p>
               </div>
               <MoreHorizontal className="h-4 w-4 shrink-0 text-muted-foreground/70 transition-colors group-hover:text-foreground" />
-            </button>
+            </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="start"
@@ -184,7 +200,7 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen, setShowSupportModal 
             </div>
 
             <DropdownMenuItem
-              className="cursor-pointer rounded-md px-3 py-2.5 focus:bg-primary/5"
+              className="cursor-pointer rounded-xl px-3 py-2.5 focus:bg-primary/5"
               onSelect={() => setShowSupportModal(true)}
             >
               <div className="flex flex-col leading-tight">
@@ -193,7 +209,7 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen, setShowSupportModal 
               </div>
             </DropdownMenuItem>
             <DropdownMenuItem
-              className="cursor-pointer rounded-md px-3 py-2 text-sm font-normal text-red-500 focus:bg-red-50 focus:text-red-500"
+              className="cursor-pointer rounded-xl px-3 py-2 text-sm font-normal text-red-500 focus:bg-red-50 focus:text-red-500"
               onSelect={() => signOut({ callbackUrl: "/login" })}
             >
               <span>Sign out</span>
@@ -209,6 +225,7 @@ export function DashboardShell({ children, user, store }: DashboardShellProps) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showSupportModal, setShowSupportModal] = useState(false);
+  const publicStoreUrl = store?.slug ? getStoreUrl(store.slug, ROOT_DOMAIN) : null;
   const onboardingComplete = Boolean(store?.configured && store?.hasFirstProduct);
   const showSetupReminder =
     !onboardingComplete &&
@@ -264,7 +281,7 @@ export function DashboardShell({ children, user, store }: DashboardShellProps) {
           <div className="flex items-center gap-4">
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden text-foreground hover:bg-foreground/10 rounded-md">
+                <Button variant="ghost" size="icon" className="md:hidden text-foreground hover:bg-foreground/10 rounded-xl">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
@@ -287,22 +304,22 @@ export function DashboardShell({ children, user, store }: DashboardShellProps) {
               <input
                 type="text"
                 placeholder="Search..."
-                className="w-[260px] h-9 pl-9 pr-3 text-sm font-normal border rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary/30 transition-all placeholder:text-muted-foreground/40"
+                className="w-[260px] h-9 pl-9 pr-3 text-sm font-normal border rounded-xl bg-background focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary/30 transition-all placeholder:text-muted-foreground/40"
               />
             </div>
 
-            {store?.slug ? (
+            {publicStoreUrl ? (
               <Link
-                href={`/${store.slug}`}
+                href={publicStoreUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 h-9 px-4 text-sm font-normal border rounded-md hover:bg-muted/50 transition-colors text-foreground"
+                className="inline-flex items-center gap-2 h-9 px-4 text-sm font-normal border rounded-xl hover:bg-muted/50 transition-colors text-foreground"
               >
                 View Store
                 <Store className="h-4 w-4 text-muted-foreground" />
               </Link>
             ) : (
-              <span className="inline-flex items-center gap-2 h-9 px-4 text-sm font-normal border rounded-md text-muted-foreground/60 cursor-not-allowed">
+              <span className="inline-flex items-center gap-2 h-9 px-4 text-sm font-normal border rounded-xl text-muted-foreground/60 cursor-not-allowed">
                 View Store
                 <Store className="h-4 w-4" />
               </span>
@@ -317,7 +334,7 @@ export function DashboardShell({ children, user, store }: DashboardShellProps) {
                 <div className="flex items-start gap-2.5">
                   <CircleAlert className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                   <div className="space-y-0.5">
-                    <p className="text-sm font-medium text-foreground">
+                    <p className="text-sm font-normal text-foreground">
                       Finish setup to unlock the full dashboard.
                     </p>
                     <p className="text-xs text-muted-foreground">
@@ -329,13 +346,13 @@ export function DashboardShell({ children, user, store }: DashboardShellProps) {
                 <div className="flex items-center gap-2">
                   <Link
                     href="/dashboard"
-                    className="inline-flex h-8 items-center rounded-md border border-border bg-background px-3 text-xs font-medium text-foreground hover:bg-muted/40"
+                    className="inline-flex h-8 items-center rounded-xl border border-border bg-background px-3 text-xs font-normal text-foreground hover:bg-muted/40"
                   >
                     View Checklist
                   </Link>
                   <Link
                     href={nextSetupStep.href}
-                    className="inline-flex h-8 items-center rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+                    className="inline-flex h-8 items-center rounded-xl bg-primary px-3 text-xs font-normal text-primary-foreground hover:bg-primary/90"
                   >
                     {nextSetupStep.label}
                   </Link>

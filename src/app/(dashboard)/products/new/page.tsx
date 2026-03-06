@@ -4,7 +4,7 @@ import { Settings } from "lucide-react";
 
 import { auth } from "@/lib/auth";
 import db from "@/lib/db";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/dashboard/dashboard-button";
 import { NewProductPageClient } from "@/components/dashboard/new-product-page-client";
 
 export default async function NewProductPage() {

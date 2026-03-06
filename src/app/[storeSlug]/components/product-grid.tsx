@@ -1,6 +1,7 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { toast } from "sonner"
@@ -15,6 +16,7 @@ type Product = {
   imageUrl: string | null
   category: string | null
   isAvailable: boolean
+  hasOptions?: boolean
 }
 
 type ProductGridProps = {
@@ -25,6 +27,13 @@ type ProductGridProps = {
 }
 
 type SortOption = "featured" | "newest" | "price-asc" | "price-desc" | "name-asc"
+type DiscoveryFilters = {
+  query: string
+  activeCategory: string
+  sort: SortOption
+}
+
+const VALID_SORT_OPTIONS: SortOption[] = ["featured", "newest", "price-asc", "price-desc", "name-asc"]
 
 function formatPrice(price: number, currency: string): string {
   try {
@@ -55,6 +64,41 @@ function formatCardDescription(description: string | null): string {
 }
 
 export function ProductGrid({ products, currency, brandColor, storeSlug }: ProductGridProps) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  const query = searchParams.get("query") || ""
+  const activeCategory = searchParams.get("category") || "All"
+  const sort = (searchParams.get("sort") as SortOption) || "featured"
+
+  const createQueryString = (name: string, value: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (value) {
+      params.set(name, value)
+    } else {
+      params.delete(name)
+    }
+    return params.toString()
+  }
+
+  const setQuery = (newQuery: string) => {
+    router.replace(`${pathname}?${createQueryString("query", newQuery)}`, { scroll: false })
+  }
+
+  const setActiveCategory = (newCategory: string) => {
+    router.replace(
+      `${pathname}?${createQueryString("category", newCategory === "All" ? "" : newCategory)}`,
+      { scroll: false }
+    )
+  }
+
+  const setSort = (newSort: SortOption) => {
+    router.replace(`${pathname}?${createQueryString("sort", newSort === "featured" ? "" : newSort)}`, {
+      scroll: false,
+    })
+  }
+
   const categories = useMemo(() => {
     const counts = new Map<string, number>()
 
@@ -68,10 +112,6 @@ export function ProductGrid({ products, currency, brandColor, storeSlug }: Produ
       ...Array.from(counts.entries()).map(([name, count]) => ({ name, count })),
     ]
   }, [products])
-
-  const [query, setQuery] = useState("")
-  const [activeCategory, setActiveCategory] = useState("All")
-  const [sort, setSort] = useState<SortOption>("featured")
 
   const filtered = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
@@ -118,9 +158,7 @@ export function ProductGrid({ products, currency, brandColor, storeSlug }: Produ
   const hasProducts = products.length > 0
 
   const clearFilters = () => {
-    setQuery("")
-    setActiveCategory("All")
-    setSort("featured")
+    router.replace(pathname, { scroll: false })
   }
 
   return (
@@ -141,13 +179,13 @@ export function ProductGrid({ products, currency, brandColor, storeSlug }: Produ
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search products, category or keyword..."
-              className="h-12 w-full rounded-xl border border-[#DFDFDA] bg-transparent pl-11 pr-4 text-sm text-[#1A1A1A] placeholder:text-[#8D8D88] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0"
+              className="h-12 w-full rounded-none border border-[#DFDFDA] bg-transparent pl-11 pr-4 text-sm text-[#1A1A1A] placeholder:text-[#8D8D88] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0"
               style={{ "--tw-ring-color": `${brandColor}66` } as { [key: string]: string }}
             />
           </div>
 
           <div className="flex items-center gap-2 self-start md:self-auto">
-            <div className="inline-flex h-11 items-center gap-2 rounded-xl border border-[#DFDFDA] px-3 text-xs font-semibold uppercase tracking-wide text-[#666661]">
+            <div className="inline-flex h-11 items-center gap-2 rounded-none border border-[#DFDFDA] px-3 text-xs font-semibold uppercase tracking-wide text-[#666661]">
               <ArrowUpDown className="h-3.5 w-3.5" />
               Sort
             </div>
@@ -155,7 +193,7 @@ export function ProductGrid({ products, currency, brandColor, storeSlug }: Produ
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value as SortOption)}
-                className="h-11 appearance-none rounded-xl border border-[#DFDFDA] bg-transparent px-4 pr-10 text-sm font-medium text-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2"
+                className="h-11 appearance-none rounded-none border border-[#DFDFDA] bg-transparent px-4 pr-10 text-sm font-medium text-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2"
                 style={{ "--tw-ring-color": `${brandColor}66` } as { [key: string]: string }}
                 aria-label="Sort products"
               >
@@ -177,7 +215,7 @@ export function ProductGrid({ products, currency, brandColor, storeSlug }: Produ
               key={cat.name}
               onClick={() => setActiveCategory(cat.name)}
               aria-pressed={activeCategory === cat.name}
-              className="inline-flex h-9 items-center gap-2 rounded-full border px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+              className="inline-flex h-9 items-center gap-2 rounded-none border px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
               style={
                 activeCategory === cat.name
                   ? {
@@ -191,7 +229,7 @@ export function ProductGrid({ products, currency, brandColor, storeSlug }: Produ
               }
             >
               <span>{cat.name}</span>
-              <span className="rounded-full px-1.5 py-0.5 text-[11px]">{cat.count}</span>
+              <span className="rounded-none px-1.5 py-0.5 text-[11px]">{cat.count}</span>
             </button>
           ))}
         </div>
@@ -230,7 +268,7 @@ export function ProductGrid({ products, currency, brandColor, storeSlug }: Produ
           <button
             type="button"
             onClick={clearFilters}
-            className="mt-6 inline-flex h-10 items-center rounded-lg bg-[#1A1A1A] px-5 text-sm font-medium text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+            className="mt-6 inline-flex h-10 items-center rounded-none bg-[#1A1A1A] px-5 text-sm font-medium text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
           >
             Reset discovery
           </button>
@@ -265,6 +303,7 @@ function ProductCard({
 }) {
   const { addToCart, setIsCartOpen } = useStore()
   const description = formatCardDescription(product.description)
+  const requiresOptions = Boolean(product.hasOptions)
 
   const handleQuickAdd = () => {
     addToCart({
@@ -281,12 +320,12 @@ function ProductCard({
   }
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-sm border border-[#E6E6E1]">
+    <article className="group flex h-full flex-col overflow-hidden rounded-none border border-[#E6E6E1]">
       <Link
-        href={`/${storeSlug}/product/${product.id}`}
+        href={`/${storeSlug}/products/${product.id}`}
         className="relative block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-inset"
       >
-        <div className="absolute left-3 top-3 z-10 inline-flex items-center rounded-sm bg-white/90 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#4C4C47] backdrop-blur-sm">
+        <div className="absolute left-3 top-3 z-10 inline-flex items-center rounded-none bg-white/90 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#4C4C47] backdrop-blur-sm">
           {product.category?.trim() || "Featured"}
         </div>
 
@@ -309,10 +348,10 @@ function ProductCard({
 
       <div className="flex flex-1 flex-col p-3 sm:p-4">
         <Link
-          href={`/${storeSlug}/product/${product.id}`}
-          className="space-y-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+          href={`/${storeSlug}/products/${product.id}`}
+          className="space-y-2 rounded-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
         >
-          <h3 className="line-clamp-2 text-[13px] font-semibold leading-snug text-[#1A1A1A] sm:text-[15px]">
+          <h3 className="line-clamp-2 text-[13px] font-semibold leading-snug text-[#2D2D2A] sm:text-[15px]">
             {product.name}
           </h3>
           {description ? (
@@ -327,7 +366,7 @@ function ProductCard({
             {formatPrice(product.price, currency)}
           </p>
           <Link
-            href={`/${storeSlug}/product/${product.id}`}
+            href={`/${storeSlug}/products/${product.id}`}
             className="text-[11px] font-semibold uppercase tracking-wide text-[#575751] underline decoration-[#BDBDB6] underline-offset-4 hover:text-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2 sm:text-xs"
           >
             Details
@@ -335,19 +374,34 @@ function ProductCard({
         </div>
 
         <div className="mt-3 sm:mt-4">
-          <button
-            type="button"
-            onClick={handleQuickAdd}
-            aria-label={`Quick add ${product.name} to cart`}
-            className="inline-flex h-9 w-full items-center justify-center rounded-sm border text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2 sm:h-11 sm:text-sm"
-            style={{
-              borderColor: `${brandColor}66`,
-              color: brandColor,
-              backgroundColor: `${brandColor}10`,
-            }}
-          >
-            Quick add
-          </button>
+          {requiresOptions ? (
+            <Link
+              href={`/${storeSlug}/products/${product.id}`}
+              aria-label={`Add ${product.name} to cart`}
+              className="inline-flex h-9 w-full items-center justify-center rounded-none border text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2 sm:h-11 sm:text-sm"
+              style={{
+                borderColor: `${brandColor}66`,
+                color: brandColor,
+                backgroundColor: `${brandColor}10`,
+              }}
+            >
+              Add to cart
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={handleQuickAdd}
+              aria-label={`Add ${product.name} to cart`}
+              className="inline-flex h-9 w-full items-center justify-center rounded-none border text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2 sm:h-11 sm:text-sm"
+              style={{
+                borderColor: `${brandColor}66`,
+                color: brandColor,
+                backgroundColor: `${brandColor}10`,
+              }}
+            >
+              Add to cart
+            </button>
+          )}
         </div>
       </div>
     </article>

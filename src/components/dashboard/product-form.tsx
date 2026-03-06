@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -14,12 +14,9 @@ import { toast } from "sonner";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import {
-  DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { createProduct, updateProduct } from "@/lib/actions/products";
+import { createProduct, getStoreCategories, updateProduct } from "@/lib/actions/products";
 import { cn } from "@/lib/utils";
 
 const stripRichText = (value: string) =>
@@ -53,7 +50,41 @@ interface ProductFormProps {
 
 export function ProductForm({ initialData, onSuccess, layout = "default" }: ProductFormProps) {
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<string[]>([
+    "Clothing", "Footwear", "Accessories", "Electronics", "Home", "Beauty"
+  ]);
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const categoryWrapperRef = useRef<HTMLDivElement>(null);
+
   const isSheet = layout === "sheet";
+
+  useEffect(() => {
+    // Load existing categories from the store so store owners don't forget their previous categories
+    const loadCategories = async () => {
+      try {
+        const response = await getStoreCategories();
+        if (response.success && response.categories) {
+          // Merge default suggestions with store's existing arbitrary categories
+          const merged = new Set([...response.categories, "Clothing", "Footwear", "Accessories", "Electronics", "Home", "Beauty", "Men", "Women", "Unisex"]);
+          setCategories(Array.from(merged));
+        }
+      } catch (error) {
+        console.error("Failed to load categories", error);
+      }
+    };
+    loadCategories();
+  }, []);
+
+  useEffect(() => {
+    // Close the custom category combobox when clicking outside
+    function handleClickOutside(event: MouseEvent) {
+      if (categoryWrapperRef.current && !categoryWrapperRef.current.contains(event.target as Node)) {
+        setIsCategoryDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const form = useForm<ProductFormInput, unknown, ProductValues>({
     resolver: zodResolver(productSchema),
@@ -231,38 +262,59 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
             </SectionWrapper>
 
             <SectionWrapper title="Organization" description="Categorization & Stock">
-                <div className="space-y-2">
-                  <Label className="text-sm font-normal text-muted-foreground">Category</Label>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" className={cn(
-                        "w-full justify-between font-normal h-10 transition-all text-sm",
-                        isSheet
-                          ? "rounded-md border-border bg-background hover:bg-muted"
-                          : "rounded-3xl border-primary/20 bg-card hover:bg-secondary hover:border-primary/40 shadow-sm"
-                      )}>
-                        {form.watch("category") ? (
-                          <span className="text-primary font-medium">{form.watch("category")}</span>
-                        ) : (
-                          <span className="text-muted-foreground">Select category</span>
-                        )}
-                        <svg className="h-4 w-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-[280px] p-2 rounded-3xl border-none shadow-xl" align="start">
-                      {["Clothing", "Footwear", "Accessories", "Electronics", "Home", "Beauty"].map((cat) => (
-                        <DropdownMenuItem
-                          key={cat}
-                          onClick={() => form.setValue("category", cat, { shouldDirty: true })}
-                          className="rounded-2xl p-2 cursor-pointer focus:bg-primary/5 focus:text-primary font-normal text-sm"
-                        >
-                          {cat}
-                        </DropdownMenuItem>
+                <div className="space-y-2 relative" ref={categoryWrapperRef}>
+                  <Label htmlFor="category" className="text-sm font-normal text-muted-foreground">Category <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="category"
+                    placeholder="e.g. Vintage Apparel"
+                    autoComplete="off"
+                    {...form.register("category")}
+                    onFocus={() => setIsCategoryDropdownOpen(true)}
+                    className={cn(
+                      "h-10 transition-all font-normal text-sm w-full",
+                      isSheet
+                        ? "rounded-md border-border bg-background focus:bg-background focus:border-primary/30"
+                        : "rounded-3xl border-border bg-secondary/50 focus:bg-card focus:border-primary/30 placeholder:text-muted-foreground/50"
+                    )}
+                  />
+
+                  {isCategoryDropdownOpen && (
+                    <div className="absolute top-[calc(100%+4px)] left-0 w-full z-50 rounded-xl sm:rounded-3xl border border-border/60 bg-white shadow-xl max-h-[220px] overflow-y-auto py-2 px-2 animate-in fade-in slide-in-from-top-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                       {categories
+                        // Optional simple text-based filter based on what they are currently typing:
+                        .filter(cat => {
+                           const currentInput = form.watch("category") || "";
+                           return currentInput.trim() === "" || cat.toLowerCase().includes(currentInput.toLowerCase());
+                        })
+                        .map((cat) => (
+                          <div
+                            key={cat}
+                            onMouseDown={(e) => {
+                              // Prevent input from losing focus immediately before onClick registers
+                              e.preventDefault();
+                            }}
+                            onClick={() => {
+                              form.setValue("category", cat, { shouldDirty: true, shouldValidate: true });
+                              setIsCategoryDropdownOpen(false);
+                            }}
+                            className="rounded-lg sm:rounded-2xl p-2 cursor-pointer hover:bg-primary/5 hover:text-primary font-normal text-sm transition-colors flex items-center"
+                          >
+                           {cat}
+                          </div>
                       ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                      {categories.filter(cat => {
+                           const currentInput = form.watch("category") || "";
+                           return currentInput.trim() === "" || cat.toLowerCase().includes(currentInput.toLowerCase());
+                      }).length === 0 && (
+                        <div className="p-2 text-sm text-muted-foreground text-center">
+                           Press enter to create &quot;{form.watch("category")}&quot;
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {form.formState.errors.category && (
-                    <p className="text-xs text-red-500 mt-1">
+                    <p className="text-xs text-red-500 mt-1 relative z-0">
                         {form.formState.errors.category.message}
                     </p>
                   )}
@@ -290,9 +342,9 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                             form.setValue("sizes", newSizes.join(", "), { shouldDirty: true });
                           }}
                           className={cn(
-                            "cursor-pointer w-8 h-8 flex items-center justify-center rounded-2xl text-xs font-medium transition-all border",
+                            "cursor-pointer w-8 h-8 flex items-center justify-center rounded-2xl text-xs font-normal transition-all border",
                             isSelected
-                              ? "bg-primary text-primary-foreground border-primary shadow-sm transform scale-105"
+                              ? "bg-primary text-primary-foreground border-primary"
                               : "bg-card text-muted-foreground border-border hover:border-primary/30 hover:bg-primary/5"
                           )}
                         >
@@ -343,7 +395,7 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
           isSheet ? "pt-6 mt-6 border-t border-border/70" : "pt-2 pb-8"
         )}>
             {isSheet && (
-                <Button variant="outline" type="button" onClick={() => onSuccess()} className="h-9 px-4 rounded-md border-border hover:bg-muted text-sm font-medium transition-all">
+                <Button variant="outline" type="button" size="sm" onClick={() => onSuccess()}>
                     Cancel
                 </Button>
             )}
@@ -351,12 +403,7 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                 size="default"
                 type="submit"
                 disabled={loading}
-                className={cn(
-                  "bg-primary text-primary-foreground hover:bg-primary/90 transition-all h-9 font-medium text-sm",
-                  isSheet
-                    ? "rounded-md px-4 shadow-none hover:translate-y-0"
-                    : "rounded-3xl px-6 shadow-md hover:shadow-lg hover:-translate-y-0.5 w-full sm:w-auto"
-                )}
+                className={cn(!isSheet && "w-full sm:w-auto")}
             >
                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 {initialData ? "Save Changes" : "Create Product"}

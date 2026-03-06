@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { Check, Sparkles, Star } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { LandingButton } from "@/components/landing/landing-button"
 import { ScrollAnimation } from "@/components/ui/scroll-animation"
 import { cn } from "@/lib/utils"
 
@@ -148,11 +148,11 @@ export function Pricing() {
     >
       <div className="mx-auto max-w-7xl px-6">
         <ScrollAnimation className="mx-auto mb-10 max-w-3xl text-center md:mb-14" variant="fade-up">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/20 px-3 py-1 text-xs font-medium uppercase tracking-[0.16em] text-primary">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-none landing-section-tag border border-primary/20 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-primary">
             Pricing
           </div>
 
-          <h2 className="font-heading text-3xl md:text-5xl font-semibold leading-[1.06] tracking-[-0.02em] text-foreground">
+          <h2 className="font-heading text-3xl md:text-5xl font-normal leading-[1.06] tracking-[-0.02em] text-foreground">
             Start free, upgrade as you grow
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground md:text-lg">
@@ -173,24 +173,24 @@ export function Pricing() {
                 {plans.map((plan) => (
                   <div key={plan.key} className="space-y-3 text-left">
                     <div className="flex items-center gap-2">
-                      <p className="text-lg font-semibold text-foreground">{plan.name}</p>
+                      <p className="text-lg font-normal text-foreground">{plan.name}</p>
                       {plan.popular && (
                         <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
                           Popular
                         </span>
                       )}
                     </div>
-                    <Button
+                    <LandingButton
                       asChild
-                      variant={plan.popular ? "default" : "outline"}
+                      tone={plan.popular ? "primary" : "outline"}
                       size="sm"
                       className={cn(
-                        "h-9 rounded-full px-4 text-sm font-semibold",
+                        "min-w-[140px] justify-center",
                         !plan.popular && "bg-background"
                       )}
                     >
                       <Link href={plan.href}>{plan.cta}</Link>
-                    </Button>
+                    </LandingButton>
                   </div>
                 ))}
               </div>
@@ -201,7 +201,7 @@ export function Pricing() {
                 return (
                   <div key={section.title} className="pt-5">
                     <div className="grid [grid-template-columns:minmax(260px,1.6fr)_minmax(170px,1fr)_minmax(170px,1fr)] items-center gap-x-8 py-2">
-                      <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                      <div className="flex items-center gap-2 text-sm font-normal text-foreground">
                         <SectionIcon className="h-4 w-4" />
                         <span>{section.title}</span>
                       </div>
@@ -212,12 +212,28 @@ export function Pricing() {
                     {section.rows.map((row) => (
                       <div
                         key={`${section.title}-${row.label}`}
-                        className="grid [grid-template-columns:minmax(260px,1.6fr)_minmax(170px,1fr)_minmax(170px,1fr)] items-center gap-x-8 border-b border-black/8 py-4"
+                        className={cn(
+                          "grid [grid-template-columns:minmax(260px,1.6fr)_minmax(170px,1fr)_minmax(170px,1fr)] gap-x-8 border-b border-black/8",
+                          row.label === "Price" ? "items-start py-5" : "items-center py-4"
+                        )}
                       >
                         <div className="pr-4 text-[15px] text-muted-foreground">{row.label}</div>
                         {plans.map((plan) => (
                           <div key={`${row.label}-${plan.key}`} className="text-[15px] text-foreground">
-                            {renderValue(row.values[plan.key])}
+                            {row.label === "Price" ? (
+                              <div className="space-y-1">
+                                <div className="flex items-end gap-2">
+                                  <span className="text-xl md:text-2xl font-medium leading-none tracking-[-0.035em] text-foreground">
+                                    {plan.price}
+                                  </span>
+                                  <span className="pb-0.5 text-sm text-muted-foreground">
+                                    {plan.period}
+                                  </span>
+                                </div>
+                              </div>
+                            ) : (
+                              renderValue(row.values[plan.key])
+                            )}
                           </div>
                         ))}
                       </div>

@@ -137,7 +137,7 @@ export function ProductsTable({ products, onEdit, onDelete }: ProductsTableProps
           <div className="flex justify-end">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-muted/80 transition-colors focus-visible:ring-1 focus-visible:ring-ring">
+                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl hover:bg-muted/80 transition-colors focus-visible:ring-1 focus-visible:ring-ring">
                   <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
                   <span className="sr-only">Open menu</span>
                 </Button>

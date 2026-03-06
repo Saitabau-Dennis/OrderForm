@@ -11,92 +11,109 @@ interface OTPInputProps {
   disabled?: boolean;
 }
 
-export function OTPInput({ length = 6, value, onChange, className, disabled }: OTPInputProps) {
+export function OTPInput({
+  length = 6,
+  value,
+  onChange,
+  className,
+  disabled,
+}: OTPInputProps) {
   const inputRefs = React.useRef<(HTMLInputElement | null)[]>([]);
+  const [focusedIndex, setFocusedIndex] = React.useState<number | null>(null);
+
+  const focus = (i: number) => inputRefs.current[i]?.focus();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-    const newValue = e.target.value;
-    if (isNaN(Number(newValue))) return;
+    const raw = e.target.value;
+    if (!/^\d*$/.test(raw)) return;
 
-    const newOtp = value.split("");
-    // Handle pasting or single char input
-    if (newValue.length > 1) {
-       const pastedValue = newValue.slice(0, length);
-       onChange(pastedValue);
-       const nextIndex = Math.min(pastedValue.length, length - 1);
-       inputRefs.current[nextIndex]?.focus();
-       return;
+    if (raw.length > 1) {
+      const pasted = raw.slice(0, length);
+      onChange(pasted);
+      focus(Math.min(pasted.length, length - 1));
+      return;
     }
 
-    newOtp[index] = newValue;
-    const finalValue = newOtp.join("").slice(0, length);
-    onChange(finalValue);
-
-    if (newValue && index < length - 1) {
-      inputRefs.current[index + 1]?.focus();
-    }
+    const chars = value.split("");
+    chars[index] = raw;
+    onChange(chars.join("").slice(0, length));
+    if (raw && index < length - 1) focus(index + 1);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
     if (e.key === "Backspace") {
       if (!value[index] && index > 0) {
-        inputRefs.current[index - 1]?.focus();
-        const newOtp = value.split("");
-        newOtp[index - 1] = "";
-        onChange(newOtp.join(""));
+        focus(index - 1);
+        const chars = value.split("");
+        chars[index - 1] = "";
+        onChange(chars.join(""));
       } else {
-         const newOtp = value.split("");
-         newOtp[index] = "";
-         onChange(newOtp.join(""));
+        const chars = value.split("");
+        chars[index] = "";
+        onChange(chars.join(""));
       }
     } else if (e.key === "ArrowLeft" && index > 0) {
-      inputRefs.current[index - 1]?.focus();
+      focus(index - 1);
     } else if (e.key === "ArrowRight" && index < length - 1) {
-      inputRefs.current[index + 1]?.focus();
+      focus(index + 1);
     }
   };
 
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
-    const pastedData = e.clipboardData.getData("text").slice(0, length);
-    if (!/^\d+$/.test(pastedData)) return;
-    onChange(pastedData);
-    const nextIndex = Math.min(pastedData.length, length - 1);
-    inputRefs.current[nextIndex]?.focus();
+    const pasted = e.clipboardData.getData("text").slice(0, length);
+    if (!/^\d+$/.test(pasted)) return;
+    onChange(pasted);
+    focus(Math.min(pasted.length, length - 1));
   };
 
   return (
-    <div className={cn("flex items-center gap-1.5 sm:gap-2", className)}>
-      {Array.from({ length }).map((_, index) => (
-        <React.Fragment key={index}>
-          <input
-            ref={(el) => { inputRefs.current[index] = el; }}
-            type="text"
-            inputMode="numeric"
-            maxLength={1}
-            value={value[index] || ""}
-            onChange={(e) => handleChange(e, index)}
-            onKeyDown={(e) => handleKeyDown(e, index)}
-            onPaste={handlePaste}
-            disabled={disabled}
-            className={cn(
-              "w-9 h-11 sm:w-11 sm:h-12 text-center text-lg sm:text-xl font-semibold rounded-2xl sm:rounded-3xl transition-all duration-150 outline-none",
-              "bg-muted/40 border border-border/60",
-              "focus:border-primary focus:ring-2 focus:ring-primary/20 focus:bg-background",
-              "hover:border-primary/40 hover:bg-muted/60",
-              "disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-muted/40",
-              value[index]
-                ? "border-primary/60 bg-primary/5 text-primary shadow-sm"
-                : "text-foreground"
+    <div className={cn("flex items-center justify-center gap-2", className)}>
+      {Array.from({ length }).map((_, index) => {
+        const filled = Boolean(value[index]);
+        const focused = focusedIndex === index;
+
+        return (
+          <React.Fragment key={index}>
+            <input
+              ref={(el) => { inputRefs.current[index] = el; }}
+              type="text"
+              inputMode="numeric"
+              maxLength={1}
+              value={value[index] || ""}
+              onChange={(e) => handleChange(e, index)}
+              onKeyDown={(e) => handleKeyDown(e, index)}
+              onPaste={handlePaste}
+              onFocus={() => setFocusedIndex(index)}
+              onBlur={() => setFocusedIndex(null)}
+              disabled={disabled}
+              className={cn(
+                // size & shape
+                "w-10 h-11 text-center text-base font-semibold rounded-lg",
+                // transitions
+                "transition-all duration-150 outline-none",
+                // base - always visible border
+                "border bg-background",
+                // idle
+                !filled && !focused && "border-border text-foreground",
+                // focused (empty or filled)
+                focused && "border-primary ring-2 ring-primary/20 text-foreground",
+                // filled & not focused
+                filled && !focused && "border-primary/50 bg-primary/5 text-primary",
+                // disabled
+                disabled && "opacity-40 cursor-not-allowed"
+              )}
+            />
+
+            {/* dash separator between positions 3 and 4 */}
+            {index === 2 && (
+              <span className="text-border select-none text-sm font-medium px-0.5">—</span>
             )}
-          />
-          {/* Separator dash after the 3rd digit */}
-          {index === 2 && (
-            <span className="text-muted-foreground/40 font-medium text-base sm:text-lg px-0">–</span>
-          )}
-        </React.Fragment>
-      ))}
+          </React.Fragment>
+        );
+      })}
     </div>
   );
 }
-OTPInput.displayName = "OTPInput"
+
+OTPInput.displayName = "OTPInput";

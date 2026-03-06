@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { CheckCircle2, Package, ShoppingCart, Store } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/dashboard/dashboard-button";
 
 interface SetupChecklistProps {
   storeName?: string | null;
@@ -48,7 +48,7 @@ export function SetupChecklist({
           <h2 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
             {displayName}
           </h2>
-          <ShoppingCart className="h-9 w-9 text-muted-foreground/70" />
+          <span className="text-2xl text-[#1A1A1A]">🛒</span>
         </div>
           <p className="mt-2 text-sm text-muted-foreground md:text-base">
           Complete the <span className="text-emerald-600">{displayName}</span>{" "}
@@ -95,7 +95,7 @@ function SetupItem({
 }: SetupItemProps) {
   return (
     <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4 rounded-xl border border-border/50 bg-muted/30 px-5 py-4">
-      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-border/60 bg-background">
+      <div className="flex h-14 w-14 shrink-0 items-center justify-center ">
         {icon}
       </div>
       <div className="min-w-0">

@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { LandingButton } from "@/components/landing/landing-button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { ArrowRight, Store, ShoppingBag, Share2, MessageCircle } from "lucide-react"
 import Link from "next/link"
@@ -43,10 +43,10 @@ export function HowItWorks() {
           {/* Left Column - Content */}
           <ScrollAnimation variant="fade-up" className="lg:sticky lg:top-32 self-start space-y-8 text-center lg:text-left">
             <div className="space-y-4">
-              <div className="inline-flex items-center px-3 py-1 rounded-full border border-primary/20 text-primary text-xs font-medium mb-4 uppercase tracking-[0.16em]">
+              <div className="inline-flex items-center px-2 py-0.5 rounded-none landing-section-tag border border-primary/20 text-primary text-[10px] font-medium mb-4 uppercase tracking-[0.12em]">
                 How It Works
               </div>
-              <h2 className="text-3xl md:text-5xl font-semibold tracking-[-0.02em] font-heading leading-[1.06]">
+              <h2 className="text-3xl md:text-5xl font-normal tracking-[-0.02em] font-heading leading-[1.06]">
                 From link to <br/>
                 <span className="text-primary">order in seconds.</span>
               </h2>
@@ -56,12 +56,12 @@ export function HowItWorks() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Button asChild size="lg" className="w-full sm:w-auto rounded-full px-8 text-base font-semibold">
+                <LandingButton asChild size="lg" className="w-full sm:w-auto rounded-xl px-8 text-base font-semibold">
                   <Link href="/register">
                   Start your store
                   <ArrowRight className="ml-2 w-4 h-4" />
                   </Link>
-                </Button>
+                </LandingButton>
             </div>
 
             {/* Decorative elements */}
@@ -86,7 +86,7 @@ export function HowItWorks() {
                 )}>
                   <CardHeader className="p-0 pb-4">
                     <step.icon className="w-14 h-14 text-primary mb-5 stroke-[1.25]" />
-                    <CardTitle className="text-xl md:text-2xl font-semibold font-heading tracking-[-0.01em] text-foreground">{step.title}</CardTitle>
+                    <CardTitle className="text-xl md:text-2xl font-normal font-heading tracking-[-0.01em] text-foreground">{step.title}</CardTitle>
                   </CardHeader>
                   <CardContent className="p-0">
                     <CardDescription className="text-base md:text-lg leading-relaxed text-muted-foreground font-sans">

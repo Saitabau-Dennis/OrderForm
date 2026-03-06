@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Sora, Outfit, Signika, DM_Sans, Instrument_Serif, Poppins, Plus_Jakarta_Sans, Bungee, Montserrat } from "next/font/google";
 import { GeistSans } from "geist/font/sans";
+import localFont from "next/font/local";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -35,6 +36,16 @@ const instrumentSerif = Instrument_Serif({
   variable: "--font-instrument-serif"
 });
 
+const clashDisplay = localFont({
+  src: "../../public/Fonts/ClashDisplay_Complete/Fonts/WEB/fonts/ClashDisplay-Variable.woff2",
+  variable: "--font-clash-display",
+});
+
+const teknaf = localFont({
+  src: "../../public/Fonts/teknaf-regular-font/TeknafRegular-rv0aB.otf",
+  variable: "--font-teknaf",
+});
+
 
 export const metadata: Metadata = {
   title: "OrderForm.store",
@@ -43,6 +54,9 @@ export const metadata: Metadata = {
     icon: "/icon.svg",
     shortcut: "/icon.svg",
     apple: "/icon.svg",
+  },
+  other: {
+    google: "notranslate",
   },
 };
 
@@ -54,8 +68,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${sora.variable} ${outfit.variable} ${signika.variable} ${dmSans.variable} ${instrumentSerif.variable} ${poppins.variable} ${jakarta.variable} ${bungee.variable} ${montserrat.variable} ${GeistSans.variable} font-sans antialiased`}>
+    <html lang="en" suppressHydrationWarning translate="no" className="notranslate">
+      <body className={`${inter.variable} ${sora.variable} ${outfit.variable} ${signika.variable} ${dmSans.variable} ${instrumentSerif.variable} ${poppins.variable} ${jakarta.variable} ${bungee.variable} ${montserrat.variable} ${GeistSans.variable} ${clashDisplay.variable} ${teknaf.variable} notranslate font-sans antialiased`}>
         <Providers>
           {children}
         </Providers>

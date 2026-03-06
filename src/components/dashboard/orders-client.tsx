@@ -1,11 +1,15 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { Button } from "@/components/dashboard/dashboard-button";
+import { ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { OrdersTable } from "./orders-table";
 import { OrderDetails } from "./order-details";
 import { updateOrderStatus } from "@/lib/actions/orders";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { formatOrderId } from "@/lib/utils";
 
 export function OrdersClient({ initialOrders, stats, standalone = true, storeName }: any) {
   const [orders, setOrders] = useState(initialOrders);
@@ -38,11 +42,19 @@ export function OrdersClient({ initialOrders, stats, standalone = true, storeNam
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
+      const normalizedQuery = q.replace(/[^a-z0-9]/g, "");
       result = result.filter(
-        (o: any) =>
-          o.customerName?.toLowerCase().includes(q) ||
-          o.displayId?.toLowerCase().includes(q) ||
-          o.customerPhone?.includes(q)
+        (o: any) => {
+          const formattedOrderId = formatOrderId(o.displayId || o.orderNumber || o.id).toLowerCase();
+          const normalizedOrderId = formattedOrderId.replace(/[^a-z0-9]/g, "");
+          return (
+            o.customerName?.toLowerCase().includes(q) ||
+            o.displayId?.toLowerCase().includes(q) ||
+            formattedOrderId.includes(q) ||
+            normalizedOrderId.includes(normalizedQuery) ||
+            o.customerPhone?.includes(q)
+          );
+        }
       );
     }
     return result;
@@ -53,7 +65,7 @@ export function OrdersClient({ initialOrders, stats, standalone = true, storeNam
       ["Order No", "Customer", "Phone", "Status", "Date", "Total Amount"].join(","),
       ...filteredOrders.map((o: any) =>
         [
-          o.displayId || o.orderNumber,
+          formatOrderId(o.displayId || o.orderNumber || o.id),
           o.customerName,
           o.customerPhone,
           o.status,
@@ -133,39 +145,49 @@ export function OrdersClient({ initialOrders, stats, standalone = true, storeNam
                 <div className="flex items-center gap-2">
                   {/* Filter */}
                   <div className="relative">
-                    <button
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => setShowFilterMenu(!showFilterMenu)}
-                      className="h-8 px-3 text-xs font-normal border rounded-md hover:bg-muted/50 transition-colors flex items-center gap-1.5"
+                      className="h-8 rounded-xl font-normal"
                     >
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                       </svg>
                       Filter
-                    </button>
+                      <ChevronDown className={cn("ml-1 h-3 w-3 transition-transform", showFilterMenu && "rotate-180")} />
+                    </Button>
                     {showFilterMenu && (
                       <div className="absolute right-0 top-full mt-1 w-36 bg-white border rounded-lg shadow-lg z-10 py-1">
                         {["all", "pending", "processing", "completed", "cancelled"].map((s) => (
-                          <button
+                          <Button
                             key={s}
+                            variant="ghost"
+                            size="sm"
+                            type="button"
                             onClick={() => { setStatusFilter(s); setShowFilterMenu(false); }}
-                            className={`w-full text-left px-3 py-1.5 text-xs hover:bg-muted/50 transition-colors capitalize ${statusFilter === s ? "font-medium text-foreground bg-muted/30" : "text-muted-foreground"}`}
+                            className={`h-auto w-full justify-start rounded-none px-3 py-1.5 text-xs capitalize hover:bg-muted/50 ${
+                              statusFilter === s ? "bg-muted/30 font-medium text-foreground" : "text-muted-foreground"
+                            }`}
                           >
                             {s === "all" ? "All Orders" : s}
-                          </button>
+                          </Button>
                         ))}
                       </div>
                     )}
                   </div>
                   {/* Export */}
-                  <button
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={handleExport}
-                    className="h-8 px-3 text-xs font-normal border rounded-md hover:bg-muted/50 transition-colors flex items-center gap-1.5"
+                    className="h-8 rounded-xl font-normal"
                   >
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                     Export
-                  </button>
+                  </Button>
                 </div>
               </div>
 

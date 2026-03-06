@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { LandingButton } from "@/components/landing/landing-button"
 import { ScrollAnimation } from "@/components/ui/scroll-animation"
 import { ArrowRight, Instagram, Facebook, MessageCircle, Linkedin } from "lucide-react"
 
@@ -15,11 +15,11 @@ export function AboutUs() {
           {/* Left Column: Text Content */}
           <div className="flex flex-col items-start text-left">
              <ScrollAnimation variant="fade-up">
-                <div className="inline-flex items-center px-3 py-1 rounded-full border border-primary/20 text-primary text-xs font-semibold mb-6 uppercase tracking-[0.16em]">
+                <div className="inline-flex items-center px-2 py-0.5 rounded-none landing-section-tag border border-primary/20 text-primary text-[10px] font-semibold mb-6 uppercase tracking-[0.12em]">
                   What is OrderForm?
                 </div>
                 
-                <h2 className="text-3xl md:text-5xl font-heading font-semibold text-foreground mb-6 leading-[1.06] tracking-[-0.02em]">
+                <h2 className="text-3xl md:text-5xl font-heading font-normal text-foreground mb-6 leading-[1.06] tracking-[-0.02em]">
                   Built for sellers who grow on social media, <span className="text-primary italic font-heading">not complex storefront tools.</span>
                 </h2>
                 
@@ -33,12 +33,12 @@ export function AboutUs() {
                 </div>
 
                 <div className="mt-8">
-                      <Button asChild size="lg" className="group rounded-full px-8 text-sm md:text-base font-semibold">
+                      <LandingButton asChild size="lg" className="group rounded-xl px-8 text-sm md:text-base font-semibold">
                        <Link href="/register" target="_blank" rel="noopener noreferrer">
                          Launch your store
                          <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                        </Link>
-                      </Button>
+                      </LandingButton>
                 </div>
              </ScrollAnimation>
           </div>

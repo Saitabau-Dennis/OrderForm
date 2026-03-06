@@ -1,10 +1,13 @@
+import { auth } from "@/lib/auth"
 import { Navbar } from "@/components/landing/navbar"
 import { Footer } from "@/components/landing/footer"
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const session = await auth()
+
   return (
     <main className="min-h-screen flex flex-col theme-landing bg-background text-foreground">
-      <Navbar />
+      <Navbar isAuthenticated={!!session} />
       
       <div className="flex-1 w-full max-w-4xl mx-auto px-6 py-32 md:py-40">
         <h1 className="text-4xl md:text-5xl font-heading font-medium tracking-tight mb-8">Terms of Service</h1>

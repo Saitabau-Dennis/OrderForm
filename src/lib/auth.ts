@@ -1,7 +1,5 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import db from "@/lib/db";
-import bcrypt from "bcryptjs";
 import authConfig from "@/auth.config";
 
 declare module "next-auth" {
@@ -29,6 +27,11 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        const [{ default: db }, bcrypt] = await Promise.all([
+          import("@/lib/db"),
+          import("bcryptjs"),
+        ]);
+
         if (!credentials?.email || !credentials?.password) {
           return null;
         }

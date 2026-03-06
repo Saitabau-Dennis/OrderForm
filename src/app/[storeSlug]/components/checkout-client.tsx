@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { toast } from "sonner"
@@ -44,6 +44,10 @@ type PlacedOrderState = {
   total: number
 }
 
+function getCheckoutDraftStorageKey(storeSlug: string) {
+  return `orderform_checkout_draft:${storeSlug}`
+}
+
 function normalizePhone(value: string): string {
   return value.replace(/\D/g, "")
 }
@@ -82,9 +86,11 @@ function getFieldClass(hasError: boolean): string {
 }
 
 export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, brandColor }: CheckoutClientProps) {
+  const checkoutDraftStorageKey = useMemo(() => getCheckoutDraftStorageKey(storeSlug), [storeSlug])
   const { cart, cartTotal, removeFromCart, updateQuantity, clearCart } = useStore()
 
   const [isLoading, setIsLoading] = useState(false)
+  const [hasHydratedDraft, setHasHydratedDraft] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<CheckoutFieldErrors>({})
   const [placedOrder, setPlacedOrder] = useState<PlacedOrderState | null>(null)
   const [formData, setFormData] = useState<CheckoutFormData>({
@@ -101,6 +107,45 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
   const deliveryFee = selectedZone ? selectedZone.price : 0
   const grandTotal = cartTotal + deliveryFee
   const cartCount = cart.reduce((count, item) => count + item.quantity, 0)
+
+  useEffect(() => {
+    try {
+      const rawDraft = localStorage.getItem(checkoutDraftStorageKey)
+      if (!rawDraft) return
+
+      const parsedDraft = JSON.parse(rawDraft) as Partial<CheckoutFormData>
+      setFormData((previous) => ({
+        name: typeof parsedDraft.name === "string" ? parsedDraft.name : previous.name,
+        phone: typeof parsedDraft.phone === "string" ? parsedDraft.phone : previous.phone,
+        deliveryAddress:
+          typeof parsedDraft.deliveryAddress === "string"
+            ? parsedDraft.deliveryAddress
+            : previous.deliveryAddress,
+        zoneId: typeof parsedDraft.zoneId === "string" ? parsedDraft.zoneId : previous.zoneId,
+      }))
+    } catch (error) {
+      console.error("Failed to restore checkout draft", error)
+    } finally {
+      setHasHydratedDraft(true)
+    }
+  }, [checkoutDraftStorageKey])
+
+  useEffect(() => {
+    if (!hasHydratedDraft) return
+
+    const hasAnyDraftValue = Object.values(formData).some((value) => value.trim() !== "")
+
+    try {
+      if (!hasAnyDraftValue) {
+        localStorage.removeItem(checkoutDraftStorageKey)
+        return
+      }
+
+      localStorage.setItem(checkoutDraftStorageKey, JSON.stringify(formData))
+    } catch (error) {
+      console.error("Failed to save checkout draft", error)
+    }
+  }, [checkoutDraftStorageKey, formData, hasHydratedDraft])
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-KE", {
@@ -154,6 +199,7 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
         total: grandTotal,
       })
       clearCart()
+      localStorage.removeItem(checkoutDraftStorageKey)
       toast.success("Order placed successfully")
     } catch (error) {
       console.error(error)
@@ -245,6 +291,7 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
           <div>
             <h2 className="text-xl font-semibold tracking-tight text-[#1A1A1A]">Contact & Delivery</h2>
             <p className="mt-1 text-sm text-[#737373]">Enter your details to confirm your order.</p>
+            <p className="mt-1 text-[11px] text-[#85857E]">Your details are saved automatically on this device.</p>
           </div>
           <div className="rounded-full bg-[#F3F3F0] px-3 py-1 text-xs font-semibold text-[#5A5A55]" aria-live="polite">
             {cartCount} item{cartCount === 1 ? "" : "s"}

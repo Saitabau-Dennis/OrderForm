@@ -75,10 +75,10 @@ export function Features() {
             <div className="mx-auto max-w-7xl px-6">
                 <ScrollAnimation variant="fade-up">
                     <div className="mb-16 text-center max-w-3xl mx-auto">
-                    <div className="inline-flex items-center px-3 py-1 rounded-full border border-primary/20 text-primary text-xs font-medium mb-4 uppercase tracking-[0.16em]">
+                    <div className="inline-flex items-center px-2 py-0.5 rounded-none landing-section-tag border border-primary/20 text-primary text-[10px] font-medium mb-4 uppercase tracking-[0.12em]">
                Features
               </div>
-                    <h2 className="text-3xl md:text-5xl font-heading font-semibold text-foreground leading-[1.06] tracking-[-0.02em] mb-6">
+                    <h2 className="text-3xl md:text-5xl font-heading font-normal text-foreground leading-[1.06] tracking-[-0.02em] mb-6">
                         Everything you need <br className="hidden md:block" />
                         to <span className="text-primary">run your store.</span>
                     </h2>
@@ -133,7 +133,7 @@ interface CardHeadingProps {
 
 const CardHeading = ({ title, description }: CardHeadingProps) => (
     <div className="relative z-10 p-5 pb-1 md:p-6 md:pb-2">
-        <h3 className="font-heading font-semibold text-lg md:text-xl leading-snug text-foreground mb-3">
+        <h3 className="font-heading font-normal text-lg md:text-xl leading-snug text-foreground mb-3">
             <span className="text-primary">{title.split(" ")[0]}</span>{" "}
             {title.split(" ").slice(1).join(" ")}
         </h3>
@@ -156,7 +156,7 @@ const DualModeImage = ({ src, alt, width, height, className }: DualModeImageProp
         width={width}
         height={height}
         className={cn(
-            "block h-auto w-full rounded-lg border border-border/60 bg-background shadow-[0_28px_60px_-24px_rgba(0,0,0,0.65),0_14px_28px_-18px_rgba(0,0,0,0.55)]",
+            "block h-auto w-full rounded-lg border border-border/60 bg-background",
             className
         )}
     />

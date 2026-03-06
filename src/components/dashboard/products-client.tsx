@@ -114,7 +114,6 @@ export function ProductsClient({ initialProducts, canAddProduct }: ProductsClien
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-lg h-9 px-3 text-sm border-border bg-background hover:bg-accent transition-colors font-medium"
               >
                 <Filter className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                 Filter
@@ -125,21 +124,21 @@ export function ProductsClient({ initialProducts, canAddProduct }: ProductsClien
               <DropdownMenuSeparator className="bg-border/50 my-1" />
               <DropdownMenuItem
                 onClick={() => setStatusFilter("all")}
-                className={cn("cursor-pointer rounded-lg text-sm font-medium px-2 py-1.5", statusFilter === "all" && "bg-accent text-accent-foreground")}
+                className={cn("cursor-pointer rounded-lg text-sm font-normal px-2 py-1.5", statusFilter === "all" && "bg-accent text-accent-foreground")}
               >
                 All Products
                 <span className="ml-auto text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded-md">{initialProducts.length}</span>
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setStatusFilter("active")}
-                className={cn("cursor-pointer rounded-lg text-sm font-medium px-2 py-1.5", statusFilter === "active" && "bg-accent text-accent-foreground")}
+                className={cn("cursor-pointer rounded-lg text-sm font-normal px-2 py-1.5", statusFilter === "active" && "bg-accent text-accent-foreground")}
               >
                 Active
                 <span className="ml-auto text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded-md">{activeCount}</span>
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setStatusFilter("draft")}
-                className={cn("cursor-pointer rounded-lg text-sm font-medium px-2 py-1.5", statusFilter === "draft" && "bg-accent text-accent-foreground")}
+                className={cn("cursor-pointer rounded-lg text-sm font-normal px-2 py-1.5", statusFilter === "draft" && "bg-accent text-accent-foreground")}
               >
                 Draft
                 <span className="ml-auto text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded-md">{draftCount}</span>
@@ -150,7 +149,6 @@ export function ProductsClient({ initialProducts, canAddProduct }: ProductsClien
           <Button
             variant="outline"
             size="sm"
-            className="rounded-lg h-9 px-3 text-sm border-border bg-background hover:bg-accent transition-colors font-medium"
           >
             <FileDown className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
             Export
@@ -159,7 +157,6 @@ export function ProductsClient({ initialProducts, canAddProduct }: ProductsClien
           <Button
             onClick={() => router.push(canAddProduct ? "/products/new" : "/settings")}
             size="sm"
-            className="bg-foreground text-background hover:bg-foreground/90 transition-all rounded-lg h-9 px-4 text-sm font-medium shadow-sm"
           >
             {canAddProduct ? (
               <Plus className="mr-2 h-3.5 w-3.5" />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,18 +8,13 @@ import { z } from "zod";
 import { toast } from "sonner";
 
 import { productSchema } from "@/components/dashboard/product-form";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/dashboard/dashboard-button";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Switch } from "@/components/ui/switch";
-import { createProduct } from "@/lib/actions/products";
+import { createProduct, getStoreCategories } from "@/lib/actions/products";
 import { cn } from "@/lib/utils";
 
 interface ProductWizardProps {
@@ -72,6 +67,37 @@ const STEPS = [
 export function ProductWizard({ onSuccess }: ProductWizardProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
+
+  const [categories, setCategories] = useState<string[]>([
+    "Clothing", "Footwear", "Accessories", "Electronics", "Home", "Beauty"
+  ]);
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const categoryWrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const response = await getStoreCategories();
+        if (response.success && response.categories) {
+          const merged = new Set([...response.categories, "Clothing", "Footwear", "Accessories", "Electronics", "Home", "Beauty", "Men", "Women", "Unisex"]);
+          setCategories(Array.from(merged));
+        }
+      } catch (error) {
+        console.error("Failed to load categories", error);
+      }
+    };
+    loadCategories();
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (categoryWrapperRef.current && !categoryWrapperRef.current.contains(event.target as Node)) {
+        setIsCategoryDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const form = useForm<WizardFormInput, unknown, WizardFormValues>({
     resolver: zodResolver(wizardSchema),
@@ -157,11 +183,13 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
               const isActive = index === currentStep;
 
               return (
-                <button
+                <Button
                   key={step.id}
                   type="button"
+                  variant="ghost"
+                  size="sm"
                   onClick={() => goToStep(index)}
-                  className="w-full py-4 text-left flex items-start justify-between gap-3"
+                  className="h-auto w-full items-start justify-between gap-3 px-0 py-4 text-left hover:bg-transparent"
                 >
                   <div className="pr-2">
                     <p className={cn("text-sm font-medium", isActive ? "text-foreground" : "text-muted-foreground")}>
@@ -182,7 +210,7 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
                   >
                     {isDone ? "✓" : index + 1}
                   </span>
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -202,31 +230,52 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
                   {form.formState.errors.name && <p className="text-xs text-red-500">{form.formState.errors.name.message}</p>}
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 relative" ref={categoryWrapperRef}>
                   <Label className="text-sm text-muted-foreground">Category</Label>
                   <p className="text-[11px] text-muted-foreground">Helps shoppers find the product faster.</p>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button
-                        type="button"
-                        className="h-10 w-full rounded-md border border-border bg-background px-3 text-left text-sm text-foreground"
-                      >
-                        {formData.category || "Select category"}
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width) p-1 rounded-md" align="start">
-                      {CATEGORY_OPTIONS.map((cat) => (
-                        <DropdownMenuItem
-                          key={cat}
-                          onClick={() => form.setValue("category", cat, { shouldValidate: true })}
-                          className="cursor-pointer rounded-sm py-2 text-sm"
-                        >
-                          {cat}
-                        </DropdownMenuItem>
+                  <Input
+                    id="category"
+                    placeholder="e.g. Vintage Apparel"
+                    autoComplete="off"
+                    {...form.register("category")}
+                    onFocus={() => setIsCategoryDropdownOpen(true)}
+                    className="h-10 rounded-md bg-background w-full"
+                  />
+
+                  {isCategoryDropdownOpen && (
+                    <div className="absolute top-[calc(100%+4px)] left-0 w-full z-50 rounded-md border border-border/80 bg-white shadow-xl max-h-[220px] overflow-y-auto py-1 px-1 animate-in fade-in slide-in-from-top-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                       {categories
+                        .filter(cat => {
+                           const currentInput = form.watch("category") || "";
+                           return currentInput.trim() === "" || cat.toLowerCase().includes(currentInput.toLowerCase());
+                        })
+                        .map((cat) => (
+                          <div
+                            key={cat}
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                            }}
+                            onClick={() => {
+                              form.setValue("category", cat, { shouldDirty: true, shouldValidate: true });
+                              setIsCategoryDropdownOpen(false);
+                            }}
+                            className="rounded-sm p-2 cursor-pointer hover:bg-muted font-normal text-sm transition-colors flex items-center"
+                          >
+                           {cat}
+                          </div>
                       ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  {form.formState.errors.category && <p className="text-xs text-red-500">{form.formState.errors.category.message}</p>}
+                      {categories.filter(cat => {
+                           const currentInput = form.watch("category") || "";
+                           return currentInput.trim() === "" || cat.toLowerCase().includes(currentInput.toLowerCase());
+                      }).length === 0 && (
+                        <div className="p-2 text-sm text-muted-foreground text-center">
+                           Press enter to create &quot;{form.watch("category")}&quot;
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {form.formState.errors.category && <p className="text-xs text-red-500 relative z-0">{form.formState.errors.category.message}</p>}
                 </div>
 
                 <div className="space-y-1.5 md:col-span-2">
@@ -277,9 +326,11 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
                   {SIZE_PRESETS.map((size) => {
                     const isSelected = selectedSizes.includes(size);
                     return (
-                      <button
+                      <Button
                         key={size}
                         type="button"
+                        variant="outline"
+                        size="sm"
                         onClick={() => {
                           const next = isSelected
                             ? selectedSizes.filter((value) => value !== size)
@@ -287,14 +338,14 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
                           form.setValue("sizes", next.join(", "), { shouldValidate: true });
                         }}
                         className={cn(
-                          "h-7 rounded-sm border px-2.5 text-xs",
+                          "h-7 rounded-sm border px-2.5 text-xs font-normal",
                           isSelected
                             ? "border-primary text-primary bg-primary/5"
                             : "border-border text-muted-foreground",
                         )}
                       >
                         {size}
-                      </button>
+                      </Button>
                     );
                   })}
                 </div>
@@ -432,13 +483,15 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
                         )}
                       </div>
                       <div className="px-2 py-2.5">
-                        <button
+                        <Button
                           type="button"
+                          variant="link"
+                          size="sm"
                           onClick={() => setCurrentStep(item.step)}
-                          className="text-xs text-primary hover:text-primary/80"
+                          className="h-auto p-0 text-xs font-normal text-primary hover:text-primary/80"
                         >
                           Edit
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   ))}
@@ -447,34 +500,37 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
             )}
           </div>
 
-          <div className="mt-8 flex items-center justify-end gap-3 text-sm">
-            <button
+          <div className="mt-8 flex items-center justify-end gap-3">
+            <Button
+              variant="ghost"
+              size="sm"
               type="button"
               onClick={() => setCurrentStep((prev) => Math.max(prev - 1, 0))}
               disabled={currentStep === 0 || loading}
-              className={cn("text-muted-foreground hover:text-foreground", currentStep === 0 && "opacity-40 pointer-events-none")}
+              className={cn("h-9 rounded-xl", currentStep === 0 && "opacity-40 pointer-events-none")}
             >
-              Prev
-            </button>
-            <span className="h-3.5 w-px bg-border" />
+              Previous
+            </Button>
 
             {currentStep < STEPS.length - 1 ? (
-              <button
+              <Button
                 type="button"
+                size="sm"
                 onClick={() => goToStep(currentStep + 1)}
-                className="text-primary hover:text-primary/80"
+                className="h-9 rounded-xl px-6"
               >
-                Next
-              </button>
+                Next Step
+              </Button>
             ) : (
-              <button
+              <Button
                 type="button"
+                size="sm"
                 onClick={handleCreateClick}
                 disabled={loading}
-                className="text-primary hover:text-primary/80 disabled:opacity-50"
+                className="h-9 rounded-xl px-6 min-w-[120px]"
               >
-                {loading ? "Creating..." : "Create"}
-              </button>
+                {loading ? "Creating..." : "Create Product"}
+              </Button>
             )}
           </div>
         </form>

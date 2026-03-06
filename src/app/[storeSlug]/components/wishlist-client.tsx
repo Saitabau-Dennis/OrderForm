@@ -19,10 +19,9 @@ type WishlistClientProps = {
   storeSlug: string
   currency: string
   allProducts: ProductInfo[]
-  brandColor: string
 }
 
-export function WishlistClient({ storeSlug, currency, allProducts, brandColor }: WishlistClientProps) {
+export function WishlistClient({ storeSlug, currency, allProducts }: WishlistClientProps) {
   const { wishlist, toggleWishlist } = useStore()
 
   // Find products that are in the user's wishlist
@@ -73,7 +72,7 @@ export function WishlistClient({ storeSlug, currency, allProducts, brandColor }:
             <Trash2 className="w-4 h-4" />
           </button>
 
-          <Link href={`/${storeSlug}/product/${product.id}`} className="block cursor-pointer">
+          <Link href={`/${storeSlug}/products/${product.id}`} className="block cursor-pointer">
             {/* Image */}
             <div className="relative aspect-[4/5] md:aspect-square w-full bg-[#EEECEA] overflow-hidden mb-3 rounded-sm">
               {product.imageUrl ? (

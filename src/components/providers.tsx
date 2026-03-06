@@ -1,7 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { SessionProvider } from "next-auth/react";
 
 const NextTopLoader = dynamic(() => import("nextjs-toploader"), {
   ssr: false,
@@ -14,7 +13,7 @@ const SonnerToaster = dynamic(
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <SessionProvider>
+    <>
       <NextTopLoader
         color="#00311F"
         showSpinner={false}
@@ -23,7 +22,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       />
       {children}
       <SonnerToaster
-        position="bottom-right"
+        position="top-right"
         toastOptions={{
           classNames: {
             success: "!bg-green-600 !text-white !border-green-600",
@@ -31,7 +30,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           },
         }}
       />
-    </SessionProvider>
+    </>
   );
 }
 Providers.displayName = "Providers"

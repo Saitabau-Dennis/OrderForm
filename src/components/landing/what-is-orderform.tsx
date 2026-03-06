@@ -8,10 +8,10 @@ export function WhatIsOrderform() {
     <section className="py-16 md:py-24 bg-background overflow-hidden">
       <div className="max-w-4xl mx-auto px-6 text-center">
         <ScrollAnimation variant="fade-up">
-          <div className="inline-flex items-center px-3 py-1 rounded-full border border-primary/20 text-primary text-[13px] font-medium mb-6 uppercase tracking-[0.16em]">
-            What is <span className="[font-family:var(--font-instrument-serif)] text-lg capitalize tracking-tight font-normal ml-1.5 -mb-0.5">Orderform</span>?
+          <div className="inline-flex items-center px-2 py-0.5 rounded-none landing-section-tag border border-primary/20 text-primary text-[10px] font-medium mb-6 uppercase tracking-[0.12em]">
+            What is <span className="[font-family:var(--font-instrument-serif)] text-sm capitalize tracking-tight font-normal ml-1.5 -mb-0.5">Orderform</span>?
           </div>
-          <h2 className="text-3xl md:text-5xl font-heading font-semibold text-foreground mb-8 leading-[1.06] tracking-[-0.02em]">
+          <h2 className="text-3xl md:text-5xl font-heading font-normal text-foreground mb-8 leading-[1.06] tracking-[-0.02em]">
             The missing bridge between <span className="text-muted-foreground">social traffic</span> and <span className="text-primary">paid orders.</span>
           </h2>
           <div className="max-w-2xl mx-auto text-base md:text-lg leading-relaxed text-muted-foreground font-sans">

@@ -27,6 +27,11 @@ import {
 } from "@/components/ui/select";
 import { updateStoreSettings } from "@/lib/actions/store";
 
+const ROOT_DOMAIN = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || process.env.NEXT_PUBLIC_VERCEL_URL || "")
+  .replace(/^https?:\/\//i, "")
+  .replace(/\/.*$/, "")
+  .toLowerCase();
+
 // --- Constants & Schemas ---
 
 const THEMES = [
@@ -275,16 +280,34 @@ export function OnboardingWizard({ initialData }: OnboardingWizardProps) {
                                 <div className="space-y-3">
                                    <Label className="text-sm font-semibold text-gray-700">Store Link (Slug)</Label>
                                    <div className="flex rounded-xl border border-gray-200 overflow-hidden focus-within:border-[#00311F] focus-within:ring-4 focus-within:ring-[#00311F]/10 transition-all">
-                                      <div className="bg-gray-50 px-4 flex items-center text-gray-500 border-r border-gray-200 text-sm font-medium">orderform.store/</div>
-                                      <Input
-                                         {...form.register("slug")}
-                                         onChange={(e) => {
-                                            form.setValue("slug", e.target.value);
-                                            setIsSlugEdited(true);
-                                         }}
-                                         placeholder="my-store"
-                                         className="h-12 border-none shadow-none focus-visible:ring-0 rounded-none px-4 text-base"
-                                      />
+                                      {ROOT_DOMAIN ? (
+                                        <>
+                                          <div className="bg-gray-50 px-4 flex items-center text-gray-500 border-r border-gray-200 text-sm font-medium">https://</div>
+                                          <Input
+                                             {...form.register("slug")}
+                                             onChange={(e) => {
+                                                form.setValue("slug", e.target.value);
+                                                setIsSlugEdited(true);
+                                             }}
+                                             placeholder="my-store"
+                                             className="h-12 border-none shadow-none focus-visible:ring-0 rounded-none px-4 text-base"
+                                          />
+                                          <div className="bg-gray-50 px-4 flex items-center text-gray-500 border-l border-gray-200 text-sm font-medium">.{ROOT_DOMAIN}</div>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <div className="bg-gray-50 px-4 flex items-center text-gray-500 border-r border-gray-200 text-sm font-medium">orderform.store/</div>
+                                          <Input
+                                             {...form.register("slug")}
+                                             onChange={(e) => {
+                                                form.setValue("slug", e.target.value);
+                                                setIsSlugEdited(true);
+                                             }}
+                                             placeholder="my-store"
+                                             className="h-12 border-none shadow-none focus-visible:ring-0 rounded-none px-4 text-base"
+                                          />
+                                        </>
+                                      )}
                                    </div>
                                    {form.formState.errors.slug && <p className="text-sm text-red-500">{form.formState.errors.slug.message}</p>}
                                 </div>
@@ -460,9 +483,10 @@ export function OnboardingWizard({ initialData }: OnboardingWizardProps) {
               </Button>
 
               <Button
+                 size="lg"
                  onClick={step < 4 ? nextStep : form.handleSubmit(onSubmit)}
                  disabled={loading}
-                 className="bg-[#00311F] hover:bg-[#00311F]/90 text-white px-8 h-12 rounded-xl shadow-lg shadow-[#00311F]/20 text-base font-medium transition-all hover:scale-[1.02] active:scale-[0.98]"
+                 className="px-8 h-12 text-base font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                  {loading ? (
                     <Loader2 className="w-5 h-5 animate-spin" />

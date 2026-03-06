@@ -262,7 +262,7 @@ export function DataTable<TData, TValue>({
             size="sm"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
-            className="rounded-lg h-8 px-3 text-xs border-border hover:bg-accent disabled:opacity-40 transition-all"
+            className="rounded-xl h-8 px-3 text-xs border-border hover:bg-accent disabled:opacity-40 transition-all"
           >
             <ChevronLeft className="h-3.5 w-3.5 mr-1" />
             Previous
@@ -272,7 +272,7 @@ export function DataTable<TData, TValue>({
             size="sm"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
-            className="rounded-lg h-8 px-3 text-xs border-border hover:bg-accent disabled:opacity-40 transition-all"
+            className="rounded-xl h-8 px-3 text-xs border-border hover:bg-accent disabled:opacity-40 transition-all"
           >
             Next
             <ChevronRight className="h-3.5 w-3.5 ml-1" />

@@ -63,7 +63,7 @@ export function CustomersClient({ data }: CustomersClientProps) {
             onClick={handleExport}
             variant="outline"
             size="sm"
-            className="rounded-lg h-9 px-3 text-sm border-border bg-background hover:bg-accent transition-colors"
+            className="rounded-xl h-9 px-3 text-sm border-border bg-background hover:bg-accent transition-colors font-normal"
           >
             <FileText className="mr-1.5 h-3.5 w-3.5" />
             Export

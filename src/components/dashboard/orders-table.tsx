@@ -37,7 +37,7 @@ export function OrdersTable({ orders, onView, selectedOrderId, onUpdateStatus }:
           >
             <td className="px-5 py-4">
               <span className="font-normal text-foreground">
-                {order.displayId || formatOrderId(order.orderNumber || order.id)}
+                {formatOrderId(order.displayId || order.orderNumber || order.id)}
               </span>
             </td>
             <td className="px-5 py-4">

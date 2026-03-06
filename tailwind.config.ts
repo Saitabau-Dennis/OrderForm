@@ -22,6 +22,7 @@ const config: Config = {
         "dm-sans": ["var(--font-dm-sans)"],
         "poppins": ["var(--font-poppins)"],
         "jakarta": ["var(--font-jakarta)"],
+        "clash-display": ["var(--font-clash-display)"],
       },
     },
   },
