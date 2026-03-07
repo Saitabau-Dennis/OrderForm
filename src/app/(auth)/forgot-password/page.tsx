@@ -40,7 +40,7 @@ export default function ForgotPasswordPage() {
       {/* Left Side - Text */}
       <div className="w-full hidden md:flex md:w-1/2 bg-primary p-10 flex-col justify-between text-primary-foreground relative overflow-hidden">
         <div className="relative z-10">
-          <Link href="/" className="[font-family:var(--font-teknaf)] text-3xl font-semibold tracking-tight mb-12 block mt-1">
+          <Link href="/" className="[font-family:var(--font-adcure)] text-3xl font-semibold tracking-tight mb-12 block mt-1">
             Orderform
           </Link>
           <h1 className="font-heading text-4xl md:text-5xl font-normal tracking-tight leading-tight mb-6">
@@ -66,7 +66,7 @@ export default function ForgotPasswordPage() {
       <div className="w-full md:w-1/2 px-5 pb-8 pt-7 sm:px-6 md:p-10 flex flex-col justify-center bg-background">
         <div className="max-w-sm mx-auto w-full">
           <div className="md:hidden mb-6 rounded-2xl border border-primary/30 bg-primary p-4 text-center shadow-lg">
-             <Link href="/" className="[font-family:var(--font-teknaf)] text-3xl font-semibold tracking-tight text-primary-foreground mt-1">
+             <Link href="/" className="[font-family:var(--font-adcure)] text-3xl font-semibold tracking-tight text-primary-foreground mt-1">
               Orderform
             </Link>
             <p className="mt-2 text-xs text-primary-foreground/75">Request a code and reset your password quickly.</p>

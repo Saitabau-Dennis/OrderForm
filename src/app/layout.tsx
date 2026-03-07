@@ -41,9 +41,9 @@ const clashDisplay = localFont({
   variable: "--font-clash-display",
 });
 
-const teknaf = localFont({
-  src: "../../public/Fonts/teknaf-regular-font/TeknafRegular-rv0aB.otf",
-  variable: "--font-teknaf",
+const adcure = localFont({
+  src: "../../public/Fonts/adcure-font/adcure.otf",
+  variable: "--font-adcure",
 });
 
 
@@ -69,7 +69,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning translate="no" className="notranslate">
-      <body className={`${inter.variable} ${sora.variable} ${outfit.variable} ${signika.variable} ${dmSans.variable} ${instrumentSerif.variable} ${poppins.variable} ${jakarta.variable} ${bungee.variable} ${montserrat.variable} ${GeistSans.variable} ${clashDisplay.variable} ${teknaf.variable} notranslate font-sans antialiased`}>
+      <body className={`${inter.variable} ${sora.variable} ${outfit.variable} ${signika.variable} ${dmSans.variable} ${instrumentSerif.variable} ${poppins.variable} ${jakarta.variable} ${bungee.variable} ${montserrat.variable} ${GeistSans.variable} ${clashDisplay.variable} ${adcure.variable} notranslate font-sans antialiased`}>
         <Providers>
           {children}
         </Providers>
