@@ -1,66 +1,67 @@
 "use client";
 
+import { cva } from "class-variance-authority";
+import { motion, type HTMLMotionProps } from "motion/react";
 import { cn } from "@/lib/utils";
 
-export function WaveLoader({
-  className,
-  color = "#00311F",
-}: {
-  className?: string;
-  color?: string;
-}) {
-  const dots = [0, 1, 2,3];
+const bouncingDotsVariant = cva("flex items-center justify-center gap-2", {
+  variants: {
+    messagePlacement: {
+      bottom: "flex-col",
+      right: "flex-row",
+      left: "flex-row-reverse",
+    },
+  },
+  defaultVariants: {
+    messagePlacement: "bottom",
+  },
+});
 
+type MessagePlacement = "bottom" | "left" | "right";
+
+interface WaveLoaderProps {
+  dots?: number;
+  color?: string;
+  message?: string;
+  messagePlacement?: MessagePlacement;
+}
+
+export function WaveLoader({
+  dots = 3,
+  color = "#00311F",
+  message,
+  messagePlacement = "bottom",
+  className,
+  ...props
+}: HTMLMotionProps<"div"> & WaveLoaderProps) {
   return (
-    <div className={cn("flex w-full items-center justify-center p-4", className)}>
-      <div className="wl-root" role="status" aria-label="Loading">
-        {dots.map((i) => (
-          <span
-            key={i}
-            className="wl-dot"
-            style={{ animationDelay: `${i * 0.13}s` }}
+    <div
+      role="status"
+      aria-label="Loading"
+      className={cn(
+        "w-full p-4",
+        bouncingDotsVariant({ messagePlacement }),
+        className
+      )}
+    >
+      <div className="flex items-center justify-center gap-2">
+        {Array.from({ length: dots }).map((_, index) => (
+          <motion.div
+            key={index}
+            className="h-3 w-3 rounded-full bg-foreground"
+            style={{ backgroundColor: color }}
+            animate={{ y: [0, -20, 0] }}
+            transition={{
+              duration: 0.6,
+              repeat: Number.POSITIVE_INFINITY,
+              delay: index * 0.2,
+              ease: "easeInOut",
+            }}
+            {...props}
           />
         ))}
       </div>
-
-      <style jsx>{`
-        .wl-root {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-
-        .wl-dot {
-          display: block;
-          width: 16px;
-          height: 16px;
-          border-radius: 50%;
-          background: ${color};
-          animation: wl-bounce 1s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-        }
-
-        @keyframes wl-bounce {
-          0%, 100% {
-            transform: translateY(0) scale(1);
-            opacity: 0.3;
-          }
-          45% {
-            transform: translateY(-22px) scale(0.9);
-            opacity: 1;
-          }
-          60% {
-            transform: translateY(-22px) scale(0.9);
-            opacity: 1;
-          }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .wl-dot {
-            animation: none;
-            opacity: 0.7;
-          }
-        }
-      `}</style>
+      {message ? <div>{message}</div> : null}
     </div>
   );
 }

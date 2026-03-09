@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTopLoader } from "nextjs-toploader";
 import { Plus, Filter, FileDown, Settings } from "lucide-react";
 import { toast } from "sonner";
 
@@ -35,6 +36,7 @@ interface ProductsClientProps {
 
 export function ProductsClient({ initialProducts, canAddProduct }: ProductsClientProps) {
   const router = useRouter();
+  const topLoader = useTopLoader();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -80,6 +82,11 @@ export function ProductsClient({ initialProducts, canAddProduct }: ProductsClien
   const handleFormSuccess = () => {
     setIsSheetOpen(false);
     router.refresh();
+  };
+
+  const handleAddProductClick = () => {
+    topLoader.start();
+    router.push(canAddProduct ? "/products/new" : "/settings");
   };
 
   // Filter products by status
@@ -155,7 +162,7 @@ export function ProductsClient({ initialProducts, canAddProduct }: ProductsClien
           </Button>
 
           <Button
-            onClick={() => router.push(canAddProduct ? "/products/new" : "/settings")}
+            onClick={handleAddProductClick}
             size="sm"
           >
             {canAddProduct ? (
