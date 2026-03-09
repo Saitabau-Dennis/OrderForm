@@ -57,10 +57,10 @@ export function WishlistClient({ storeSlug, currency, allProducts }: WishlistCli
   }
 
   return (
-    <div className="overflow-x-auto border border-[#E8E8E5] bg-white">
+    <div className="overflow-x-auto border border-[#E8E8E5]">
       <table className="min-w-full border-collapse">
         <thead>
-          <tr className="border-b border-[#E8E8E5] bg-[#FAFAF8] text-left">
+          <tr className="border-b border-[#E8E8E5] text-left">
             <th className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#6D6D67]">Item</th>
             <th className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#6D6D67]">Product</th>
             <th className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#6D6D67]">Category</th>
