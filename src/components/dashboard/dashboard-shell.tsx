@@ -31,7 +31,6 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { SupportModal } from "@/components/dashboard/support-modal";
 import { signOut } from "next-auth/react";
 import BoringAvatar from "boring-avatars";
 
@@ -73,10 +72,9 @@ interface SidebarContentProps {
     hasFirstProduct: boolean;
   } | null;
   setIsMobileMenuOpen: (open: boolean) => void;
-  setShowSupportModal: (open: boolean) => void;
 }
 
-const SidebarContent = ({ user, store, setIsMobileMenuOpen, setShowSupportModal }: SidebarContentProps) => {
+const SidebarContent = ({ user, store, setIsMobileMenuOpen }: SidebarContentProps) => {
   const pathname = usePathname();
 
   const routes = [
@@ -172,12 +170,12 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen, setShowSupportModal 
               variant="ghost"
               className="group flex w-full h-auto cursor-pointer items-center gap-3 rounded-xl border border-transparent p-2.5 text-left transition-colors hover:border-border/70 hover:bg-muted/40 focus:outline-none"
             >
-              <Avatar className="h-10 w-10 rounded-xl bg-muted/50">
+              <Avatar className="h-10 w-10 rounded-none bg-muted/50">
                 <AvatarImage
-                  src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${user.name || "User"}&backgroundColor=e9c46a,2a9d8f,264653`}
-                  className="rounded-xl object-cover"
+                  src={`https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=${user.name || "User"}&backgroundColor=e9c46a,2a9d8f,264653`}
+                  className="rounded-none object-cover"
                 />
-                <AvatarFallback className="rounded-xl bg-foreground/10 text-xs font-normal text-foreground">
+                <AvatarFallback className="rounded-none bg-foreground/10 text-xs font-normal text-foreground">
                   {user.name?.charAt(0).toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
@@ -198,16 +196,6 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen, setShowSupportModal 
               <p className="truncate text-base font-normal leading-tight text-foreground">{user.name || "User"}</p>
               <p className="mt-0.5 truncate text-xs font-normal text-muted-foreground">{user.email}</p>
             </div>
-
-            <DropdownMenuItem
-              className="cursor-pointer rounded-xl px-3 py-2.5 focus:bg-primary/5"
-              onSelect={() => setShowSupportModal(true)}
-            >
-              <div className="flex flex-col leading-tight">
-                <span className="text-sm font-normal text-foreground">Help & Support</span>
-                <span className="mt-0.5 text-[11px] text-muted-foreground">Contact support and report issues</span>
-              </div>
-            </DropdownMenuItem>
             <DropdownMenuItem
               className="cursor-pointer rounded-xl px-3 py-2 text-sm font-normal text-red-500 focus:bg-red-50 focus:text-red-500"
               onSelect={() => signOut({ callbackUrl: "/login" })}
@@ -224,7 +212,6 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen, setShowSupportModal 
 export function DashboardShell({ children, user, store }: DashboardShellProps) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [showSupportModal, setShowSupportModal] = useState(false);
   const publicStoreUrl = store?.slug ? getStoreUrl(store.slug, ROOT_DOMAIN) : null;
   const onboardingComplete = Boolean(store?.configured && store?.hasFirstProduct);
   const showSetupReminder =
@@ -272,7 +259,11 @@ export function DashboardShell({ children, user, store }: DashboardShellProps) {
   return (
     <div className="flex min-h-screen bg-background text-foreground font-poppins">
       <aside className="hidden w-72 border-r border-border bg-white md:block fixed inset-y-0 left-0 z-30">
-        <SidebarContent user={user} store={store} setIsMobileMenuOpen={setIsMobileMenuOpen} setShowSupportModal={setShowSupportModal} />
+        <SidebarContent
+          user={user}
+          store={store}
+          setIsMobileMenuOpen={setIsMobileMenuOpen}
+        />
       </aside>
 
       <div className="flex w-full flex-col md:pl-72 transition-all duration-300">
@@ -286,7 +277,11 @@ export function DashboardShell({ children, user, store }: DashboardShellProps) {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="p-0 w-72 border-r-0 bg-background text-foreground">
-                <SidebarContent user={user} store={store} setIsMobileMenuOpen={setIsMobileMenuOpen} setShowSupportModal={setShowSupportModal} />
+                <SidebarContent
+                  user={user}
+                  store={store}
+                  setIsMobileMenuOpen={setIsMobileMenuOpen}
+                />
               </SheetContent>
             </Sheet>
 
@@ -304,7 +299,7 @@ export function DashboardShell({ children, user, store }: DashboardShellProps) {
               <input
                 type="text"
                 placeholder="Search..."
-                className="w-[260px] h-9 pl-9 pr-3 text-sm font-normal border rounded-xl bg-background focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary/30 transition-all placeholder:text-muted-foreground/40"
+                className="w-[260px] h-9 pl-9 pr-3 text-sm font-normal border rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary/30 transition-all placeholder:text-muted-foreground/40"
               />
             </div>
 
@@ -313,7 +308,7 @@ export function DashboardShell({ children, user, store }: DashboardShellProps) {
                 href={publicStoreUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 h-9 px-4 text-sm font-normal border rounded-xl hover:bg-muted/50 transition-colors text-foreground"
+                className="inline-flex items-center gap-2 h-9 px-4 text-sm font-normal border rounded-md hover:bg-muted/50 transition-colors text-foreground"
               >
                 View Store
                 <Store className="h-4 w-4 text-muted-foreground" />
@@ -363,8 +358,6 @@ export function DashboardShell({ children, user, store }: DashboardShellProps) {
           {children}
         </main>
       </div>
-
-      <SupportModal open={showSupportModal} onOpenChange={setShowSupportModal} />
     </div>
   );
 }

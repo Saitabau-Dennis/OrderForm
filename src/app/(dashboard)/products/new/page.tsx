@@ -10,7 +10,7 @@ import { NewProductPageClient } from "@/components/dashboard/new-product-page-cl
 export default async function NewProductPage() {
   const session = await auth();
 
-  if (!session) {
+  if (!session?.user?.id) {
     redirect("/login");
   }
 

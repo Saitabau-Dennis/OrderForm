@@ -31,7 +31,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const session = await auth();
   const { range = "7d" } = await searchParams;
 
-  if (!session) {
+  if (!session?.user?.id) {
     redirect("/login");
   }
 

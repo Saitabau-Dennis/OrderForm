@@ -19,6 +19,7 @@ import {
 import { createProduct, getStoreCategories, updateProduct } from "@/lib/actions/products";
 import { cn } from "@/lib/utils";
 
+// Converts rich-text HTML into plain text for "required description" checks.
 const stripRichText = (value: string) =>
   value
     .replace(/<[^>]*>/g, " ")
@@ -35,6 +36,7 @@ export const productSchema = z.object({
   category: z.string().min(1, "Category is required"),
   isAvailable: z.boolean().default(true),
   imageUrl: z.string().min(1, "Product image is required"),
+  galleryImages: z.array(z.string()).default([]),
   sizes: z.string().min(1, "At least one size/variant is required"),
 });
 
@@ -59,7 +61,7 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
   const isSheet = layout === "sheet";
 
   useEffect(() => {
-    // Load existing categories from the store so store owners don't forget their previous categories
+    // Merge defaults with store-specific categories already used in past products.
     const loadCategories = async () => {
       try {
         const response = await getStoreCategories();
@@ -76,7 +78,7 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
   }, []);
 
   useEffect(() => {
-    // Close the custom category combobox when clicking outside
+    // Close custom category dropdown on outside clicks.
     function handleClickOutside(event: MouseEvent) {
       if (categoryWrapperRef.current && !categoryWrapperRef.current.contains(event.target as Node)) {
         setIsCategoryDropdownOpen(false);
@@ -95,6 +97,10 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
       category: initialData?.category || "",
       isAvailable: initialData?.isAvailable ?? true,
       imageUrl: initialData?.imageUrl || "",
+      galleryImages: Array.isArray((initialData as { galleryImages?: unknown })?.galleryImages)
+        ? ((initialData as { galleryImages?: unknown[] }).galleryImages ?? [])
+            .filter((value): value is string => typeof value === "string" && value.trim() !== "")
+        : [],
       sizes: initialData?.sizes || "",
     },
   });
@@ -259,6 +265,58 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                         {form.formState.errors.imageUrl.message}
                     </p>
                 )}
+
+                <div className="space-y-2 pt-3">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-normal text-muted-foreground">Additional images</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-8 rounded-md px-3 text-xs"
+                      onClick={() => {
+                        const current = form.getValues("galleryImages") || [];
+                        form.setValue("galleryImages", [...current, ""], { shouldDirty: true });
+                      }}
+                    >
+                      Add image
+                    </Button>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">Optional extra images for product gallery.</p>
+
+                  <div className="space-y-3">
+                    {(form.watch("galleryImages") || []).map((url, index) => (
+                      <div key={`gallery-${index}`} className="rounded-md border border-border p-2">
+                        <div className="h-44">
+                          <ImageUpload
+                            value={url}
+                            onChange={(nextUrl) => {
+                              const current = [...(form.getValues("galleryImages") || [])];
+                              current[index] = nextUrl;
+                              form.setValue("galleryImages", current, { shouldDirty: true });
+                            }}
+                            endpoint="productImage"
+                            label={`Upload image ${index + 1}`}
+                            helperText="PNG, JPG up to 4MB"
+                          />
+                        </div>
+                        <div className="mt-2 flex justify-end">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            className="h-8 rounded-md px-2 text-xs text-muted-foreground hover:text-destructive"
+                            onClick={() => {
+                              const current = [...(form.getValues("galleryImages") || [])];
+                              current.splice(index, 1);
+                              form.setValue("galleryImages", current, { shouldDirty: true });
+                            }}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
             </SectionWrapper>
 
             <SectionWrapper title="Organization" description="Categorization & Stock">

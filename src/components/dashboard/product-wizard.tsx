@@ -24,7 +24,7 @@ interface ProductWizardProps {
 const CATEGORY_OPTIONS = ["Clothing", "Footwear", "Accessories", "Electronics", "Home", "Beauty"];
 const SIZE_PRESETS = ["XS", "S", "M", "L", "XL", "XXL"];
 const wizardSchema = productSchema.extend({
-  // Allow creating product first, image can be uploaded later.
+  // Wizard permits empty image so merchants can publish quickly and update media later.
   imageUrl: z.string().optional().default(""),
 });
 type WizardFormInput = z.input<typeof wizardSchema>;
@@ -128,6 +128,7 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
       return;
     }
 
+    // Validate only the current step fields before allowing forward navigation.
     const valid = await form.trigger(STEPS[currentStep].fields);
     if (!valid) {
       toast.error("Please complete required fields first.");

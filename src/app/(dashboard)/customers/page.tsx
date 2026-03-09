@@ -13,7 +13,7 @@ const formatter = new Intl.NumberFormat("en-US", {
 export default async function CustomersPage() {
   const session = await auth();
 
-  if (!session) {
+  if (!session?.user?.id) {
     redirect("/login");
   }
 

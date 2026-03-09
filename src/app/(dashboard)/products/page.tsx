@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default async function ProductsPage() {
   const session = await auth();
 
-  if (!session) {
+  if (!session?.user?.id) {
     redirect("/login");
   }
 

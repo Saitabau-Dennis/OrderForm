@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
-import { ImageUpload } from "@/components/ui/image-upload";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import {
   Select,
@@ -30,83 +29,44 @@ const ROOT_DOMAIN = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || process.env.NEXT_PUB
 
 const THEMES = [
   {
-    name: "Modern Minimalist",
-    primary: "#30382F",
-    secondary: "#95D5B2",
-    description: "Clean and balanced for most stores.",
+    name: "Butter & Twilight",
+    primary: "#426BC2",
+    secondary: "#FFED9E",
   },
   {
-    name: "Midnight Luxe",
-    primary: "#1A1A1A",
-    secondary: "#D4AF37",
-    description: "Dark and premium.",
+    name: "Leaves & Sky",
+    primary: "#4A9166",
+    secondary: "#A6CFF2",
   },
   {
-    name: "Organic Earth",
-    primary: "#5D7052",
-    secondary: "#F3E9D2",
-    description: "Natural and calm.",
+    name: "Blossom & Forest",
+    primary: "#124224",
+    secondary: "#F2C0CA",
   },
   {
-    name: "Oceanic Depth",
-    primary: "#0F4C81",
-    secondary: "#89C2D9",
-    description: "Clear and trustworthy.",
-  },
-  {
-    name: "Urban Concrete",
-    primary: "#2D3436",
-    secondary: "#E1E8EE",
-    description: "Modern neutral look.",
-  },
-  {
-    name: "Coral Bloom",
-    primary: "#E8402A",
-    secondary: "#FFE4DF",
-    description: "Warm and energetic.",
-  },
-  {
-    name: "Electric Violet",
-    primary: "#6929C4",
-    secondary: "#E8DAFF",
-    description: "Bold and creative.",
-  },
-  {
-    name: "Tropical Teal",
-    primary: "#0077B6",
-    secondary: "#C8F0FB",
-    description: "Fresh and vibrant.",
-  },
-  {
-    name: "Sunset Orange",
-    primary: "#D9650A",
-    secondary: "#FFF0E0",
-    description: "Bright and inviting.",
-  },
-  {
-    name: "Berry Pop",
-    primary: "#C0175D",
-    secondary: "#FFD6EA",
-    description: "Playful and eye-catching.",
-  },
-  {
-    name: "Forest Fresh",
-    primary: "#1A7F4B",
-    secondary: "#CFFAE0",
-    description: "Lively and fresh.",
+    name: "Cloud & Apple",
+    primary: "#A6BA1A",
+    secondary: "#F7F2E8",
   },
 ];
 
+// Form schema intentionally allows empty strings for optional URL/email fields.
 const settingsSchema = z.object({
   name: z.string().min(1, "Store name is required"),
   description: z.string().default(""),
   slug: z.string().min(1, "Slug is required"),
   whatsappNumber: z.string().min(10, "WhatsApp number is required"),
+  contactEmail: z.union([z.literal(""), z.string().email("Enter a valid email address")]).default(""),
+  contactPhone: z.string().default(""),
+  contactAddress: z.string().default(""),
+  instagramUrl: z.union([z.literal(""), z.string().url("Enter a valid URL including https://")]).default(""),
+  facebookUrl: z.union([z.literal(""), z.string().url("Enter a valid URL including https://")]).default(""),
+  tiktokUrl: z.union([z.literal(""), z.string().url("Enter a valid URL including https://")]).default(""),
+  xUrl: z.union([z.literal(""), z.string().url("Enter a valid URL including https://")]).default(""),
   currency: z.string().default("KES"),
-  logoUrl: z.string().default(""),
-  brandColor: z.string().default("#30382F"),
-  secondaryColor: z.string().default("#95D5B2"),
-  theme: z.string().default("Modern Minimalist"),
+  brandColor: z.string().default("#426BC2"),
+  secondaryColor: z.string().default("#A6CFF2"),
+  theme: z.string().default("Butter & Twilight"),
   isActive: z.boolean().default(true),
   deliveryZones: z.array(
     z.object({
@@ -129,8 +89,14 @@ interface InitialStoreData {
   description?: string | null;
   slug?: string | null;
   whatsappNumber?: string | null;
+  contactEmail?: string | null;
+  contactPhone?: string | null;
+  contactAddress?: string | null;
+  instagramUrl?: string | null;
+  facebookUrl?: string | null;
+  tiktokUrl?: string | null;
+  xUrl?: string | null;
   currency?: string | null;
-  logoUrl?: string | null;
   brandColor?: string | null;
   secondaryColor?: string | null;
   theme?: string | null;
@@ -151,7 +117,7 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"config" | "account">("config");
   const avatarSeed = userData?.name || "User";
-  const diceAvatarSrc = `https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(
+  const diceAvatarSrc = `https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=${encodeURIComponent(
     avatarSeed
   )}&backgroundColor=e9c46a,2a9d8f,264653`;
 
@@ -162,11 +128,17 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
       description: initialData?.description || "",
       slug: initialData?.slug || "",
       whatsappNumber: initialData?.whatsappNumber || "",
+      contactEmail: initialData?.contactEmail || "",
+      contactPhone: initialData?.contactPhone || "",
+      contactAddress: initialData?.contactAddress || "",
+      instagramUrl: initialData?.instagramUrl || "",
+      facebookUrl: initialData?.facebookUrl || "",
+      tiktokUrl: initialData?.tiktokUrl || "",
+      xUrl: initialData?.xUrl || "",
       currency: initialData?.currency || "KES",
-      logoUrl: initialData?.logoUrl || "",
-      brandColor: initialData?.brandColor || "#30382F",
-      secondaryColor: initialData?.secondaryColor || "#95D5B2",
-      theme: initialData?.theme || "Modern Minimalist",
+      brandColor: initialData?.brandColor || "#426BC2",
+      secondaryColor: initialData?.secondaryColor || "#A6CFF2",
+      theme: initialData?.theme || "Butter & Twilight",
       isActive: initialData?.isActive ?? true,
       deliveryZones:
         initialData?.deliveryZones?.map((zone: InitialDeliveryZone) => ({
@@ -185,6 +157,7 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
   const selectedThemeName = form.watch("theme");
 
   useEffect(() => {
+    // Auto-generate slug only during first-time setup; never overwrite existing stores.
     if (!initialData && name) {
       const slug = name
         .toLowerCase()
@@ -274,81 +247,63 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 pt-8">
           <SectionBlock
             title="Store Identity"
-            description="Name, logo, link, and store description."
+            description="Name, link, and store description."
           >
-            <div className="grid gap-7 lg:grid-cols-[180px_minmax(0,1fr)]">
-              <div>
-                <Label className="text-sm font-normal text-muted-foreground">Logo</Label>
-                <div className="mt-2 h-44 w-full max-w-[176px]">
-                  <ImageUpload
-                    value={form.watch("logoUrl")}
-                    onChange={(url) => form.setValue("logoUrl", url, { shouldDirty: true })}
-                    endpoint="imageUploader"
-                    className="h-full w-full"
-                    variant="dashboard"
-                    helperText="Drop Store Logo Here"
-                    label="Upload Store Logo"
-                  />
-                </div>
-                <p className="mt-2 text-xs text-muted-foreground">Recommended: square PNG or SVG.</p>
-              </div>
-
-              <div className="space-y-5">
-                <div className="grid gap-5 md:grid-cols-2">
-                  <FieldGroup label="Store Name" error={form.formState.errors.name?.message}>
-                    <Input
-                      {...form.register("name")}
-                      placeholder="e.g. My Awesome Store"
-                      className="h-11 rounded-xl"
-                    />
-                  </FieldGroup>
-
-                  <FieldGroup label="Store URL" error={form.formState.errors.slug?.message}>
-                    <div className="flex overflow-hidden rounded-xl border border-input focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1">
-                      {ROOT_DOMAIN ? (
-                        <>
-                          <span className="inline-flex items-center border-r border-input bg-muted/30 px-3 text-xs text-muted-foreground">
-                            https://
-                          </span>
-                          <Input
-                            {...form.register("slug")}
-                            className="h-11 rounded-none border-0 focus-visible:ring-0"
-                          />
-                          <span className="inline-flex items-center border-l border-input bg-muted/30 px-3 text-xs text-muted-foreground">
-                            .{ROOT_DOMAIN}
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <span className="inline-flex items-center border-r border-input bg-muted/30 px-3 text-xs text-muted-foreground">
-                            orderform.store/
-                          </span>
-                          <Input
-                            {...form.register("slug")}
-                            className="h-11 rounded-none border-0 focus-visible:ring-0"
-                          />
-                        </>
-                      )}
-                    </div>
-                  </FieldGroup>
-                </div>
-
-                <FieldGroup label="Description">
-                  <Controller
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <RichTextEditor
-                        value={field.value ?? ""}
-                        onChange={field.onChange}
-                        toolbar="advanced"
-                        placeholder="Describe your store..."
-                        className="min-h-[170px]"
-                      />
-                    )}
+            <div className="space-y-5">
+              <div className="grid gap-5 md:grid-cols-2">
+                <FieldGroup label="Store Name" error={form.formState.errors.name?.message}>
+                  <Input
+                    {...form.register("name")}
+                    placeholder="e.g. My Awesome Store"
+                    className="h-11 rounded-xl"
                   />
                 </FieldGroup>
+
+                <FieldGroup label="Store URL" error={form.formState.errors.slug?.message}>
+                  <div className="flex overflow-hidden rounded-xl border border-input focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1">
+                    {ROOT_DOMAIN ? (
+                      <>
+                        <span className="inline-flex items-center border-r border-input bg-muted/30 px-3 text-xs text-muted-foreground">
+                          https://
+                        </span>
+                        <Input
+                          {...form.register("slug")}
+                          className="h-11 rounded-none border-0 focus-visible:ring-0"
+                        />
+                        <span className="inline-flex items-center border-l border-input bg-muted/30 px-3 text-xs text-muted-foreground">
+                          .{ROOT_DOMAIN}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="inline-flex items-center border-r border-input bg-muted/30 px-3 text-xs text-muted-foreground">
+                          orderform.store/
+                        </span>
+                        <Input
+                          {...form.register("slug")}
+                          className="h-11 rounded-none border-0 focus-visible:ring-0"
+                        />
+                      </>
+                    )}
+                  </div>
+                </FieldGroup>
               </div>
+
+              <FieldGroup label="Description">
+                <Controller
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <RichTextEditor
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
+                      toolbar="advanced"
+                      placeholder="Describe your store..."
+                      className="min-h-[170px]"
+                    />
+                  )}
+                />
+              </FieldGroup>
             </div>
           </SectionBlock>
 
@@ -393,6 +348,99 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
           </SectionBlock>
 
           <SectionBlock
+            title="Contact Details"
+            description="These details are shown in the storefront Contact Us section."
+          >
+            <div className="grid gap-5 md:grid-cols-2">
+              <FieldGroup
+                label="Contact Email"
+                error={form.formState.errors.contactEmail?.message}
+              >
+                <Input
+                  {...form.register("contactEmail")}
+                  className="h-11 rounded-xl"
+                  placeholder="support@yourstore.com"
+                />
+              </FieldGroup>
+
+              <FieldGroup
+                label="Contact Phone"
+                error={form.formState.errors.contactPhone?.message}
+              >
+                <Input
+                  {...form.register("contactPhone")}
+                  className="h-11 rounded-xl"
+                  placeholder="e.g. +254712345678"
+                />
+              </FieldGroup>
+
+              <div className="md:col-span-2">
+                <FieldGroup
+                  label="Contact Address"
+                  error={form.formState.errors.contactAddress?.message}
+                >
+                  <Input
+                    {...form.register("contactAddress")}
+                    className="h-11 rounded-xl"
+                    placeholder="e.g. Kimathi Street, Nairobi CBD"
+                  />
+                </FieldGroup>
+              </div>
+            </div>
+          </SectionBlock>
+
+          <SectionBlock
+            title="Social Links"
+            description="Add your social profile URLs so customers can find you."
+          >
+            <div className="grid gap-5 md:grid-cols-2">
+              <FieldGroup
+                label="Instagram URL"
+                error={form.formState.errors.instagramUrl?.message}
+              >
+                <Input
+                  {...form.register("instagramUrl")}
+                  className="h-11 rounded-xl"
+                  placeholder="https://instagram.com/yourstore"
+                />
+              </FieldGroup>
+
+              <FieldGroup
+                label="Facebook URL"
+                error={form.formState.errors.facebookUrl?.message}
+              >
+                <Input
+                  {...form.register("facebookUrl")}
+                  className="h-11 rounded-xl"
+                  placeholder="https://facebook.com/yourstore"
+                />
+              </FieldGroup>
+
+              <FieldGroup
+                label="TikTok URL"
+                error={form.formState.errors.tiktokUrl?.message}
+              >
+                <Input
+                  {...form.register("tiktokUrl")}
+                  className="h-11 rounded-xl"
+                  placeholder="https://tiktok.com/@yourstore"
+                />
+              </FieldGroup>
+
+              <FieldGroup
+                label="X (Twitter) URL"
+                error={form.formState.errors.xUrl?.message}
+              >
+                <Input
+                  {...form.register("xUrl")}
+                  className="h-11 rounded-xl"
+                  placeholder="https://x.com/yourstore"
+                />
+              </FieldGroup>
+            </div>
+          </SectionBlock>
+
+          <SectionBlock
             title="Theme"
             description="Select a style preset. Colors are applied automatically."
           >
@@ -401,7 +449,7 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
                 Pick a theme below. You can see all available color combinations.
               </p>
 
-              <div className="grid max-w-4xl gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid max-w-4xl gap-3 sm:grid-cols-2">
                 {THEMES.map((theme) => {
                   const isSelected = selectedThemeName === theme.name;
 
@@ -413,13 +461,13 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
                       size="sm"
                       onClick={() => applyTheme(theme.name)}
                       className={cn(
-                        "h-auto w-full flex-col items-stretch rounded-xl border p-3 text-left transition-colors",
+                        "h-auto w-full flex-col items-stretch border p-3 text-left transition-colors",
                         isSelected
                           ? "border-primary bg-primary/5"
                           : "border-border hover:border-primary/30"
                       )}
                     >
-                      <div className="overflow-hidden rounded-xl border border-border">
+                      <div className="overflow-hidden border border-border">
                         <div className="h-8" style={{ backgroundColor: theme.primary }} />
                         <div className="h-8" style={{ backgroundColor: theme.secondary }} />
                       </div>
@@ -430,9 +478,6 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
                           <span className="text-[11px] font-normal text-primary">Selected</span>
                         ) : null}
                       </div>
-                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                        {theme.description}
-                      </p>
                     </Button>
                   );
                 })}
@@ -534,10 +579,10 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
           <SectionBlock title="Account" description="Basic account information.">
             <div className="space-y-5">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                <div className="h-20 w-20 overflow-hidden rounded-xl border border-border bg-muted/20">
-                  <Avatar className="h-20 w-20 rounded-xl">
-                    <AvatarImage src={diceAvatarSrc} alt="Profile" className="object-cover" />
-                    <AvatarFallback className="rounded-xl bg-muted/20 text-xl font-semibold text-primary/60">
+                <div className="h-20 w-20 overflow-hidden rounded-none border border-border bg-muted/20">
+                  <Avatar className="h-20 w-20 rounded-none">
+                    <AvatarImage src={diceAvatarSrc} alt="Profile" className="rounded-none object-cover" />
+                    <AvatarFallback className="rounded-none bg-muted/20 text-xl font-semibold text-primary/60">
                       {userData?.name?.charAt(0).toUpperCase() || "U"}
                     </AvatarFallback>
                   </Avatar>

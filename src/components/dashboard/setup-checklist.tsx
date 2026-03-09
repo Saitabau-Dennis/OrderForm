@@ -44,9 +44,9 @@ export function SetupChecklist({
   return (
     <section className="mx-auto w-full max-w-2xl py-1">
       <div className="mb-5 text-center">
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-start gap-2">
           <h2 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-            {displayName}
+            {displayName}'s Store
           </h2>
           <span className="text-2xl text-[#1A1A1A]">🛒</span>
         </div>
