@@ -1,6 +1,6 @@
 export * from "./customers-client"
 export * from "./customers-table"
-export * from "./dashboard-button"
+export { Button as DashboardButton } from "./dashboard-button"
 export * from "./dashboard-data-table"
 export * from "./dashboard-font-scope"
 export * from "./dashboard-shell"
