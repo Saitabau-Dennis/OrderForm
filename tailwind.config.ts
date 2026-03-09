@@ -11,7 +11,8 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        primary: "var(--primary)", // Powered by CSS variable
+        // Theme tokens are sourced from runtime CSS variables.
+        primary: "var(--primary)",
         "primary-foreground": "var(--primary-foreground)",
         "brand-pine": "#00311F",
       },

@@ -90,6 +90,13 @@ model Store {
   name           String
   description    String?
   whatsappNumber String?
+  contactEmail   String?
+  contactPhone   String?
+  contactAddress String?
+  instagramUrl   String?
+  facebookUrl    String?
+  tiktokUrl      String?
+  xUrl           String?
   currency       String  @default("KES")
 
   // Branding
@@ -143,6 +150,7 @@ model Product {
   description String?
   price       Decimal
   imageUrl    String?
+  galleryImages Json? // ["https://...","https://..."]
   category    String?
   sizes       String? // Comma separated
   isAvailable Boolean @default(true)
