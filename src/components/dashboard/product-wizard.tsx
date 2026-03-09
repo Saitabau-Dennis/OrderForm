@@ -21,7 +21,7 @@ interface ProductWizardProps {
   onSuccess: () => void;
 }
 
-const CATEGORY_OPTIONS = ["Clothing", "Footwear", "Accessories", "Electronics", "Home", "Beauty"];
+const CATEGORY_OPTIONS = ["Men","Women","Unisex"];
 const SIZE_PRESETS = ["XS", "S", "M", "L", "XL", "XXL"];
 const wizardSchema = productSchema.extend({
   // Wizard permits empty image so merchants can publish quickly and update media later.
@@ -69,7 +69,7 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
   const [loading, setLoading] = useState(false);
 
   const [categories, setCategories] = useState<string[]>([
-    "Clothing", "Footwear", "Accessories", "Electronics", "Home", "Beauty"
+    "Men", "Women", "Unisex"
   ]);
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const categoryWrapperRef = useRef<HTMLDivElement>(null);
@@ -79,7 +79,7 @@ export function ProductWizard({ onSuccess }: ProductWizardProps) {
       try {
         const response = await getStoreCategories();
         if (response.success && response.categories) {
-          const merged = new Set([...response.categories, "Clothing", "Footwear", "Accessories", "Electronics", "Home", "Beauty", "Men", "Women", "Unisex"]);
+          const merged = new Set([...response.categories, "Men", "Women", "Unisex"]);
           setCategories(Array.from(merged));
         }
       } catch (error) {
