@@ -48,7 +48,7 @@ export function ScrollAnimation({
   viewport = { once: true, margin: "-80px" },
   as: Component = "div",
 }: ScrollAnimationProps) {
-  const MotionComponent = useMemo(() => motion(Component as any), [Component])
+  const MotionComponent = useMemo(() => motion.create(Component as any), [Component])
 
   return (
     <MotionComponent

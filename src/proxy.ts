@@ -14,26 +14,27 @@ const ROOT_DOMAIN = (
   .replace(/\/.*$/, "")
   .toLowerCase();
 const RESERVED_SUBDOMAINS = new Set(["www", "app"]);
-const PROTECTED_PATH_REGEX = /^\/(dashboard|settings|products|orders|onboarding)(\/|$)/;
+const PROTECTED_PATH_REGEX =
+  /^\/(dashboard|settings|products|orders|onboarding|overview|customers)(\/|$)/;
 const APP_PATHS_TO_SKIP_REWRITE = ["/login", "/register", "/forgot-password", "/reset-password"];
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;
   const isLoggedIn = !!req.auth;
 
-  // Preserve dashboard auth protection.
+  // Enforce auth for dashboard paths before any host-based rewrite rules.
   if (PROTECTED_PATH_REGEX.test(pathname) && !isLoggedIn) {
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("callbackUrl", req.nextUrl.pathname);
     return Response.redirect(loginUrl);
   }
 
-  // Skip rewriting if root domain is not configured.
+  // Multitenant rewrites only run when a root domain is configured.
   if (!ROOT_DOMAIN) {
     return NextResponse.next();
   }
 
-  // Keep auth/dashboard routes on their original paths.
+  // Keep app/auth paths untouched even on subdomains.
   if (PROTECTED_PATH_REGEX.test(pathname)) {
     return NextResponse.next();
   }
@@ -47,7 +48,7 @@ export default auth((req) => {
   const rootHost = ROOT_DOMAIN;
   const wwwHost = `www.${ROOT_DOMAIN}`;
 
-  // Main domain requests continue as-is.
+  // Main domain and www host serve the root app directly.
   if (!host || host === rootHost || host === wwwHost) {
     return NextResponse.next();
   }
@@ -67,6 +68,7 @@ export default auth((req) => {
     return NextResponse.next();
   }
 
+  // Rewrite `sub.root-domain.com/foo` -> `/{sub}/foo` for storefront routing.
   const rewrittenUrl = req.nextUrl.clone();
   rewrittenUrl.pathname = pathname === "/" ? `/${subdomain}` : `/${subdomain}${pathname}`;
   return NextResponse.rewrite(rewrittenUrl);

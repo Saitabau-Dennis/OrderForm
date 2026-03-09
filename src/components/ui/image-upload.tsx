@@ -52,7 +52,7 @@ export function ImageUpload({
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const objectUrlRef = useRef<string | null>(null);
-  const preview = optimisticPreview || value || null;
+  const preview = isUploading ? optimisticPreview || value || null : value || null;
 
   const { startUpload } = useUploadThing(endpoint, {
     onClientUploadComplete: (res) => {
@@ -156,8 +156,10 @@ export function ImageUpload({
 
       {preview ? (
         <div
+          onClick={() => !disabled && !isUploading && fileInputRef.current?.click()}
           className={cn(
             "relative h-full w-full overflow-hidden border group",
+            !disabled && !isUploading && "cursor-pointer",
             variant === "dashboard" ? "rounded-2xl border-border/80" : "rounded-md border-border"
           )}
         >
@@ -175,6 +177,11 @@ export function ImageUpload({
               ) : (
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
               )}
+            </div>
+          )}
+          {!isUploading && !disabled && (
+            <div className="pointer-events-none absolute bottom-2 left-2 rounded-md bg-card/85 px-2 py-1 text-[11px] text-muted-foreground">
+              Click to replace
             </div>
           )}
           {!isUploading && (

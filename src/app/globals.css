@@ -246,6 +246,47 @@ html::-webkit-scrollbar {
   animation-delay: 700ms;
 }
 
+@keyframes lumaSpin {
+  0% {
+    inset: 0 35px 35px 0;
+  }
+  12.5% {
+    inset: 0 35px 0 0;
+  }
+  25% {
+    inset: 35px 35px 0 0;
+  }
+  37.5% {
+    inset: 35px 0 0 0;
+  }
+  50% {
+    inset: 35px 0 0 35px;
+  }
+  62.5% {
+    inset: 0 0 0 35px;
+  }
+  75% {
+    inset: 0 0 35px 35px;
+  }
+  87.5% {
+    inset: 0 0 35px 0;
+  }
+  100% {
+    inset: 0 35px 35px 0;
+  }
+}
+
+.luma-spin-orb {
+  position: absolute;
+  border-radius: 50px;
+  box-shadow: inset 0 0 0 3px currentColor;
+  animation: lumaSpin 2.5s infinite;
+}
+
+.luma-spin-delay {
+  animation-delay: -1.25s;
+}
+
 @keyframes float {
   0% {
     transform: translateY(0px);

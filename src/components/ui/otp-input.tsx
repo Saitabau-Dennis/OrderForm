@@ -8,6 +8,8 @@ interface OTPInputProps {
   value: string;
   onChange: (value: string) => void;
   className?: string;
+  inputClassName?: string;
+  separatorClassName?: string;
   disabled?: boolean;
 }
 
@@ -16,6 +18,8 @@ export function OTPInput({
   value,
   onChange,
   className,
+  inputClassName,
+  separatorClassName,
   disabled,
 }: OTPInputProps) {
   const inputRefs = React.useRef<(HTMLInputElement | null)[]>([]);
@@ -101,13 +105,14 @@ export function OTPInput({
                 // filled & not focused
                 filled && !focused && "border-primary/50 bg-primary/5 text-primary",
                 // disabled
-                disabled && "opacity-40 cursor-not-allowed"
+                disabled && "opacity-40 cursor-not-allowed",
+                inputClassName
               )}
             />
 
             {/* dash separator between positions 3 and 4 */}
             {index === 2 && (
-              <span className="text-border select-none text-sm font-medium px-0.5">—</span>
+              <span className={cn("text-border select-none text-sm font-medium px-0.5", separatorClassName)}>—</span>
             )}
           </React.Fragment>
         );
