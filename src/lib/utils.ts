@@ -5,6 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+// Normalizes mixed legacy/current order identifiers into a consistent display format.
 export function formatOrderId(orderRef: number | string): string {
   if (typeof orderRef === "number") {
     return `ORD-${orderRef.toString().padStart(4, "0")}`
@@ -13,7 +14,7 @@ export function formatOrderId(orderRef: number | string): string {
   const raw = `${orderRef || ""}`.trim().toUpperCase()
   if (!raw) return "ORD-0000"
 
-  if (/^[A-Z]+-\d+$/.test(raw)) {
+  if (/^[A-Z]+-[A-Z0-9]+$/.test(raw)) {
     return raw
   }
 

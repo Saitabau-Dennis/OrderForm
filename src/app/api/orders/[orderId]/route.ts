@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import db from "@/lib/db";
 
+// Fetches one order (including items) scoped to the current merchant.
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ orderId: string }> }
@@ -9,7 +10,7 @@ export async function GET(
   try {
     const session = await auth();
 
-    if (!session || !session.user) {
+    if (!session?.user?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -46,7 +47,7 @@ export async function PATCH(
   try {
     const session = await auth();
 
-    if (!session || !session.user) {
+    if (!session?.user?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -62,7 +63,7 @@ export async function PATCH(
       return new NextResponse("Store not found", { status: 404 });
     }
 
-    // Verify ownership
+    // Ownership check prevents cross-store order updates.
     const existingOrder = await db.order.findFirst({
         where: { id: orderId, storeId: store.id }
     });

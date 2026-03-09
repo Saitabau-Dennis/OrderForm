@@ -1,10 +1,12 @@
 "use server";
 
 import db from "@/lib/db";
-import { sendVerificationEmail, sendPasswordResetEmail } from "@/lib/email";
+import { sendPasswordResetEmail, sendVerifyEmail, sendWelcomeEmail } from "@/lib/email/send-email";
+import { getAppBaseUrl } from "@/lib/email/resend";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
+// Generates and stores a short-lived verification code, then emails it to the user.
 export const sendVerificationCode = async (email: string) => {
   try {
     const user = await db.user.findUnique({ where: { email } });
@@ -25,7 +27,8 @@ export const sendVerificationCode = async (email: string) => {
       }
     });
 
-    await sendVerificationEmail(email, verificationToken);
+    const verifyUrl = `${getAppBaseUrl()}/verify-email?email=${encodeURIComponent(email)}&code=${encodeURIComponent(verificationToken)}`;
+    await sendVerifyEmail(email, user.name ?? undefined, verifyUrl);
 
     return { success: "Verification code sent" };
   } catch (error) {
@@ -47,7 +50,7 @@ export const verifyEmail = async (email: string, code: string) => {
       return { error: "Invalid or expired code" };
     }
 
-    // Verify the token
+    // Codes are stored hashed, so verification must use bcrypt compare.
     const isValid = await bcrypt.compare(code, user.verificationToken);
 
     if (!isValid) {
@@ -62,6 +65,11 @@ export const verifyEmail = async (email: string, code: string) => {
         verificationTokenExpires: null
       }
     });
+
+    const welcomeResult = await sendWelcomeEmail(email, user.name ?? undefined);
+    if (!welcomeResult.success) {
+      console.error("Error sending welcome email:", welcomeResult.error);
+    }
 
     return { success: "Email verified successfully" };
   } catch (error) {
@@ -90,7 +98,8 @@ export const sendPasswordResetCode = async (email: string) => {
       }
     });
 
-    await sendPasswordResetEmail(email, resetToken);
+    const resetUrl = `${getAppBaseUrl()}/reset-password?email=${encodeURIComponent(email)}&code=${encodeURIComponent(resetToken)}`;
+    await sendPasswordResetEmail(email, user.name ?? undefined, resetUrl);
 
     return { success: "Password reset code sent" };
   } catch (error) {
@@ -112,7 +121,7 @@ export const verifyResetCode = async (email: string, code: string) => {
       return { error: "Invalid or expired code" };
     }
 
-    // Verify the token
+    // Reset codes are hashed at rest for the same reason as verification codes.
     const isValid = await bcrypt.compare(code, user.resetToken);
 
     if (!isValid) {
@@ -139,7 +148,7 @@ export const resetPassword = async (email: string, code: string, newPassword: st
       return { error: "Invalid or expired code" };
     }
 
-    // Verify the token
+    // Only accept password changes with a valid unexpired reset token.
     const isValid = await bcrypt.compare(code, user.resetToken);
 
     if (!isValid) {

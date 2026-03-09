@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import authConfig from "@/auth.config";
 
+// Extend default session shape so callers can rely on `session.user.id`.
 declare module "next-auth" {
   interface Session {
     user: {
@@ -48,6 +49,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         }
 
         // Enforce email verification before allowing dashboard access.
+        // Keep sign-in disabled until email ownership is verified.
         if (!user.emailVerified) {
           return null;
         }
@@ -72,8 +74,11 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   ],
   callbacks: {
     async session({ session, token }) {
+      // Copy custom fields from JWT to session for server/client consumers.
       if (token && session.user) {
-        session.user.id = token.id as string;
+        const tokenId =
+          typeof token.id === "string" ? token.id : token.sub;
+        session.user.id = tokenId ?? "";
         session.user.name = token.name;
         session.user.email = typeof token.email === "string" ? token.email : "";
         session.user.image = token.picture;
@@ -81,8 +86,12 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       return session;
     },
     async jwt({ token, user }) {
+      // Persist user id on first sign-in, then keep it stable across refreshes.
       if (user) {
         token.id = user.id;
+      }
+      if (!token.id && token.sub) {
+        token.id = token.sub;
       }
       return token;
     },

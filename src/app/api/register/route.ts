@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { sendVerificationCode } from "@/lib/actions/auth";
 
+// Registers a user + starter store, then triggers email verification.
 export async function POST(req: Request) {
   try {
     const { storeName, email, password } = await req.json();
@@ -33,7 +34,7 @@ export async function POST(req: Request) {
       }
     });
 
-    // Create Store
+    // Create a default store immediately so onboarding can continue after verification.
     const slug = storeName
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
@@ -45,13 +46,12 @@ export async function POST(req: Request) {
       data: {
         userId: user.id,
         name: storeName,
-        slug: uniqueSlug, // Ensure uniqueness
-        whatsappNumber: "", // Optional now
-        // deliveryZones is a relation, no need to init if empty
+        slug: uniqueSlug,
+        whatsappNumber: "",
       }
     });
 
-    // Send verification email
+    // Sends one-time code via email; account remains blocked until verified.
     await sendVerificationCode(email);
 
     return NextResponse.json(

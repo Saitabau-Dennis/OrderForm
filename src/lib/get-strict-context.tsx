@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+// Small helper to create contexts that fail fast when used outside their provider.
 function getStrictContext<T>(
   name?: string,
 ): readonly [

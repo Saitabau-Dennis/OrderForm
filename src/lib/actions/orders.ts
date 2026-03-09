@@ -2,6 +2,7 @@
 
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { randomInt } from "crypto";
 import db from "@/lib/db";
 import { z } from "zod";
 
@@ -10,13 +11,18 @@ const DEFAULT_PERCENT_OFF =
   Number.isFinite(rewardPercentFromEnv) && rewardPercentFromEnv > 0
     ? rewardPercentFromEnv
     : 10;
+const DISPLAY_ID_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const DISPLAY_ID_RANDOM_LENGTH = 6;
+const MAX_DISPLAY_ID_GENERATION_ATTEMPTS = 5;
 
+// Validates checkout payloads coming from storefront clients.
 const CreateOrderSchema = z.object({
   storeId: z.string(),
   customerName: z.string().min(1, "Name is required"),
   customerPhone: z.string().min(7, "Phone is required"),
   deliveryAddress: z.string().min(1, "Address is required"),
   deliveryZone: z.string().optional(),
+  deliveryFee: z.number().min(0).optional(),
   items: z.array(z.object({
     productId: z.string(),
     name: z.string(),
@@ -37,12 +43,17 @@ const normalizePhoneForKey = (phone: string) => {
 };
 
 const roundMoney = (amount: number) => Math.round(amount * 100) / 100;
+// Uses a restricted alphabet to avoid ambiguous characters in human-facing IDs.
+const generateDisplayIdSuffix = () =>
+  Array.from({ length: DISPLAY_ID_RANDOM_LENGTH }, () =>
+    DISPLAY_ID_ALPHABET[randomInt(0, DISPLAY_ID_ALPHABET.length)]
+  ).join("");
 
 export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
   try {
     const validatedData = CreateOrderSchema.parse(data);
 
-    // Fetch store to get name for ID generation
+    // Store name contributes a recognizable prefix (e.g. "NIK-XXXXXX").
     const store = await db.store.findUnique({
       where: { id: validatedData.storeId }
     });
@@ -51,16 +62,11 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
       return { error: "Store not found" };
     }
 
-    // Generate Display ID (e.g., NIK-4821)
+    // Fallback to ORD when store name does not produce alphabetic characters.
     const sanitizedStoreName = store.name.replace(/[^A-Za-z]/g, "").toUpperCase();
     const prefix = sanitizedStoreName.slice(0, 3) || "ORD";
-    const randomNum = Math.floor(1000 + Math.random() * 9000); // 1000-9999
-    const displayId = `${prefix}-${randomNum}`;
 
-    // Note: In a high-volume prod app, we'd handle collisions with a retry loop here.
-    // For now, the probability is low enough for this scale.
-
-    // Load products from DB so totals cannot be tampered with on the client.
+    // Always price from DB values to prevent client-side total tampering.
     const productIds = validatedData.items.map((item) => item.productId);
     const products = await db.product.findMany({
       where: {
@@ -114,6 +120,7 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
         where: { code: requestedCode },
       });
 
+      // A code is valid only for the right store, in-window, below usage cap, and (optionally) same phone.
       const now = new Date();
       const validForStore = discountCode?.storeId === store.id;
       const stillUsable =
@@ -137,10 +144,12 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
       discountAmount = roundMoney((subtotal * safePercent) / 100);
     }
 
-    const totalAmount = roundMoney(Math.max(0, subtotal - discountAmount));
+    const deliveryFee = roundMoney(Math.max(0, validatedData.deliveryFee ?? 0));
+    const totalAmount = roundMoney(Math.max(0, subtotal - discountAmount + deliveryFee));
 
     const order = await db.$transaction(async (tx) => {
       const normalizedPhone = normalizePhoneForKey(validatedData.customerPhone);
+      // Upsert keeps repeat buyers tied to one Customer record per normalized phone/store pair.
       const customer = await tx.customer.upsert({
         where: {
           storeId_phoneNormalized: {
@@ -167,11 +176,11 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
         data: {
           storeId: validatedData.storeId,
           customerId: customer.id,
-          displayId: displayId,
           customerName: validatedData.customerName,
           customerPhone: validatedData.customerPhone,
           deliveryAddress: validatedData.deliveryAddress,
           deliveryZone: validatedData.deliveryZone,
+          deliveryFee,
           totalAmount,
           subtotal,
           discountAmount,
@@ -190,6 +199,7 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
       });
 
       if (appliedDiscountCode) {
+        // updateMany + guard conditions avoids race conditions under concurrent redemptions.
         const redemption = await tx.discountCode.updateMany({
           where: {
             id: appliedDiscountCode.id,
@@ -217,7 +227,29 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
         }
       }
 
-      return createdOrder;
+      let updatedOrder = null;
+      // displayId uniqueness is global; retry when Prisma returns P2002 collisions.
+      for (let attempt = 0; attempt < MAX_DISPLAY_ID_GENERATION_ATTEMPTS; attempt += 1) {
+        const displayId = `${prefix}-${generateDisplayIdSuffix()}`;
+        try {
+          updatedOrder = await tx.order.update({
+            where: { id: createdOrder.id },
+            data: { displayId },
+          });
+          break;
+        } catch (error) {
+          if ((error as { code?: string })?.code === "P2002") {
+            continue;
+          }
+          throw error;
+        }
+      }
+
+      if (!updatedOrder) {
+        throw new Error("Failed to allocate unique display ID.");
+      }
+
+      return updatedOrder;
     });
 
     return {
@@ -244,7 +276,7 @@ export async function updateOrderStatus(id: string, status: string) {
   try {
     const session = await auth();
 
-    if (!session) {
+    if (!session?.user?.id) {
       return { error: "Unauthorized" };
     }
 

@@ -2,17 +2,18 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import db from "@/lib/db";
 
+// Returns the current merchant store profile and related delivery zones.
 export async function GET(req: Request) {
   try {
     const session = await auth();
 
-    if (!session || !session.user) {
+    if (!session?.user?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
     const store = await db.store.findFirst({
         where: { userId: session.user.id },
-        include: { deliveryZones: true } // Include relation
+        include: { deliveryZones: true }
     });
 
     if (!store) {
@@ -30,7 +31,7 @@ export async function PUT(req: Request) {
   try {
     const session = await auth();
 
-    if (!session || !session.user) {
+    if (!session?.user?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -39,8 +40,14 @@ export async function PUT(req: Request) {
       name,
       slug,
       whatsappNumber,
+      contactEmail,
+      contactPhone,
+      contactAddress,
+      instagramUrl,
+      facebookUrl,
+      tiktokUrl,
+      xUrl,
       currency,
-      logoUrl,
       brandColor,
       theme,
       description,
@@ -62,15 +69,22 @@ export async function PUT(req: Request) {
         name,
         slug,
         whatsappNumber,
+        contactEmail,
+        contactPhone,
+        contactAddress,
+        instagramUrl,
+        facebookUrl,
+        tiktokUrl,
+        xUrl,
         currency,
-        logoUrl,
         brandColor,
         theme,
         description,
         isActive,
         deliveryZones: {
+            // Replace zones with the latest submitted list from settings UI.
             deleteMany: {},
-            create: deliveryZones // Assumes [{name, price}]
+            create: deliveryZones
         }
       },
       include: { deliveryZones: true }

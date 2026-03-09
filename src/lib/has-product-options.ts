@@ -3,6 +3,7 @@ type ProductOptionsInput = {
   variants: unknown
 }
 
+// Returns true when either comma-separated sizes or structured variant options exist.
 export function hasProductOptions(product: ProductOptionsInput): boolean {
   const hasSizes =
     typeof product.sizes === "string" &&

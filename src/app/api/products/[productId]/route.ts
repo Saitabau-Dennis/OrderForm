@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import db from "@/lib/db";
 
+// Reads one product and enforces store ownership.
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ productId: string }> }
@@ -9,7 +10,7 @@ export async function GET(
   try {
     const session = await auth();
 
-    if (!session || !session.user) {
+    if (!session?.user?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -45,12 +46,19 @@ export async function PUT(
   try {
     const session = await auth();
 
-    if (!session || !session.user) {
+    if (!session?.user?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
     const body = await req.json();
-    const { name, price, category, description, imageUrl, isAvailable, variants, sizes } = body;
+    const { name, price, category, description, imageUrl, galleryImages, isAvailable, variants, sizes } = body;
+    // Keep gallery payload clean and stable before persistence.
+    const normalizedGalleryImages = Array.from(
+      new Set(
+        (Array.isArray(galleryImages) ? galleryImages : [])
+          .filter((item): item is string => typeof item === "string" && item.trim() !== "")
+      )
+    );
     const { productId } = await params;
 
     const store = await db.store.findFirst({
@@ -61,7 +69,7 @@ export async function PUT(
       return new NextResponse("Store not found", { status: 404 });
     }
 
-    // Verify ownership
+    // Ensure users can only edit products in their own store.
     const existingProduct = await db.product.findFirst({
         where: { id: productId, storeId: store.id }
     });
@@ -78,6 +86,7 @@ export async function PUT(
         category,
         description,
         imageUrl,
+        galleryImages: normalizedGalleryImages,
         isAvailable,
         variants: variants || [],
         sizes
@@ -98,7 +107,7 @@ export async function DELETE(
   try {
     const session = await auth();
 
-    if (!session || !session.user) {
+    if (!session?.user?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -112,6 +121,7 @@ export async function DELETE(
       return new NextResponse("Store not found", { status: 404 });
     }
 
+    // deleteMany ensures the ID belongs to this store in the same statement.
     const result = await db.product.deleteMany({
       where: {
         id: productId,

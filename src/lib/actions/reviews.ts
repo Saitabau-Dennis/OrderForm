@@ -17,6 +17,7 @@ const DEFAULT_EXPIRY_DAYS =
     : 30;
 const DEFAULT_MAX_USES = 1;
 
+// Review submission payload expected from the public storefront.
 const SubmitReviewSchema = z.object({
   storeId: z.string(),
   productId: z.string().optional(),
@@ -34,6 +35,7 @@ const ReviewModerationSchema = z.object({
 
 const normalizePhone = (phone: string) => phone.replace(/\D/g, "");
 
+// Generates a readable per-store coupon code and verifies uniqueness in DB.
 async function generateUniqueDiscountCode(storeName: string) {
   const storePrefix = storeName
     .replace(/[^a-zA-Z0-9]/g, "")
@@ -86,6 +88,7 @@ export async function submitReview({
       imageUrl,
     });
 
+    // Accept flexible input like "#ord-0012" and normalize matching.
     const normalizedOrderRef = validatedData.orderRef.trim().replace(/^#/, "").toUpperCase();
     const orderNumber = Number.parseInt(normalizedOrderRef.replace(/[^\d]/g, ""), 10);
 
@@ -105,6 +108,7 @@ export async function submitReview({
       take: 5,
     });
 
+    // Phone match is the final ownership check for customer-submitted reviews.
     const matchedOrder = orderCandidates.find(
       (order) =>
         normalizePhone(order.customerPhone) ===
@@ -209,6 +213,7 @@ export async function approveReview(reviewId: string) {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + DEFAULT_EXPIRY_DAYS);
 
+    // Approving a review and creating its reward code must be atomic.
     const approvedReview = await db.$transaction(async (tx) => {
       const updatedReview = await tx.review.update({
         where: { id: review.id },

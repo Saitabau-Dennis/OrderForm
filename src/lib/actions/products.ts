@@ -10,6 +10,7 @@ const ProductInputSchema = z.object({
   description: z.string().optional().nullable(),
   price: z.coerce.number().positive("Price must be greater than 0"),
   imageUrl: z.string().optional().nullable(),
+  galleryImages: z.array(z.string()).optional().default([]),
   category: z.string().optional().nullable(),
   sizes: z.string().optional().nullable(),
   isAvailable: z.boolean().optional(),
@@ -18,15 +19,20 @@ const ProductInputSchema = z.object({
 
 type ProductInput = z.infer<typeof ProductInputSchema>;
 
+// Parses and validates unknown payloads from forms/APIs before DB writes.
 const normalizeProductPayload = (raw: unknown): ProductInput =>
   ProductInputSchema.parse(raw);
+
+// Deduplicates gallery URLs and drops empty entries.
+const normalizeGallery = (images: string[] | undefined) =>
+  Array.from(new Set((images ?? []).map((value) => value.trim()).filter(Boolean)));
 
 export async function createProduct(data: unknown) {
   try {
     const payload = normalizeProductPayload(data);
     const session = await auth();
 
-    if (!session) {
+    if (!session?.user?.id) {
       return { error: "Unauthorized" };
     }
 
@@ -39,6 +45,7 @@ export async function createProduct(data: unknown) {
     }
 
     const isStoreConfigured = Boolean(store.whatsappNumber?.trim());
+    // Products cannot be published until core store contact setup is complete.
     if (!isStoreConfigured) {
       return { error: "Please configure your store settings before adding products." };
     }
@@ -50,17 +57,18 @@ export async function createProduct(data: unknown) {
         description: payload.description ?? null,
         price: payload.price,
         imageUrl: payload.imageUrl ?? null,
+        galleryImages: normalizeGallery(payload.galleryImages),
         category: payload.category ?? null,
         sizes: payload.sizes ?? null,
         isAvailable: payload.isAvailable ?? true,
-        variants: payload.variants ?? [], // Store as JSON
+        variants: payload.variants ?? [], // Persisted as JSON for flexible option structures.
       }
     });
 
     revalidatePath("/products");
     revalidatePath(`/${store.slug}`);
 
-    // Return plain object
+    // Normalize Prisma Decimal/Date fields into plain JSON-safe values.
     return { success: true, product: JSON.parse(JSON.stringify(product)) };
   } catch (error) {
     console.error("Error creating product:", error);
@@ -73,7 +81,7 @@ export async function updateProduct(id: string, data: unknown) {
     const payload = normalizeProductPayload(data);
     const session = await auth();
 
-    if (!session) {
+    if (!session?.user?.id) {
       return { error: "Unauthorized" };
     }
 
@@ -85,7 +93,7 @@ export async function updateProduct(id: string, data: unknown) {
       return { error: "Store not found" };
     }
 
-    // Ensure the product belongs to the user's store
+    // Ownership check prevents cross-store product edits.
     const product = await db.product.findFirst({
       where: { id: id, storeId: store.id }
     });
@@ -101,6 +109,7 @@ export async function updateProduct(id: string, data: unknown) {
         description: payload.description ?? null,
         price: payload.price,
         imageUrl: payload.imageUrl ?? null,
+        galleryImages: normalizeGallery(payload.galleryImages),
         category: payload.category ?? null,
         sizes: payload.sizes ?? null,
         isAvailable: payload.isAvailable ?? true,
@@ -122,7 +131,7 @@ export async function deleteProduct(id: string) {
   try {
     const session = await auth();
 
-    if (!session) {
+    if (!session?.user?.id) {
       return { error: "Unauthorized" };
     }
 
@@ -134,7 +143,7 @@ export async function deleteProduct(id: string) {
       return { error: "Store not found" };
     }
 
-    // Delete using deleteMany to ensure storeId matches (safeguard)
+    // deleteMany enforces both ID and storeId in one query.
     const result = await db.product.deleteMany({
       where: {
         id: id,
@@ -160,7 +169,7 @@ export async function getStoreCategories() {
   try {
     const session = await auth();
 
-    if (!session) {
+    if (!session?.user?.id) {
       return { error: "Unauthorized" };
     }
 

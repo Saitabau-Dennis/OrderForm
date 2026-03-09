@@ -10,19 +10,26 @@ interface StoreSettingsData {
   description?: string;
   slug: string;
   whatsappNumber: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  contactAddress?: string;
+  instagramUrl?: string;
+  facebookUrl?: string;
+  tiktokUrl?: string;
+  xUrl?: string;
   currency: string;
-  logoUrl?: string;
   brandColor: string;
   secondaryColor?: string;
   theme: string;
   deliveryZones: { name: string; price: number }[];
 }
 
+// Creates or updates the current user's store profile and replaces delivery zones in full.
 export async function updateStoreSettings(data: StoreSettingsData) {
   try {
     const session = await auth();
 
-    if (!session) {
+    if (!session?.user?.id) {
       return { error: "Unauthorized" };
     }
 
@@ -33,17 +40,24 @@ export async function updateStoreSettings(data: StoreSettingsData) {
     const previousSlug = existingStore?.slug ?? null;
 
     if (!existingStore) {
-      // Create new store
+      // First-time setup path.
       await db.store.create({
         data: {
           userId: session.user.id,
           name: data.name,
           slug: data.slug,
+          description: data.description,
           whatsappNumber: data.whatsappNumber,
+          contactEmail: data.contactEmail || null,
+          contactPhone: data.contactPhone || null,
+          contactAddress: data.contactAddress || null,
+          instagramUrl: data.instagramUrl || null,
+          facebookUrl: data.facebookUrl || null,
+          tiktokUrl: data.tiktokUrl || null,
+          xUrl: data.xUrl || null,
           currency: data.currency,
-          logoUrl: data.logoUrl,
           brandColor: data.brandColor,
-          secondaryColor: data.secondaryColor || "#95D5B2", // Default fallback
+          secondaryColor: data.secondaryColor || "#95D5B2",
           theme: data.theme,
           deliveryZones: {
             create: data.deliveryZones || []
@@ -51,7 +65,7 @@ export async function updateStoreSettings(data: StoreSettingsData) {
         }
       });
     } else {
-      // Update existing store
+      // Edit path: zones are replaced to mirror form state exactly.
       await db.store.update({
         where: { id: existingStore.id },
         data: {
@@ -59,13 +73,19 @@ export async function updateStoreSettings(data: StoreSettingsData) {
           slug: data.slug,
           description: data.description,
           whatsappNumber: data.whatsappNumber,
+          contactEmail: data.contactEmail || null,
+          contactPhone: data.contactPhone || null,
+          contactAddress: data.contactAddress || null,
+          instagramUrl: data.instagramUrl || null,
+          facebookUrl: data.facebookUrl || null,
+          tiktokUrl: data.tiktokUrl || null,
+          xUrl: data.xUrl || null,
           currency: data.currency,
-          logoUrl: data.logoUrl,
           brandColor: data.brandColor,
-          secondaryColor: data.secondaryColor || "#95D5B2", // Default fallback
+          secondaryColor: data.secondaryColor || "#95D5B2",
           theme: data.theme,
           deliveryZones: {
-            deleteMany: {}, // Remove all old zones
+            deleteMany: {},
             create: data.deliveryZones || []
           }
         }
@@ -76,7 +96,7 @@ export async function updateStoreSettings(data: StoreSettingsData) {
     revalidatePath("/dashboard");
     revalidatePath("/products");
 
-    // Revalidate both old and new public store paths when slug changes.
+    // Revalidate both old and new storefront paths when the slug is changed.
     if (previousSlug) {
       revalidatePath(`/${previousSlug}`);
     }
@@ -101,7 +121,7 @@ export async function getStoreStatus() {
   try {
     const session = await auth();
 
-    if (!session) {
+    if (!session?.user?.id) {
       return { error: "Unauthorized" };
     }
 
@@ -113,6 +133,7 @@ export async function getStoreStatus() {
       return { configured: false, hasFirstProduct: false, onboardingComplete: false };
     }
 
+    // Onboarding is complete only after store contact setup and at least one product.
     const isConfigured = !!store.whatsappNumber;
     const productsCount = await db.product.count({
       where: { storeId: store.id }
