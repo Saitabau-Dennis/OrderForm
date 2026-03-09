@@ -22,10 +22,13 @@ import {
 } from "@/components/ui/select";
 import { updateStoreSettings } from "@/lib/actions/store";
 
-const ROOT_DOMAIN = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || process.env.NEXT_PUBLIC_VERCEL_URL || "")
+const ROOT_DOMAIN = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || "")
   .replace(/^https?:\/\//i, "")
   .replace(/\/.*$/, "")
   .toLowerCase();
+
+const CAN_USE_SUBDOMAIN_URLS =
+  Boolean(ROOT_DOMAIN) && !ROOT_DOMAIN.endsWith(".vercel.app");
 
 const THEMES = [
   {
@@ -261,7 +264,7 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
 
                 <FieldGroup label="Store URL" error={form.formState.errors.slug?.message}>
                   <div className="flex overflow-hidden rounded-xl border border-input focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1">
-                    {ROOT_DOMAIN ? (
+                    {CAN_USE_SUBDOMAIN_URLS ? (
                       <>
                         <span className="inline-flex items-center border-r border-input bg-muted/30 px-3 text-xs text-muted-foreground">
                           https://

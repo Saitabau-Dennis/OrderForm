@@ -34,13 +34,16 @@ import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
 import BoringAvatar from "boring-avatars";
 
-const ROOT_DOMAIN = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || process.env.NEXT_PUBLIC_VERCEL_URL || "")
+const ROOT_DOMAIN = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || "")
   .replace(/^https?:\/\//i, "")
   .replace(/\/.*$/, "")
   .toLowerCase();
 
+const CAN_USE_SUBDOMAIN_URLS =
+  Boolean(ROOT_DOMAIN) && !ROOT_DOMAIN.endsWith(".vercel.app");
+
 const getStoreUrl = (slug: string, rootDomain: string) => {
-  if (rootDomain) return `https://${slug}.${rootDomain}`;
+  if (CAN_USE_SUBDOMAIN_URLS && rootDomain) return `https://${slug}.${rootDomain}`;
   return `/${slug}`;
 };
 
