@@ -1,12 +1,10 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useMemo } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
-import { toast } from "sonner"
 import { ArrowUpDown, Search, SlidersHorizontal } from "lucide-react"
-import { useStore } from "./store-provider"
 
 type Product = {
   id: string
@@ -24,16 +22,10 @@ type ProductGridProps = {
   currency: string
   brandColor: string
   storeSlug: string
+  mode?: "default" | "related"
 }
 
 type SortOption = "featured" | "newest" | "price-asc" | "price-desc" | "name-asc"
-type DiscoveryFilters = {
-  query: string
-  activeCategory: string
-  sort: SortOption
-}
-
-const VALID_SORT_OPTIONS: SortOption[] = ["featured", "newest", "price-asc", "price-desc", "name-asc"]
 
 function formatPrice(price: number, currency: string): string {
   try {
@@ -63,7 +55,14 @@ function formatCardDescription(description: string | null): string {
     .trim()
 }
 
-export function ProductGrid({ products, currency, brandColor, storeSlug }: ProductGridProps) {
+export function ProductGrid({
+  products,
+  currency,
+  brandColor,
+  storeSlug,
+  mode = "default",
+}: ProductGridProps) {
+  const isRelatedMode = mode === "related"
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -156,6 +155,7 @@ export function ProductGrid({ products, currency, brandColor, storeSlug }: Produ
 
   const hasActiveFilters = query.trim().length > 0 || activeCategory !== "All" || sort !== "featured"
   const hasProducts = products.length > 0
+  const visibleProducts = isRelatedMode ? products : filteredAndSorted
 
   const clearFilters = () => {
     router.replace(pathname, { scroll: false })
@@ -163,93 +163,94 @@ export function ProductGrid({ products, currency, brandColor, storeSlug }: Produ
 
   return (
     <div id="products">
-      {/* Controls */}
-      <div className="mb-8 md:mb-10 space-y-5">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="relative w-full md:max-w-lg">
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8D8D88]" />
-            <span
-              aria-hidden="true"
-              className="absolute right-2 top-1/2 hidden -translate-y-1/2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#6C6C66] sm:inline-flex"
-            >
-              Search
-            </span>
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search products, category or keyword..."
-              className="h-12 w-full rounded-none border border-[#DFDFDA] bg-transparent pl-11 pr-4 text-sm text-[#1A1A1A] placeholder:text-[#8D8D88] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0"
-              style={{ "--tw-ring-color": `${brandColor}66` } as { [key: string]: string }}
-            />
-          </div>
-
-          <div className="flex items-center gap-2 self-start md:self-auto">
-            <div className="inline-flex h-11 items-center gap-2 rounded-none border border-[#DFDFDA] px-3 text-xs font-semibold uppercase tracking-wide text-[#666661]">
-              <ArrowUpDown className="h-3.5 w-3.5" />
-              Sort
-            </div>
-            <div className="relative">
-              <select
-                value={sort}
-                onChange={(e) => setSort(e.target.value as SortOption)}
-                className="h-11 appearance-none rounded-none border border-[#DFDFDA] bg-transparent px-4 pr-10 text-sm font-medium text-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2"
-                style={{ "--tw-ring-color": `${brandColor}66` } as { [key: string]: string }}
-                aria-label="Sort products"
+      {!isRelatedMode ? (
+        <div className="mb-8 space-y-5 md:mb-10">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="relative w-full md:max-w-lg">
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8D8D88]" />
+              <span
+                aria-hidden="true"
+                className="absolute right-2 top-1/2 hidden -translate-y-1/2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#6C6C66] sm:inline-flex"
               >
-                <option value="featured">Featured</option>
-                <option value="newest">Newest</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-                <option value="name-asc">Name: A to Z</option>
-              </select>
-              <SlidersHorizontal className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7A7A73]" />
+                Search
+              </span>
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search products, category or keyword..."
+                className="h-12 w-full rounded-none border border-[#DFDFDA] bg-transparent pl-11 pr-4 text-sm text-[#1A1A1A] placeholder:text-[#8D8D88] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0"
+                style={{ "--tw-ring-color": `${brandColor}66` } as { [key: string]: string }}
+              />
+            </div>
+
+            <div className="flex items-center gap-2 self-start md:self-auto">
+              <div className="inline-flex h-11 items-center gap-2 rounded-none border border-[#DFDFDA] px-3 text-xs font-semibold uppercase tracking-wide text-[#666661]">
+                <ArrowUpDown className="h-3.5 w-3.5" />
+                Sort
+              </div>
+              <div className="relative">
+                <select
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value as SortOption)}
+                  className="h-11 appearance-none rounded-none border border-[#DFDFDA] bg-transparent px-4 pr-10 text-sm font-medium text-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2"
+                  style={{ "--tw-ring-color": `${brandColor}66` } as { [key: string]: string }}
+                  aria-label="Sort products"
+                >
+                  <option value="featured">Featured</option>
+                  <option value="newest">Newest</option>
+                  <option value="price-asc">Price: Low to High</option>
+                  <option value="price-desc">Price: High to Low</option>
+                  <option value="name-asc">Name: A to Z</option>
+                </select>
+                <SlidersHorizontal className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7A7A73]" />
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          {categories.map((cat) => (
-            <button
-              type="button"
-              key={cat.name}
-              onClick={() => setActiveCategory(cat.name)}
-              aria-pressed={activeCategory === cat.name}
-              className="inline-flex h-9 items-center gap-2 rounded-none border px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
-              style={
-                activeCategory === cat.name
-                  ? {
-                      color: brandColor,
-                      borderColor: `${brandColor}66`,
-                    }
-                  : {
-                      color: "#575751",
-                      borderColor: "#DFDFDA",
-                    }
-              }
-            >
-              <span>{cat.name}</span>
-              <span className="rounded-none px-1.5 py-0.5 text-[11px]">{cat.count}</span>
-            </button>
-          ))}
-        </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {categories.map((cat) => (
+              <button
+                type="button"
+                key={cat.name}
+                onClick={() => setActiveCategory(cat.name)}
+                aria-pressed={activeCategory === cat.name}
+                className="inline-flex h-9 items-center gap-2 rounded-none border px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+                style={
+                  activeCategory === cat.name
+                    ? {
+                        color: brandColor,
+                        borderColor: `${brandColor}66`,
+                      }
+                    : {
+                        color: "#575751",
+                        borderColor: "#DFDFDA",
+                      }
+                }
+              >
+                <span>{cat.name}</span>
+                <span className="rounded-none px-1.5 py-0.5 text-[11px]">{cat.count}</span>
+              </button>
+            ))}
+          </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-          <p className="text-[#666661]" aria-live="polite">
-            Showing <span className="font-semibold text-[#1A1A1A]">{filteredAndSorted.length}</span> of{" "}
-            <span className="font-semibold text-[#1A1A1A]">{products.length}</span> products
-          </p>
-          {hasActiveFilters ? (
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="text-sm font-medium underline decoration-[#B0B0AA] underline-offset-4 hover:text-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
-            >
-              Clear filters
-            </button>
-          ) : null}
+          <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+            <p className="text-[#666661]" aria-live="polite">
+              Showing <span className="font-semibold text-[#1A1A1A]">{filteredAndSorted.length}</span> of{" "}
+              <span className="font-semibold text-[#1A1A1A]">{products.length}</span> products
+            </p>
+            {hasActiveFilters ? (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="text-sm font-medium underline decoration-[#B0B0AA] underline-offset-4 hover:text-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+              >
+                Clear filters
+              </button>
+            ) : null}
+          </div>
         </div>
-      </div>
+      ) : null}
 
       {/* Product Grid */}
       {!hasProducts ? (
@@ -259,7 +260,7 @@ export function ProductGrid({ products, currency, brandColor, storeSlug }: Produ
             This store is still being curated. Check back soon for new arrivals.
           </p>
         </div>
-      ) : filteredAndSorted.length === 0 ? (
+      ) : !isRelatedMode && filteredAndSorted.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#D8D8D2] bg-white px-6 py-20 text-center">
           <p className="text-lg font-semibold text-[#1A1A1A]">No matches found</p>
           <p className="mt-2 max-w-md text-sm text-[#737373]">
@@ -268,20 +269,20 @@ export function ProductGrid({ products, currency, brandColor, storeSlug }: Produ
           <button
             type="button"
             onClick={clearFilters}
-            className="mt-6 inline-flex h-10 items-center rounded-none bg-[#1A1A1A] px-5 text-sm font-medium text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+            className="mt-6 inline-flex h-10 items-center rounded-none px-5 text-sm font-medium text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+            style={{ backgroundColor: "var(--store-brand, #1A1A1A)" }}
           >
             Reset discovery
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 md:gap-5 lg:grid-cols-3 lg:gap-6 xl:grid-cols-4">
-          {filteredAndSorted.map((product) => (
+        <div className={`grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 md:gap-5 ${isRelatedMode ? "lg:grid-cols-4 lg:gap-5" : "lg:grid-cols-3 lg:gap-6 xl:grid-cols-4"}`}>
+          {visibleProducts.map((product) => (
             <ProductCard
               key={product.id}
               product={product}
               currency={currency}
               storeSlug={storeSlug}
-              brandColor={brandColor}
             />
           ))}
         </div>
@@ -294,48 +295,26 @@ function ProductCard({
   product,
   currency,
   storeSlug,
-  brandColor,
 }: {
   product: Product
   currency: string
   storeSlug: string
-  brandColor: string
 }) {
-  const { addToCart, setIsCartOpen } = useStore()
   const description = formatCardDescription(product.description)
-  const requiresOptions = Boolean(product.hasOptions)
-
-  const handleQuickAdd = () => {
-    addToCart({
-      productId: product.id,
-      name: product.name,
-      price: product.price,
-      imageUrl: product.imageUrl,
-      variant: null,
-      quantity: 1,
-    })
-
-    setIsCartOpen(true)
-    toast.success(`${product.name} added to cart`)
-  }
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-none border border-[#E6E6E1]">
+    <article className="flex h-full flex-col overflow-hidden rounded-none border border-[#E6E6E1]">
       <Link
         href={`/${storeSlug}/products/${product.id}`}
         className="relative block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-inset"
       >
-        <div className="absolute left-3 top-3 z-10 inline-flex items-center rounded-none bg-white/90 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#4C4C47] backdrop-blur-sm">
-          {product.category?.trim() || "Featured"}
-        </div>
-
         <div className="relative aspect-square w-full overflow-hidden bg-[#EEECEA] sm:aspect-[4/5]">
           {product.imageUrl ? (
             <Image
               src={product.imageUrl}
               alt={product.name}
               fill
-              className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
+              className="object-cover object-center"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1400px) 33vw, 25vw"
             />
           ) : (
@@ -351,7 +330,7 @@ function ProductCard({
           href={`/${storeSlug}/products/${product.id}`}
           className="space-y-2 rounded-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
         >
-          <h3 className="line-clamp-2 text-[13px] font-semibold leading-snug text-[#2D2D2A] sm:text-[15px]">
+          <h3 className="line-clamp-2 text-[13px] font-medium leading-snug text-[#2D2D2A] sm:text-[15px]">
             {product.name}
           </h3>
           {description ? (
@@ -373,36 +352,6 @@ function ProductCard({
           </Link>
         </div>
 
-        <div className="mt-3 sm:mt-4">
-          {requiresOptions ? (
-            <Link
-              href={`/${storeSlug}/products/${product.id}`}
-              aria-label={`Add ${product.name} to cart`}
-              className="inline-flex h-9 w-full items-center justify-center rounded-none border text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2 sm:h-11 sm:text-sm"
-              style={{
-                borderColor: `${brandColor}66`,
-                color: brandColor,
-                backgroundColor: `${brandColor}10`,
-              }}
-            >
-              Add to cart
-            </Link>
-          ) : (
-            <button
-              type="button"
-              onClick={handleQuickAdd}
-              aria-label={`Add ${product.name} to cart`}
-              className="inline-flex h-9 w-full items-center justify-center rounded-none border text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2 sm:h-11 sm:text-sm"
-              style={{
-                borderColor: `${brandColor}66`,
-                color: brandColor,
-                backgroundColor: `${brandColor}10`,
-              }}
-            >
-              Add to cart
-            </button>
-          )}
-        </div>
       </div>
     </article>
   )

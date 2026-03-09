@@ -1,6 +1,6 @@
 "use client"
 
-import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react"
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react"
 
 export type CartItem = {
   productId: string
@@ -24,6 +24,10 @@ type StoreContextType = {
   toggleWishlist: (productId: string) => void
   isInWishlist: (productId: string) => boolean
 
+  actionModal: StoreActionModal | null
+  showActionModal: (modal: StoreActionModal) => void
+  hideActionModal: () => void
+
   isCartOpen: boolean
   setIsCartOpen: (open: boolean) => void
   toggleCart: () => void
@@ -35,9 +39,18 @@ type StoreContextType = {
 
 const StoreContext = createContext<StoreContextType | null>(null)
 
+export type StoreActionModal = {
+  type: "cart" | "wishlist"
+  productId: string
+  name: string
+  imageUrl: string | null
+  category: string | null
+}
+
 const LEGACY_CART_KEY = "orderform_cart"
 const LEGACY_WISHLIST_KEY = "orderform_wishlist"
 
+// Store-scoped keys prevent data bleeding between different storefront slugs.
 function getCartStorageKey(storeSlug: string) {
   return `orderform_cart:${storeSlug}`
 }
@@ -55,6 +68,7 @@ function parseJson<T>(value: string | null): T | null {
   }
 }
 
+// Keeps only valid cart records and drops entries for products that no longer exist.
 function sanitizeCart(value: unknown, availableProductIds: Set<string>): CartItem[] {
   if (!Array.isArray(value)) return []
 
@@ -87,6 +101,7 @@ function sanitizeCart(value: unknown, availableProductIds: Set<string>): CartIte
   return sanitized
 }
 
+// Keeps only unique, currently available product ids.
 function sanitizeWishlist(value: unknown, availableProductIds: Set<string>): string[] {
   if (!Array.isArray(value)) return []
 
@@ -131,9 +146,10 @@ export function StoreProvider({
   const wishlistStorageKey = useMemo(() => getWishlistStorageKey(storeSlug), [storeSlug])
   const [cart, setCart] = useState<CartItem[]>([])
   const [wishlist, setWishlist] = useState<string[]>([])
-  const isHydratedRef = useRef(false)
+  const [actionModal, setActionModal] = useState<StoreActionModal | null>(null)
+  const [hasInitialized, setHasInitialized] = useState(false)
 
-  // Load from localStorage on mount
+  // Restore scoped state and transparently migrate legacy unscoped keys.
   useEffect(() => {
     try {
       const rawScopedCart = localStorage.getItem(cartStorageKey)
@@ -148,30 +164,30 @@ export function StoreProvider({
       const nextCart = sanitizeCart(parsedCart, availableProductsSet)
       const nextWishlist = sanitizeWishlist(parsedWishlist, availableProductsSet)
 
-      // Local storage restoration must happen after mount to keep SSR/client in sync.
+      // State must be set after mount to avoid SSR hydration drift.
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setCart(nextCart)
       setWishlist(nextWishlist)
     } catch (e) {
       console.error("Failed to load store state", e)
     }
-    isHydratedRef.current = true
+    setHasInitialized(true)
   }, [availableProductsSet, cartStorageKey, wishlistStorageKey])
 
-  // Save to localStorage when state changes
+  // Persist cart after initial hydration only.
   useEffect(() => {
-    if (!isHydratedRef.current) return
+    if (!hasInitialized) return
     localStorage.setItem(cartStorageKey, JSON.stringify(cart))
-  }, [cart, cartStorageKey])
+  }, [cart, cartStorageKey, hasInitialized])
 
   useEffect(() => {
-    if (!isHydratedRef.current) return
+    if (!hasInitialized) return
     localStorage.setItem(wishlistStorageKey, JSON.stringify(wishlist))
-  }, [wishlist, wishlistStorageKey])
+  }, [wishlist, wishlistStorageKey, hasInitialized])
 
-  // Keep multiple tabs/windows synchronized.
+  // Sync cart/wishlist updates across tabs via the storage event.
   useEffect(() => {
-    if (!isHydratedRef.current) return
+    if (!hasInitialized) return
 
     const handleStorage = (event: StorageEvent) => {
       if (!event.key) return
@@ -189,9 +205,9 @@ export function StoreProvider({
 
     window.addEventListener("storage", handleStorage)
     return () => window.removeEventListener("storage", handleStorage)
-  }, [availableProductsSet, cartStorageKey, wishlistStorageKey])
+  }, [availableProductsSet, cartStorageKey, wishlistStorageKey, hasInitialized])
 
-  // Cart Actions
+  // Cart actions.
   const addToCart = (newItem: Omit<CartItem, "quantity"> & { quantity?: number }) => {
     if (!availableProductsSet.has(newItem.productId)) return
 
@@ -233,7 +249,7 @@ export function StoreProvider({
   const cartTotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0)
   const cartCount = cart.reduce((count, item) => count + item.quantity, 0)
 
-  // Wishlist Actions
+  // Wishlist actions.
   const toggleWishlist = (productId: string) => {
     if (!availableProductsSet.has(productId)) return
 
@@ -247,7 +263,10 @@ export function StoreProvider({
 
   const isInWishlist = (productId: string) => wishlist.includes(productId)
 
-  // UI State for Sliders
+  const showActionModal = (modal: StoreActionModal) => setActionModal(modal)
+  const hideActionModal = () => setActionModal(null)
+
+  // UI state for side panels/modals.
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [isWishlistOpen, setIsWishlistOpen] = useState(false)
 
@@ -259,13 +278,11 @@ export function StoreProvider({
       value={{
         cart, addToCart, removeFromCart, updateQuantity, clearCart, cartTotal, cartCount,
         wishlist, toggleWishlist, isInWishlist,
+        actionModal, showActionModal, hideActionModal,
         isCartOpen, setIsCartOpen, toggleCart,
         isWishlistOpen, setIsWishlistOpen, toggleWishlistSidebar
       }}
     >
-      {/* Suppress hydration mismatch by not rendering until loaded if strictly needed,
-          but usually okay to render children. To be safe with counts, we can render immediately
-          and let the client hydrate. */}
       {children}
     </StoreContext.Provider>
   )

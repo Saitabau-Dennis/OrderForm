@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
+import type { CSSProperties } from "react";
 import db from "@/lib/db";
 import { hasProductOptions } from "@/lib/has-product-options";
 
 import { StoreProvider } from "./components/store-provider";
-import { StoreCartSheet } from "./components/store-cart-sheet";
-import { StoreWishlistSheet } from "./components/store-wishlist-sheet";
+import { StoreActionModal } from "./components/store-action-modal";
 
 export default async function StoreRootLayout({
   children,
@@ -51,12 +51,19 @@ export default async function StoreRootLayout({
     hasOptions: hasProductOptions(p),
   }))
 
+  const storefrontThemeVars: CSSProperties = {
+    "--store-brand": store.brandColor || "#426BC2",
+    "--store-secondary": store.secondaryColor || "#A6CFF2",
+  } as CSSProperties
+
   return (
-    <div className="min-h-screen bg-[#F7F7F5] theme-store font-clash-display antialiased">
+    <div
+      className="min-h-screen bg-[#F7F7F5] theme-store font-clash-display antialiased"
+      style={storefrontThemeVars}
+    >
       <StoreProvider storeSlug={store.slug} availableProductIds={serializedProducts.map((product) => product.id)}>
         {children}
-        <StoreCartSheet storeSlug={store.slug} currency={store.currency} />
-        <StoreWishlistSheet storeSlug={store.slug} currency={store.currency} allProducts={serializedProducts} />
+        <StoreActionModal storeSlug={store.slug} />
       </StoreProvider>
     </div>
   );

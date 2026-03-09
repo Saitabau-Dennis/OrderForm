@@ -36,36 +36,55 @@ export default async function AllProductsPage({
     hasOptions: hasProductOptions(product),
   }))
 
+  const categories = Array.from(
+    new Set(
+      products
+        .map((product) => product.category?.trim() || "")
+        .filter(Boolean)
+    )
+  ).sort((a, b) => a.localeCompare(b))
+
   const safeStore = {
     name: store.name,
-    logoUrl: store.logoUrl,
     brandColor: store.brandColor,
     slug: store.slug,
     currency: store.currency,
+    categories,
+    socialLinks: {
+      instagramUrl: store.instagramUrl,
+      facebookUrl: store.facebookUrl,
+      tiktokUrl: store.tiktokUrl,
+      xUrl: store.xUrl,
+    },
   }
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F7F7F5]">
       <StoreNavbar store={safeStore} />
 
-      <main className="flex-1 max-w-7xl mx-auto w-full px-3 sm:px-4 lg:px-6 py-10 md:py-14">
-        <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#1A1A1A]">All Products</h1>
-          <p className="mt-1 text-sm text-[#6D6D67]">
-            Browse the full catalog from {store.name}. {serializedProducts.length} item
-            {serializedProducts.length === 1 ? "" : "s"} available.
-          </p>
-        </div>
+      <main className="flex-1 w-full px-3 sm:px-5 lg:px-7 py-10 md:py-14">
+        <div className="mx-auto w-full max-w-[1500px]">
+          <div className="mb-6">
+            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#1A1A1A]">All Products</h1>
+            <p className="mt-1 text-sm text-[#6D6D67]">
+              Browse the full catalog from {store.name}. {serializedProducts.length} item
+              {serializedProducts.length === 1 ? "" : "s"} available.
+            </p>
+          </div>
 
-        <ProductGrid
-          products={serializedProducts}
-          currency={safeStore.currency}
-          brandColor={safeStore.brandColor}
-          storeSlug={safeStore.slug}
-        />
+          <ProductGrid
+            products={serializedProducts}
+            currency={safeStore.currency}
+            brandColor={safeStore.brandColor}
+            storeSlug={safeStore.slug}
+          />
+        </div>
       </main>
 
-      <StoreFooter storeName={store.name} />
+      <StoreFooter
+        storeName={store.name}
+        socialLinks={safeStore.socialLinks}
+      />
     </div>
   )
 }
