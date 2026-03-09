@@ -24,7 +24,7 @@ type WishlistClientProps = {
 export function WishlistClient({ storeSlug, currency, allProducts }: WishlistClientProps) {
   const { wishlist, toggleWishlist } = useStore()
 
-  // Find products that are in the user's wishlist
+  // Resolve persisted wishlist ids into full product rows for rendering.
   const savedProducts = allProducts.filter(p => wishlist.includes(p.id))
 
   const formatPrice = (p: number) => {
@@ -37,7 +37,7 @@ export function WishlistClient({ storeSlug, currency, allProducts }: WishlistCli
 
   if (savedProducts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 bg-white border border-[#E8E8E5] rounded-sm text-center">
+      <div className="flex flex-col items-center justify-center py-24  border border-[#CECEC9]] rounded-none text-center">
         <div className="h-16 w-16 mb-4 rounded-full bg-[#F7F7F5] flex items-center justify-center">
           <Heart className="w-7 h-7 text-[#1A1A1A] fill-transparent" strokeWidth={1.5} />
         </div>
@@ -57,54 +57,63 @@ export function WishlistClient({ storeSlug, currency, allProducts }: WishlistCli
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-10 md:gap-x-6 md:gap-y-12">
-      {savedProducts.map((product) => (
-        <div key={product.id} className="group relative">
-          {/* Remove Button */}
-          <button
-            onClick={(e) => {
-              e.preventDefault()
-              toggleWishlist(product.id)
-            }}
-            className="absolute top-2 right-2 z-10 w-8 h-8 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white text-[#737373] hover:text-red-500"
-            aria-label="Remove from wishlist"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-
-          <Link href={`/${storeSlug}/products/${product.id}`} className="block cursor-pointer">
-            {/* Image */}
-            <div className="relative aspect-[4/5] md:aspect-square w-full bg-[#EEECEA] overflow-hidden mb-3 rounded-sm">
-              {product.imageUrl ? (
-                <Image
-                  src={product.imageUrl}
-                  alt={product.name}
-                  fill
-                  className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.04]"
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center px-4 text-center">
-                  <span className="text-[#AAAAAA] text-[10px] md:text-xs uppercase tracking-widest font-medium">No image</span>
-                </div>
-              )}
-            </div>
-
-            {/* Info */}
-            <div className="space-y-0.5">
-              <p className="text-[12px] md:text-[13px] text-[#737373] font-normal leading-none">
-                {product.category ?? ""}
-              </p>
-              <p className="text-[13px] md:text-sm font-medium text-[#1A1A1A] leading-snug line-clamp-2">
-                {product.name}
-              </p>
-              <p className="text-[13px] md:text-sm font-semibold text-[#1A1A1A]">
-                {formatPrice(product.price)}
-              </p>
-            </div>
-          </Link>
-        </div>
-      ))}
+    <div className="overflow-x-auto border border-[#E8E8E5] bg-white">
+      <table className="min-w-full border-collapse">
+        <thead>
+          <tr className="border-b border-[#E8E8E5] bg-[#FAFAF8] text-left">
+            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#6D6D67]">Item</th>
+            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#6D6D67]">Product</th>
+            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#6D6D67]">Category</th>
+            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#6D6D67]">Price</th>
+            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#6D6D67]">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {savedProducts.map((product) => (
+            <tr key={product.id} className="border-b border-[#EFEFEA] last:border-b-0">
+              <td className="px-4 py-3">
+                <Link href={`/${storeSlug}/products/${product.id}`} className="block">
+                  <div className="relative h-16 w-16 overflow-hidden rounded-sm bg-[#EEECEA]">
+                    {product.imageUrl ? (
+                      <Image
+                        src={product.imageUrl}
+                        alt={product.name}
+                        fill
+                        className="object-cover object-center"
+                        sizes="64px"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center px-1 text-center">
+                        <span className="text-[9px] uppercase tracking-wider text-[#AAAAAA]">No image</span>
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              </td>
+              <td className="px-4 py-3">
+                <Link
+                  href={`/${storeSlug}/products/${product.id}`}
+                  className="text-sm font-medium text-[#1A1A1A] transition hover:underline"
+                >
+                  {product.name}
+                </Link>
+              </td>
+              <td className="px-4 py-3 text-sm text-[#737373]">{product.category || "-"}</td>
+              <td className="px-4 py-3 text-sm font-semibold text-[#1A1A1A]">{formatPrice(product.price)}</td>
+              <td className="px-4 py-3">
+                <button
+                  onClick={() => toggleWishlist(product.id)}
+                  className="inline-flex h-9 items-center gap-2 border border-[#D8D8D2] px-3 text-xs font-semibold uppercase tracking-[0.08em] text-[#5F5F5A] transition hover:border-red-200 hover:text-red-600"
+                  aria-label="Remove from wishlist"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  Remove
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   )
 }

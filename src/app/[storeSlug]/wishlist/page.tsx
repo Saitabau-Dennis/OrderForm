@@ -49,23 +49,49 @@ export default async function WishlistPage({
     hasOptions: hasProductOptions(p),
   }))
 
+  const categories = Array.from(
+    new Set(
+      allProducts
+        .map((product) => product.category?.trim() || "")
+        .filter(Boolean)
+    )
+  ).sort((a, b) => a.localeCompare(b))
+
+  const safeStore = {
+    name: store.name,
+    brandColor: store.brandColor,
+    slug: store.slug,
+    categories,
+    socialLinks: {
+      instagramUrl: store.instagramUrl,
+      facebookUrl: store.facebookUrl,
+      tiktokUrl: store.tiktokUrl,
+      xUrl: store.xUrl,
+    },
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-[#F7F7F5]">
-      <StoreNavbar store={store} />
+      <StoreNavbar store={safeStore} />
 
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 md:py-16">
-        <h1 className="text-2xl md:text-3xl font-semibold text-[#1A1A1A] mb-8 md:mb-12">
-          Your Wishlist
-        </h1>
+      <main className="flex-1 w-full px-3 sm:px-5 lg:px-7 py-10 md:py-16">
+        <div className="mx-auto w-full max-w-[1500px]">
+          <h1 className="text-2xl md:text-3xl font-semibold text-[#1A1A1A] mb-8 md:mb-12">
+            Your Wishlist
+          </h1>
 
-        <WishlistClient
-          storeSlug={store.slug}
-          currency={store.currency}
-          allProducts={serializedProducts}
-        />
+          <WishlistClient
+            storeSlug={store.slug}
+            currency={store.currency}
+            allProducts={serializedProducts}
+          />
+        </div>
       </main>
 
-      <StoreFooter storeName={store.name} />
+      <StoreFooter
+        storeName={store.name}
+        socialLinks={safeStore.socialLinks}
+      />
     </div>
   )
 }

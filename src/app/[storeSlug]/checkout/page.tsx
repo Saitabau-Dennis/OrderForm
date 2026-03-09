@@ -22,6 +22,17 @@ export default async function CheckoutPage({
     notFound()
   }
 
+  const categoryRows = await db.product.findMany({
+    where: { storeId: store.id, isAvailable: true, category: { not: null } },
+    select: { category: true },
+    distinct: ["category"],
+    orderBy: { category: "asc" },
+  })
+
+  const categories = categoryRows
+    .map((entry) => entry.category?.trim() || "")
+    .filter(Boolean)
+
   // Serialize delivery zones
   const serializedZones = store.deliveryZones.map((z) => ({
     id: z.id,
@@ -31,30 +42,39 @@ export default async function CheckoutPage({
 
   const safeStore = {
     name: store.name,
-    logoUrl: store.logoUrl,
     brandColor: store.brandColor,
     slug: store.slug,
+    categories,
+    socialLinks: {
+      instagramUrl: store.instagramUrl,
+      facebookUrl: store.facebookUrl,
+      tiktokUrl: store.tiktokUrl,
+      xUrl: store.xUrl,
+    },
   }
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F7F7F5]">
       <StoreNavbar store={safeStore} />
 
-      <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 md:py-16">
-        <h1 className="text-2xl md:text-3xl font-semibold text-[#1A1A1A] mb-8 md:mb-12">
-          Checkout
-        </h1>
+      <main className="flex-1 w-full px-3 sm:px-5 lg:px-7 py-10 md:py-16">
+        <div className="mx-auto w-full max-w-[1500px]">
+          <h1 className="mb-8 text-2xl font-semibold text-[#1A1A1A] md:mb-10 md:text-3xl">Checkout</h1>
 
-        <CheckoutClient
-          storeId={store.id}
-          storeSlug={store.slug}
-          currency={store.currency}
-          deliveryZones={serializedZones}
-          brandColor={store.brandColor}
-        />
+          <CheckoutClient
+            storeId={store.id}
+            storeSlug={store.slug}
+            currency={store.currency}
+            deliveryZones={serializedZones}
+            brandColor={store.brandColor}
+          />
+        </div>
       </main>
 
-      <StoreFooter storeName={store.name} />
+      <StoreFooter
+        storeName={store.name}
+        socialLinks={safeStore.socialLinks}
+      />
     </div>
   )
 }

@@ -5,14 +5,10 @@ import Image from "next/image"
 import Link from "next/link"
 import { toast } from "sonner"
 import { useStore } from "./store-provider"
+import { createOrder } from "@/lib/actions/orders"
 import {
   Loader2,
   ArrowLeft,
-  CheckCircle2,
-  Clock3,
-  ShieldCheck,
-  Truck,
-  Trash2,
 } from "lucide-react"
 
 type DeliveryZone = {
@@ -36,14 +32,11 @@ type CheckoutFormData = {
   zoneId: string
 }
 
+type PaymentMethod = "mpesa" | "card"
+
 type CheckoutFieldErrors = Partial<Record<keyof CheckoutFormData, string>>
 
-type PlacedOrderState = {
-  orderReference: string
-  customerName: string
-  total: number
-}
-
+// Per-store draft key lets shoppers resume checkout without cross-store conflicts.
 function getCheckoutDraftStorageKey(storeSlug: string) {
   return `orderform_checkout_draft:${storeSlug}`
 }
@@ -52,6 +45,7 @@ function normalizePhone(value: string): string {
   return value.replace(/\D/g, "")
 }
 
+// Client-side validation mirrors server expectations for faster feedback.
 function validateCheckout(formData: CheckoutFormData, requiresZone: boolean): CheckoutFieldErrors {
   const errors: CheckoutFieldErrors = {}
 
@@ -76,29 +70,55 @@ function validateCheckout(formData: CheckoutFormData, requiresZone: boolean): Ch
 }
 
 function getFieldClass(hasError: boolean): string {
-  const base = "w-full rounded-sm text-sm text-[#1A1A1A] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-0"
+  const base = "w-full rounded-none text-sm text-[#1A1A1A] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-0"
 
   if (hasError) {
-    return `${base} border border-red-400 bg-red-50 focus:border-red-500`
+    return `${base} border border-red-400 bg-transparent focus:border-red-500`
   }
 
-  return `${base} border border-[#E8E8E5] bg-[#FAFAFA] focus:border-[#1A1A1A] focus:bg-white`
+  return `${base} border border-[#E8E8E5] bg-transparent focus:border-[#1A1A1A]`
 }
 
 export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, brandColor }: CheckoutClientProps) {
   const checkoutDraftStorageKey = useMemo(() => getCheckoutDraftStorageKey(storeSlug), [storeSlug])
-  const { cart, cartTotal, removeFromCart, updateQuantity, clearCart } = useStore()
+  const { cart, cartTotal } = useStore()
 
   const [isLoading, setIsLoading] = useState(false)
   const [hasHydratedDraft, setHasHydratedDraft] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<CheckoutFieldErrors>({})
-  const [placedOrder, setPlacedOrder] = useState<PlacedOrderState | null>(null)
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("mpesa")
+  const [orderNotes, setOrderNotes] = useState("")
+  const [shipToDifferentAddress, setShipToDifferentAddress] = useState(false)
+  const [emailAddress, setEmailAddress] = useState("")
+  const [addressLineTwo, setAddressLineTwo] = useState("")
   const [formData, setFormData] = useState<CheckoutFormData>({
     name: "",
     phone: "",
     deliveryAddress: "",
     zoneId: "",
   })
+  const paymentOptions: Array<{
+    id: PaymentMethod
+    label: string
+    description: string
+    imageSrc: string
+    imageAlt: string
+  }> = [
+    {
+      id: "mpesa",
+      label: "M-PESA",
+      description: "Pay with your phone number after placing the order.",
+      imageSrc: "/images/mpesa.jpg",
+      imageAlt: "M-PESA",
+    },
+    {
+      id: "card",
+      label: "Debit/Credit Cards",
+      description: "Visa, Mastercard and more via secure card checkout.",
+      imageSrc: "/images/paystack-ke.png",
+      imageAlt: "Card payment options",
+    },
+  ]
 
   const selectedZone = useMemo(
     () => deliveryZones.find((zone) => zone.id === formData.zoneId),
@@ -106,9 +126,11 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
   )
   const deliveryFee = selectedZone ? selectedZone.price : 0
   const grandTotal = cartTotal + deliveryFee
-  const cartCount = cart.reduce((count, item) => count + item.quantity, 0)
+  const [firstNamePart = "", ...otherNameParts] = formData.name.trim().split(/\s+/)
+  const lastNamePart = otherNameParts.join(" ")
 
   useEffect(() => {
+    // Restore previous in-progress checkout details from localStorage.
     try {
       const rawDraft = localStorage.getItem(checkoutDraftStorageKey)
       if (!rawDraft) return
@@ -133,6 +155,7 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
   useEffect(() => {
     if (!hasHydratedDraft) return
 
+    // Persist only non-empty drafts so old data does not linger indefinitely.
     const hasAnyDraftValue = Object.values(formData).some((value) => value.trim() !== "")
 
     try {
@@ -168,14 +191,13 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
     }
   }
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault()
-
+  const submitOrder = async () => {
     if (cart.length === 0) {
       toast.error("Your cart is empty")
       return
     }
 
+    // Final totals and discount validation still happen server-side in `createOrder`.
     const errors = validateCheckout(formData, deliveryZones.length > 0)
     setFieldErrors(errors)
 
@@ -187,20 +209,37 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
     setIsLoading(true)
 
     try {
-      // This remains mocked until checkout is wired to server actions.
-      console.log("Submitting order...", { storeId, cart, formData, grandTotal })
-      await new Promise((resolve) => setTimeout(resolve, 1200))
-
-      const mockReference = `ORD-${Math.floor(100000 + Math.random() * 900000)}`
-
-      setPlacedOrder({
-        orderReference: mockReference,
+      const orderResult = await createOrder({
+        storeId,
         customerName: formData.name.trim(),
-        total: grandTotal,
+        customerPhone: formData.phone.trim(),
+        deliveryAddress: formData.deliveryAddress.trim(),
+        deliveryZone: selectedZone?.name,
+        deliveryFee,
+        notes: orderNotes.trim() || undefined,
+        items: cart.map((item) => ({
+          productId: item.productId,
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+          variant: item.variant || undefined,
+        })),
       })
-      clearCart()
+
+      if (!orderResult?.success || !orderResult.id) {
+        toast.error(orderResult?.error || "We could not place your order. Please try again.")
+        return
+      }
+
+      const query = new URLSearchParams({
+        method: paymentMethod,
+        orderId: orderResult.id,
+      })
+      const targetUrl = `/${storeSlug}/checkout/payment?${query.toString()}`
+
+      // Clear local draft once order is successfully created.
       localStorage.removeItem(checkoutDraftStorageKey)
-      toast.success("Order placed successfully")
+      window.location.assign(targetUrl)
     } catch (error) {
       console.error(error)
       toast.error("We could not place your order. Please try again.")
@@ -209,64 +248,15 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
     }
   }
 
-  if (placedOrder) {
-    return (
-      <div className="py-8 md:py-10">
-        <div className="mx-auto max-w-lg text-center">
-          <div
-            className="mx-auto mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full text-white"
-            style={{ backgroundColor: brandColor || "#1A1A1A" }}
-          >
-            <CheckCircle2 className="h-7 w-7" />
-          </div>
-
-          <h2 className="text-2xl font-semibold tracking-tight text-[#1A1A1A]">Order Confirmed</h2>
-          <p className="mt-2 text-sm text-[#6F6F69]">
-            Thanks, {placedOrder.customerName}. Your order has been received and is being processed.
-          </p>
-
-          <div className="mt-6 text-left">
-            <div className="flex items-center justify-between border-b border-[#E8E8E5] py-2 text-sm">
-              <span className="text-[#737373]">Order reference</span>
-              <span className="font-semibold text-[#1A1A1A]">{placedOrder.orderReference}</span>
-            </div>
-            <div className="flex items-center justify-between py-2 text-sm">
-              <span className="text-[#737373]">Total paid</span>
-              <span className="font-semibold text-[#1A1A1A]">{formatPrice(placedOrder.total)}</span>
-            </div>
-          </div>
-
-          <div className="mt-6 grid gap-2 text-left">
-            <TrustRow icon={Clock3} text="We usually confirm orders within a few minutes." />
-            <TrustRow icon={Truck} text="Delivery timeline depends on your selected location." />
-            <TrustRow icon={ShieldCheck} text="Your details are securely stored for order fulfillment." />
-          </div>
-
-          <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:justify-center">
-            <Link
-              href={`/${storeSlug}`}
-              className="inline-flex h-11 items-center justify-center rounded-sm px-5 text-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
-              style={{ backgroundColor: brandColor || "#1A1A1A" }}
-            >
-              Continue Shopping
-            </Link>
-            <button
-              type="button"
-              onClick={() => setPlacedOrder(null)}
-              className="inline-flex h-11 items-center justify-center rounded-sm border border-[#DADAD5] px-5 text-sm font-semibold text-[#1A1A1A] hover:bg-[#F5F5F2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
-            >
-              Place Another Order
-            </button>
-          </div>
-        </div>
-      </div>
-    )
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
+    await submitOrder()
   }
 
   if (cart.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-sm border border-[#E8E8E5] bg-white py-20 text-center">
-        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#F7F7F5]">
+      <div className="flex flex-col items-center justify-center rounded-none border border-[#E8E8E5] py-20 text-center">
+        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-none">
           <span className="text-2xl text-[#1A1A1A]">🛒</span>
         </div>
         <h2 className="mb-2 text-xl font-semibold text-[#1A1A1A]">Your cart is empty</h2>
@@ -275,7 +265,8 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
         </p>
         <Link
           href={`/${storeSlug}`}
-          className="inline-flex h-12 items-center gap-2 rounded-sm bg-[#1A1A1A] px-6 text-sm font-medium text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+          className="inline-flex h-12 items-center gap-2 rounded-none px-6 text-sm font-medium text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+          style={{ backgroundColor: "var(--store-brand, #1A1A1A)" }}
         >
           <ArrowLeft className="h-4 w-4" />
           Continue Shopping
@@ -286,238 +277,299 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
 
   return (
     <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:gap-10">
-      <div className="lg:col-span-7 rounded-sm border border-[#E8E8E5] bg-white p-6 md:p-8">
-        <div className="mb-6 flex items-start justify-between gap-4 border-b border-[#EFEFEA] pb-5">
-          <div>
-            <h2 className="text-xl font-semibold tracking-tight text-[#1A1A1A]">Contact & Delivery</h2>
-            <p className="mt-1 text-sm text-[#737373]">Enter your details to confirm your order.</p>
-            <p className="mt-1 text-[11px] text-[#85857E]">Your details are saved automatically on this device.</p>
-          </div>
-          <div className="rounded-full bg-[#F3F3F0] px-3 py-1 text-xs font-semibold text-[#5A5A55]" aria-live="polite">
-            {cartCount} item{cartCount === 1 ? "" : "s"}
-          </div>
-        </div>
+      <div className="lg:col-span-7">
+        <form id="checkout-form" onSubmit={handleSubmit} className="space-y-7" noValidate>
+          <section className="grid items-start gap-7 lg:grid-cols-[minmax(0,1fr)_340px]">
+            <div className="space-y-5">
+              <h2 className="text-[42px] font-medium tracking-tight text-[#1A1A1A]">Billing Details</h2>
 
-        <form id="checkout-form" onSubmit={handleSubmit} className="space-y-6" noValidate>
-          <section className="space-y-4">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6A6A65]">Contact Information</h3>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <label htmlFor="first-name" className="text-[13px] font-medium text-[#1A1A1A]">
+                    First name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="first-name"
+                    type="text"
+                    value={firstNamePart}
+                    onChange={(event) => {
+                      const nextName = [event.target.value, lastNamePart].filter(Boolean).join(" ")
+                      setFieldValue("name", nextName)
+                    }}
+                    className={`${getFieldClass(Boolean(fieldErrors.name))} h-11 px-3`}
+                    aria-invalid={Boolean(fieldErrors.name)}
+                  />
+                </div>
 
-            <div className="space-y-1.5">
-              <label htmlFor="name" className="text-[13px] font-medium text-[#1A1A1A]">
-                Full Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="name"
-                type="text"
-                value={formData.name}
-                onChange={(event) => setFieldValue("name", event.target.value)}
-                placeholder="e.g. Jane Doe"
-                className={`${getFieldClass(Boolean(fieldErrors.name))} h-12 px-4`}
-                aria-invalid={Boolean(fieldErrors.name)}
-                aria-describedby={fieldErrors.name ? "checkout-name-error" : undefined}
-              />
+                <div className="space-y-1.5">
+                  <label htmlFor="last-name" className="text-[13px] font-medium text-[#1A1A1A]">
+                    Last name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="last-name"
+                    type="text"
+                    value={lastNamePart}
+                    onChange={(event) => {
+                      const nextName = [firstNamePart, event.target.value].filter(Boolean).join(" ")
+                      setFieldValue("name", nextName)
+                    }}
+                    className={`${getFieldClass(Boolean(fieldErrors.name))} h-11 px-3`}
+                    aria-invalid={Boolean(fieldErrors.name)}
+                  />
+                </div>
+              </div>
+
               {fieldErrors.name ? (
                 <p id="checkout-name-error" className="text-xs text-red-600" role="alert">
                   {fieldErrors.name}
                 </p>
               ) : null}
-            </div>
 
-            <div className="space-y-1.5">
-              <label htmlFor="phone" className="text-[13px] font-medium text-[#1A1A1A]">
-                Phone Number (M-PESA) <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="phone"
-                type="tel"
-                value={formData.phone}
-                onChange={(event) => setFieldValue("phone", event.target.value)}
-                placeholder="e.g. 0712345678"
-                className={`${getFieldClass(Boolean(fieldErrors.phone))} h-12 px-4`}
-                aria-invalid={Boolean(fieldErrors.phone)}
-                aria-describedby={fieldErrors.phone ? "checkout-phone-error" : undefined}
-              />
-              {fieldErrors.phone ? (
-                <p id="checkout-phone-error" className="text-xs text-red-600" role="alert">
-                  {fieldErrors.phone}
-                </p>
-              ) : (
-                <p className="text-[11px] text-[#85857E]">We use this number for order confirmation and payment prompts.</p>
-              )}
-            </div>
-          </section>
-
-          <section className="space-y-4 border-t border-[#EFEFEA] pt-5">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6A6A65]">Delivery Details</h3>
-
-            <div className="space-y-1.5">
-              <label htmlFor="deliveryAddress" className="text-[13px] font-medium text-[#1A1A1A]">
-                Delivery Address / Location <span className="text-red-500">*</span>
-              </label>
-              <textarea
-                id="deliveryAddress"
-                rows={4}
-                value={formData.deliveryAddress}
-                onChange={(event) => setFieldValue("deliveryAddress", event.target.value)}
-                placeholder="Enter building, street, landmarks, or detailed directions"
-                className={`${getFieldClass(Boolean(fieldErrors.deliveryAddress))} resize-y p-4`}
-                aria-invalid={Boolean(fieldErrors.deliveryAddress)}
-                aria-describedby={fieldErrors.deliveryAddress ? "checkout-address-error" : undefined}
-              />
-              {fieldErrors.deliveryAddress ? (
-                <p id="checkout-address-error" className="text-xs text-red-600" role="alert">
-                  {fieldErrors.deliveryAddress}
-                </p>
-              ) : null}
-            </div>
-
-            {deliveryZones.length > 0 ? (
               <div className="space-y-1.5">
-                <label htmlFor="zone" className="text-[13px] font-medium text-[#1A1A1A]">
-                  Delivery Zone <span className="text-red-500">*</span>
+                <p className="text-[13px] font-medium text-[#1A1A1A]">
+                  Country / Region <span className="text-red-500">*</span>
+                </p>
+                <p className="text-[30px] font-semibold leading-none tracking-tight text-[#1A1A1A]">Kenya</p>
+              </div>
+
+              <div className="space-y-1.5">
+                <label htmlFor="deliveryAddress" className="text-[13px] font-medium text-[#1A1A1A]">
+                  Street address <span className="text-red-500">*</span>
                 </label>
-                <select
-                  id="zone"
-                  value={formData.zoneId}
-                  onChange={(event) => setFieldValue("zoneId", event.target.value)}
-                  className={`${getFieldClass(Boolean(fieldErrors.zoneId))} h-12 px-4`}
-                  aria-invalid={Boolean(fieldErrors.zoneId)}
-                  aria-describedby={fieldErrors.zoneId ? "checkout-zone-error" : undefined}
-                >
-                  <option value="">Select a delivery area</option>
-                  {deliveryZones.map((zone) => (
-                    <option key={zone.id} value={zone.id}>
-                      {zone.name} — {formatPrice(zone.price)}
-                    </option>
-                  ))}
-                </select>
-                {fieldErrors.zoneId ? (
-                  <p id="checkout-zone-error" className="text-xs text-red-600" role="alert">
-                    {fieldErrors.zoneId}
+                <input
+                  id="deliveryAddress"
+                  type="text"
+                  value={formData.deliveryAddress}
+                  onChange={(event) => setFieldValue("deliveryAddress", event.target.value)}
+                  placeholder="House number and street name"
+                  className={`${getFieldClass(Boolean(fieldErrors.deliveryAddress))} h-11 px-3`}
+                  aria-invalid={Boolean(fieldErrors.deliveryAddress)}
+                  aria-describedby={fieldErrors.deliveryAddress ? "checkout-address-error" : undefined}
+                />
+                <input
+                  id="deliveryAddress-2"
+                  type="text"
+                  value={addressLineTwo}
+                  onChange={(event) => setAddressLineTwo(event.target.value)}
+                  placeholder="Apartment, suite, unit, etc. (optional)"
+                  className="h-11 w-full rounded-none border border-[#E8E8E5] bg-transparent px-3 text-sm text-[#1A1A1A] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]"
+                />
+                {fieldErrors.deliveryAddress ? (
+                  <p id="checkout-address-error" className="text-xs text-red-600" role="alert">
+                    {fieldErrors.deliveryAddress}
                   </p>
                 ) : null}
               </div>
-            ) : null}
+
+              {deliveryZones.length > 0 ? (
+                <div className="space-y-1.5">
+                  <label htmlFor="zone" className="text-[13px] font-medium text-[#1A1A1A]">
+                    Town / City <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    id="zone"
+                    value={formData.zoneId}
+                    onChange={(event) => setFieldValue("zoneId", event.target.value)}
+                    className={`${getFieldClass(Boolean(fieldErrors.zoneId))} h-11 px-3`}
+                    aria-invalid={Boolean(fieldErrors.zoneId)}
+                    aria-describedby={fieldErrors.zoneId ? "checkout-zone-error" : undefined}
+                  >
+                    <option value="">Select city</option>
+                    {deliveryZones.map((zone) => (
+                      <option key={zone.id} value={zone.id}>
+                        {zone.name} — {formatPrice(zone.price)}
+                      </option>
+                    ))}
+                  </select>
+                  {fieldErrors.zoneId ? (
+                    <p id="checkout-zone-error" className="text-xs text-red-600" role="alert">
+                      {fieldErrors.zoneId}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
+
+              <div className="space-y-1.5">
+                <label htmlFor="phone" className="text-[13px] font-medium text-[#1A1A1A]">
+                  Phone <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(event) => setFieldValue("phone", event.target.value)}
+                  placeholder="+254 712345678"
+                  className={`${getFieldClass(Boolean(fieldErrors.phone))} h-11 px-3`}
+                  aria-invalid={Boolean(fieldErrors.phone)}
+                  aria-describedby={fieldErrors.phone ? "checkout-phone-error" : undefined}
+                />
+                {fieldErrors.phone ? (
+                  <p id="checkout-phone-error" className="text-xs text-red-600" role="alert">
+                    {fieldErrors.phone}
+                  </p>
+                ) : null}
+              </div>
+
+              <div className="space-y-1.5">
+                <label htmlFor="email-address" className="text-[13px] font-medium text-[#1A1A1A]">
+                  Email address <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="email-address"
+                  type="email"
+                  value={emailAddress}
+                  onChange={(event) => setEmailAddress(event.target.value)}
+                  placeholder="you@example.com"
+                  className="h-11 w-full rounded-none border border-[#E8E8E5] bg-transparent px-3 text-sm text-[#1A1A1A] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <input
+                  id="ship-different-address"
+                  type="checkbox"
+                  checked={shipToDifferentAddress}
+                  onChange={(event) => setShipToDifferentAddress(event.target.checked)}
+                  className="h-4 w-4 rounded-none border-[#BEBEB8] text-[#1A1A1A] focus:ring-[#1A1A1A]"
+                />
+                <label htmlFor="ship-different-address" className="text-[19px] font-semibold text-[#1A1A1A]">
+                  Ship To A Different Address?
+                </label>
+              </div>
+
+              <div className="space-y-1.5">
+                <label htmlFor="order-notes" className="text-[13px] font-medium text-[#1A1A1A]">
+                  Order notes (optional)
+                </label>
+                <textarea
+                  id="order-notes"
+                  rows={6}
+                  value={orderNotes}
+                  onChange={(event) => setOrderNotes(event.target.value)}
+                  placeholder="Notes about your order, e.g. special notes for delivery."
+                  className="w-full resize-y rounded-none border border-[#D7D7D2] bg-transparent p-3 text-sm text-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]"
+                />
+              </div>
+            </div>
           </section>
         </form>
       </div>
 
-      <div className="flex flex-col gap-5 lg:col-span-5">
-        <div className="rounded-sm border border-[#E8E8E5] bg-white p-6 md:p-8">
-          <h2 className="mb-5 text-xl font-semibold tracking-tight text-[#1A1A1A]">Order Summary</h2>
-
-          <div className="max-h-[360px] space-y-3 overflow-y-auto pr-1">
-            {cart.map((item) => (
-              <div key={`${item.productId}-${item.variant}`} className="rounded-sm border border-[#ECECE7] bg-[#FAFAF8] p-3">
-                <div className="flex gap-3">
-                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-sm border border-[#E8E8E5] bg-[#EEECEA]">
-                    {item.imageUrl ? (
-                      <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />
-                    ) : null}
-                  </div>
-
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="line-clamp-2 text-sm font-semibold leading-tight text-[#1A1A1A]">{item.name}</p>
-                      <button
-                        type="button"
-                        onClick={() => removeFromCart(item.productId, item.variant)}
-                        aria-label={`Remove ${item.name} from order`}
-                        className="inline-flex h-7 w-7 items-center justify-center rounded-sm text-[#7A7A73] transition-colors hover:bg-[#F0F0EC] hover:text-red-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-1"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-
-                    {item.variant ? <p className="mt-1 line-clamp-1 text-[12px] text-[#737373]">{item.variant}</p> : null}
-
-                    <div className="mt-2 flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-1 rounded-sm border border-[#E2E2DD] bg-white px-1 py-1">
-                        <button
-                          type="button"
-                          onClick={() => updateQuantity(item.productId, item.variant, item.quantity - 1)}
-                          aria-label={`Decrease quantity of ${item.name}`}
-                          className="inline-flex h-6 w-6 items-center justify-center rounded-sm text-[#737373] hover:bg-[#F6F6F3] hover:text-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]"
-                        >
-                          -
-                        </button>
-                        <span className="min-w-[18px] text-center text-[13px] font-semibold text-[#1A1A1A]" aria-live="polite">
-                          {item.quantity}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => updateQuantity(item.productId, item.variant, item.quantity + 1)}
-                          aria-label={`Increase quantity of ${item.name}`}
-                          className="inline-flex h-6 w-6 items-center justify-center rounded-sm text-[#737373] hover:bg-[#F6F6F3] hover:text-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]"
-                        >
-                          +
-                        </button>
-                      </div>
-
-                      <p className="text-sm font-bold text-[#1A1A1A]">{formatPrice(item.price * item.quantity)}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
+      <div className="lg:col-span-5">
+        <div className="border border-[#DADAD5]">
+          <div className="border-b border-[#DADAD5] px-6 py-5">
+            <h2 className="text-[36px] font-semibold tracking-tight text-[#1A1A1A]">Your Order</h2>
           </div>
 
-          <div className="mt-5 space-y-2 border-t border-[#E8E8E5] pt-4 text-[15px]">
-            <div className="flex items-center justify-between text-[#737373]">
+          <div className="px-6 py-4">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] border-b border-[#E2E2DD] pb-3 text-[13px] font-semibold text-[#4E4E49]">
+              <span>Product</span>
               <span>Subtotal</span>
-              <span className="font-medium text-[#1A1A1A]">{formatPrice(cartTotal)}</span>
             </div>
-            <div className="flex items-center justify-between text-[#737373]">
-              <span>Delivery</span>
-              <span className="font-medium text-[#1A1A1A]">
-                {deliveryFee > 0 ? formatPrice(deliveryFee) : "Select a zone"}
-              </span>
+
+            <div className="divide-y divide-[#E8E8E5]">
+              {cart.map((item) => (
+                <div key={`checkout-item-${item.productId}-${item.variant || "default"}`} className="grid grid-cols-[minmax(0,1fr)_auto] gap-4 py-4 text-sm">
+                  <p className="min-w-0 text-[#4A4A45]">
+                    <span className="line-clamp-1">{item.name}</span>
+                    <span className="text-xs text-[#70706A]"> × {item.quantity}</span>
+                  </p>
+                  <span className="font-semibold text-[#1A1A1A]">{formatPrice(item.price * item.quantity)}</span>
+                </div>
+              ))}
             </div>
-            <div className="mt-2 flex items-center justify-between border-t border-[#E8E8E5] pt-3">
-              <span className="font-semibold text-[#1A1A1A]">Total</span>
-              <span className="text-lg font-bold" style={{ color: brandColor || "#1A1A1A" }}>
-                {formatPrice(grandTotal)}
-              </span>
+
+            <div className="space-y-0 border-t border-[#DADAD5]">
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] py-4 text-[29px] font-semibold text-[#1A1A1A]">
+                <span className="text-[17px]">Subtotal</span>
+                <span className="text-[17px]">{formatPrice(cartTotal)}</span>
+              </div>
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] border-t border-[#E8E8E5] py-4 text-[15px] text-[#4E4E49]">
+                <span className="font-semibold">Shipment</span>
+                <span className="font-semibold">{selectedZone ? selectedZone.name : "Custom Rate"}</span>
+              </div>
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] border-t border-[#DADAD5] py-4">
+                <span className="text-xl font-semibold text-[#1A1A1A]">Total</span>
+                <span className="text-xl font-semibold text-[#1A1A1A]" style={{ color: brandColor || "#1A1A1A" }}>
+                  {formatPrice(grandTotal)}
+                </span>
+              </div>
             </div>
           </div>
 
-          <button
-            form="checkout-form"
-            type="submit"
-            disabled={isLoading}
-            className="mt-6 flex h-14 w-full items-center justify-center gap-2 rounded-sm text-[15px] font-semibold text-white transition-opacity hover:opacity-90 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
-            style={{ backgroundColor: brandColor || "#1A1A1A" }}
-          >
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            {isLoading ? "Processing..." : "Place Order"}
-          </button>
+          <div className="border-t border-[#DADAD5] px-6 py-5">
+            <div className="space-y-5">
+              {paymentOptions.map((option) => {
+                const isActive = paymentMethod === option.id
+                return (
+                  <label key={option.id} className="block cursor-pointer">
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="radio"
+                        name="payment-method"
+                        value={option.id}
+                        checked={isActive}
+                        onChange={() => setPaymentMethod(option.id)}
+                        className="h-4 w-4 accent-[#1A1A1A]"
+                      />
+                      <p className="text-base leading-none font-medium text-[#1A1A1A]">{option.label}</p>
+                      {option.id === "mpesa" ? (
+                        <Image
+                          src={option.imageSrc}
+                          alt={option.imageAlt}
+                          width={64}
+                          height={24}
+                          className="h-6 w-auto object-contain"
+                        />
+                      ) : null}
+                    </div>
+                    {isActive ? (
+                      <div className="ml-7 mt-2 bg-[#DAD5E1] px-3 py-2 text-sm text-[#4B4B46]">
+                        {option.id === "mpesa"
+                          ? "Place order and pay using M-PESA."
+                          : "Proceed to secure card checkout after placing order."}
+                      </div>
+                    ) : null}
 
-          <p className="mt-3 text-center text-[11px] text-[#85857E]">
-            By placing this order, you agree to share the details required for delivery and confirmation.
-          </p>
+                    {option.id === "card" ? (
+                      <div className="ml-7 mt-2 rounded border border-[#DDDDD8] bg-white px-3 py-3">
+                        <div className="flex items-center justify-center">
+                          <Image
+                            src="/images/paystack-ke.png"
+                            alt="Visa, Mastercard, Amex, M-PESA and Apple Pay"
+                            width={520}
+                            height={92}
+                            className="h-auto w-full max-w-[520px] object-contain"
+                          />
+                        </div>
+                      </div>
+                    ) : null}
+                  </label>
+                )
+              })}
+            </div>
+          </div>
+
+          <div className="border-t border-[#DADAD5] px-6 py-6">
+            <p className="max-w-[520px] text-[16px] leading-relaxed text-[#666661]">
+              Your personal data will be used to process your order, support your experience and for other purposes described in our privacy policy.
+            </p>
+            <div className="mt-5 flex justify-end">
+              <button
+                type="button"
+                onClick={submitOrder}
+                disabled={isLoading}
+                className="inline-flex h-12 min-w-[170px] items-center justify-center border border-[#1A1A1A] bg-transparent px-6 text-xl font-medium text-[#1A1A1A] transition-colors hover:bg-[#1A1A1A] hover:text-white disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+              >
+                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {isLoading ? "Processing..." : "Place Order"}
+              </button>
+            </div>
+          </div>
         </div>
-
-        {/* <div className="grid grid-cols-1 gap-2 rounded-sm border border-[#E8E8E5] bg-white p-4 sm:grid-cols-3">
-          <TrustRow icon={Clock3} text="Quick confirmation" />
-          <TrustRow icon={Truck} text="Reliable delivery" />
-          <TrustRow icon={ShieldCheck} text="Secure checkout" />
-        </div> */}
       </div>
-    </div>
-  )
-}
-
-function TrustRow({
-  icon: Icon,
-  text,
-}: {
-  icon: React.ComponentType<{ className?: string }>
-  text: string
-}) {
-  return (
-    <div className="flex items-center gap-2 py-1.5">
-      <Icon className="h-4 w-4 text-[#1A1A1A]" />
-      <p className="text-xs font-medium text-[#555550]">{text}</p>
     </div>
   )
 }
