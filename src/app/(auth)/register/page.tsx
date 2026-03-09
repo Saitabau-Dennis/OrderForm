@@ -47,6 +47,8 @@ export default function RegisterPage() {
   ]
 
   const isPasswordStrong = passwordRequirements.every(req => req.test(formData.password))
+  const doPasswordsMatch = formData.password === formData.confirmPassword
+  const showPasswordMismatch = formData.confirmPassword.length > 0 && !doPasswordsMatch
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -303,6 +305,11 @@ export default function RegisterPage() {
                       {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
+                  {showPasswordMismatch && (
+                    <p className="text-xs text-red-500 mt-1">
+                      Passwords do not match
+                    </p>
+                  )}
                 </div>
               </div>
             )}
@@ -323,7 +330,7 @@ export default function RegisterPage() {
 
               <Button
                 type="submit"
-                disabled={loading}
+                disabled={loading || (step === 3 && (!isPasswordStrong || !doPasswordsMatch || !formData.confirmPassword))}
                 size="lg"
                 className="flex-1 h-12 text-base font-semibold"
               >

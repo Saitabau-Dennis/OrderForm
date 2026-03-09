@@ -18,6 +18,7 @@ import { ButtonLoader } from "@/components/ui/button-loader";
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
+  const urlCode = searchParams.get("code");
 
   const [step, setStep] = useState(1);
   const [code, setCode] = useState("");
@@ -28,6 +29,14 @@ function ResetPasswordForm() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  useEffect(() => {
+    if (code) return;
+    if (!urlCode) return;
+    const normalizedCode = urlCode.trim();
+    if (!/^\d{1,6}$/.test(normalizedCode)) return;
+    setCode(normalizedCode);
+  }, [urlCode, code]);
+
   const passwordRequirements = [
     { label: "At least 8 characters", test: (p: string) => p.length >= 8 },
     { label: "One uppercase letter", test: (p: string) => /[A-Z]/.test(p) },
@@ -37,6 +46,8 @@ function ResetPasswordForm() {
   ];
 
   const isPasswordStrong = passwordRequirements.every((req) => req.test(password));
+  const doPasswordsMatch = password === confirmPassword;
+  const showPasswordMismatch = confirmPassword.length > 0 && !doPasswordsMatch;
 
   const handleVerifyCode = useCallback(async (verificationCode: string) => {
     if (!email) return;
@@ -254,11 +265,16 @@ function ResetPasswordForm() {
                   )}
                 </button>
               </div>
+              {showPasswordMismatch && (
+                <p className="mt-1 text-xs text-red-500">
+                  Passwords do not match
+                </p>
+              )}
             </div>
 
             <Button
               type="submit"
-              disabled={loading || !password || !isPasswordStrong}
+              disabled={loading || !password || !confirmPassword || !isPasswordStrong || !doPasswordsMatch}
               size="lg"
               className="w-full h-12 text-base font-semibold"
             >
@@ -300,7 +316,7 @@ export default function ResetPasswordPage() {
 
         <div className="relative z-10">
           <p className="font-sans text-primary-foreground/50 text-sm">
-            &copy; 2026 Orderform. All rights reserved.
+            &copy; {new Date().getFullYear()} Orderform. All rights reserved.
           </p>
         </div>
 

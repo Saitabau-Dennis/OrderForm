@@ -71,7 +71,7 @@ export default function LoginPage() {
 
         <div className="relative z-10">
           <p className="font-sans text-primary-foreground/50 text-sm">
-            &copy; 2026 Orderform. All rights reserved.
+            &copy; {new Date().getFullYear()} Orderform. All rights reserved.
           </p>
         </div>
 

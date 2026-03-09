@@ -14,10 +14,19 @@ export function VerifyEmailForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
+  const urlCode = searchParams.get("code");
 
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
+
+  useEffect(() => {
+    if (code) return;
+    if (!urlCode) return;
+    const normalizedCode = urlCode.trim();
+    if (!/^\d{1,6}$/.test(normalizedCode)) return;
+    setCode(normalizedCode);
+  }, [urlCode, code]);
 
   const handleVerify = useCallback(async (verificationCode: string) => {
     if (!email) {
@@ -90,13 +99,15 @@ export function VerifyEmailForm() {
       </div>
 
       <div className="space-y-6 sm:space-y-8">
-        <div className="w-full overflow-x-auto pb-1">
+        <div className="w-full">
           <OTPInput
             value={code}
             onChange={setCode}
             length={6}
             disabled={loading}
-            className="min-w-max mx-auto"
+            className="mx-auto w-full max-w-[300px] !justify-between !gap-1.5 sm:max-w-[340px] sm:!gap-2"
+            inputClassName="w-9 h-11 sm:w-10 sm:h-12 shrink-0 rounded-xl border border-border/80 bg-background text-base sm:text-lg font-semibold tracking-[0.01em] shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] focus-visible:ring-0 focus-visible:border-primary"
+            separatorClassName="text-foreground/30 px-0.5 sm:px-1 text-sm sm:text-base"
           />
         </div>
 

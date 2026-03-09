@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 export default async function OnboardingPage() {
   const session = await auth();
 
-  if (!session) {
+  if (!session?.user?.id) {
     redirect("/login");
   }
 

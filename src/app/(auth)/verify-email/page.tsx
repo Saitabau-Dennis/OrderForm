@@ -22,7 +22,7 @@ export default function VerifyEmailPage() {
 
         <div className="relative z-10">
           <p className="font-sans text-primary-foreground/50 text-sm">
-            &copy; 2024 Orderform. All rights reserved.
+            &copy; {new Date().getFullYear()} Orderform. All rights reserved.
           </p>
         </div>
 
