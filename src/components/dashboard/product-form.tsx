@@ -13,9 +13,6 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
-import {
-  DropdownMenuContent,
-} from "@/components/ui/dropdown-menu";
 import { createProduct, getStoreCategories, updateProduct } from "@/lib/actions/products";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +30,8 @@ export const productSchema = z.object({
     message: "Description is required",
   }),
   price: z.coerce.number().min(0, "Price must be positive"),
+  stock: z.union([z.literal(""), z.coerce.number().int().min(0)]).optional().default(""),
+  optionStocks: z.record(z.string(), z.coerce.number().int().min(0)).optional().default({}),
   category: z.string().min(1, "Category is required"),
   isAvailable: z.boolean().default(true),
   imageUrl: z.string().min(1, "Product image is required"),
@@ -47,10 +46,11 @@ type ProductInitialData = Partial<ProductValues> & { id: string };
 interface ProductFormProps {
   initialData?: ProductInitialData | null;
   onSuccess: () => void;
+  onCancel?: () => void;
   layout?: "default" | "sheet";
 }
 
-export function ProductForm({ initialData, onSuccess, layout = "default" }: ProductFormProps) {
+export function ProductForm({ initialData, onSuccess, onCancel, layout = "default" }: ProductFormProps) {
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<string[]>([
     "Clothing", "Footwear", "Accessories", "Electronics", "Home", "Beauty"
@@ -90,20 +90,13 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
 
   const form = useForm<ProductFormInput, unknown, ProductValues>({
     resolver: zodResolver(productSchema),
-    defaultValues: {
-      name: initialData?.name || "",
-      description: initialData?.description || "",
-      price: initialData?.price ? Number(initialData.price) : 0,
-      category: initialData?.category || "",
-      isAvailable: initialData?.isAvailable ?? true,
-      imageUrl: initialData?.imageUrl || "",
-      galleryImages: Array.isArray((initialData as { galleryImages?: unknown })?.galleryImages)
-        ? ((initialData as { galleryImages?: unknown[] }).galleryImages ?? [])
-            .filter((value): value is string => typeof value === "string" && value.trim() !== "")
-        : [],
-      sizes: initialData?.sizes || "",
-    },
+    defaultValues: buildDefaultValues(initialData),
   });
+
+  useEffect(() => {
+    // Keep form values in sync when editing a different product in the same mounted sheet.
+    form.reset(buildDefaultValues(initialData));
+  }, [form, initialData]);
 
   const onSubmit = async (data: ProductValues) => {
     try {
@@ -133,9 +126,9 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
   const SectionWrapper = ({ children, title, description }: { children: React.ReactNode; title: string; description?: string }) => {
     if (isSheet) {
       return (
-        <section className="py-6 border-b border-border/70 first:pt-0 last:border-b-0">
+        <section className="rounded-xl border border-border bg-white px-5 py-5 sm:px-6">
           <div className="mb-4 space-y-1">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">{title}</h3>
             {description && <p className="text-sm text-muted-foreground">{description}</p>}
           </div>
           <div className="space-y-5">{children}</div>
@@ -160,10 +153,10 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
 
   return (
       <form onSubmit={form.handleSubmit(onSubmit)} className={cn(isSheet ? "space-y-0" : "space-y-8")}>
-        <div className={cn("grid", layout === "default" ? "grid-cols-1 gap-8 lg:grid-cols-3" : "grid-cols-1 gap-0")}>
+        <div className={cn("grid", layout === "default" ? "grid-cols-1 gap-8 lg:grid-cols-3" : "grid-cols-1 gap-6")}>
 
           {/* Main Column: Details */}
-          <div className={cn(layout === "default" ? "space-y-8 lg:col-span-2" : "space-y-0")}>
+          <div className={cn(layout === "default" ? "space-y-8 lg:col-span-2" : "space-y-6")}>
 
             <SectionWrapper title="Product Information" description="Essential details">
                 <div className="space-y-2">
@@ -241,18 +234,43 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                     </p>
                   )}
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="stock" className="text-sm font-normal text-muted-foreground">Available Stock <span className="text-xs">(optional)</span></Label>
+                  <Input
+                    type="number"
+                    id="stock"
+                    min={0}
+                    placeholder="e.g. 300 (leave empty to use option stock only)"
+                    className={cn(
+                      "h-10 transition-all font-medium text-sm tabular-nums",
+                      isSheet
+                        ? "rounded-md border-border bg-background focus:bg-background focus:border-primary/30"
+                        : "rounded-3xl border-border bg-secondary/50 focus:bg-card focus:border-primary/30"
+                    )}
+                    {...form.register("stock", {
+                      setValueAs: (value) => (value === "" ? "" : Number(value)),
+                    })}
+                  />
+                  {form.formState.errors.stock && (
+                    <p className="text-xs text-red-500">
+                      {form.formState.errors.stock.message}
+                    </p>
+                  )}
+                </div>
             </SectionWrapper>
           </div>
 
           {/* Side Column: Media & Organization */}
-          <div className={cn(layout === "default" ? "space-y-8" : "space-y-0")}>
+          <div className={cn(layout === "default" ? "space-y-8" : "space-y-6")}>
 
             <SectionWrapper title="Media" description="Product images">
                 <div className={cn(
-                  "p-2 border border-dashed border-border",
+                  "p-2 border border-dashed border-border min-h-[220px]",
                   isSheet ? "rounded-md bg-muted/20" : "rounded-3xl bg-secondary/50"
                 )}>
                     <ImageUpload
+                    className="h-[204px]"
                     value={form.watch("imageUrl")}
                     onChange={(url) => form.setValue("imageUrl", url, { shouldDirty: true })}
                     endpoint="productImage"
@@ -283,9 +301,9 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                   </div>
                   <p className="text-[11px] text-muted-foreground">Optional extra images for product gallery.</p>
 
-                  <div className="space-y-3">
+                  <div className="grid gap-3 md:grid-cols-2">
                     {(form.watch("galleryImages") || []).map((url, index) => (
-                      <div key={`gallery-${index}`} className="rounded-md border border-border p-2">
+                      <div key={`gallery-${index}`} className="rounded-md border border-border p-2 bg-background/60">
                         <div className="h-44">
                           <ImageUpload
                             value={url}
@@ -337,7 +355,7 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                   />
 
                   {isCategoryDropdownOpen && (
-                    <div className="absolute top-[calc(100%+4px)] left-0 w-full z-50 rounded-xl sm:rounded-3xl border border-border/60 bg-white shadow-xl max-h-[220px] overflow-y-auto py-2 px-2 animate-in fade-in slide-in-from-top-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                    <div className="absolute left-0 top-[calc(100%+8px)] z-50 max-h-[220px] w-full overflow-y-auto rounded-2xl border border-border bg-card px-2 py-2 text-foreground shadow-[0_18px_40px_rgba(0,0,0,0.08)] animate-in fade-in zoom-in-95 slide-in-from-top-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                        {categories
                         // Optional simple text-based filter based on what they are currently typing:
                         .filter(cat => {
@@ -355,7 +373,7 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                               form.setValue("category", cat, { shouldDirty: true, shouldValidate: true });
                               setIsCategoryDropdownOpen(false);
                             }}
-                            className="rounded-lg sm:rounded-2xl p-2 cursor-pointer hover:bg-primary/5 hover:text-primary font-normal text-sm transition-colors flex items-center"
+                            className="flex cursor-pointer items-center rounded-xl px-3 py-2.5 text-sm font-normal text-foreground transition-colors hover:bg-primary/5 hover:text-primary"
                           >
                            {cat}
                           </div>
@@ -364,7 +382,7 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                            const currentInput = form.watch("category") || "";
                            return currentInput.trim() === "" || cat.toLowerCase().includes(currentInput.toLowerCase());
                       }).length === 0 && (
-                        <div className="p-2 text-sm text-muted-foreground text-center">
+                        <div className="p-2 text-center text-sm text-muted-foreground">
                            Press enter to create &quot;{form.watch("category")}&quot;
                         </div>
                       )}
@@ -426,6 +444,51 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
                   )}
                 </div>
 
+                {form.watch("sizes")?.trim() ? (
+                  <div className="space-y-2 pt-1">
+                    <Label className="text-sm font-normal text-muted-foreground">
+                      Stock by Size/Option <span className="text-xs">(optional)</span>
+                    </Label>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {Array.from(
+                        new Set(
+                          form
+                            .watch("sizes")
+                            ?.split(",")
+                            .map((value) => value.trim())
+                            .filter(Boolean) || []
+                        )
+                      ).map((option) => (
+                        <div key={`option-stock-${option}`} className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground">{option}</Label>
+                          <Input
+                            type="number"
+                            min={0}
+                            placeholder="0"
+                            className={cn(
+                              "h-9 border-border text-sm",
+                              isSheet ? "rounded-md bg-background" : "rounded-3xl bg-secondary/50"
+                            )}
+                            value={String((form.watch("optionStocks")?.[option] ?? ""))}
+                            onChange={(event) => {
+                              const current = { ...(form.getValues("optionStocks") || {}) };
+                              if (event.target.value === "") {
+                                delete current[option];
+                              } else {
+                                current[option] = Math.max(0, Math.trunc(Number(event.target.value)));
+                              }
+                              form.setValue("optionStocks", current, { shouldDirty: true });
+                            }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-[11px] text-muted-foreground">
+                      Set stock per option (e.g. shoe sizes 37-40, clothing sizes S-XL). Leave blank for unlimited per option.
+                    </p>
+                  </div>
+                ) : null}
+
                 <div className="pt-3 mt-3 border-t border-border">
                     <div className={cn(
                       "flex items-center justify-between p-3 border border-border",
@@ -450,10 +513,10 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
 
         <div className={cn(
           "flex items-center justify-end gap-3",
-          isSheet ? "pt-6 mt-6 border-t border-border/70" : "pt-2 pb-8"
+          isSheet ? "sticky bottom-0 mt-8 border-t border-border/70 bg-card/95 px-1 py-4 backdrop-blur supports-[backdrop-filter]:bg-card/80" : "pt-2 pb-8"
         )}>
             {isSheet && (
-                <Button variant="outline" type="button" size="sm" onClick={() => onSuccess()}>
+                <Button variant="outline" type="button" size="sm" onClick={() => onCancel?.()}>
                     Cancel
                 </Button>
             )}
@@ -469,4 +532,59 @@ export function ProductForm({ initialData, onSuccess, layout = "default" }: Prod
         </div>
       </form>
   );
+}
+
+function normalizeGalleryImages(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.filter((item): item is string => typeof item === "string" && item.trim().length > 0);
+  }
+
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      if (Array.isArray(parsed)) {
+        return parsed.filter((item): item is string => typeof item === "string" && item.trim().length > 0);
+      }
+    } catch {
+      return value
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+  }
+
+  return [];
+}
+
+function buildDefaultValues(initialData?: ProductInitialData | null): ProductValues {
+  const optionStocksRaw = (initialData as { optionStocks?: unknown } | undefined)?.optionStocks;
+  const normalizedOptionStocks = Array.isArray(optionStocksRaw)
+    ? Object.fromEntries(
+        optionStocksRaw
+          .map((entry) => {
+            if (!entry || typeof entry !== "object") return null;
+            const row = entry as { optionValue?: unknown; stock?: unknown };
+            if (typeof row.optionValue !== "string") return null;
+            const parsedStock = Number(row.stock);
+            if (!Number.isFinite(parsedStock)) return null;
+            return [row.optionValue, Math.max(0, Math.trunc(parsedStock))] as const;
+          })
+          .filter((entry): entry is readonly [string, number] => Boolean(entry))
+      )
+    : optionStocksRaw && typeof optionStocksRaw === "object"
+      ? (optionStocksRaw as Record<string, number>)
+      : {};
+
+  return {
+    name: initialData?.name || "",
+    description: initialData?.description || "",
+    price: initialData?.price ? Number(initialData.price) : 0,
+    stock: typeof initialData?.stock === "number" ? initialData.stock : "",
+    optionStocks: normalizedOptionStocks,
+    category: initialData?.category || "",
+    isAvailable: initialData?.isAvailable ?? true,
+    imageUrl: initialData?.imageUrl || "",
+    galleryImages: normalizeGalleryImages((initialData as { galleryImages?: unknown } | undefined)?.galleryImages),
+    sizes: initialData?.sizes || "",
+  };
 }

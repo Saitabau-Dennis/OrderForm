@@ -9,6 +9,11 @@ const ProductInputSchema = z.object({
   name: z.string().min(1, "Product name is required"),
   description: z.string().optional().nullable(),
   price: z.coerce.number().positive("Price must be greater than 0"),
+  stock: z.preprocess(
+    (value) => (value === "" || value === undefined ? null : value),
+    z.coerce.number().int().min(0).nullable()
+  ),
+  optionStocks: z.record(z.string(), z.coerce.number().int().min(0)).optional().default({}),
   imageUrl: z.string().optional().nullable(),
   galleryImages: z.array(z.string()).optional().default([]),
   category: z.string().optional().nullable(),
@@ -26,6 +31,14 @@ const normalizeProductPayload = (raw: unknown): ProductInput =>
 // Deduplicates gallery URLs and drops empty entries.
 const normalizeGallery = (images: string[] | undefined) =>
   Array.from(new Set((images ?? []).map((value) => value.trim()).filter(Boolean)));
+
+const normalizeOptionStocks = (optionStocks: Record<string, number> | undefined) =>
+  Object.entries(optionStocks ?? {})
+    .map(([optionValue, stock]) => ({
+      optionValue: optionValue.trim().toLowerCase(),
+      stock: Math.max(0, Math.trunc(Number(stock))),
+    }))
+    .filter((row) => row.optionValue.length > 0);
 
 export async function createProduct(data: unknown) {
   try {
@@ -50,19 +63,35 @@ export async function createProduct(data: unknown) {
       return { error: "Please configure your store settings before adding products." };
     }
 
-    const product = await db.product.create({
-      data: {
-        storeId: store.id,
-        name: payload.name,
-        description: payload.description ?? null,
-        price: payload.price,
-        imageUrl: payload.imageUrl ?? null,
-        galleryImages: normalizeGallery(payload.galleryImages),
-        category: payload.category ?? null,
-        sizes: payload.sizes ?? null,
-        isAvailable: payload.isAvailable ?? true,
-        variants: payload.variants ?? [], // Persisted as JSON for flexible option structures.
+    const normalizedOptionStocks = normalizeOptionStocks(payload.optionStocks);
+    const product = await db.$transaction(async (tx) => {
+      const createdProduct = await tx.product.create({
+        data: {
+          storeId: store.id,
+          name: payload.name,
+          description: payload.description ?? null,
+          price: payload.price,
+          stock: payload.stock ?? null,
+          imageUrl: payload.imageUrl ?? null,
+          galleryImages: normalizeGallery(payload.galleryImages),
+          category: payload.category ?? null,
+          sizes: payload.sizes ?? null,
+          isAvailable: payload.isAvailable ?? true,
+          variants: payload.variants ?? [], // Persisted as JSON for flexible option structures.
+        }
+      });
+
+      if (normalizedOptionStocks.length > 0) {
+        await tx.productOptionStock.createMany({
+          data: normalizedOptionStocks.map((row) => ({
+            productId: createdProduct.id,
+            optionValue: row.optionValue,
+            stock: row.stock,
+          })),
+        });
       }
+
+      return createdProduct;
     });
 
     revalidatePath("/products");
@@ -102,19 +131,39 @@ export async function updateProduct(id: string, data: unknown) {
       return { error: "Product not found" };
     }
 
-    const updatedProduct = await db.product.update({
-      where: { id: id },
-      data: {
-        name: payload.name,
-        description: payload.description ?? null,
-        price: payload.price,
-        imageUrl: payload.imageUrl ?? null,
-        galleryImages: normalizeGallery(payload.galleryImages),
-        category: payload.category ?? null,
-        sizes: payload.sizes ?? null,
-        isAvailable: payload.isAvailable ?? true,
-        variants: payload.variants ?? [],
+    const normalizedOptionStocks = normalizeOptionStocks(payload.optionStocks);
+    const updatedProduct = await db.$transaction(async (tx) => {
+      const nextProduct = await tx.product.update({
+        where: { id: id },
+        data: {
+          name: payload.name,
+          description: payload.description ?? null,
+          price: payload.price,
+          stock: payload.stock ?? null,
+          imageUrl: payload.imageUrl ?? null,
+          galleryImages: normalizeGallery(payload.galleryImages),
+          category: payload.category ?? null,
+          sizes: payload.sizes ?? null,
+          isAvailable: payload.isAvailable ?? true,
+          variants: payload.variants ?? [],
+        }
+      });
+
+      await tx.productOptionStock.deleteMany({
+        where: { productId: id },
+      });
+
+      if (normalizedOptionStocks.length > 0) {
+        await tx.productOptionStock.createMany({
+          data: normalizedOptionStocks.map((row) => ({
+            productId: id,
+            optionValue: row.optionValue,
+            stock: row.stock,
+          })),
+        });
       }
+
+      return nextProduct;
     });
 
     revalidatePath("/products");

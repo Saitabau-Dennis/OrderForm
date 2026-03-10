@@ -20,7 +20,7 @@ export default async function ProductsPage() {
       where: { userId: session.user.id }
   });
 
-  let productsData: any[] = [];
+  let productsData: unknown[] = [];
   const isStoreConfigured = Boolean(store?.whatsappNumber?.trim());
 
   if (store) {
@@ -28,6 +28,7 @@ export default async function ProductsPage() {
         where: { storeId: store.id },
         orderBy: { createdAt: 'desc' },
         include: {
+          optionStocks: true,
           _count: {
             select: { orderItems: true }
           }

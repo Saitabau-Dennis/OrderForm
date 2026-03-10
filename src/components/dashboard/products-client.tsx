@@ -29,8 +29,23 @@ import { deleteProduct } from "@/lib/actions/products";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
+interface ProductRecord {
+  id: string;
+  name: string;
+  imageUrl?: string | null;
+  price?: number;
+  stock?: number | null;
+  optionStocks?: Array<{ optionValue: string; stock: number }>;
+  isAvailable: boolean;
+  category?: string | null;
+  description?: string | null;
+  sizes?: string;
+  galleryImages?: string[];
+  _count?: { orderItems?: number };
+}
+
 interface ProductsClientProps {
-  initialProducts: any[];
+  initialProducts: ProductRecord[];
   canAddProduct: boolean;
 }
 
@@ -38,19 +53,19 @@ export function ProductsClient({ initialProducts, canAddProduct }: ProductsClien
   const router = useRouter();
   const topLoader = useTopLoader();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<ProductRecord | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
   // Delete State
-  const [deleteProductData, setDeleteProductData] = useState<any | null>(null);
+  const [deleteProductData, setDeleteProductData] = useState<ProductRecord | null>(null);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
-  const handleEdit = (product: any) => {
+  const handleEdit = (product: ProductRecord) => {
     setSelectedProduct(product);
     setIsSheetOpen(true);
   };
 
-  const handleDelete = (product: any) => {
+  const handleDelete = (product: ProductRecord) => {
     setDeleteProductData(product);
   };
 
@@ -67,7 +82,7 @@ export function ProductsClient({ initialProducts, canAddProduct }: ProductsClien
             setDeleteProductData(null);
             router.refresh();
         }
-    } catch (error) {
+    } catch {
         toast.error("Something went wrong");
     } finally {
         setIsDeleteLoading(false);
@@ -86,7 +101,7 @@ export function ProductsClient({ initialProducts, canAddProduct }: ProductsClien
 
   const handleAddProductClick = () => {
     topLoader.start();
-    router.push(canAddProduct ? "/products/new" : "/settings");
+    router.push(canAddProduct ? `/products/new?fresh=${Date.now()}` : "/settings");
   };
 
   // Filter products by status
@@ -121,34 +136,35 @@ export function ProductsClient({ initialProducts, canAddProduct }: ProductsClien
               <Button
                 variant="outline"
                 size="sm"
+                className="h-10 rounded-xl border-border bg-card px-4 text-foreground hover:bg-muted hover:text-foreground"
               >
                 <Filter className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                 Filter
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 rounded-xl border border-border/60 shadow-lg bg-card p-1">
-              <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground px-2 py-1.5">Filter by Status</DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-border/50 my-1" />
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
+              <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => setStatusFilter("all")}
-                className={cn("cursor-pointer rounded-lg text-sm font-normal px-2 py-1.5", statusFilter === "all" && "bg-accent text-accent-foreground")}
+                className={cn(statusFilter === "all" && "bg-primary/5 text-primary")}
               >
                 All Products
-                <span className="ml-auto text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded-md">{initialProducts.length}</span>
+                <span className="ml-auto rounded-md bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">{initialProducts.length}</span>
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setStatusFilter("active")}
-                className={cn("cursor-pointer rounded-lg text-sm font-normal px-2 py-1.5", statusFilter === "active" && "bg-accent text-accent-foreground")}
+                className={cn(statusFilter === "active" && "bg-primary/5 text-primary")}
               >
                 Active
-                <span className="ml-auto text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded-md">{activeCount}</span>
+                <span className="ml-auto rounded-md bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">{activeCount}</span>
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setStatusFilter("draft")}
-                className={cn("cursor-pointer rounded-lg text-sm font-normal px-2 py-1.5", statusFilter === "draft" && "bg-accent text-accent-foreground")}
+                className={cn(statusFilter === "draft" && "bg-primary/5 text-primary")}
               >
                 Draft
-                <span className="ml-auto text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded-md">{draftCount}</span>
+                <span className="ml-auto rounded-md bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">{draftCount}</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -190,23 +206,33 @@ export function ProductsClient({ initialProducts, canAddProduct }: ProductsClien
           if (!open) handleSheetClose();
           setIsSheetOpen(open);
       }}>
-        <SheetContent className="w-full sm:max-w-[760px] p-0 bg-card border-l border-border">
-          <div className="h-full flex flex-col">
-            <div className="px-6 py-5 border-b border-border/80">
+        <SheetContent className="w-full border-l border-border bg-card p-0 sm:max-w-[860px]">
+          <div className="flex h-full flex-col">
+            <div className="sticky top-0 z-20 border-b border-border/80 bg-card px-6 py-5">
                 <SheetHeader>
-                <SheetTitle className="text-lg font-semibold text-foreground">
-                    Edit Product
-                </SheetTitle>
-                <SheetDescription className="text-xs text-muted-foreground">
-                    Update product information, media, and availability.
-                </SheetDescription>
+                <div className="flex items-start justify-between gap-4 pr-10">
+                  <div>
+                    <SheetTitle className="text-2xl font-semibold tracking-tight text-foreground">
+                        Edit Product
+                    </SheetTitle>
+                    <SheetDescription className="mt-1 text-sm text-muted-foreground">
+                        Update product information, media, and availability without leaving the catalog.
+                    </SheetDescription>
+                  </div>
+                  {selectedProduct ? (
+                    <div className="rounded-full border border-border/70 bg-background/80 px-3 py-1.5 text-xs font-medium text-foreground">
+                      {selectedProduct.isAvailable ? "Active" : "Draft"}
+                    </div>
+                  ) : null}
+                </div>
                 </SheetHeader>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-6 py-5">
+            <div className="flex-1 overflow-y-auto px-6 py-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               <ProductForm
                 initialData={selectedProduct}
                 onSuccess={handleFormSuccess}
+                onCancel={handleSheetClose}
                 layout="sheet"
               />
             </div>

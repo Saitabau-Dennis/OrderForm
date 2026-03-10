@@ -51,7 +51,7 @@ export async function PUT(
     }
 
     const body = await req.json();
-    const { name, price, category, description, imageUrl, galleryImages, isAvailable, variants, sizes } = body;
+    const { name, price, stock, optionStocks, category, description, imageUrl, galleryImages, isAvailable, variants, sizes } = body;
     // Keep gallery payload clean and stable before persistence.
     const normalizedGalleryImages = Array.from(
       new Set(
@@ -78,19 +78,51 @@ export async function PUT(
         return new NextResponse("Product not found", { status: 404 });
     }
 
-    const product = await db.product.update({
-      where: { id: productId },
-      data: {
-        name,
-        price: parseFloat(price),
-        category,
-        description,
-        imageUrl,
-        galleryImages: normalizedGalleryImages,
-        isAvailable,
-        variants: variants || [],
-        sizes
+    const normalizedOptionStocks = Object.entries(
+      optionStocks && typeof optionStocks === "object" ? optionStocks as Record<string, unknown> : {}
+    )
+      .map(([optionValue, qty]) => ({
+        optionValue: optionValue.trim().toLowerCase(),
+        stock: Math.max(0, Math.trunc(Number(qty))),
+      }))
+      .filter((row) => row.optionValue.length > 0 && Number.isFinite(row.stock));
+
+    const product = await db.$transaction(async (tx) => {
+      const updated = await tx.product.update({
+        where: { id: productId },
+        data: {
+          name,
+          price: parseFloat(price),
+          stock: stock === "" || stock === undefined || stock === null
+            ? null
+            : (Number.isFinite(Number(stock))
+              ? Math.max(0, Math.trunc(Number(stock)))
+              : existingProduct.stock),
+          category,
+          description,
+          imageUrl,
+          galleryImages: normalizedGalleryImages,
+          isAvailable,
+          variants: variants || [],
+          sizes
+        }
+      });
+
+      await tx.productOptionStock.deleteMany({
+        where: { productId },
+      });
+
+      if (normalizedOptionStocks.length > 0) {
+        await tx.productOptionStock.createMany({
+          data: normalizedOptionStocks.map((row) => ({
+            productId,
+            optionValue: row.optionValue,
+            stock: row.stock,
+          })),
+        });
       }
+
+      return updated;
     });
 
     return NextResponse.json(product);

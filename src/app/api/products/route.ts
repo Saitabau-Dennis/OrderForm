@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import db from "@/lib/db";
 
 // Lists products for the authenticated store owner.
-export async function GET(req: Request) {
+export async function GET() {
   try {
     const session = await auth();
 
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { name, price, category, description, imageUrl, galleryImages, isAvailable, sizes, variants } = body;
+    const { name, price, stock, optionStocks, category, description, imageUrl, galleryImages, isAvailable, sizes, variants } = body;
     // Guard against duplicate/empty URLs coming from client forms.
     const normalizedGalleryImages = Array.from(
       new Set(
@@ -67,19 +67,45 @@ export async function POST(req: Request) {
       return new NextResponse("Please configure your store settings before adding products.", { status: 400 });
     }
 
-    const product = await db.product.create({
-      data: {
-        storeId: store.id,
-        name,
-        price: parseFloat(price),
-        category,
-        description,
-        imageUrl,
-        galleryImages: normalizedGalleryImages,
-        isAvailable,
-        sizes,
-        variants: variants || []
+    const normalizedOptionStocks = Object.entries(
+      optionStocks && typeof optionStocks === "object" ? optionStocks as Record<string, unknown> : {}
+    )
+      .map(([optionValue, qty]) => ({
+        optionValue: optionValue.trim().toLowerCase(),
+        stock: Math.max(0, Math.trunc(Number(qty))),
+      }))
+      .filter((row) => row.optionValue.length > 0 && Number.isFinite(row.stock));
+
+    const product = await db.$transaction(async (tx) => {
+      const created = await tx.product.create({
+        data: {
+          storeId: store.id,
+          name,
+          price: parseFloat(price),
+          stock: stock === "" || stock === undefined || stock === null
+            ? null
+            : (Number.isFinite(Number(stock)) ? Math.max(0, Math.trunc(Number(stock))) : null),
+          category,
+          description,
+          imageUrl,
+          galleryImages: normalizedGalleryImages,
+          isAvailable,
+          sizes,
+          variants: variants || []
+        }
+      });
+
+      if (normalizedOptionStocks.length > 0) {
+        await tx.productOptionStock.createMany({
+          data: normalizedOptionStocks.map((row) => ({
+            productId: created.id,
+            optionValue: row.optionValue,
+            stock: row.stock,
+          })),
+        });
       }
+
+      return created;
     });
 
     return NextResponse.json(product);
