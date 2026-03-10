@@ -15,6 +15,8 @@ type ProductInfo = {
   name: string
   description: string | null
   price: number
+  stock?: number | null
+  optionStocks?: Array<{ optionValue: string; stock: number }>
   imageUrl: string | null
   galleryImages?: unknown
   category: string | null
@@ -109,7 +111,9 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
 
   const variantGroups = useMemo(() => {
     const parsedGroups = parseVariantGroups(product.variants)
-    const hasSizeGroup = parsedGroups.some((group) => group.name.toLowerCase() === "size")
+    const hasSizeGroup = parsedGroups.some((group) =>
+      group.name.toLowerCase().includes("size")
+    )
 
     // Backfill "Size" options from legacy comma-separated sizes when variants omit it.
     if (sizeList.length > 0 && !hasSizeGroup) {
@@ -141,12 +145,28 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
 
   const isWishlisted = wishlist.includes(product.id)
   const [quantity, setQuantity] = useState(1)
+  const globalStock = typeof product.stock === "number" && Number.isFinite(product.stock)
+    ? Math.max(0, Math.trunc(product.stock))
+    : null
 
   const selectedVariantLabel = Object.entries(selectedOptions)
     .filter(([, value]) => Boolean(value))
     .map(([name, value]) => `${name}: ${value}`)
     .join(" / ")
 
+  const optionStockMap = useMemo(
+    () =>
+      new Map(
+        (product.optionStocks || []).map((row) => [row.optionValue.trim().toLowerCase(), row.stock])
+      ),
+    [product.optionStocks]
+  )
+  const selectedOptionStockValues = Object.values(selectedOptions)
+    .map((value) => optionStockMap.get(value.trim().toLowerCase()))
+    .filter((value): value is number => typeof value === "number" && Number.isFinite(value))
+  const selectedOptionStock = selectedOptionStockValues.length > 0 ? Math.min(...selectedOptionStockValues) : null
+  const effectiveStock = selectedOptionStock ?? globalStock
+  const canPurchase = effectiveStock === null ? true : effectiveStock > 0
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-KE", {
       style: "currency",
@@ -171,6 +191,8 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
   }
 
   const addItemToCart = () => {
+    if (!canPurchase) return
+
     addToCart({
       productId: product.id,
       name: product.name,
@@ -297,6 +319,13 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
           <div className="mt-4 flex items-center gap-3">
             <p className="text-2xl font-medium text-[#1A1A1A]">{formatPrice(product.price)}</p>
           </div>
+          <p className="mt-2 text-sm text-[#696963]">
+            {selectedOptionStock !== null
+              ? `${selectedOptionStock.toLocaleString()} available for selected option`
+              : globalStock !== null
+                ? (canPurchase ? `${globalStock.toLocaleString()} in stock` : "Out of stock")
+                : "Available"}
+          </p>
         </div>
 
         {variantGroups.length > 0 ? (
@@ -341,7 +370,7 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
               type="button"
               aria-label="Decrease quantity"
               onClick={() => setQuantity((current) => Math.max(1, current - 1))}
-              className="inline-flex h-8 w-8 items-center justify-center text-[#666661] transition-colors hover:bg-[#F3F3F0] hover:text-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-1"
+              className="inline-flex h-8 w-8 items-center justify-center text-[#666661] transition-colors hover:bg-[#F3F3F0] hover:text-[#1A1A1A] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-1"
             >
               <Minus className="h-4 w-4" />
             </button>
@@ -351,8 +380,15 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
             <button
               type="button"
               aria-label="Increase quantity"
-              onClick={() => setQuantity((current) => current + 1)}
-              className="inline-flex h-8 w-8 items-center justify-center text-[#666661] transition-colors hover:bg-[#F3F3F0] hover:text-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-1"
+              onClick={() =>
+                setQuantity((current) => {
+                  if (!canPurchase) return 1
+                  if (effectiveStock === null) return current + 1
+                  return Math.min(effectiveStock, current + 1)
+                })
+              }
+              disabled={!canPurchase || (effectiveStock !== null && quantity >= effectiveStock)}
+              className="inline-flex h-8 w-8 items-center justify-center text-[#666661] transition-colors hover:bg-[#F3F3F0] hover:text-[#1A1A1A] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-1"
             >
               <Plus className="h-4 w-4" />
             </button>
@@ -361,7 +397,8 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
             <button
               type="button"
               onClick={handleAddToCart}
-            className="inline-flex h-10 min-w-[170px] items-center justify-center bg-[#1A1A1A] px-5 text-sm font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+              disabled={!canPurchase}
+            className="inline-flex h-10 min-w-[170px] items-center justify-center bg-[#1A1A1A] px-5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
           >
             Add to Cart
           </button>
@@ -369,7 +406,8 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
           <button
             type="button"
             onClick={handleBuyNow}
-            className="inline-flex h-10 min-w-[130px] items-center justify-center border border-[#1A1A1A] bg-transparent px-5 text-sm font-semibold text-[#1A1A1A] transition-colors hover:bg-[#F4F4F0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+            disabled={!canPurchase}
+            className="inline-flex h-10 min-w-[130px] items-center justify-center border border-[#1A1A1A] bg-transparent px-5 text-sm font-semibold text-[#1A1A1A] transition-colors hover:bg-[#F4F4F0] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
           >
             Buy Now
           </button>
@@ -404,7 +442,8 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
           <button
             type="button"
             onClick={handleAddToCart}
-            className="ml-auto inline-flex h-11 items-center justify-center bg-[#1A1A1A] px-5 text-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+            disabled={!canPurchase}
+            className="ml-auto inline-flex h-11 items-center justify-center bg-[#1A1A1A] px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
           >
             Add to Cart
           </button>

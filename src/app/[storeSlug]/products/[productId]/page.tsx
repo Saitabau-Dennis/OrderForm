@@ -21,6 +21,7 @@ export default async function ProductPage({
   params: Promise<{ storeSlug: string; productId: string }>
 }) {
   const { storeSlug, productId } = await params
+  const referenceTime = new Date().toISOString()
 
   // 1. Fetch store and product
   const store = await db.store.findUnique({
@@ -33,6 +34,7 @@ export default async function ProductPage({
 
   let product = await db.product.findFirst({
     where: { id: productId, storeId: store.id },
+    include: { optionStocks: true },
   })
 
   // Backward compatibility: support slug-like product URLs (e.g. /products/beanie-hat-beige)
@@ -48,6 +50,7 @@ export default async function ProductPage({
     if (matched) {
       product = await db.product.findFirst({
         where: { id: matched.id, storeId: store.id },
+        include: { optionStocks: true },
       })
     }
   }
@@ -82,6 +85,7 @@ export default async function ProductPage({
     ...p,
     price: Number(p.price),
     hasOptions: hasProductOptions(p),
+    createdAt: p.createdAt.toISOString(),
   }))
 
   const categoryRows = await db.product.findMany({
@@ -128,6 +132,7 @@ export default async function ProductPage({
                 brandColor={store.brandColor}
                 storeSlug={store.slug}
                 mode="related"
+                referenceTime={referenceTime}
               />
             ) : (
               <p className="text-[13px] text-[#737373]">No related products at this time.</p>

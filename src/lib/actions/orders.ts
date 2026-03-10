@@ -49,6 +49,21 @@ const generateDisplayIdSuffix = () =>
     DISPLAY_ID_ALPHABET[randomInt(0, DISPLAY_ID_ALPHABET.length)]
   ).join("");
 
+const extractVariantOptionValues = (variant?: string) => {
+  if (!variant) return [];
+
+  return variant
+    .split("/")
+    .map((segment) => segment.trim())
+    .filter(Boolean)
+    .map((segment) => {
+      const separatorIndex = segment.indexOf(":");
+      if (separatorIndex === -1) return segment.trim();
+      return segment.slice(separatorIndex + 1).trim();
+    })
+    .filter(Boolean);
+};
+
 export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
   try {
     const validatedData = CreateOrderSchema.parse(data);
@@ -77,6 +92,14 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
         id: true,
         name: true,
         price: true,
+        stock: true,
+        isAvailable: true,
+        optionStocks: {
+          select: {
+            optionValue: true,
+            stock: true,
+          },
+        },
       },
     });
     const productMap = new Map(products.map((p) => [p.id, p]));
@@ -85,6 +108,9 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
       const product = productMap.get(item.productId);
       if (!product) {
         throw new Error(`Product not found: ${item.productId}`);
+      }
+      if (!product.isAvailable) {
+        throw new Error(`Product unavailable: ${product.name}`);
       }
 
       const unitPrice = Number(product.price);
@@ -97,6 +123,21 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
         lineTotal: unitPrice * item.quantity,
       };
     });
+    // Consolidate duplicate product IDs (e.g. same product with multiple variants) for stock reservation.
+    const requestedQuantityByProduct = lineItems.reduce((acc, item) => {
+      acc.set(item.productId, (acc.get(item.productId) || 0) + item.quantity);
+      return acc;
+    }, new Map<string, number>());
+    const requestedQuantityByProductOption = lineItems.reduce((acc, item) => {
+      const productOptions = acc.get(item.productId) || new Map<string, number>();
+      for (const optionValue of extractVariantOptionValues(item.variant)) {
+        const normalized = optionValue.trim().toLowerCase();
+        if (!normalized) continue;
+        productOptions.set(normalized, (productOptions.get(normalized) || 0) + item.quantity);
+      }
+      acc.set(item.productId, productOptions);
+      return acc;
+    }, new Map<string, Map<string, number>>());
 
     const subtotal = roundMoney(
       lineItems.reduce((sum, item) => sum + item.lineTotal, 0)
@@ -148,6 +189,56 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
     const totalAmount = roundMoney(Math.max(0, subtotal - discountAmount + deliveryFee));
 
     const order = await db.$transaction(async (tx) => {
+      for (const [productId, quantity] of requestedQuantityByProduct.entries()) {
+        const product = productMap.get(productId);
+        if (!product) {
+          throw new Error(`Product not found: ${productId}`);
+        }
+        const optionStocksMap = new Map(
+          product.optionStocks.map((row) => [row.optionValue.trim().toLowerCase(), row.stock])
+        );
+        const requestedOptionQuantities = requestedQuantityByProductOption.get(productId) || new Map<string, number>();
+
+        let reservedByOption = false;
+        for (const [optionValue, optionQty] of requestedOptionQuantities.entries()) {
+          if (!optionStocksMap.has(optionValue)) continue;
+
+          reservedByOption = true;
+          const optionStockReservation = await tx.productOptionStock.updateMany({
+            where: {
+              productId,
+              optionValue,
+              stock: { gte: optionQty },
+            },
+            data: {
+              stock: { decrement: optionQty },
+            },
+          });
+
+          if (optionStockReservation.count === 0) {
+            throw new Error(`Insufficient stock for ${product.name} (${optionValue})`);
+          }
+        }
+
+        if (!reservedByOption && product.stock !== null) {
+          const stockReservation = await tx.product.updateMany({
+            where: {
+              id: productId,
+              storeId: validatedData.storeId,
+              isAvailable: true,
+              stock: { gte: quantity },
+            },
+            data: {
+              stock: { decrement: quantity },
+            },
+          });
+
+          if (stockReservation.count === 0) {
+            throw new Error(`Insufficient stock for ${product.name}`);
+          }
+        }
+      }
+
       const normalizedPhone = normalizePhoneForKey(validatedData.customerPhone);
       // Upsert keeps repeat buyers tied to one Customer record per normalized phone/store pair.
       const customer = await tx.customer.upsert({
@@ -265,6 +356,12 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
     };
   } catch (error) {
     console.error("Error creating order:", error);
+    if (error instanceof Error && error.message.includes("Insufficient stock")) {
+      return { error: error.message };
+    }
+    if (error instanceof Error && error.message.includes("Product unavailable")) {
+      return { error: error.message };
+    }
     if (error instanceof Error && error.message.includes("Discount code is no longer available")) {
       return { error: "Discount code is no longer available." };
     }
