@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import type { ComponentProps } from "react";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { ProductsClient } from "@/components/dashboard/products-client";
@@ -20,7 +21,8 @@ export default async function ProductsPage() {
       where: { userId: session.user.id }
   });
 
-  let productsData: unknown[] = [];
+  type InitialProducts = ComponentProps<typeof ProductsClient>["initialProducts"];
+  let productsData: InitialProducts = [];
   const isStoreConfigured = Boolean(store?.whatsappNumber?.trim());
 
   if (store) {

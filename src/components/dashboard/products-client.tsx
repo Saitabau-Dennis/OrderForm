@@ -1,5 +1,6 @@
 "use client";
 
+import type { ComponentProps } from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTopLoader } from "nextjs-toploader";
@@ -40,9 +41,13 @@ interface ProductRecord {
   category?: string | null;
   description?: string | null;
   sizes?: string;
+  createdAt?: string;
   galleryImages?: string[];
   _count?: { orderItems?: number };
 }
+
+type TableProduct = ComponentProps<typeof ProductsTable>["products"][number];
+type ProductFormInitialData = NonNullable<ComponentProps<typeof ProductForm>["initialData"]>;
 
 interface ProductsClientProps {
   initialProducts: ProductRecord[];
@@ -53,19 +58,21 @@ export function ProductsClient({ initialProducts, canAddProduct }: ProductsClien
   const router = useRouter();
   const topLoader = useTopLoader();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<ProductRecord | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<ProductFormInitialData | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
   // Delete State
-  const [deleteProductData, setDeleteProductData] = useState<ProductRecord | null>(null);
+  const [deleteProductData, setDeleteProductData] = useState<TableProduct | null>(null);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
-  const handleEdit = (product: ProductRecord) => {
-    setSelectedProduct(product);
+  const handleEdit = (product: TableProduct) => {
+    const rawProduct = initialProducts.find((item) => item.id === product.id);
+    if (!rawProduct) return;
+    setSelectedProduct(toProductFormInitialData(rawProduct));
     setIsSheetOpen(true);
   };
 
-  const handleDelete = (product: ProductRecord) => {
+  const handleDelete = (product: TableProduct) => {
     setDeleteProductData(product);
   };
 
@@ -111,6 +118,7 @@ export function ProductsClient({ initialProducts, canAddProduct }: ProductsClien
     if (statusFilter === "draft") return product.isAvailable === false;
     return true;
   });
+  const tableProducts = filteredProducts.map(toTableProduct);
 
   const activeCount = initialProducts.filter((p) => p.isAvailable).length;
   const draftCount = initialProducts.filter((p) => !p.isAvailable).length;
@@ -196,7 +204,7 @@ export function ProductsClient({ initialProducts, canAddProduct }: ProductsClien
       {/* Products Table */}
       <div>
         <ProductsTable
-            products={filteredProducts}
+            products={tableProducts}
             onEdit={handleEdit}
             onDelete={handleDelete}
         />
@@ -255,4 +263,40 @@ export function ProductsClient({ initialProducts, canAddProduct }: ProductsClien
       />
     </div>
   );
+}
+
+function toTableProduct(product: ProductRecord): TableProduct {
+  return {
+    id: product.id,
+    name: product.name,
+    price: Number(product.price ?? 0),
+    imageUrl: product.imageUrl ?? undefined,
+    isAvailable: product.isAvailable,
+    category: product.category ?? undefined,
+    sizes: product.sizes ?? undefined,
+    createdAt: product.createdAt,
+    _count: product._count,
+  };
+}
+
+function toProductFormInitialData(product: ProductRecord): ProductFormInitialData {
+  return {
+    id: product.id,
+    name: product.name,
+    description: product.description ?? "",
+    price: Number(product.price ?? 0),
+    stock: typeof product.stock === "number" ? product.stock : "",
+    optionStocks: Array.isArray(product.optionStocks)
+      ? Object.fromEntries(
+          product.optionStocks.map((row) => [row.optionValue, Math.max(0, Math.trunc(Number(row.stock)))])
+        )
+      : {},
+    category: product.category ?? "",
+    isAvailable: product.isAvailable,
+    imageUrl: product.imageUrl ?? "",
+    galleryImages: Array.isArray(product.galleryImages)
+      ? product.galleryImages.filter((value): value is string => typeof value === "string" && value.trim().length > 0)
+      : [],
+    sizes: product.sizes ?? "",
+  };
 }
