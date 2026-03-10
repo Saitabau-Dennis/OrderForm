@@ -54,7 +54,7 @@ export function StoreFooter({ storeName, socialLinks }: StoreFooterProps) {
               href="/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#1A1A1A] font-medium hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+              className="text-[#1A1A1A] font-bold hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
             >
               OrderForm
             </a>

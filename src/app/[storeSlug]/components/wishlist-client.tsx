@@ -73,7 +73,7 @@ export function WishlistClient({ storeSlug, currency, allProducts }: WishlistCli
             <tr key={product.id} className="border-b border-[#EFEFEA] last:border-b-0">
               <td className="px-4 py-3">
                 <Link href={`/${storeSlug}/products/${product.id}`} className="block">
-                  <div className="relative h-16 w-16 overflow-hidden rounded-sm bg-[#EEECEA]">
+                  <div className="relative h-16 w-16 overflow-hidden rounded-none bg-[#EEECEA]">
                     {product.imageUrl ? (
                       <Image
                         src={product.imageUrl}

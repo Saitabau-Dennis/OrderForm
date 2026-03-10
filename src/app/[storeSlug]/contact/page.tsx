@@ -51,43 +51,43 @@ export default async function ContactPage({
       <StoreNavbar store={safeStore} />
 
       <main className="flex-1 w-full px-3 py-12 sm:px-5 lg:px-7 md:py-16">
-        <div className="mx-auto grid w-full max-w-[1500px] gap-10 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-12">
-          <aside className="pt-1">
+        <div className="mx-auto grid w-full max-w-[1500px] items-start gap-10 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-12">
+          <aside className="pt-[84px]">
             <div className="border-t border-[#D8D8D3] py-8">
-              <p className="text-[28px] leading-none text-[#151513]">WHATSAPP</p>
+              <p className="text-[22px] leading-none text-[#151513]">WHATSAPP</p>
               {primaryPhone ? (
-                <a href={`tel:${primaryPhone}`} className="mt-3 block break-words text-[20px] leading-snug text-[#6D6D67] hover:underline">
+                <a href={`tel:${primaryPhone}`} className="mt-3 block break-words text-[16px] leading-snug text-[#6D6D67] hover:underline">
                   {primaryPhone}
                 </a>
               ) : (
-                <p className="mt-3 text-[20px] leading-snug text-[#6D6D67]">Not provided</p>
+                <p className="mt-3 text-[16px] leading-snug text-[#6D6D67]">Not provided</p>
               )}
             </div>
 
             <div className="border-t border-[#D8D8D3] py-8">
-              <p className="text-[28px] leading-none text-[#151513]">EMAIL US</p>
+              <p className="text-[22px] leading-none text-[#151513]">EMAIL US</p>
               {primaryEmail ? (
                 <a
                   href={`mailto:${primaryEmail}`}
-                  className="mt-3 block break-all text-[20px] leading-snug text-[#6D6D67] hover:underline"
+                  className="mt-3 block break-all text-[16px] leading-snug text-[#6D6D67] hover:underline"
                 >
                   {primaryEmail}
                 </a>
               ) : (
-                <p className="mt-3 text-[20px] leading-snug text-[#6D6D67]">Not provided</p>
+                <p className="mt-3 text-[16px] leading-snug text-[#6D6D67]">Not provided</p>
               )}
             </div>
 
             <div className="border-y border-[#D8D8D3] py-8">
-              <p className="text-[28px] leading-none text-[#151513]">ADDRESS</p>
-              <p className="mt-3 break-words text-[20px] leading-snug text-[#6D6D67]">{primaryAddress}</p>
+              <p className="text-[22px] leading-none text-[#151513]">ADDRESS</p>
+              <p className="mt-3 break-words text-[16px] leading-snug text-[#6D6D67]">{primaryAddress}</p>
             </div>
           </aside>
 
-          <section>
+          <section className="max-w-[1250px]">
             <h1 className="text-[54px] leading-none text-[#151513]">GET IN TOUCH</h1>
 
-            <form className="mt-8 space-y-5">
+            <form className="mt-8 space-y-6">
               <div className="grid gap-4 md:grid-cols-3">
                 <input
                   type="text"
