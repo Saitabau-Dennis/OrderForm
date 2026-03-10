@@ -11,6 +11,7 @@ export default async function AllProductsPage({
   params: Promise<{ storeSlug: string }>
 }) {
   const { storeSlug } = await params
+  const referenceTime = new Date().toISOString()
 
   const store = await db.store.findUnique({
     where: { slug: storeSlug },
@@ -34,6 +35,7 @@ export default async function AllProductsPage({
     category: product.category,
     isAvailable: product.isAvailable,
     hasOptions: hasProductOptions(product),
+    createdAt: product.createdAt.toISOString(),
   }))
 
   const categories = Array.from(
@@ -77,6 +79,7 @@ export default async function AllProductsPage({
             currency={safeStore.currency}
             brandColor={safeStore.brandColor}
             storeSlug={safeStore.slug}
+            referenceTime={referenceTime}
           />
         </div>
       </main>

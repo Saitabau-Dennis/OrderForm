@@ -10,6 +10,7 @@ const HOMEPAGE_PRODUCTS_LIMIT = 8;
 
 export default async function StorePage({ params }: { params: Promise<{ storeSlug: string }> }) {
   const { storeSlug } = await params;
+  const referenceTime = new Date().toISOString();
 
   const store = await db.store.findUnique({
     where: { slug: storeSlug },
@@ -47,6 +48,7 @@ export default async function StorePage({ params }: { params: Promise<{ storeSlu
     category: p.category,
     isAvailable: p.isAvailable,
     hasOptions: hasProductOptions(p),
+    createdAt: p.createdAt.toISOString(),
   }));
 
   const safeStore = {
@@ -81,6 +83,7 @@ export default async function StorePage({ params }: { params: Promise<{ storeSlu
             brandColor={safeStore.brandColor}
             storeSlug={safeStore.slug}
             mode="related"
+            referenceTime={referenceTime}
           />
 
           <div className="mt-8 flex justify-center">

@@ -15,6 +15,7 @@ type Product = {
   category: string | null
   isAvailable: boolean
   hasOptions?: boolean
+  createdAt?: string
 }
 
 type ProductGridProps = {
@@ -23,9 +24,12 @@ type ProductGridProps = {
   brandColor: string
   storeSlug: string
   mode?: "default" | "related"
+  referenceTime: string
 }
 
 type SortOption = "featured" | "newest" | "price-asc" | "price-desc" | "name-asc"
+
+const NEW_PRODUCT_WINDOW_DAYS = 7
 
 function formatPrice(price: number, currency: string): string {
   try {
@@ -55,12 +59,26 @@ function formatCardDescription(description: string | null): string {
     .trim()
 }
 
+function isNewProduct(referenceTime: string, createdAt?: string): boolean {
+  if (!createdAt) return false
+
+  const postedAt = new Date(createdAt)
+  if (Number.isNaN(postedAt.getTime())) return false
+
+  const comparedAt = new Date(referenceTime)
+  if (Number.isNaN(comparedAt.getTime())) return false
+
+  const ageInMs = comparedAt.getTime() - postedAt.getTime()
+  return ageInMs >= 0 && ageInMs <= NEW_PRODUCT_WINDOW_DAYS * 24 * 60 * 60 * 1000
+}
+
 export function ProductGrid({
   products,
   currency,
   brandColor,
   storeSlug,
   mode = "default",
+  referenceTime,
 }: ProductGridProps) {
   const isRelatedMode = mode === "related"
   const router = useRouter()
@@ -135,7 +153,11 @@ export function ProductGrid({
 
     switch (sort) {
       case "newest":
-        sorted.reverse()
+        sorted.sort((a, b) => {
+          const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0
+          const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0
+          return bTime - aTime
+        })
         break
       case "price-asc":
         sorted.sort((a, b) => a.price - b.price)
@@ -283,6 +305,7 @@ export function ProductGrid({
               product={product}
               currency={currency}
               storeSlug={storeSlug}
+              referenceTime={referenceTime}
             />
           ))}
         </div>
@@ -295,12 +318,15 @@ function ProductCard({
   product,
   currency,
   storeSlug,
+  referenceTime,
 }: {
   product: Product
   currency: string
   storeSlug: string
+  referenceTime: string
 }) {
   const description = formatCardDescription(product.description)
+  const showNewBadge = isNewProduct(referenceTime, product.createdAt)
 
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-none border border-[#E6E6E1]">
@@ -309,6 +335,11 @@ function ProductCard({
         className="relative block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-inset"
       >
         <div className="relative aspect-square w-full overflow-hidden bg-[#EEECEA] sm:aspect-[4/5]">
+          {showNewBadge ? (
+            <span className="absolute left-3 top-3 z-10 inline-flex items-center rounded-none border border-white/70 bg-[#1A1A1A] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white shadow-sm">
+              New
+            </span>
+          ) : null}
           {product.imageUrl ? (
             <Image
               src={product.imageUrl}
