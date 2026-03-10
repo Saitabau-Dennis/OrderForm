@@ -1,9 +1,9 @@
 "use client";
 
-import { Pencil, MoreHorizontal, Trash2, Package, ImageOff, Eye } from "lucide-react";
+import { MoreHorizontal, Package, ImageOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ColumnDef } from "@tanstack/react-table";
-import { formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 
 import { Button } from "@/components/dashboard/dashboard-button";
 import {
@@ -62,7 +62,7 @@ export function ProductsTable({ products, onEdit, onDelete }: ProductsTableProps
         const product = row.original;
         return (
           <div className="flex items-center gap-4">
-            <Avatar className="h-24 w-24 rounded-xl border border-border/60 shrink-0">
+            <Avatar className="h-24 w-24 rounded-none border border-border/60 shrink-0">
               <AvatarImage src={product.imageUrl} alt={product.name} className="object-cover" />
               <AvatarFallback className="rounded-xl bg-muted text-muted-foreground text-sm font-medium">
                 {product.imageUrl ? <ImageOff className="h-6 w-6 opacity-40" /> : product.name.substring(0, 2).toUpperCase()}
@@ -123,7 +123,7 @@ export function ProductsTable({ products, onEdit, onDelete }: ProductsTableProps
         if (!createdAt) return <span className="text-sm text-muted-foreground">—</span>;
         return (
           <span className="text-sm text-muted-foreground">
-            {formatDistanceToNow(new Date(createdAt), { addSuffix: true })}
+            {format(new Date(createdAt), "MMM d, yyyy")}
           </span>
         );
       },
@@ -137,23 +137,26 @@ export function ProductsTable({ products, onEdit, onDelete }: ProductsTableProps
           <div className="flex justify-end">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl hover:bg-muted/80 transition-colors focus-visible:ring-1 focus-visible:ring-ring">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 rounded-xl border border-border bg-card text-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-1 focus-visible:ring-primary/15"
+                >
                   <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
                   <span className="sr-only">Open menu</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40 rounded-xl border-2 border-border shadow-lg bg-white p-1.5">
-                <DropdownMenuLabel className="font-normal text-xs text-muted-foreground px-3 py-1.5">
+              <DropdownMenuContent align="end" className="w-44">
+                <DropdownMenuLabel>
                   Actions
                 </DropdownMenuLabel>
                 <DropdownMenuItem
                   onClick={() => onEdit ? onEdit(product) : router.push(`/products/${product.id}`)}
-                  className="cursor-pointer rounded-lg text-sm font-normal py-2 px-3 text-foreground hover:bg-muted/60 transition-colors"
                 >
                   Edit
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className="cursor-pointer rounded-lg text-sm font-normal py-2 px-3 text-foreground hover:bg-muted/60 transition-colors"
+                  className="text-red-500 focus:bg-red-50 focus:text-red-500"
                   onClick={() => onDelete?.(product)}
                 >
                   Delete
