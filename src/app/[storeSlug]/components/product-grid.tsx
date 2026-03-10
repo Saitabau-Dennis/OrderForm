@@ -276,14 +276,14 @@ export function ProductGrid({
 
       {/* Product Grid */}
       {!hasProducts ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#D8D8D2] bg-white px-6 py-20 text-center">
+        <div className="flex flex-col items-center justify-center rounded-none border border-dashed border-[#D8D8D2] bg-white px-6 py-20 text-center">
           <p className="text-lg font-semibold text-[#1A1A1A]">No products yet</p>
           <p className="mt-2 max-w-md text-sm text-[#737373]">
             This store is still being curated. Check back soon for new arrivals.
           </p>
         </div>
       ) : !isRelatedMode && filteredAndSorted.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#D8D8D2] bg-white px-6 py-20 text-center">
+        <div className="flex flex-col items-center justify-center rounded-none border border-dashed border-[#D8D8D2] bg-white px-6 py-20 text-center">
           <p className="text-lg font-semibold text-[#1A1A1A]">No matches found</p>
           <p className="mt-2 max-w-md text-sm text-[#737373]">
             Try a different keyword or change the category and sort options.
