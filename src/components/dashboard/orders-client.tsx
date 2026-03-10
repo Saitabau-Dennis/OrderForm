@@ -3,6 +3,14 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/dashboard/dashboard-button";
 import { ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { OrdersTable } from "./orders-table";
 import { OrderDetails } from "./order-details";
@@ -16,7 +24,6 @@ export function OrdersClient({ initialOrders, stats, standalone = true, storeNam
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [showFilterMenu, setShowFilterMenu] = useState(false);
   const router = useRouter();
 
   const handleUpdateStatus = async (orderId: string, status: string) => {
@@ -144,38 +151,37 @@ export function OrdersClient({ initialOrders, stats, standalone = true, storeNam
                 </div>
                 <div className="flex items-center gap-2">
                   {/* Filter */}
-                  <div className="relative">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setShowFilterMenu(!showFilterMenu)}
-                      className="h-8 rounded-xl font-normal"
-                    >
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                      </svg>
-                      Filter
-                      <ChevronDown className={cn("ml-1 h-3 w-3 transition-transform", showFilterMenu && "rotate-180")} />
-                    </Button>
-                    {showFilterMenu && (
-                      <div className="absolute right-0 top-full mt-1 w-36 bg-white border rounded-lg shadow-lg z-10 py-1">
-                        {["all", "pending", "processing", "completed", "cancelled"].map((s) => (
-                          <Button
-                            key={s}
-                            variant="ghost"
-                            size="sm"
-                            type="button"
-                            onClick={() => { setStatusFilter(s); setShowFilterMenu(false); }}
-                            className={`h-auto w-full justify-start rounded-none px-3 py-1.5 text-xs capitalize hover:bg-muted/50 ${
-                              statusFilter === s ? "bg-muted/30 font-medium text-foreground" : "text-muted-foreground"
-                            }`}
-                          >
-                            {s === "all" ? "All Orders" : s}
-                          </Button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 rounded-xl border-border bg-card font-normal text-foreground hover:bg-muted hover:text-foreground"
+                      >
+                        <svg className="h-3.5 w-3.5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                        </svg>
+                        Filter
+                        <ChevronDown className="ml-1 h-3 w-3 text-muted-foreground" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-44">
+                      <DropdownMenuLabel>Filter Orders</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      {["all", "pending", "processing", "completed", "cancelled"].map((s) => (
+                        <DropdownMenuItem
+                          key={s}
+                          onClick={() => setStatusFilter(s)}
+                          className={cn(
+                            "capitalize",
+                            statusFilter === s && "bg-primary/5 text-primary"
+                          )}
+                        >
+                          {s === "all" ? "All Orders" : s}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                   {/* Export */}
                   <Button
                     variant="outline"

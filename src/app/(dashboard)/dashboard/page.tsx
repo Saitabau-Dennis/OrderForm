@@ -307,22 +307,22 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                           <Button
                             variant="outline"
                             size="sm"
-                            className="h-auto rounded-lg border bg-white px-3 py-2 text-sm font-normal text-foreground"
+                            className="h-10 rounded-xl border-border bg-card px-4 text-sm font-normal text-foreground hover:bg-muted hover:text-foreground"
                           >
                             <CalendarRange className="h-4 w-4 text-muted-foreground" />
                             {rangeLabels[range]}
                             <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48 rounded-2xl bg-card border border-border shadow-xl">
-                          <DropdownMenuItem asChild className="focus:bg-primary/5 focus:text-primary cursor-pointer rounded-xl m-1 px-3 py-2">
-                            <Link href="?range=7d" scroll={false} className="w-full text-xs font-medium uppercase tracking-wider">Last 7 Days</Link>
+                        <DropdownMenuContent align="end" className="w-52">
+                          <DropdownMenuItem asChild className="m-0">
+                            <Link href="?range=7d" scroll={false} className="w-full text-xs font-medium uppercase tracking-[0.16em] text-foreground">Last 7 Days</Link>
                           </DropdownMenuItem>
-                          <DropdownMenuItem asChild className="focus:bg-primary/5 focus:text-primary cursor-pointer rounded-xl m-1 px-3 py-2">
-                            <Link href="?range=30d" scroll={false} className="w-full text-xs font-medium uppercase tracking-wider">Last 30 Days</Link>
+                          <DropdownMenuItem asChild className="m-0">
+                            <Link href="?range=30d" scroll={false} className="w-full text-xs font-medium uppercase tracking-[0.16em] text-foreground">Last 30 Days</Link>
                           </DropdownMenuItem>
-                          <DropdownMenuItem asChild className="focus:bg-primary/5 focus:text-primary cursor-pointer rounded-xl m-1 px-3 py-2">
-                            <Link href="?range=1y" scroll={false} className="w-full text-xs font-medium uppercase tracking-wider">Last Year</Link>
+                          <DropdownMenuItem asChild className="m-0">
+                            <Link href="?range=1y" scroll={false} className="w-full text-xs font-medium uppercase tracking-[0.16em] text-foreground">Last Year</Link>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

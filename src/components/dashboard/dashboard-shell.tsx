@@ -97,7 +97,7 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen }: SidebarContentProp
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="flex items-center gap-3 w-full h-auto p-2.5 rounded-xl border border-border/40 hover:bg-foreground/[0.03] transition-all duration-150 cursor-pointer group focus:outline-none"
+              className="flex h-auto w-full cursor-pointer items-center gap-3 rounded-xl border border-border bg-card p-2.5 text-foreground transition-all duration-200 hover:bg-muted focus:outline-none"
             >
               <div className="shrink-0">
                 <BoringAvatar
@@ -107,20 +107,20 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen }: SidebarContentProp
                   colors={["#264653", "#2a9d8f", "#e9c46a", "#f4a261", "#e76f51"]}
                 />
               </div>
-              <span className="truncate text-sm font-normal text-foreground flex-1 text-left">
+              <span className="flex-1 truncate text-left text-sm font-normal text-foreground">
                 {store?.name || "My Store"}
               </span>
-              <div className="flex flex-col shrink-0 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors">
+              <div className="flex shrink-0 flex-col text-muted-foreground transition-colors group-hover:text-foreground">
                 <ChevronUp className="h-3 w-3 -mb-0.5" />
                 <ChevronDown className="h-3 w-3 -mt-0.5" />
               </div>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" sideOffset={4} className="w-[240px] bg-white rounded-lg border shadow-md p-1.5 font-poppins">
-             <div className="px-2 py-1.5">
-                <p className="text-[11px] font-normal text-muted-foreground uppercase tracking-wider">Stores</p>
+          <DropdownMenuContent align="start" sideOffset={4} className="w-[240px] font-poppins">
+             <div className="px-3 py-2">
+                <p className="text-[11px] font-normal uppercase tracking-[0.16em] text-muted-foreground">Stores</p>
              </div>
-             <DropdownMenuItem className="focus:bg-muted/50 cursor-pointer gap-2.5 px-2.5 py-2.5 rounded-xl">
+             <DropdownMenuItem className="gap-2.5">
                 <div className="shrink-0">
                   <BoringAvatar
                     size={22}
@@ -129,12 +129,12 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen }: SidebarContentProp
                     colors={["#264653", "#2a9d8f", "#e9c46a", "#f4a261", "#e76f51"]}
                   />
                 </div>
-                <span className="text-sm font-normal text-foreground truncate flex-1">{store?.name || "My Store"}</span>
-                <Check className="h-3.5 w-3.5 text-primary shrink-0" />
+                <span className="flex-1 truncate text-sm font-normal text-foreground">{store?.name || "My Store"}</span>
+                <Check className="h-3.5 w-3.5 shrink-0 text-primary" />
              </DropdownMenuItem>
-             <DropdownMenuSeparator className="bg-border/60 my-1" />
-             <DropdownMenuItem className="focus:bg-muted/50 cursor-pointer gap-2.5 px-2.5 py-2.5 rounded-xl text-muted-foreground hover:text-foreground">
-                <div className="h-[22px] w-[22px] rounded-full border border-dashed border-muted-foreground/30 flex items-center justify-center">
+             <DropdownMenuSeparator />
+             <DropdownMenuItem className="gap-2.5 text-muted-foreground">
+                <div className="flex h-[22px] w-[22px] items-center justify-center rounded-full border border-dashed border-border">
                   <Plus className="h-3 w-3" />
                 </div>
                 <span className="text-sm font-normal">New store</span>
@@ -171,14 +171,14 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen }: SidebarContentProp
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="group flex w-full h-auto cursor-pointer items-center gap-3 rounded-xl border border-transparent p-2.5 text-left transition-colors hover:border-border/70 hover:bg-muted/40 focus:outline-none"
+              className="group flex h-auto w-full cursor-pointer items-center gap-3  bg-card p-2.5 text-left text-foreground transition-colors hover:bg-muted focus:outline-none"
             >
               <Avatar className="h-10 w-10 rounded-none bg-muted/50">
                 <AvatarImage
                   src={`https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=${user.name || "User"}&backgroundColor=e9c46a,2a9d8f,264653`}
                   className="rounded-none object-cover"
                 />
-                <AvatarFallback className="rounded-none bg-foreground/10 text-xs font-normal text-foreground">
+                <AvatarFallback className="rounded-none bg-muted text-xs font-normal text-foreground">
                   {user.name?.charAt(0).toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
@@ -186,21 +186,21 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen }: SidebarContentProp
                 <p className="truncate text-sm font-normal leading-tight text-foreground">{user.name || "User"}</p>
                 <p className="mt-0.5 truncate text-xs leading-tight text-muted-foreground">{user.email}</p>
               </div>
-              <MoreHorizontal className="h-4 w-4 shrink-0 text-muted-foreground/70 transition-colors group-hover:text-foreground" />
+              <MoreHorizontal className="h-4 w-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="start"
             side="top"
             sideOffset={6}
-            className="w-[236px] rounded-xl border border-border bg-card p-1.5 font-poppins shadow-[0_10px_24px_rgba(0,0,0,0.08)]"
+            className="w-[236px] font-poppins"
           >
-            <div className="rounded-lg px-3 py-2.5">
+            <div className="rounded-xl px-3 py-2.5">
               <p className="truncate text-base font-normal leading-tight text-foreground">{user.name || "User"}</p>
               <p className="mt-0.5 truncate text-xs font-normal text-muted-foreground">{user.email}</p>
             </div>
             <DropdownMenuItem
-              className="cursor-pointer rounded-xl px-3 py-2 text-sm font-normal text-red-500 focus:bg-red-50 focus:text-red-500"
+              className="text-red-500 focus:bg-red-50 focus:text-red-500"
               onSelect={() => signOut({ callbackUrl: "/login" })}
             >
               <span>Sign out</span>
