@@ -47,9 +47,18 @@ export default auth((req) => {
   const host = hostHeader.split(":")[0].toLowerCase();
   const rootHost = ROOT_DOMAIN;
   const wwwHost = `www.${ROOT_DOMAIN}`;
+  const appHost = `app.${ROOT_DOMAIN}`;
 
   // Main domain and www host serve the root app directly.
   if (!host || host === rootHost || host === wwwHost) {
+    return NextResponse.next();
+  }
+
+  // app.{domain} serves the dashboard — redirect bare root to /dashboard.
+  if (host === appHost) {
+    if (pathname === "/") {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
     return NextResponse.next();
   }
 

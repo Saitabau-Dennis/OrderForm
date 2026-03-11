@@ -42,6 +42,11 @@ const ROOT_DOMAIN = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || "")
 const CAN_USE_SUBDOMAIN_URLS =
   Boolean(ROOT_DOMAIN) && !ROOT_DOMAIN.endsWith(".vercel.app");
 
+const getDashboardBaseUrl = () => {
+  if (CAN_USE_SUBDOMAIN_URLS) return `https://app.${ROOT_DOMAIN}`;
+  return "";
+};
+
 const getStoreUrl = (slug: string, rootDomain: string) => {
   if (CAN_USE_SUBDOMAIN_URLS && rootDomain) return `https://${slug}.${rootDomain}`;
   return `/${slug}`;
@@ -201,7 +206,7 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen }: SidebarContentProp
             </div>
             <DropdownMenuItem
               className="text-red-500 focus:bg-red-50 focus:text-red-500"
-              onSelect={() => signOut({ callbackUrl: "/login" })}
+              onSelect={() => signOut({ callbackUrl: `${getDashboardBaseUrl()}/login` })}
             >
               <span>Sign out</span>
             </DropdownMenuItem>
