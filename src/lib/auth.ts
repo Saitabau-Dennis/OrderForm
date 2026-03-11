@@ -1,5 +1,5 @@
 import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
+import Credentials, { CredentialsSignin } from "next-auth/providers/credentials";
 import authConfig from "@/auth.config";
 
 // Extend default session shape so callers can rely on `session.user.id`.
@@ -12,6 +12,10 @@ declare module "next-auth" {
       image?: string | null;
     };
   }
+}
+
+class UnverifiedEmailError extends CredentialsSignin {
+  code = "unverified_email" as const;
 }
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
@@ -49,9 +53,9 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         }
 
         // Enforce email verification before allowing dashboard access.
-        // Keep sign-in disabled until email ownership is verified.
+        // Throw a typed error so the login page can redirect to verify-email.
         if (!user.emailVerified) {
-          return null;
+          throw new UnverifiedEmailError();
         }
 
         const isPasswordValid = await bcrypt.compare(

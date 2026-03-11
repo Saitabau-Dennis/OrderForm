@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Eye, EyeOff } from "lucide-react"
 import { ButtonLoader } from "@/components/ui/button-loader"
 import { toast } from "sonner"
+import { sendVerificationCode } from "@/lib/actions/auth"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -33,7 +34,14 @@ export default function LoginPage() {
       })
 
       if (res?.error) {
-        toast.error("Invalid email/password or your email is not verified yet")
+        if (res.error === "unverified_email") {
+          // Auto-send a fresh verification code and redirect to the verify page.
+          await sendVerificationCode(formData.email)
+          toast.warning("Please verify your email address — we've sent a verification code to your inbox.")
+          router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`)
+        } else {
+          toast.error("Invalid email or password")
+        }
       } else {
         const callbackUrl = searchParams.get("callbackUrl")
         const safeRedirect =
