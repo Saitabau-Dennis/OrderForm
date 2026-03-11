@@ -279,9 +279,9 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
     <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:gap-10">
       <div className="lg:col-span-7">
         <form id="checkout-form" onSubmit={handleSubmit} className="space-y-7" noValidate>
-          <section className="grid items-start gap-7 lg:grid-cols-[minmax(0,1fr)_340px]">
+          <section className="grid items-start gap-7 lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_340px]">
             <div className="space-y-5">
-              <h2 className="text-[42px] font-medium tracking-tight text-[#1A1A1A]">Billing Details</h2>
+              <h2 className="text-[30px] font-medium tracking-tight text-[#1A1A1A] sm:text-[36px] lg:text-[42px]">Billing Details</h2>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
@@ -329,7 +329,7 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
                 <p className="text-[13px] font-medium text-[#1A1A1A]">
                   Country / Region <span className="text-red-500">*</span>
                 </p>
-                <p className="text-[30px] font-semibold leading-none tracking-tight text-[#1A1A1A]">Kenya</p>
+                <p className="text-[24px] font-semibold leading-none tracking-tight text-[#1A1A1A] sm:text-[28px] lg:text-[30px]">Kenya</p>
               </div>
 
               <div className="space-y-1.5">
@@ -434,7 +434,7 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
                   onChange={(event) => setShipToDifferentAddress(event.target.checked)}
                   className="h-4 w-4 rounded-none border-[#BEBEB8] text-[#1A1A1A] focus:ring-[#1A1A1A]"
                 />
-                <label htmlFor="ship-different-address" className="text-[19px] font-semibold text-[#1A1A1A]">
+                <label htmlFor="ship-different-address" className="text-base font-semibold text-[#1A1A1A] sm:text-[19px]">
                   Ship To A Different Address?
                 </label>
               </div>
@@ -459,11 +459,11 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
 
       <div className="lg:col-span-5">
         <div className="border border-[#DADAD5]">
-          <div className="border-b border-[#DADAD5] px-6 py-5">
-            <h2 className="text-[36px] font-semibold tracking-tight text-[#1A1A1A]">Your Order</h2>
+          <div className="border-b border-[#DADAD5] px-4 py-4 sm:px-6 sm:py-5">
+            <h2 className="text-[28px] font-semibold tracking-tight text-[#1A1A1A] sm:text-[32px] lg:text-[36px]">Your Order</h2>
           </div>
 
-          <div className="px-6 py-4">
+          <div className="px-4 py-4 sm:px-6">
             <div className="grid grid-cols-[minmax(0,1fr)_auto] border-b border-[#E2E2DD] pb-3 text-[13px] font-semibold text-[#4E4E49]">
               <span>Product</span>
               <span>Subtotal</span>
@@ -499,7 +499,7 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
             </div>
           </div>
 
-          <div className="border-t border-[#DADAD5] px-6 py-5">
+          <div className="border-t border-[#DADAD5] px-4 py-5 sm:px-6">
             <div className="space-y-5">
               {paymentOptions.map((option) => {
                 const isActive = paymentMethod === option.id
@@ -552,16 +552,16 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
             </div>
           </div>
 
-          <div className="border-t border-[#DADAD5] px-6 py-6">
-            <p className="max-w-[520px] text-[16px] leading-relaxed text-[#666661]">
+          <div className="border-t border-[#DADAD5] px-4 py-5 sm:px-6 sm:py-6">
+            <p className="max-w-[520px] text-sm leading-relaxed text-[#666661] sm:text-[16px]">
               Your personal data will be used to process your order, support your experience and for other purposes described in our privacy policy.
             </p>
-            <div className="mt-5 flex justify-end">
+            <div className="mt-5 flex justify-start sm:justify-end">
               <button
                 type="button"
                 onClick={submitOrder}
                 disabled={isLoading}
-                className="inline-flex h-12 min-w-[170px] items-center justify-center border border-[#1A1A1A] bg-transparent px-6 text-xl font-medium text-[#1A1A1A] transition-colors hover:bg-[#1A1A1A] hover:text-white disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+                className="inline-flex h-12 min-w-[170px] items-center justify-center border border-[#1A1A1A] bg-transparent px-6 text-lg font-medium text-[#1A1A1A] transition-colors hover:bg-[#1A1A1A] hover:text-white disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2 sm:text-xl"
               >
                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 {isLoading ? "Processing..." : "Place Order"}

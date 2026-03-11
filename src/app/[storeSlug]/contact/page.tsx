@@ -52,9 +52,9 @@ export default async function ContactPage({
 
       <main className="flex-1 w-full px-3 py-12 sm:px-5 lg:px-7 md:py-16">
         <div className="mx-auto grid w-full max-w-[1500px] items-start gap-10 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-12">
-          <aside className="pt-[84px]">
+          <aside className="pt-0 lg:pt-[84px]">
             <div className="border-t border-[#D8D8D3] py-8">
-              <p className="text-[22px] leading-none text-[#151513]">WHATSAPP</p>
+              <p className="text-[18px] leading-none text-[#151513] sm:text-[22px]">WHATSAPP</p>
               {primaryPhone ? (
                 <a href={`tel:${primaryPhone}`} className="mt-3 block break-words text-[16px] leading-snug text-[#6D6D67] hover:underline">
                   {primaryPhone}
@@ -65,7 +65,7 @@ export default async function ContactPage({
             </div>
 
             <div className="border-t border-[#D8D8D3] py-8">
-              <p className="text-[22px] leading-none text-[#151513]">EMAIL US</p>
+              <p className="text-[18px] leading-none text-[#151513] sm:text-[22px]">EMAIL US</p>
               {primaryEmail ? (
                 <a
                   href={`mailto:${primaryEmail}`}
@@ -79,13 +79,13 @@ export default async function ContactPage({
             </div>
 
             <div className="border-y border-[#D8D8D3] py-8">
-              <p className="text-[22px] leading-none text-[#151513]">ADDRESS</p>
+              <p className="text-[18px] leading-none text-[#151513] sm:text-[22px]">ADDRESS</p>
               <p className="mt-3 break-words text-[16px] leading-snug text-[#6D6D67]">{primaryAddress}</p>
             </div>
           </aside>
 
           <section className="max-w-[1250px]">
-            <h1 className="text-[54px] leading-none text-[#151513]">GET IN TOUCH</h1>
+            <h1 className="text-[34px] leading-none text-[#151513] sm:text-[44px] lg:text-[54px]">GET IN TOUCH</h1>
 
             <form className="mt-8 space-y-6">
               <div className="grid gap-4 md:grid-cols-3">
@@ -114,7 +114,7 @@ export default async function ContactPage({
 
               <button
                 type="button"
-                className="inline-flex h-14 min-w-[300px] items-center justify-center border border-[#111111] px-8 text-lg font-semibold tracking-wide text-[#111111] transition-colors hover:bg-[#ECECE7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+                className="inline-flex h-12 w-full items-center justify-center border border-[#111111] px-6 text-base font-semibold tracking-wide text-[#111111] transition-colors hover:bg-[#ECECE7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2 sm:h-14 sm:w-auto sm:min-w-[260px] sm:px-8 sm:text-lg"
               >
                 SEND MESSAGE
               </button>

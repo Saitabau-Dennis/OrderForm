@@ -86,8 +86,8 @@ export function CartClient({
   }
 
   return (
-    <div className="space-y-10">
-      <div className="grid grid-cols-[minmax(0,1fr)_140px_150px] border-b border-[#D6D6D0] pb-3 text-[11px] uppercase tracking-[0.2em] text-[#666661]">
+    <div className="space-y-8 md:space-y-10">
+      <div className="hidden grid-cols-[minmax(0,1fr)_140px_150px] border-b border-[#D6D6D0] pb-3 text-[11px] uppercase tracking-[0.2em] text-[#666661] md:grid">
         <span>Product</span>
         <span className="text-center">Quantity</span>
         <span className="text-right">Total</span>
@@ -101,7 +101,7 @@ export function CartClient({
           return (
             <div
               key={`${item.productId}-${item.variant}`}
-              className="grid grid-cols-[minmax(0,1fr)_140px_150px] items-start gap-4 py-8 md:gap-6"
+              className="grid grid-cols-1 items-start gap-4 py-6 md:grid-cols-[minmax(0,1fr)_140px_150px] md:gap-6 md:py-8"
             >
               <div className="flex min-w-0 gap-4">
                 <Link
@@ -136,7 +136,7 @@ export function CartClient({
                 </div>
               </div>
 
-              <div className="flex items-center justify-center gap-2">
+              <div className="flex items-center justify-between gap-3 md:justify-center">
                 <div className="flex h-12 items-center border border-[#9A9A94] px-2">
                   <button
                     type="button"
@@ -180,7 +180,7 @@ export function CartClient({
                 </button>
               </div>
 
-              <p className="pt-2 text-right text-lg font-medium text-[#111111] lg:text-xl">
+              <p className="pt-1 text-left text-lg font-medium text-[#111111] md:pt-2 md:text-right lg:text-xl">
                 {formatPrice(item.price * item.quantity)}
               </p>
             </div>
@@ -205,8 +205,8 @@ export function CartClient({
           />
         </div>
 
-        <div className="flex flex-col items-end">
-          <div className="w-full max-w-[380px] text-right">
+        <div className="flex flex-col items-start sm:items-end">
+          <div className="w-full max-w-[380px] text-left sm:text-right">
             <div className="flex items-center justify-between text-[#131313]">
               <span className="text-[13px] uppercase tracking-[0.1em] lg:text-sm">
                 Estimated total

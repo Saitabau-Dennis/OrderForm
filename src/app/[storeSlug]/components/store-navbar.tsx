@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
-import { ShoppingBag, Heart, Search } from "lucide-react"
+import { ShoppingBag, Heart, Search, Menu, X, ChevronDown } from "lucide-react"
 import { useStore } from "./store-provider"
 import { StoreTopBar } from "./store-top-bar"
 
@@ -33,6 +33,8 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
   const isCatalogActive = pathname.startsWith(`/${store.slug}/products`)
   const isContactActive = pathname === `/${store.slug}/contact`
   const contactHref = `/${store.slug}/contact`
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [mobileCatalogOpen, setMobileCatalogOpen] = useState(false)
 
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -47,18 +49,66 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
       <StoreTopBar socialLinks={store.socialLinks} />
 
       <div>
-        <div className="mx-auto grid h-[140px] w-full max-w-[1460px] items-center gap-4 px-4 pt-6 sm:px-6 sm:pt-8 lg:grid-cols-[320px_minmax(0,1fr)_220px] lg:px-8 lg:pt-10">
+        <div className="mx-auto w-full max-w-[1460px] px-4 py-5 sm:px-6 sm:py-6 lg:hidden">
+          <div className="relative flex items-center justify-center pb-6 pt-2">
+            <Link
+              href={`/${store.slug}`}
+              className="inline-flex min-w-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+              title={store.name}
+            >
+              <span className="block max-w-[min(76vw,260px)] break-words text-center [font-family:var(--font-adcure)] text-[clamp(18px,7vw,24px)] leading-[0.88] tracking-tight text-[#111111] line-clamp-2">
+                {store.name}
+              </span>
+            </Link>
+
+            <Link
+              href={`/${store.slug}/cart`}
+              aria-label="Open cart"
+              className="absolute right-0 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center text-[#1A1A1A] transition-colors hover:bg-[#F0F0EE] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+            >
+              <ShoppingBag className="h-5 w-5" strokeWidth={1.8} />
+              {cartCount > 0 ? (
+                <span
+                  className="absolute -right-1 -top-1 inline-flex h-4 min-w-[16px] items-center justify-center px-1 text-[10px] font-bold text-white"
+                  style={{ backgroundColor: "var(--store-brand, #1A1A1A)" }}
+                >
+                  {cartCount}
+                </span>
+              ) : null}
+            </Link>
+          </div>
+
+          <div className="flex items-center justify-start">
+            <button
+              type="button"
+              onClick={() => {
+                setMobileMenuOpen((current) => {
+                  const next = !current
+                  if (!next) setMobileCatalogOpen(false)
+                  return next
+                })
+              }}
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileMenuOpen}
+              className="inline-flex h-9 w-9 items-center justify-center text-[#1A1A1A] transition-colors hover:bg-[#F0F0EE] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
+        </div>
+
+        <div className="mx-auto hidden w-full max-w-[1460px] items-center gap-4 px-8 pb-0 pt-10 lg:grid lg:h-[140px] lg:grid-cols-[320px_minmax(0,1fr)_220px]">
           <Link
             href={`/${store.slug}`}
-            className="relative inline-flex min-w-0 shrink-0 pr-8 pt-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+            className="relative inline-flex min-w-0 shrink-0 rounded-sm pt-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2 lg:pr-8"
             title={store.name}
           >
-            <span className="block max-w-[320px] [font-family:var(--font-adcure)] text-[30px] leading-[0.82] tracking-tight text-[#111111] sm:text-[34px] lg:text-[38px]">
+            <span className="block max-w-[320px] [font-family:var(--font-adcure)] text-[38px] leading-[0.82] tracking-tight text-[#111111]">
               {store.name}
             </span>
           </Link>
 
-          <form onSubmit={handleSearch} className="relative mx-auto hidden w-full max-w-[640px] lg:block">
+          <form onSubmit={handleSearch} className="relative mx-auto w-full max-w-[640px]">
             <input
               type="search"
               value={searchQuery}
@@ -75,7 +125,7 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
             </button>
           </form>
 
-          <div className="flex items-center justify-start gap-2 md:justify-end sm:gap-3">
+          <div className="flex items-center justify-end gap-3">
             <Link
               href={`/${store.slug}/wishlist`}
               aria-label="Open wishlist"
@@ -111,8 +161,113 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
         </div>
       </div>
 
-      <div className="mx-auto flex h-[180px] w-full max-w-[1460px] items-end justify-center px-4 pb-8 sm:px-6 lg:px-8">
-        <nav className="flex items-center justify-center gap-10">
+      {mobileMenuOpen ? (
+        <div className="fixed inset-0 z-[70] bg-black/5 lg:hidden">
+          <button
+            type="button"
+            aria-label="Close menu"
+            onClick={() => {
+              setMobileMenuOpen(false)
+              setMobileCatalogOpen(false)
+            }}
+            className="absolute inset-0 h-full w-full cursor-default"
+          />
+
+          <div className="relative h-full w-[min(88vw,430px)] bg-[#F5F5F3] shadow-[6px_0_22px_rgba(0,0,0,0.12)]">
+            <nav>
+              <div className="grid grid-cols-[minmax(0,1fr)_44px] border-b border-[#D8D8D3]">
+                <Link
+                  href={`/${store.slug}`}
+                  onClick={() => {
+                    setMobileMenuOpen(false)
+                    setMobileCatalogOpen(false)
+                  }}
+                  className={`block px-6 py-4 text-sm font-semibold tracking-wide ${
+                    isHomeActive ? "text-[#111111]" : "text-[#2A2A26]"
+                  }`}
+                >
+                  HOME
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false)
+                    setMobileCatalogOpen(false)
+                  }}
+                  aria-label="Close menu"
+                  className="inline-flex h-11 w-11 items-center justify-center bg-[#111111] text-white"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="border-b border-[#D8D8D3]">
+                <button
+                  type="button"
+                  onClick={() => setMobileCatalogOpen((current) => !current)}
+                  aria-expanded={mobileCatalogOpen}
+                  className="grid w-full grid-cols-[minmax(0,1fr)_56px] items-center text-left"
+                >
+                  <span className="px-6 py-4 text-sm font-semibold tracking-wide text-[#2A2A26]">
+                    COLLECTIONS
+                  </span>
+                  <span className="inline-flex h-full items-center justify-center border-l border-[#D8D8D3] bg-[#EFEFED] text-[#6B6B65]">
+                    <ChevronDown className={`h-5 w-5 transition-transform ${mobileCatalogOpen ? "rotate-180" : ""}`} />
+                  </span>
+                </button>
+
+                {mobileCatalogOpen ? (
+                  <div>
+                    <Link
+                      href={`/${store.slug}/products`}
+                      onClick={() => {
+                        setMobileMenuOpen(false)
+                        setMobileCatalogOpen(false)
+                      }}
+                      className={`block border-t border-[#E3E3DE] px-6 py-4 text-sm ${
+                        isCatalogActive ? "font-semibold text-[#111111]" : "text-[#2A2A26]"
+                      }`}
+                    >
+                      All products
+                    </Link>
+                    {categories.length > 0 ? (
+                      categories.map((category) => (
+                        <Link
+                          key={category}
+                          href={`/${store.slug}/products?category=${encodeURIComponent(category)}`}
+                          onClick={() => {
+                            setMobileMenuOpen(false)
+                            setMobileCatalogOpen(false)
+                          }}
+                          className="block border-t border-[#E3E3DE] px-6 py-4 text-sm text-[#2A2A26]"
+                        >
+                          {category}
+                        </Link>
+                      ))
+                    ) : null}
+                  </div>
+                ) : null}
+              </div>
+
+              <Link
+                href={contactHref}
+                onClick={() => {
+                  setMobileMenuOpen(false)
+                  setMobileCatalogOpen(false)
+                }}
+                className={`block border-b border-[#D8D8D3] px-6 py-4 text-sm font-semibold tracking-wide ${
+                  isContactActive ? "text-[#111111]" : "text-[#2A2A26]"
+                }`}
+              >
+                CONTACT US
+              </Link>
+            </nav>
+          </div>
+        </div>
+      ) : null}
+
+      <div className="mx-auto hidden w-full max-w-[1460px] px-4 pb-6 sm:px-6 sm:pb-6 lg:flex lg:h-[180px] lg:items-end lg:justify-center lg:px-8 lg:pb-8">
+        <nav className="flex items-center gap-6 overflow-x-auto pb-2 text-nowrap [scrollbar-width:none] sm:justify-center sm:gap-10 sm:pb-1 lg:gap-12">
           <Link
             href={`/${store.slug}`}
             className={`text-sm font-semibold tracking-wide ${
@@ -133,7 +288,7 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
               <span>+</span>
             </Link>
 
-            <div className="pointer-events-none invisible absolute left-1/2 top-full z-50 w-[240px] -translate-x-1/2 pt-3 opacity-0 transition-all duration-150 group-hover:pointer-events-auto group-hover:visible group-hover:opacity-100">
+            <div className="pointer-events-none invisible absolute left-0 top-full z-50 w-[240px] pt-3 opacity-0 transition-all duration-150 group-hover:pointer-events-auto group-hover:visible group-hover:opacity-100 sm:left-1/2 sm:-translate-x-1/2">
               <div className="border border-[#D8D8D3] bg-[#F7F7F5] p-2 shadow-[0_10px_24px_rgba(20,20,18,0.08)]">
                 <Link
                   href={`/${store.slug}/products`}

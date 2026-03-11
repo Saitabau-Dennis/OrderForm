@@ -22,16 +22,16 @@ export function StoreTopBar({ socialLinks }: StoreTopBarProps) {
 
   return (
     <div className="border-b border-[#E3E3DE]">
-      <div className="mx-auto flex w-full max-w-[1460px] items-center justify-center gap-5 px-4 py-2 sm:px-6 lg:justify-end lg:px-8">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#6D6D67]">Follow us</span>
-        <div className="flex items-center gap-4">
+      <div className="mx-auto flex w-full max-w-[1460px] flex-wrap items-center justify-center gap-x-5 gap-y-2 px-4 py-2 sm:px-6 lg:justify-end lg:px-8">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#6D6D67] sm:text-[11px]">Follow us</span>
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 lg:justify-end">
           {links.map((social) => (
             <a
               key={social.label}
               href={social.href!}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs font-semibold uppercase tracking-[0.14em] text-[#1A1A1A] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+              className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#1A1A1A] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2 sm:text-xs"
             >
               {social.label}
             </a>

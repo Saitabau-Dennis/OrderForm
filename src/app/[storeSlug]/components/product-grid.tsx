@@ -206,16 +206,16 @@ export function ProductGrid({
               />
             </div>
 
-            <div className="flex items-center gap-2 self-start md:self-auto">
-              <div className="inline-flex h-11 items-center gap-2 rounded-none border border-[#DFDFDA] px-3 text-xs font-semibold uppercase tracking-wide text-[#666661]">
+            <div className="flex w-full flex-wrap items-center gap-2 self-start sm:w-auto md:self-auto">
+              <div className="inline-flex h-11 items-center gap-2 rounded-none border border-[#DFDFDA] px-3 text-[11px] font-semibold uppercase tracking-wide text-[#666661] sm:text-xs">
                 <ArrowUpDown className="h-3.5 w-3.5" />
                 Sort
               </div>
-              <div className="relative">
+              <div className="relative min-w-[180px] flex-1 sm:flex-none">
                 <select
                   value={sort}
                   onChange={(e) => setSort(e.target.value as SortOption)}
-                  className="h-11 appearance-none rounded-none border border-[#DFDFDA] bg-transparent px-4 pr-10 text-sm font-medium text-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2"
+                  className="h-11 w-full appearance-none rounded-none border border-[#DFDFDA] bg-transparent px-4 pr-10 text-sm font-medium text-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2"
                   style={{ "--tw-ring-color": `${brandColor}66` } as { [key: string]: string }}
                   aria-label="Sort products"
                 >
@@ -237,7 +237,7 @@ export function ProductGrid({
                 key={cat.name}
                 onClick={() => setActiveCategory(cat.name)}
                 aria-pressed={activeCategory === cat.name}
-                className="inline-flex h-9 items-center gap-2 rounded-none border px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+                className="inline-flex h-9 max-w-full items-center gap-2 rounded-none border px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2 sm:px-4 sm:text-sm"
                 style={
                   activeCategory === cat.name
                     ? {
@@ -250,13 +250,13 @@ export function ProductGrid({
                       }
                 }
               >
-                <span>{cat.name}</span>
+                <span className="truncate">{cat.name}</span>
                 <span className="rounded-none px-1.5 py-0.5 text-[11px]">{cat.count}</span>
               </button>
             ))}
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+          <div className="flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between">
             <p className="text-[#666661]" aria-live="polite">
               Showing <span className="font-semibold text-[#1A1A1A]">{filteredAndSorted.length}</span> of{" "}
               <span className="font-semibold text-[#1A1A1A]">{products.length}</span> products
@@ -298,7 +298,7 @@ export function ProductGrid({
           </button>
         </div>
       ) : (
-        <div className={`grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 md:gap-5 ${isRelatedMode ? "lg:grid-cols-4 lg:gap-5" : "lg:grid-cols-3 lg:gap-6 xl:grid-cols-4"}`}>
+        <div className={`grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 md:gap-5 ${isRelatedMode ? "lg:grid-cols-4 lg:gap-5" : "lg:grid-cols-3 lg:gap-6 xl:grid-cols-4"}`}>
           {visibleProducts.map((product) => (
             <ProductCard
               key={product.id}

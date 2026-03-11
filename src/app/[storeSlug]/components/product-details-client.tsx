@@ -228,7 +228,7 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
   }
 
   return (
-    <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 items-start gap-9 pb-24 lg:grid-cols-[minmax(0,56%)_minmax(0,44%)] lg:gap-8 lg:pb-0">
+    <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 items-start gap-9 pb-36 lg:grid-cols-[minmax(0,56%)_minmax(0,44%)] lg:gap-8 lg:pb-0">
       <div className="space-y-3 lg:sticky lg:top-20 lg:self-start">
         <div className="mx-auto w-full max-w-[620px]">
           <div className="relative aspect-[3/4] w-full overflow-hidden border border-[#DADAD4] bg-white">
@@ -271,7 +271,7 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
         </div>
 
         {galleryImages.length > 1 ? (
-          <div className="mx-auto grid w-full max-w-[620px] grid-cols-5 gap-2 sm:grid-cols-6">
+          <div className="mx-auto grid w-full max-w-[620px] grid-cols-4 gap-2 sm:grid-cols-6">
             {galleryImages.map((image, index) => (
               <button
                 key={`${image}-${index}`}
@@ -297,7 +297,7 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#6E6E68]">{product.category}</p>
           ) : null}
 
-          <h1 className="font-serif text-3xl font-medium leading-tight tracking-tight text-[#171715] md:text-5xl">
+          <h1 className="font-serif text-2xl font-medium leading-tight tracking-tight text-[#171715] sm:text-3xl md:text-5xl">
             {product.name}
           </h1>
 
@@ -394,11 +394,11 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
             </button>
           </div>
 
-            <button
-              type="button"
-              onClick={handleAddToCart}
-              disabled={!canPurchase}
-            className="inline-flex h-10 min-w-[170px] items-center justify-center bg-[#1A1A1A] px-5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={!canPurchase}
+            className="inline-flex h-10 w-full items-center justify-center bg-[#1A1A1A] px-5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2 sm:w-auto sm:min-w-[170px]"
           >
             Add to Cart
           </button>
@@ -407,7 +407,7 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
             type="button"
             onClick={handleBuyNow}
             disabled={!canPurchase}
-            className="inline-flex h-10 min-w-[130px] items-center justify-center border border-[#1A1A1A] bg-transparent px-5 text-sm font-semibold text-[#1A1A1A] transition-colors hover:bg-[#F4F4F0] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+            className="inline-flex h-10 w-full items-center justify-center border border-[#1A1A1A] bg-transparent px-5 text-sm font-semibold text-[#1A1A1A] transition-colors hover:bg-[#F4F4F0] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2 sm:w-auto sm:min-w-[130px]"
           >
             Buy Now
           </button>
@@ -417,7 +417,7 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
             onClick={handleToggleWishlist}
             aria-label="Toggle wishlist"
             aria-pressed={isWishlisted}
-            className={`inline-flex h-10 items-center justify-center gap-2 border px-4 text-sm font-medium transition-colors ${
+            className={`inline-flex h-10 w-full items-center justify-center gap-2 border px-4 text-sm font-medium transition-colors sm:w-auto ${
               isWishlisted
                 ? "border-[#1A1A1A] bg-[#1A1A1A] text-white"
                 : "border-[#D9D9D4] bg-white text-[#1A1A1A] hover:border-[#1A1A1A]"

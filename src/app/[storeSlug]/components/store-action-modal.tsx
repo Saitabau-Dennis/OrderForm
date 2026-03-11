@@ -61,18 +61,18 @@ export function StoreActionModal({ storeSlug }: { storeSlug: string }) {
 
   return (
     <div
-      className="pointer-events-none fixed right-4 top-[112px] z-[100] w-[min(460px,calc(100vw-2rem))] sm:right-6 sm:top-[118px] lg:right-8 lg:top-[124px]"
+      className="pointer-events-none fixed inset-x-3 bottom-20 z-[100] sm:inset-x-auto sm:right-6 sm:top-[118px] sm:bottom-auto sm:w-[min(460px,calc(100vw-3rem))] lg:right-8 lg:top-[124px]"
       role="presentation"
     >
       <div
         role="dialog"
         aria-modal="true"
         aria-label={heading}
-        className="pointer-events-auto w-full border border-white/20 bg-black px-8 py-7 text-white shadow-[0_14px_40px_rgba(0,0,0,0.45)]"
+        className="pointer-events-auto w-full border border-white/20 bg-black px-3 py-3 text-white shadow-[0_14px_40px_rgba(0,0,0,0.45)] sm:px-8 sm:py-7"
       >
         <div className="flex items-center justify-between gap-3">
-          <p className="inline-flex items-center gap-2 text-base tracking-wide">
-            <Check className="h-4 w-4" />
+          <p className="inline-flex items-center gap-2 text-xs tracking-wide sm:text-base">
+            <Check className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             {heading}
           </p>
           <button
@@ -84,12 +84,12 @@ export function StoreActionModal({ storeSlug }: { storeSlug: string }) {
             <X className="h-5 w-5" />
           </button>
         </div>
-        <p className="mt-2 text-xs uppercase tracking-[0.12em] text-white/50">
+        <p className="mt-1 text-[10px] uppercase tracking-[0.1em] text-white/50 sm:mt-2 sm:text-xs sm:tracking-[0.12em]">
           Auto close in {secondsRemaining}s
         </p>
 
-        <div className="mt-8 flex items-start gap-4">
-          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-none bg-white/10">
+        <div className="mt-3 flex items-start gap-3 sm:mt-8 sm:gap-4">
+          <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-none bg-white/10 sm:h-24 sm:w-24">
             {actionModal.imageUrl ? (
               <Image src={actionModal.imageUrl} alt={actionModal.name} fill className="object-cover" />
             ) : (
@@ -97,27 +97,27 @@ export function StoreActionModal({ storeSlug }: { storeSlug: string }) {
             )}
           </div>
           <div className="min-w-0">
-            <p className="text-xs uppercase tracking-[0.2em] text-white/55">
+            <p className="text-[10px] uppercase tracking-[0.14em] text-white/55 sm:text-xs sm:tracking-[0.2em]">
               {(actionModal.category?.trim() || "Featured").slice(0, 24)}
             </p>
-            <p className="mt-2 line-clamp-3 text-lg font-medium uppercase leading-snug tracking-wide sm:text-xl">
+            <p className="mt-1 line-clamp-2 text-sm font-medium uppercase leading-snug tracking-wide sm:mt-2 sm:line-clamp-3 sm:text-xl">
               {actionModal.name}
             </p>
           </div>
         </div>
 
-        <div className="mt-10 space-y-5">
+        <div className="mt-4 space-y-2 sm:mt-10 sm:space-y-5">
           <Link
             href={primaryHref}
             onClick={hideActionModal}
-            className="flex h-14 items-center justify-center rounded-none border-4 border-white text-xl font-semibold tracking-wide text-white transition hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            className="flex h-10 items-center justify-center rounded-none border-2 border-white text-sm font-semibold tracking-wide text-white transition hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black sm:h-14 sm:border-4 sm:text-xl"
           >
             {primaryLabel}
           </Link>
           <button
             type="button"
             onClick={hideActionModal}
-            className="block w-full text-center text-xl tracking-wide text-white underline underline-offset-4 transition hover:text-white/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            className="block w-full text-center text-sm tracking-wide text-white underline underline-offset-4 transition hover:text-white/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:text-xl"
           >
             Continue shopping
           </button>

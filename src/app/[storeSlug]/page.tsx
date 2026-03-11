@@ -90,7 +90,10 @@ export default async function StorePage({ params }: { params: Promise<{ storeSlu
             <Link
               href={`/${safeStore.slug}/products`}
               className="inline-flex h-11 items-center rounded-none px-6 text-sm font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
-              style={{ backgroundColor: "var(--store-brand, #1A1A1A)" }}
+              style={{
+                backgroundColor: safeStore.brandColor || "var(--store-brand, #1A1A1A)",
+                "--tw-ring-color": `${(safeStore.brandColor || "#1A1A1A")}66`,
+              } as { [key: string]: string }}
             >
               Browse full catalog
             </Link>
