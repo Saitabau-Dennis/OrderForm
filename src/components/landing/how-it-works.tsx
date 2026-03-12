@@ -36,17 +36,17 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-8 md:py-12 bg-background relative scroll-mt-20">
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+    <section id="how-it-works" className="py-10 md:py-14 bg-background relative scroll-mt-20">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-12 items-start">
           
           {/* Left Column - Content */}
-          <ScrollAnimation variant="fade-up" className="lg:sticky lg:top-32 self-start space-y-8 text-center lg:text-left">
+          <ScrollAnimation variant="fade-up" className="lg:sticky lg:top-28 self-start space-y-7 text-center lg:text-left">
             <div className="space-y-4">
               <div className="inline-flex items-center px-2 py-0.5 rounded-none landing-section-tag border border-primary/20 text-primary text-[10px] font-medium mb-4 uppercase tracking-[0.12em]">
                 How It Works
               </div>
-              <h2 className="text-3xl md:text-5xl font-normal tracking-[-0.02em] font-heading leading-[1.06]">
+              <h2 className="text-3xl md:text-4xl font-normal tracking-[-0.02em] font-heading leading-[1.06]">
                 From link to <br/>
                 <span className="text-primary">order in seconds.</span>
               </h2>
@@ -56,7 +56,7 @@ export function HowItWorks() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <LandingButton asChild size="lg" className="w-full sm:w-auto rounded-xl px-8 text-base font-semibold">
+                <LandingButton asChild size="lg" className="w-full sm:w-auto rounded-xl px-6 text-sm md:text-base font-semibold">
                   <Link href="/register">
                   Start your store
                   <ArrowRight className="ml-2 w-4 h-4" />
@@ -71,21 +71,21 @@ export function HowItWorks() {
           </ScrollAnimation>
 
           {/* Right Column - Cards */}
-          <div className="relative space-y-0 min-h-[100vh]">
+          <div className="relative space-y-0 min-h-[90vh]">
             {steps.map((step, index) => (
               <div 
                 key={index}
-                className="sticky transition-all duration-500 mb-[15vh]"
+                className="sticky transition-all duration-500 mb-[13vh]"
                 style={{ 
                   top: `calc(100px + ${index * 12}px)`, // Tighter stacking offset
                   zIndex: index + 1
                 }}
               >
                 <Card className={cn(
-                  "overflow-hidden border border-primary/10 bg-card shadow-sm transition-all hover:scale-[1.02] font-sans p-6 md:p-8 rounded-xl", 
+                  "overflow-hidden border border-primary/10 bg-card shadow-sm transition-all hover:scale-[1.02] font-sans p-5 md:p-7 rounded-xl", 
                 )}>
                   <CardHeader className="p-0 pb-4">
-                    <step.icon className="w-14 h-14 text-primary mb-5 stroke-[1.25]" />
+                    <step.icon className="w-12 h-12 md:w-14 md:h-14 text-primary mb-4 stroke-[1.25]" />
                     <CardTitle className="text-xl md:text-2xl font-normal font-heading tracking-[-0.01em] text-foreground">{step.title}</CardTitle>
                   </CardHeader>
                   <CardContent className="p-0">
@@ -95,14 +95,14 @@ export function HowItWorks() {
                   </CardContent>
                   
                   {/* Decorative number */}
-                  <div className="absolute top-4 right-6 text-7xl md:text-9xl font-semibold opacity-5 select-none font-heading">
+                  <div className="absolute top-4 right-6 text-7xl md:text-8xl font-semibold opacity-5 select-none font-heading">
                     {index + 1}
                   </div>
                 </Card>
               </div>
             ))}
             
-            <div className="h-[20vh]" /> 
+            <div className="h-[14vh]" /> 
           </div>
 
         </div>

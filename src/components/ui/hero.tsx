@@ -6,7 +6,6 @@ import Link from "next/link"
 import { ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { LandingButton } from "@/components/landing/landing-button"
-import { Mockup, MockupFrame } from "@/components/ui/mockup"
 
 interface HeroProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
   title: React.ReactNode
@@ -72,14 +71,14 @@ const Hero = React.forwardRef<HTMLDivElement, HeroProps>(
         )}
 
         <h1
-          className="text-[1.7rem] sm:text-4xl md:text-4xl lg:text-5xl xl:text-6xl leading-[1.08] sm:leading-[1.05] md:leading-[1.05] lg:leading-[1.05] xl:leading-[1.05] text-center px-3 sm:px-4 md:px-6 w-full max-w-7xl mx-auto text-foreground font-heading font-normal animate-appear opacity-0 delay-100 tracking-[-0.03em] sm:tracking-[-0.04em]"
+          className="text-[1.7rem] sm:text-4xl md:text-4xl lg:text-5xl xl:text-6xl leading-[1.08] sm:leading-[1.05] md:leading-[1.05] lg:leading-[1.05] xl:leading-[1.05] text-center px-3 sm:px-4 w-full max-w-4xl mx-auto text-foreground font-heading font-normal animate-appear opacity-0 delay-100 tracking-[-0.03em] sm:tracking-[-0.04em] text-balance"
         >
           {title}
         </h1>
 
         {subtitle && (
           <p
-            className="text-[1.02rem] md:text-xl text-center font-sans px-4 sm:px-6 max-w-3xl md:max-w-4xl mx-auto mt-5 md:mt-6 mb-9 md:mb-12 leading-relaxed text-muted-foreground animate-appear opacity-0 delay-300 text-pretty"
+            className="text-[1rem] md:text-lg text-left font-sans px-4 sm:px-6 max-w-2xl md:max-w-3xl mx-auto mt-4 md:mt-5 mb-8 md:mb-10 leading-relaxed text-muted-foreground animate-appear opacity-0 delay-300"
           >
             {subtitle}
           </p>
@@ -107,19 +106,21 @@ const Hero = React.forwardRef<HTMLDivElement, HeroProps>(
         ) : null}
 
         {mockupImage && (
-          <div className="mt-10 md:mt-16 w-full max-w-6xl mx-auto relative animate-appear opacity-0 delay-700 px-4 sm:px-4 md:px-0">
-            <MockupFrame className="mx-auto w-[92%] sm:w-full p-0 rounded-[0.7rem] sm:rounded-[0.95rem] md:rounded-[1.2rem] border border-[#e3e3e3] ring-[8px] sm:ring-[12px] md:ring-[16px] ring-[#efefef] shadow-[0_16px_36px_rgba(0,0,0,0.08)] bg-white">
-              <Mockup type="responsive" className="rounded-[0.65rem] sm:rounded-[0.9rem] md:rounded-[1.1rem] border border-[#e6e6e6] bg-[#fafafa] shadow-none">
+          <div className="mt-12 md:mt-16 w-full max-w-6xl mx-auto relative animate-appear opacity-0 delay-700 px-4 sm:px-4 md:px-0">
+            <div className="relative mx-auto w-full rounded-[2rem] border border-[#e3e3df] bg-[#efefed] p-3 shadow-[0_12px_28px_rgba(20,20,20,0.06)] md:p-4">
+              <div className="relative overflow-hidden rounded-[1.65rem] border border-[#dcdcd8] bg-white ring-1 ring-[#ecece9]">
+                <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-10 bg-gradient-to-b from-white/45 to-transparent" />
                 <Image
                   src={mockupImage.src}
                   alt={mockupImage.alt}
                   width={mockupImage.width}
                   height={mockupImage.height}
-                  className="w-full"
+                  className="w-full brightness-[0.99] saturate-[0.82] contrast-[0.98]"
                   priority
                 />
-              </Mockup>
-            </MockupFrame>
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-44 bg-gradient-to-b from-transparent via-[#f7f7f5]/72 to-[#f7f7f5]" />
+              </div>
+            </div>
           </div>
         )}
       </div>

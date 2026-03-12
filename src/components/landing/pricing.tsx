@@ -144,18 +144,18 @@ export function Pricing() {
   return (
     <section
       id="pricing"
-      className="py-20 md:py-28 scroll-mt-20"
+      className="py-10 md:py-14 scroll-mt-20"
     >
       <div className="mx-auto max-w-7xl px-6">
-        <ScrollAnimation className="mx-auto mb-10 max-w-3xl text-center md:mb-14" variant="fade-up">
+        <ScrollAnimation className="mx-auto mb-8 max-w-3xl text-center md:mb-10" variant="fade-up">
           <div className="mb-5 inline-flex items-center gap-2 rounded-none landing-section-tag border border-primary/20 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-primary">
             Pricing
           </div>
 
-          <h2 className="font-heading text-3xl md:text-5xl font-normal leading-[1.06] tracking-[-0.02em] text-foreground">
+          <h2 className="font-heading text-2xl md:text-4xl font-normal leading-[1.06] tracking-[-0.02em] text-foreground">
             Start free, upgrade as you grow
           </h2>
-          <p className="mt-4 text-base leading-relaxed text-muted-foreground md:text-lg">
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground md:text-base">
             Transparent pricing with no hidden fees. We only grow when you grow.
           </p>
         </ScrollAnimation>
@@ -163,7 +163,7 @@ export function Pricing() {
         <ScrollAnimation variant="fade-up" delay={0.1}>
           <div className="mx-auto max-w-5xl overflow-x-auto">
             <div className="min-w-[760px]">
-              <div className="grid [grid-template-columns:minmax(260px,1.6fr)_minmax(170px,1fr)_minmax(170px,1fr)] items-end gap-x-8 border-b border-black/10 pb-6">
+              <div className="grid [grid-template-columns:minmax(260px,1.6fr)_minmax(170px,1fr)_minmax(170px,1fr)] items-end gap-x-8 border-b border-black/10 pb-4">
                 <div className="pr-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
                     Plan comparison
@@ -199,7 +199,7 @@ export function Pricing() {
                 const SectionIcon = section.icon
 
                 return (
-                  <div key={section.title} className="pt-5">
+                  <div key={section.title} className="pt-4">
                     <div className="grid [grid-template-columns:minmax(260px,1.6fr)_minmax(170px,1fr)_minmax(170px,1fr)] items-center gap-x-8 py-2">
                       <div className="flex items-center gap-2 text-sm font-normal text-foreground">
                         <SectionIcon className="h-4 w-4" />
@@ -214,7 +214,7 @@ export function Pricing() {
                         key={`${section.title}-${row.label}`}
                         className={cn(
                           "grid [grid-template-columns:minmax(260px,1.6fr)_minmax(170px,1fr)_minmax(170px,1fr)] gap-x-8 border-b border-black/8",
-                          row.label === "Price" ? "items-start py-5" : "items-center py-4"
+                          row.label === "Price" ? "items-start py-4" : "items-center py-3"
                         )}
                       >
                         <div className="pr-4 text-[15px] text-muted-foreground">{row.label}</div>

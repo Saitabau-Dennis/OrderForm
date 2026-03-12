@@ -71,23 +71,23 @@ const featureItems: FeatureItem[] = [
 
 export function Features() {
     return (
-        <section id="features" className="bg-background pt-8 md:pt-12 pb-8 md:pb-12 scroll-mt-28">
+        <section id="features" className="bg-background py-10 md:py-14 scroll-mt-28">
             <div className="mx-auto max-w-7xl px-6">
                 <ScrollAnimation variant="fade-up">
-                    <div className="mb-16 text-center max-w-3xl mx-auto">
+                    <div className="mb-10 text-center max-w-3xl mx-auto">
                     <div className="inline-flex items-center px-2 py-0.5 rounded-none landing-section-tag border border-primary/20 text-primary text-[10px] font-medium mb-4 uppercase tracking-[0.12em]">
                Features
               </div>
-                    <h2 className="text-3xl md:text-5xl font-heading font-normal text-foreground leading-[1.06] tracking-[-0.02em] mb-6">
+                    <h2 className="text-2xl md:text-4xl font-heading font-normal text-foreground leading-[1.06] tracking-[-0.02em] mb-4">
                         Everything you need <br className="hidden md:block" />
                         to <span className="text-primary">run your store.</span>
                     </h2>
-                    <p className="text-base md:text-lg text-muted-foreground font-sans leading-relaxed">
+                    <p className="text-sm md:text-base text-muted-foreground font-sans leading-relaxed">
                         From storefront setup to checkout, order management, and repeat-purchase tools, OrderForm gives social sellers one streamlined workflow.
                     </p>
                 </div>
 
-                <div className="mx-auto border-2 border-dotted border-primary/20 overflow-hidden">
+                <div className="mx-auto border-4 border-dotted border-primary/20 overflow-hidden">
                     <div className="grid lg:grid-cols-2">
                         {featureItems.map((item) => (
                             <FeatureCard key={item.title} className={item.cardClassName}>
@@ -96,7 +96,7 @@ export function Features() {
                                     description={item.description}
                                 />
 
-                                <div className="mt-auto px-5 pb-5 pt-3 md:px-6 md:pb-6 md:pt-4">
+                                <div className="mt-auto px-4 pb-4 pt-2 md:px-5 md:pb-5 md:pt-3">
                                     <DualModeImage
                                         src={item.src}
                                         alt={item.alt}
@@ -132,12 +132,12 @@ interface CardHeadingProps {
 }
 
 const CardHeading = ({ title, description }: CardHeadingProps) => (
-    <div className="relative z-10 p-5 pb-1 md:p-6 md:pb-2">
-        <h3 className="font-heading font-normal text-lg md:text-xl leading-snug text-foreground mb-3">
+    <div className="relative z-10 p-4 pb-1 md:p-5 md:pb-2">
+        <h3 className="font-heading font-normal text-base md:text-lg leading-snug text-foreground mb-2">
             <span className="text-primary">{title.split(" ")[0]}</span>{" "}
             {title.split(" ").slice(1).join(" ")}
         </h3>
-        <p className="text-base text-muted-foreground font-sans leading-relaxed">{description}</p>
+        <p className="text-sm md:text-base text-muted-foreground font-sans leading-relaxed">{description}</p>
     </div>
 )
 

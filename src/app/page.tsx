@@ -19,7 +19,7 @@ export default async function Home() {
       <Navbar isAuthenticated={!!session} />
 
       <Hero
-        className="pt-24 pb-6 md:pt-32 md:pb-12"
+        className="pt-20 pb-4 md:pt-24 md:pb-8"
         badge={
           <AnimatedBadge text="Built for Social Sellers" />
         }

@@ -5,8 +5,8 @@ const currentYear = new Date().getFullYear()
 
 export function Footer() {
   return (
-    <footer className="bg-background border-t border-border py-12">
-      <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between gap-10">
+    <footer className="bg-background border-t border-border py-8">
+      <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between gap-8">
 
         {/* Brand Section */}
         <div className="flex flex-col gap-4 max-w-xs">
@@ -15,7 +15,7 @@ export function Footer() {
               Orderform
             </span>
             </div>
-            <p className="text-base text-muted-foreground leading-relaxed">
+            <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
                 Built for social commerce: storefront links, clean checkout, and WhatsApp-ready orders.
             </p>
              <div className="flex items-center gap-4 text-muted-foreground">
@@ -28,25 +28,25 @@ export function Footer() {
         {/* Links Section */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 md:gap-12">
             <div className="flex flex-col gap-3">
-                <h4 className="font-normal text-base">Product</h4>
-                <Link href="#features" className="text-base text-muted-foreground hover:text-foreground transition-colors">Features</Link>
-                <Link href="#pricing" className="text-base text-muted-foreground hover:text-foreground transition-colors">Pricing</Link>
+                <h4 className="font-normal text-sm md:text-base">Product</h4>
+                <Link href="#features" className="text-sm md:text-base text-muted-foreground hover:text-foreground transition-colors">Features</Link>
+                <Link href="#pricing" className="text-sm md:text-base text-muted-foreground hover:text-foreground transition-colors">Pricing</Link>
             </div>
             <div className="flex flex-col gap-3">
-                <h4 className="font-normal text-base">Company</h4>
-                 <Link href="#" className="text-base text-muted-foreground hover:text-foreground transition-colors">About</Link>
-                 <Link href="mailto:dennisntete28@gmail.com" className="text-base text-muted-foreground hover:text-foreground transition-colors">Contact</Link>
+                <h4 className="font-normal text-sm md:text-base">Company</h4>
+                 <Link href="#" className="text-sm md:text-base text-muted-foreground hover:text-foreground transition-colors">About</Link>
+                 <Link href="mailto:dennisntete28@gmail.com" className="text-sm md:text-base text-muted-foreground hover:text-foreground transition-colors">Contact</Link>
             </div>
             <div className="flex flex-col gap-3">
-                <h4 className="font-normal text-base">Legal</h4>
-                <Link href="/privacy" className="text-base text-muted-foreground hover:text-foreground transition-colors">Privacy</Link>
-                <Link href="/terms" className="text-base text-muted-foreground hover:text-foreground transition-colors">Terms</Link>
+                <h4 className="font-normal text-sm md:text-base">Legal</h4>
+                <Link href="/privacy" className="text-sm md:text-base text-muted-foreground hover:text-foreground transition-colors">Privacy</Link>
+                <Link href="/terms" className="text-sm md:text-base text-muted-foreground hover:text-foreground transition-colors">Terms</Link>
             </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 mt-12 pt-8 border-t border-border">
-        <p className="text-base text-muted-foreground text-center md:text-center">
+      <div className="max-w-7xl mx-auto px-6 mt-8 pt-6 border-t border-border">
+        <p className="text-sm md:text-base text-muted-foreground text-center md:text-center">
           &copy; {currentYear} OrderForm. Built with ❤️ for modern social selling.
         </p>
       </div>

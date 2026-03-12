@@ -33,21 +33,21 @@ const faqs = [
 
 export function FAQ() {
   return (
-    <section id="faq" className="py-16 md:py-24 scroll-mt-28">
-      <div className="mx-auto max-w-6xl px-6">
+    <section id="faq" className="py-10 md:py-14 scroll-mt-28">
+      <div className="mx-auto max-w-7xl px-6">
         <ScrollAnimation variant="fade-up">
-          <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-14">
-            <div className="space-y-5">
-              <h2 className="font-heading text-3xl md:text-5xl font-normal tracking-[-0.02em] text-foreground">
+          <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-10">
+            <div className="space-y-4">
+              <h2 className="font-heading text-2xl md:text-4xl font-normal tracking-[-0.02em] text-foreground">
                 FAQs
               </h2>
-              <p className="text-base md:text-lg font-semibold text-muted-foreground">
+              <p className="text-sm md:text-base font-semibold text-muted-foreground">
                 Your questions answered
               </p>
-              <p className="max-w-sm font-sans text-base leading-relaxed text-muted-foreground">
+              <p className="max-w-sm font-sans text-sm md:text-base leading-relaxed text-muted-foreground">
                 Explore answers to common queries and get the information you need to make the most of OrderForm.
               </p>
-              <p className="max-w-sm font-sans text-base leading-relaxed text-muted-foreground">
+              <p className="max-w-sm font-sans text-sm md:text-base leading-relaxed text-muted-foreground">
                 Need more help? Contact our{" "}
                 <a
                   href="mailto:support@orderform.store"
@@ -66,10 +66,10 @@ export function FAQ() {
                   value={`item-${index}`}
                   className="border-b border-black/10 last:border-b"
                 >
-                  <AccordionTrigger className="py-5 text-left font-heading text-lg md:text-xl font-medium tracking-[-0.01em] text-foreground hover:no-underline [&>svg]:text-muted-foreground">
+                  <AccordionTrigger className="py-4 text-left font-heading text-base md:text-lg font-medium tracking-[-0.01em] text-foreground hover:no-underline [&>svg]:text-muted-foreground">
                     {faq.question}
                   </AccordionTrigger>
-                  <AccordionContent className="pb-5 pr-6 font-sans text-base leading-relaxed text-muted-foreground">
+                  <AccordionContent className="pb-4 pr-6 font-sans text-sm md:text-base leading-relaxed text-muted-foreground">
                     {faq.answer}
                   </AccordionContent>
                 </AccordionItem>
