@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2, Plus, Trash2 } from "lucide-react";
+import { Check, Copy, Loader2, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/dashboard/dashboard-button";
@@ -29,6 +29,7 @@ const ROOT_DOMAIN = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || "")
 
 const CAN_USE_SUBDOMAIN_URLS =
   Boolean(ROOT_DOMAIN) && !ROOT_DOMAIN.endsWith(".vercel.app");
+const LOCAL_FALLBACK_ORIGIN = "http://localhost:3000";
 
 // Form schema intentionally allows empty strings for optional URL/email fields.
 const settingsSchema = z.object({
@@ -96,6 +97,8 @@ interface SettingsFormProps {
 export function SettingsForm({ initialData, userData }: SettingsFormProps) {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"config" | "account">("config");
+  const [runtimeOrigin, setRuntimeOrigin] = useState("");
+  const [copiedStoreUrl, setCopiedStoreUrl] = useState(false);
   const avatarSeed = userData?.name || "User";
   const diceAvatarSrc = `https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=${encodeURIComponent(
     avatarSeed
@@ -134,6 +137,24 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
   });
 
   const name = form.watch("name");
+  const slug = form.watch("slug").trim();
+  const localOrigin = runtimeOrigin || LOCAL_FALLBACK_ORIGIN;
+  const isLocalRuntime =
+    runtimeOrigin.includes("localhost") ||
+    runtimeOrigin.includes("127.0.0.1") ||
+    runtimeOrigin.includes("0.0.0.0");
+  const showLocalStoreUrl = isLocalRuntime || process.env.NODE_ENV !== "production";
+  const useSubdomainPreview = CAN_USE_SUBDOMAIN_URLS && !showLocalStoreUrl;
+  const storeUrlPrefix = useSubdomainPreview ? "https://" : `${showLocalStoreUrl ? localOrigin : "https://orderform.store"}/`;
+  const publicStoreUrl = slug
+    ? useSubdomainPreview
+      ? `https://${slug}.${ROOT_DOMAIN}`
+      : `${showLocalStoreUrl ? localOrigin : "https://orderform.store"}/${slug}`
+    : "";
+
+  useEffect(() => {
+    setRuntimeOrigin(window.location.origin.toLowerCase());
+  }, []);
 
   useEffect(() => {
     // Auto-generate slug only during first-time setup; never overwrite existing stores.
@@ -174,6 +195,22 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
     }
 
     window.open(`https://wa.me/${number}`, "_blank", "noopener,noreferrer");
+  };
+
+  const handleCopyStoreUrl = async () => {
+    if (!publicStoreUrl) {
+      toast.error("Enter a store slug first");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(publicStoreUrl);
+      setCopiedStoreUrl(true);
+      toast.success("Store URL copied");
+      window.setTimeout(() => setCopiedStoreUrl(false), 1500);
+    } catch {
+      toast.error("Failed to copy URL");
+    }
   };
 
   return (
@@ -231,31 +268,57 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
                     </FieldGroup>
 
                     <FieldGroup label="Store URL" error={form.formState.errors.slug?.message}>
-                      <div className="flex overflow-hidden rounded-xl border border-input focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1">
-                        {CAN_USE_SUBDOMAIN_URLS ? (
-                          <>
-                            <span className="inline-flex items-center border-r border-input bg-muted/30 px-3 text-xs text-muted-foreground">
-                              https://
-                            </span>
-                            <Input
-                              {...form.register("slug")}
-                              className="h-11 rounded-none border-0 focus-visible:ring-0"
-                            />
-                            <span className="inline-flex items-center border-l border-input bg-muted/30 px-3 text-xs text-muted-foreground">
-                              .{ROOT_DOMAIN}
-                            </span>
-                          </>
-                        ) : (
-                          <>
-                            <span className="inline-flex items-center border-r border-input bg-muted/30 px-3 text-xs text-muted-foreground">
-                              orderform.store/
-                            </span>
-                            <Input
-                              {...form.register("slug")}
-                              className="h-11 rounded-none border-0 focus-visible:ring-0"
-                            />
-                          </>
-                        )}
+                      <div className="space-y-2">
+                        <div className="flex overflow-hidden rounded-xl border border-input focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1">
+                          {useSubdomainPreview ? (
+                            <>
+                              <span className="inline-flex items-center border-r border-input bg-muted/30 px-3 text-xs text-muted-foreground">
+                                {storeUrlPrefix}
+                              </span>
+                              <Input
+                                {...form.register("slug")}
+                                className="h-11 rounded-none border-0 focus-visible:ring-0"
+                              />
+                              <span className="inline-flex items-center border-l border-input bg-muted/30 px-3 text-xs text-muted-foreground">
+                                .{ROOT_DOMAIN}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="inline-flex items-center border-r border-input bg-muted/30 px-3 text-xs text-muted-foreground">
+                                {storeUrlPrefix}
+                              </span>
+                              <Input
+                                {...form.register("slug")}
+                                className="h-11 rounded-none border-0 focus-visible:ring-0"
+                              />
+                            </>
+                          )}
+                        </div>
+                        <div className="flex items-center justify-between gap-3 text-xs">
+                          <p className="truncate text-muted-foreground" title={publicStoreUrl || "Store URL preview"}>
+                            {publicStoreUrl || "Store URL preview"}
+                          </p>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="h-8 rounded-lg px-2.5"
+                            onClick={handleCopyStoreUrl}
+                            disabled={!publicStoreUrl}
+                          >
+                            {copiedStoreUrl ? (
+                              <>
+                                <Check className="mr-1 h-3.5 w-3.5" />
+                                Copied
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="mr-1 h-3.5 w-3.5" />
+                                Copy URL
+                              </>
+                            )}
+                          </Button>
+                        </div>
                       </div>
                     </FieldGroup>
                   </div>
