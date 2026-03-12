@@ -22,24 +22,14 @@ export default auth((req) => {
   const { pathname } = req.nextUrl;
   const isLoggedIn = !!req.auth;
 
-  // Enforce auth for dashboard paths before any host-based rewrite rules.
-  if (PROTECTED_PATH_REGEX.test(pathname) && !isLoggedIn) {
-    const loginUrl = new URL("/login", req.url);
-    loginUrl.searchParams.set("callbackUrl", req.nextUrl.pathname);
-    return Response.redirect(loginUrl);
-  }
-
   // Multitenant rewrites only run when a root domain is configured.
   if (!ROOT_DOMAIN) {
-    return NextResponse.next();
-  }
-
-  // Keep app/auth paths untouched even on subdomains.
-  if (PROTECTED_PATH_REGEX.test(pathname)) {
-    return NextResponse.next();
-  }
-
-  if (APP_PATHS_TO_SKIP_REWRITE.some((path) => pathname === path || pathname.startsWith(`${path}/`))) {
+    // Fallback: enforce auth locally when no root domain is set.
+    if (PROTECTED_PATH_REGEX.test(pathname) && !isLoggedIn) {
+      const loginUrl = new URL("/login", req.url);
+      loginUrl.searchParams.set("callbackUrl", req.nextUrl.pathname);
+      return Response.redirect(loginUrl);
+    }
     return NextResponse.next();
   }
 
@@ -48,16 +38,24 @@ export default auth((req) => {
   const rootHost = ROOT_DOMAIN;
   const wwwHost = `www.${ROOT_DOMAIN}`;
   const appHost = `app.${ROOT_DOMAIN}`;
+  const appBaseUrl = `https://${appHost}`;
 
-  // Main domain and www host serve the root app directly.
+  // On root/www domain: redirect dashboard & auth paths to app subdomain.
   if (!host || host === rootHost || host === wwwHost) {
+    if (PROTECTED_PATH_REGEX.test(pathname) || APP_PATHS_TO_SKIP_REWRITE.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
+      return NextResponse.redirect(new URL(pathname + req.nextUrl.search, appBaseUrl));
+    }
     return NextResponse.next();
   }
 
-  // app.{domain} serves the dashboard — redirect bare root to /dashboard.
+  // app.{domain}: enforce auth for dashboard, redirect root → /dashboard.
   if (host === appHost) {
+    if (PROTECTED_PATH_REGEX.test(pathname) && !isLoggedIn) {
+      const loginUrl = new URL(`/login?callbackUrl=${encodeURIComponent(pathname)}`, appBaseUrl);
+      return Response.redirect(loginUrl);
+    }
     if (pathname === "/") {
-      return NextResponse.redirect(new URL("/dashboard", req.url));
+      return NextResponse.redirect(new URL("/dashboard", appBaseUrl));
     }
     return NextResponse.next();
   }
