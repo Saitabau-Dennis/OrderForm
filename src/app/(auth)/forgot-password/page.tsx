@@ -36,17 +36,17 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="w-full max-w-3xl bg-background rounded-none md:rounded-[2.5rem] shadow-none md:shadow-2xl ring-0 md:ring-[12px] ring-primary/20 border-x-0 border-y-0 md:border border-black/5 overflow-hidden flex flex-col md:flex-row min-h-screen md:min-h-[480px]">
+    <div className="w-full max-w-2xl bg-background rounded-none md:rounded-[2rem] shadow-none md:shadow-2xl ring-0 md:ring-[10px] ring-primary/20 border-x-0 border-y-0 md:border border-black/5 overflow-hidden flex flex-col md:flex-row min-h-screen md:min-h-[420px]">
       {/* Left Side - Text */}
-      <div className="w-full hidden md:flex md:w-1/2 bg-primary p-10 flex-col justify-between text-primary-foreground relative overflow-hidden">
+      <div className="w-full hidden md:flex md:w-1/2 bg-primary p-8 flex-col justify-between text-primary-foreground relative overflow-hidden">
         <div className="relative z-10">
-          <Link href="/" className="[font-family:var(--font-adcure)] text-3xl font-semibold tracking-tight mb-12 block mt-1">
+          <Link href="/" className="[font-family:var(--font-adcure)] text-2xl font-semibold tracking-tight mb-12 block mt-1">
             Orderform
           </Link>
-          <h1 className="font-heading text-4xl md:text-5xl font-normal tracking-tight leading-tight mb-6">
+          <h1 className="font-heading text-3xl md:text-4xl font-normal tracking-tight leading-tight mb-6">
             Reset your password.
           </h1>
-          <p className="font-sans text-primary-foreground/75 text-base md:text-lg leading-relaxed">
+          <p className="font-sans text-primary-foreground/75 text-sm md:text-base leading-relaxed">
             Don&apos;t worry, we&apos;ll help you get back to managing your store in no time.
           </p>
         </div>
@@ -63,10 +63,10 @@ export default function ForgotPasswordPage() {
       </div>
 
       {/* Right Side - Form */}
-      <div className="w-full md:w-1/2 px-5 pb-8 pt-7 sm:px-6 md:p-10 flex flex-col justify-center bg-background">
-        <div className="max-w-sm mx-auto w-full">
+      <div className="w-full md:w-1/2 px-5 pb-7 pt-6 sm:px-6 md:p-8 flex flex-col justify-center bg-background">
+        <div className="max-w-xs mx-auto w-full">
           <div className="md:hidden mb-6 rounded-2xl border border-primary/30 bg-primary p-4 text-center shadow-lg">
-             <Link href="/" className="[font-family:var(--font-adcure)] text-3xl font-semibold tracking-tight text-primary-foreground mt-1">
+             <Link href="/" className="[font-family:var(--font-adcure)] text-2xl font-semibold tracking-tight text-primary-foreground mt-1">
               Orderform
             </Link>
             <p className="mt-2 text-xs text-primary-foreground/75">Request a code and reset your password quickly.</p>
@@ -79,7 +79,7 @@ export default function ForgotPasswordPage() {
             Back to login
           </Link>
 
-          <h2 className="font-heading text-2xl sm:text-3xl font-normal tracking-tight text-foreground mb-2">Forgot password?</h2>
+          <h2 className="font-heading text-xl sm:text-2xl font-normal tracking-tight text-foreground mb-2">Forgot password?</h2>
           <p className="font-sans text-sm sm:text-base text-muted-foreground mb-7 sm:mb-8">
             Enter your email address and we&apos;ll send you a code to reset your password.
           </p>
@@ -93,7 +93,7 @@ export default function ForgotPasswordPage() {
                 placeholder="name@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-12 rounded-xl bg-muted/50 border-border focus:bg-background transition-colors"
+                className="h-11 rounded-xl bg-muted/50 border-border focus:bg-background transition-colors"
                 required
               />
             </div>
@@ -102,7 +102,7 @@ export default function ForgotPasswordPage() {
               type="submit"
               disabled={loading}
               size="lg"
-              className="w-full h-12 text-base font-semibold"
+              className="w-full h-11 text-sm font-semibold"
             >
               {loading ? (
                 <span className="flex items-center gap-2">

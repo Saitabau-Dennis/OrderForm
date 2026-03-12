@@ -90,9 +90,9 @@ export function VerifyEmailForm() {
   }
 
   return (
-    <div className="w-full max-w-md mx-auto space-y-6 sm:space-y-8">
+    <div className="w-full max-w-sm mx-auto space-y-5 sm:space-y-6">
       <div className="text-center space-y-2">
-        <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-normal tracking-tight">Check your email</h2>
+        <h2 className="font-heading text-xl sm:text-2xl md:text-3xl font-normal tracking-tight">Check your email</h2>
         <p className="text-sm sm:text-base text-muted-foreground">
           We sent a verification code to <span className="font-medium text-foreground">{email}</span>
         </p>
