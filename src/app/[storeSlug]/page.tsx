@@ -88,7 +88,7 @@ export default async function StorePage({ params }: { params: Promise<{ storeSlu
 
           <div className="mt-8 flex justify-center">
             <Link
-              href={`/${safeStore.slug}/products`}
+              href={`/${safeStore.slug}/catalog`}
               className="inline-flex h-11 items-center rounded-none px-6 text-sm font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
               style={{
                 backgroundColor: safeStore.brandColor || "var(--store-brand, #1A1A1A)",

@@ -30,7 +30,7 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
 
   const categories = (store.categories ?? []).filter(Boolean)
   const isHomeActive = pathname === `/${store.slug}`
-  const isCatalogActive = pathname.startsWith(`/${store.slug}/products`)
+  const isCatalogActive = pathname.startsWith(`/${store.slug}/catalog`)
   const isContactActive = pathname === `/${store.slug}/contact`
   const contactHref = `/${store.slug}/contact`
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -38,10 +38,10 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
 
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    // Search is handled by products page query param routing.
+    // Search is handled by catalog page query param routing.
     const query = searchQuery.trim()
     const searchParams = query ? `?query=${encodeURIComponent(query)}` : ""
-    router.push(`/${store.slug}/products${searchParams}`)
+    router.push(`/${store.slug}/catalog${searchParams}`)
   }
 
   return (
@@ -219,7 +219,7 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
                 {mobileCatalogOpen ? (
                   <div>
                     <Link
-                      href={`/${store.slug}/products`}
+                      href={`/${store.slug}/catalog`}
                       onClick={() => {
                         setMobileMenuOpen(false)
                         setMobileCatalogOpen(false)
@@ -234,7 +234,7 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
                       categories.map((category) => (
                         <Link
                           key={category}
-                          href={`/${store.slug}/products?category=${encodeURIComponent(category)}`}
+                          href={`/${store.slug}/catalog?category=${encodeURIComponent(category)}`}
                           onClick={() => {
                             setMobileMenuOpen(false)
                             setMobileCatalogOpen(false)
@@ -267,7 +267,7 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
       ) : null}
 
       <div className="mx-auto hidden w-full max-w-[1460px] px-4 pb-6 sm:px-6 sm:pb-6 lg:flex lg:h-[180px] lg:items-end lg:justify-center lg:px-8 lg:pb-8">
-        <nav className="flex items-center gap-6 overflow-x-auto pb-2 text-nowrap [scrollbar-width:none] sm:justify-center sm:gap-10 sm:pb-1 lg:gap-12">
+        <nav className="flex items-center gap-6 overflow-visible pb-2 text-nowrap [scrollbar-width:none] sm:justify-center sm:gap-10 sm:pb-1 lg:gap-12">
           <Link
             href={`/${store.slug}`}
             className={`text-sm font-semibold tracking-wide ${
@@ -279,7 +279,8 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
 
           <div className="group relative">
             <Link
-              href={`/${store.slug}/products`}
+              href={`/${store.slug}/catalog`}
+              aria-haspopup="menu"
               className={`inline-flex items-center gap-1 text-sm font-semibold tracking-wide ${
                 isCatalogActive ? "text-[#111111] underline underline-offset-[6px]" : "text-[#2A2A26] hover:underline hover:underline-offset-[6px]"
               }`}
@@ -288,10 +289,10 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
               <span>+</span>
             </Link>
 
-            <div className="pointer-events-none invisible absolute left-0 top-full z-50 w-[240px] pt-3 opacity-0 transition-all duration-150 group-hover:pointer-events-auto group-hover:visible group-hover:opacity-100 sm:left-1/2 sm:-translate-x-1/2">
+            <div className="absolute left-0 top-full z-50 hidden w-[240px] pt-3 group-hover:block group-focus-within:block sm:left-1/2 sm:-translate-x-1/2">
               <div className="border border-[#D8D8D3] bg-[#F7F7F5] p-2 shadow-[0_10px_24px_rgba(20,20,18,0.08)]">
                 <Link
-                  href={`/${store.slug}/products`}
+                  href={`/${store.slug}/catalog`}
                   className="block px-3 py-2 text-sm font-semibold text-[#1A1A1A] hover:bg-[#ECECE7]"
                 >
                   All products
@@ -300,7 +301,7 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
                   categories.map((category) => (
                     <Link
                       key={category}
-                      href={`/${store.slug}/products?category=${encodeURIComponent(category)}`}
+                      href={`/${store.slug}/catalog?category=${encodeURIComponent(category)}`}
                       className="block px-3 py-2 text-sm text-[#2A2A26] hover:bg-[#ECECE7]"
                     >
                       {category}

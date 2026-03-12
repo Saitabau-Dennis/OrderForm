@@ -37,7 +37,7 @@ export default async function ProductPage({
     include: { optionStocks: true },
   })
 
-  // Backward compatibility: support slug-like product URLs (e.g. /products/beanie-hat-beige)
+  // Backward compatibility: support slug-like product URLs (e.g. /catalog/beanie-hat-beige)
   if (!product) {
     const requestedSlug = decodeURIComponent(productId)
     const productsForSlugMatch = await db.product.findMany({

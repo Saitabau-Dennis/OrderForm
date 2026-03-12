@@ -105,7 +105,7 @@ export function CartClient({
             >
               <div className="flex min-w-0 gap-4">
                 <Link
-                  href={`/${storeSlug}/products/${item.productId}`}
+                  href={`/${storeSlug}/catalog/${item.productId}`}
                   className="relative h-28 w-24 shrink-0 overflow-hidden rounded-none bg-[#ECECE8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
                 >
                   {item.imageUrl ? (

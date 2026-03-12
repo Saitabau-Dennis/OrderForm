@@ -59,7 +59,7 @@ export default async function CartPage({
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <h1 className="text-[30px] font-medium tracking-wide text-[#111111] md:text-[36px]">Your cart</h1>
             <Link
-              href={`/${store.slug}/products`}
+              href={`/${store.slug}/catalog`}
               className="text-base underline underline-offset-4 text-[#1A1A1A] hover:text-[#000000] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2 md:text-lg"
             >
               Continue shopping

@@ -6,5 +6,5 @@ export default async function LegacyProductPage({
   params: Promise<{ storeSlug: string; productId: string }>
 }) {
   const { storeSlug, productId } = await params
-  redirect(`/${storeSlug}/products/${productId}`)
+  redirect(`/${storeSlug}/catalog/${productId}`)
 }

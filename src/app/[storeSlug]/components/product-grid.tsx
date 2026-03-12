@@ -331,7 +331,7 @@ function ProductCard({
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-none border border-[#E6E6E1]">
       <Link
-        href={`/${storeSlug}/products/${product.id}`}
+        href={`/${storeSlug}/catalog/${product.id}`}
         className="relative block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-inset"
       >
         <div className="relative aspect-square w-full overflow-hidden bg-[#EEECEA] sm:aspect-[4/5]">
@@ -358,7 +358,7 @@ function ProductCard({
 
       <div className="flex flex-1 flex-col p-3 sm:p-4">
         <Link
-          href={`/${storeSlug}/products/${product.id}`}
+          href={`/${storeSlug}/catalog/${product.id}`}
           className="space-y-2 rounded-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
         >
           <h3 className="line-clamp-2 text-[13px] font-medium leading-snug text-[#2D2D2A] sm:text-[15px]">
@@ -376,7 +376,7 @@ function ProductCard({
             {formatPrice(product.price, currency)}
           </p>
           <Link
-            href={`/${storeSlug}/products/${product.id}`}
+            href={`/${storeSlug}/catalog/${product.id}`}
             className="text-[11px] font-semibold uppercase tracking-wide text-[#575751] underline decoration-[#BDBDB6] underline-offset-4 hover:text-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2 sm:text-xs"
           >
             Details
