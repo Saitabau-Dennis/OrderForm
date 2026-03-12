@@ -70,9 +70,13 @@ export default auth((req) => {
     return NextResponse.next();
   }
 
-  // Prevent double-prefixing in edge cases.
-  if (pathname === `/${subdomain}` || pathname.startsWith(`/${subdomain}/`)) {
-    return NextResponse.next();
+  // Canonicalize tenant URLs: `slug.root/slug/...` -> `slug.root/...`.
+  // Internal rewrite below will map the clean path back to `/{slug}/...`.
+  const tenantPrefix = `/${subdomain}`;
+  if (pathname === tenantPrefix || pathname.startsWith(`${tenantPrefix}/`)) {
+    const canonicalUrl = req.nextUrl.clone();
+    canonicalUrl.pathname = pathname.slice(tenantPrefix.length) || "/";
+    return NextResponse.redirect(canonicalUrl);
   }
 
   // Rewrite `sub.root-domain.com/foo` -> `/{sub}/foo` for storefront routing.
