@@ -39,13 +39,40 @@ export default auth((req) => {
   const wwwHost = `www.${ROOT_DOMAIN}`;
   const appHost = `app.${ROOT_DOMAIN}`;
   const appBaseUrl = `https://${appHost}`;
+  const domainSuffix = `.${ROOT_DOMAIN}`;
 
-  // On root/www domain: redirect dashboard & auth paths to app subdomain.
-  if (!host || host === rootHost || host === wwwHost) {
-    if (PROTECTED_PATH_REGEX.test(pathname) || APP_PATHS_TO_SKIP_REWRITE.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
-      return NextResponse.redirect(new URL(pathname + req.nextUrl.search, appBaseUrl));
+  // Resolve tenant subdomain early so storefront routes are preferred over dashboard route groups.
+  // Fallback inference (first label) keeps tenant routing resilient when ROOT_DOMAIN is misconfigured.
+  let tenantSubdomain: string | null = null;
+  if (host.endsWith(domainSuffix)) {
+    const candidate = host.slice(0, -domainSuffix.length);
+    if (candidate && !RESERVED_SUBDOMAINS.has(candidate)) {
+      tenantSubdomain = candidate;
     }
-    return NextResponse.next();
+  } else {
+    const hostParts = host.split(".");
+    if (hostParts.length >= 3) {
+      const candidate = hostParts[0];
+      if (candidate && !RESERVED_SUBDOMAINS.has(candidate)) {
+        tenantSubdomain = candidate;
+      }
+    }
+  }
+
+  if (tenantSubdomain) {
+    const tenantPrefix = `/${tenantSubdomain}`;
+    // Canonicalize tenant URLs: `slug.root/slug/...` -> `slug.root/...`.
+    // Internal rewrite below maps clean path back to `/{slug}/...`.
+    if (pathname === tenantPrefix || pathname.startsWith(`${tenantPrefix}/`)) {
+      const canonicalUrl = req.nextUrl.clone();
+      canonicalUrl.pathname = pathname.slice(tenantPrefix.length) || "/";
+      return NextResponse.redirect(canonicalUrl);
+    }
+
+    // Rewrite `sub.root-domain.com/foo` -> `/{sub}/foo` for storefront routing.
+    const rewrittenUrl = req.nextUrl.clone();
+    rewrittenUrl.pathname = pathname === "/" ? tenantPrefix : `${tenantPrefix}${pathname}`;
+    return NextResponse.rewrite(rewrittenUrl);
   }
 
   // app.{domain}: enforce auth for dashboard, redirect root → /dashboard.
@@ -60,29 +87,15 @@ export default auth((req) => {
     return NextResponse.next();
   }
 
-  const domainSuffix = `.${ROOT_DOMAIN}`;
-  if (!host.endsWith(domainSuffix)) {
+  // On root/www domain: redirect dashboard & auth paths to app subdomain.
+  if (!host || host === rootHost || host === wwwHost) {
+    if (PROTECTED_PATH_REGEX.test(pathname) || APP_PATHS_TO_SKIP_REWRITE.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
+      return NextResponse.redirect(new URL(pathname + req.nextUrl.search, appBaseUrl));
+    }
     return NextResponse.next();
   }
 
-  const subdomain = host.slice(0, -domainSuffix.length);
-  if (!subdomain || RESERVED_SUBDOMAINS.has(subdomain)) {
-    return NextResponse.next();
-  }
-
-  // Canonicalize tenant URLs: `slug.root/slug/...` -> `slug.root/...`.
-  // Internal rewrite below will map the clean path back to `/{slug}/...`.
-  const tenantPrefix = `/${subdomain}`;
-  if (pathname === tenantPrefix || pathname.startsWith(`${tenantPrefix}/`)) {
-    const canonicalUrl = req.nextUrl.clone();
-    canonicalUrl.pathname = pathname.slice(tenantPrefix.length) || "/";
-    return NextResponse.redirect(canonicalUrl);
-  }
-
-  // Rewrite `sub.root-domain.com/foo` -> `/{sub}/foo` for storefront routing.
-  const rewrittenUrl = req.nextUrl.clone();
-  rewrittenUrl.pathname = pathname === "/" ? `/${subdomain}` : `/${subdomain}${pathname}`;
-  return NextResponse.rewrite(rewrittenUrl);
+  return NextResponse.next();
 });
 
 export const config = {
