@@ -34,11 +34,15 @@ export default function LoginPage() {
       })
 
       if (res?.error) {
-        if (res.error === "unverified_email") {
+        if (res.code === "unverified_email") {
           // Auto-send a fresh verification code and redirect to the verify page.
-          await sendVerificationCode(formData.email)
-          toast.warning("Please verify your email address — we've sent a verification code to your inbox.")
-          router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`)
+          const verificationResult = await sendVerificationCode(formData.email)
+          if (verificationResult.error) {
+            toast.error(verificationResult.error)
+          } else {
+            toast.warning("Please verify your email address — we've sent a verification code to your inbox.")
+            router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`)
+          }
         } else {
           toast.error("Invalid email or password")
         }

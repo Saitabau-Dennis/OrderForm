@@ -1,5 +1,5 @@
-import NextAuth from "next-auth";
-import Credentials, { CredentialsSignin } from "next-auth/providers/credentials";
+import NextAuth, { CredentialsSignin } from "next-auth";
+import Credentials from "next-auth/providers/credentials";
 import authConfig from "@/auth.config";
 
 // Extend default session shape so callers can rely on `session.user.id`.
@@ -52,12 +52,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           return null;
         }
 
-        // Enforce email verification before allowing dashboard access.
-        // Throw a typed error so the login page can redirect to verify-email.
-        if (!user.emailVerified) {
-          throw new UnverifiedEmailError();
-        }
-
         const isPasswordValid = await bcrypt.compare(
           password,
           user.password
@@ -65,6 +59,12 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
         if (!isPasswordValid) {
           return null;
+        }
+
+        // Enforce email verification after validating credentials.
+        // This prevents triggering verification emails on bad password attempts.
+        if (!user.emailVerified) {
+          throw new UnverifiedEmailError();
         }
 
         return {
