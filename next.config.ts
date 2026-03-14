@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
       // Keeps legacy product URLs working after route rename.
       {
         source: "/:storeSlug/product/:productId",
-        destination: "/:storeSlug/products/:productId",
+        destination: "/:storeSlug/catalog/:productId",
         permanent: true,
       },
     ];
