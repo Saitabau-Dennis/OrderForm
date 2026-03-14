@@ -4,6 +4,7 @@ import { hasProductOptions } from "@/lib/has-product-options"
 import { StoreNavbar } from "../components/store-navbar"
 import { StoreFooter } from "../components/store-footer"
 import { ProductGrid } from "../components/product-grid"
+import { StoreBreadcrumbs } from "../components/store-breadcrumbs"
 
 export default async function AllProductsPage({
   params,
@@ -66,6 +67,13 @@ export default async function AllProductsPage({
 
       <main className="flex-1 w-full px-3 sm:px-5 lg:px-7 py-10 md:py-14">
         <div className="mx-auto w-full max-w-[1500px]">
+          <StoreBreadcrumbs
+            items={[
+              { label: "Home", href: `/${store.slug}` },
+              { label: "Catalog" },
+            ]}
+          />
+
           <div className="mb-6">
             <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#1A1A1A]">All Products</h1>
             <p className="mt-1 text-sm text-[#6D6D67]">

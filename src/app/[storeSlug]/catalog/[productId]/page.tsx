@@ -5,6 +5,7 @@ import { StoreNavbar } from "../../components/store-navbar"
 import { StoreFooter } from "../../components/store-footer"
 import { ProductDetailsClient } from "../../components/product-details-client"
 import { ProductGrid } from "../../components/product-grid"
+import { StoreBreadcrumbs } from "../../components/store-breadcrumbs"
 
 function slugify(value: string): string {
   return value
@@ -118,6 +119,14 @@ export default async function ProductPage({
 
       <main className="flex-1 w-full px-3 py-10 sm:px-5 lg:px-7 md:py-16">
         <div className="mx-auto w-full max-w-[1500px]">
+          <StoreBreadcrumbs
+            items={[
+              { label: "Home", href: `/${store.slug}` },
+              { label: "Catalog", href: `/${store.slug}/catalog` },
+              { label: product.name },
+            ]}
+          />
+
           {/* Upper: Product Details */}
           <ProductDetailsClient key={serializedProduct.id} product={serializedProduct} store={store} />
 

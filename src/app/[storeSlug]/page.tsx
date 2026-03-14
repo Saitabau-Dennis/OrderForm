@@ -5,6 +5,7 @@ import { hasProductOptions } from "@/lib/has-product-options";
 import { StoreNavbar } from "./components/store-navbar";
 import { ProductGrid } from "./components/product-grid";
 import { StoreFooter } from "./components/store-footer";
+import { CategoryCarousel } from "./components/category-carousel";
 
 const HOMEPAGE_PRODUCTS_LIMIT = 8;
 
@@ -20,7 +21,7 @@ export default async function StorePage({ params }: { params: Promise<{ storeSlu
     notFound();
   }
 
-  const [featuredProducts, categoryRows] = await Promise.all([
+  const [featuredProducts, categoryRows, categoryProducts] = await Promise.all([
     db.product.findMany({
       where: { storeId: store.id, isAvailable: true },
       orderBy: { createdAt: "desc" },
@@ -32,11 +33,47 @@ export default async function StorePage({ params }: { params: Promise<{ storeSlu
       distinct: ["category"],
       orderBy: { category: "asc" },
     }),
+    db.product.findMany({
+      where: { storeId: store.id, isAvailable: true, category: { not: null } },
+      select: {
+        category: true,
+        imageUrl: true,
+      },
+      orderBy: [{ category: "asc" }, { createdAt: "desc" }],
+    }),
   ]);
 
   const categories = categoryRows
     .map((entry) => entry.category?.trim() || "")
-    .filter(Boolean)
+    .filter(Boolean);
+
+  const categoryCards = new Map<string, { name: string; imageUrl: string | null }>();
+  for (const product of categoryProducts) {
+    const categoryName = product.category?.trim();
+    if (!categoryName) continue;
+
+    const existing = categoryCards.get(categoryName);
+    if (!existing) {
+      categoryCards.set(categoryName, {
+        name: categoryName,
+        imageUrl: product.imageUrl ?? null,
+      });
+      continue;
+    }
+
+    if (!existing.imageUrl && product.imageUrl) {
+      categoryCards.set(categoryName, {
+        ...existing,
+        imageUrl: product.imageUrl,
+      });
+    }
+  }
+
+  const serializedCategoryCards = Array.from(categoryCards.values()).map((category) => ({
+    name: category.name,
+    imageUrl: category.imageUrl,
+    href: `/${store.slug}/catalog?category=${encodeURIComponent(category.name)}`,
+  }));
 
   // Serialize Decimal fields to plain numbers for the client component
   const serializedProducts = featuredProducts.map((p) => ({
@@ -73,6 +110,12 @@ export default async function StorePage({ params }: { params: Promise<{ storeSlu
       <StoreNavbar store={safeStore} />
       <main className="flex-1 w-full px-3 sm:px-5 lg:px-7 py-10 md:py-14">
         <div className="mx-auto w-full max-w-[1500px]">
+          <CategoryCarousel
+            storeSlug={safeStore.slug}
+            categories={serializedCategoryCards}
+            autoScrollDelayMs={2000}
+          />
+
           <div className="mb-5">
             <h2 className="text-3xl font-medium tracking-tight text-[#1A1A1A] md:text-[40px]">Collections</h2>
           </div>

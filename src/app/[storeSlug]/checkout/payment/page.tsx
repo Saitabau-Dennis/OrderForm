@@ -4,6 +4,7 @@ import db from "@/lib/db"
 import { formatOrderId } from "@/lib/utils"
 import { StoreNavbar } from "../../components/store-navbar"
 import { StoreFooter } from "../../components/store-footer"
+import { StoreBreadcrumbs } from "../../components/store-breadcrumbs"
 import { PaymentActions } from "./payment-actions"
 
 type PaymentPageProps = {
@@ -92,7 +93,18 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
       <StoreNavbar store={safeStore} />
 
       <main className="flex-1 w-full px-3 py-7 sm:px-5 md:py-10 lg:px-7">
-        <div className="mx-auto w-full max-w-[1240px] border border-[#DADAD5] bg-transparent p-4 sm:p-6 md:p-8">
+        <div className="mx-auto w-full max-w-[1240px]">
+          <StoreBreadcrumbs
+            items={[
+              { label: "Home", href: `/${store.slug}` },
+              { label: "Cart", href: `/${store.slug}/cart` },
+              { label: "Checkout", href: `/${store.slug}/checkout` },
+              { label: "Payment" },
+            ]}
+            className="mb-4"
+          />
+
+          <div className="border border-[#DADAD5] bg-transparent p-4 sm:p-6 md:p-8">
           <div className="grid gap-4 border-b border-[#E0E0DB] pb-5 sm:grid-cols-2 lg:grid-cols-4">
             <MetaItem label="Order Number:" value={displayOrderNumber} />
             <MetaItem label="Date:" value={displayDate} />
@@ -135,6 +147,7 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
               <PaymentActions storeSlug={store.slug} method="card" />
             </section>
           )}
+        </div>
         </div>
       </main>
 

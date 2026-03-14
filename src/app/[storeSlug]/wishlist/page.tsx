@@ -3,6 +3,7 @@ import db from "@/lib/db"
 import { hasProductOptions } from "@/lib/has-product-options"
 import { StoreNavbar } from "../components/store-navbar"
 import { StoreFooter } from "../components/store-footer"
+import { StoreBreadcrumbs } from "../components/store-breadcrumbs"
 import { WishlistClient } from "../components/wishlist-client"
 
 export default async function WishlistPage({
@@ -76,6 +77,13 @@ export default async function WishlistPage({
 
       <main className="flex-1 w-full px-3 sm:px-5 lg:px-7 py-10 md:py-16">
         <div className="mx-auto w-full max-w-[1500px]">
+          <StoreBreadcrumbs
+            items={[
+              { label: "Home", href: `/${store.slug}` },
+              { label: "Wishlist" },
+            ]}
+          />
+
           <h1 className="text-2xl md:text-3xl font-semibold text-[#1A1A1A] mb-8 md:mb-12">
             Your Wishlist
           </h1>

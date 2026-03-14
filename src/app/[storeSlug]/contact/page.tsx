@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 import db from "@/lib/db"
 import { StoreNavbar } from "../components/store-navbar"
 import { StoreFooter } from "../components/store-footer"
+import { StoreBreadcrumbs } from "../components/store-breadcrumbs"
 
 export default async function ContactPage({
   params,
@@ -51,7 +52,15 @@ export default async function ContactPage({
       <StoreNavbar store={safeStore} />
 
       <main className="flex-1 w-full px-3 py-12 sm:px-5 lg:px-7 md:py-16">
-        <div className="mx-auto grid w-full max-w-[1500px] items-start gap-10 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-12">
+        <div className="mx-auto w-full max-w-[1500px]">
+          <StoreBreadcrumbs
+            items={[
+              { label: "Home", href: `/${store.slug}` },
+              { label: "Contact" },
+            ]}
+          />
+
+          <div className="grid items-start gap-10 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-12">
           <aside className="pt-0 lg:pt-[84px]">
             <div className="border-t border-[#D8D8D3] py-8">
               <p className="text-[18px] leading-none text-[#151513] sm:text-[22px]">WHATSAPP</p>
@@ -120,6 +129,7 @@ export default async function ContactPage({
               </button>
             </form>
           </section>
+          </div>
         </div>
       </main>
 

@@ -3,6 +3,7 @@ import Link from "next/link"
 import db from "@/lib/db"
 import { StoreNavbar } from "../components/store-navbar"
 import { StoreFooter } from "../components/store-footer"
+import { StoreBreadcrumbs } from "../components/store-breadcrumbs"
 import { CartClient } from "../components/cart-client"
 
 export default async function CartPage({
@@ -56,6 +57,13 @@ export default async function CartPage({
 
       <main className="flex-1 w-full px-3 py-10 sm:px-5 lg:px-7 md:py-14">
         <div className="mx-auto w-full max-w-[1500px]">
+          <StoreBreadcrumbs
+            items={[
+              { label: "Home", href: `/${store.slug}` },
+              { label: "Cart" },
+            ]}
+          />
+
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <h1 className="text-[30px] font-medium tracking-wide text-[#111111] md:text-[36px]">Your cart</h1>
             <Link
