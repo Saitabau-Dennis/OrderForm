@@ -302,7 +302,7 @@ export default function ResetPasswordPage() {
         <div className="relative z-10">
           <Link
             href="/"
-            className="[font-family:var(--font-adcure)] text-2xl font-semibold tracking-tight mb-12 block mt-1"
+            className="[font-family:var(--font-goodly)] text-[2.15rem] font-semibold tracking-tight mb-12 block mt-1"
           >
             Orderform
           </Link>
@@ -328,7 +328,7 @@ export default function ResetPasswordPage() {
       {/* Right Side - Form */}
       <div className="w-full md:w-1/2 px-5 pb-7 pt-6 sm:px-6 md:p-8 flex flex-col justify-center bg-background">
          <div className="md:hidden mb-6 rounded-2xl border border-primary/30 bg-primary p-4 text-center shadow-lg max-w-xs mx-auto w-full">
-             <Link href="/" className="[font-family:var(--font-adcure)] text-2xl font-semibold tracking-tight text-primary-foreground mt-1">
+             <Link href="/" className="[font-family:var(--font-goodly)] text-[2.15rem] font-semibold tracking-tight text-primary-foreground mt-1">
               Orderform
             </Link>
             <p className="mt-2 text-xs text-primary-foreground/75">Use your verification code to secure your account again.</p>

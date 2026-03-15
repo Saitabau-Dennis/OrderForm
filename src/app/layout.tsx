@@ -47,6 +47,32 @@ const adcure = localFont({
   variable: "--font-adcure",
 });
 
+const goodly = localFont({
+  src: [
+    {
+      path: "../../public/Fonts/goodly-font/goodly-regular.otf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/Fonts/goodly-font/goodly-medium.otf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../public/Fonts/goodly-font/goodly-semibold.otf",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../../public/Fonts/goodly-font/goodly-bold.otf",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  variable: "--font-goodly",
+});
+
 
 export const metadata: Metadata = {
   title: "OrderForm.store",
@@ -70,7 +96,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning translate="no" className="notranslate">
-      <body className={`${inter.variable} ${sora.variable} ${outfit.variable} ${signika.variable} ${dmSans.variable} ${instrumentSerif.variable} ${poppins.variable} ${jakarta.variable} ${bungee.variable} ${montserrat.variable} ${GeistSans.variable} ${clashDisplay.variable} ${adcure.variable} notranslate font-sans antialiased`}>
+      <body className={`${inter.variable} ${sora.variable} ${outfit.variable} ${signika.variable} ${dmSans.variable} ${instrumentSerif.variable} ${poppins.variable} ${jakarta.variable} ${bungee.variable} ${montserrat.variable} ${GeistSans.variable} ${clashDisplay.variable} ${adcure.variable} ${goodly.variable} notranslate font-sans antialiased`}>
         <Providers>
           {children}
         </Providers>

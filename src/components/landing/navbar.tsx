@@ -69,7 +69,7 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
   }
 
   return (
-    <div className="fixed top-0 left-0 w-full z-50 flex justify-center px-4 py-1.5 md:py-2 bg-white/70 backdrop-blur-lg">
+    <div className="fixed top-0 left-0 w-full z-50 flex justify-center px-4 py-2.5 md:py-3 bg-white/70 backdrop-blur-lg">
       <nav
         className="flex items-center justify-between w-full max-w-7xl py-1 px-2"
       >
@@ -88,7 +88,7 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
                     className="h-[16px] w-[16px] object-cover scale-[3]"
                 />
             </span>
-            <span className="[font-family:var(--font-adcure)] text-[1rem] md:text-[1.15rem] font-semibold text-foreground tracking-tight mt-1">
+            <span className="[font-family:var(--font-goodly)] text-[1.18rem] md:text-[1.36rem] font-semibold text-foreground tracking-tight mt-1">
               Orderform
             </span>
         </Link>
@@ -151,7 +151,7 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
                           className="h-4 w-4 object-cover scale-[3]"
                         />
                       </span>
-                      <SheetTitle className="[font-family:var(--font-adcure)] tracking-tight text-[1.3rem] leading-none mb-0 font-semibold text-primary mt-1">
+                      <SheetTitle className="[font-family:var(--font-goodly)] tracking-tight text-[1.5rem] leading-none mb-0 font-semibold text-primary mt-1">
                         OrderForm
                       </SheetTitle>
                     </div>

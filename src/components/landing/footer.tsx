@@ -11,7 +11,7 @@ export function Footer() {
         {/* Brand Section */}
         <div className="flex flex-col gap-4 max-w-xs">
              <div className="flex items-center gap-1">
-                 <span className="[font-family:var(--font-adcure)] text-lg md:text-xl font-semibold text-foreground tracking-tight mt-1">
+                 <span className="[font-family:var(--font-goodly)] text-2xl md:text-[2.15rem] font-semibold text-foreground tracking-tight mt-1">
               Orderform
             </span>
             </div>
