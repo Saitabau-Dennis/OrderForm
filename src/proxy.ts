@@ -49,7 +49,7 @@ export default auth((req) => {
     if (candidate && !RESERVED_SUBDOMAINS.has(candidate)) {
       tenantSubdomain = candidate;
     }
-  } else {
+  } else if (host && host !== rootHost && host !== wwwHost && host !== appHost) {
     const hostParts = host.split(".");
     if (hostParts.length >= 3) {
       const candidate = hostParts[0];
