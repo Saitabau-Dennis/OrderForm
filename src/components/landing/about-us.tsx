@@ -15,7 +15,7 @@ export function AboutUs() {
           {/* Left Column: Text Content */}
           <div className="flex flex-col items-start text-left">
              <ScrollAnimation variant="fade-up">
-                <div className="inline-flex items-center px-2 py-0.5 rounded-none landing-section-tag border border-primary/20 text-primary text-[10px] font-semibold mb-4 uppercase tracking-[0.12em]">
+                <div className="inline-flex items-center px-2 py-0.5 rounded-none landing-section-tag text-primary text-[10px] font-semibold mb-4 uppercase tracking-[0.12em]">
                   What is OrderForm?
                 </div>
                 

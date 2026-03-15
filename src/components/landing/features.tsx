@@ -75,7 +75,7 @@ export function Features() {
             <div className="mx-auto max-w-7xl px-6">
                 <ScrollAnimation variant="fade-up">
                     <div className="mb-10 text-center max-w-3xl mx-auto">
-                    <div className="inline-flex items-center px-2 py-0.5 rounded-none landing-section-tag border border-primary/20 text-primary text-[10px] font-medium mb-4 uppercase tracking-[0.12em]">
+                    <div className="inline-flex items-center px-2 py-0.5 rounded-none landing-section-tag text-primary text-[10px] font-medium mb-4 uppercase tracking-[0.12em]">
                Features
               </div>
                     <h2 className="text-2xl md:text-4xl font-heading font-normal text-foreground leading-[1.06] tracking-[-0.02em] mb-4">
