@@ -1,6 +1,7 @@
 export * from "./about-us"
 export * from "./bento-demo"
 export * from "./cta"
+export * from "./demo-video"
 export * from "./faq"
 export * from "./features"
 export * from "./footer"
