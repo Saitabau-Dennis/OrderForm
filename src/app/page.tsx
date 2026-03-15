@@ -4,6 +4,7 @@ import { Hero } from "@/components/ui/hero"
 import { AboutUs } from "@/components/landing/about-us"
 import { Features } from "@/components/landing/features"
 import { HowItWorks } from "@/components/landing/how-it-works"
+import { DemoVideo } from "@/components/landing/demo-video"
 import { MiniStorePreview } from "@/components/landing/mini-store-preview"
 import { Pricing } from "@/components/landing/pricing"
 import { FAQ } from "@/components/landing/faq"
@@ -19,25 +20,36 @@ export default async function Home() {
       <Navbar isAuthenticated={!!session} />
 
       <Hero
-        className="pt-20 pb-4 md:pt-24 md:pb-8"
+        className="pt-24 pb-4 md:pt-28 md:pb-8"
         badge={
           <AnimatedBadge text="Built for Social Sellers" />
         }
         title={
           <>
-            The fastest way to turn{" "}
-            <span className="[font-family:var(--font-sora)] italic text-foreground font-light tracking-tight px-1">DMs into real orders</span>
+            <span className="block lg:whitespace-nowrap">
+              Turn{" "}
+              <span className="[font-family:var(--font-sora)] italic text-[#334155] font-normal tracking-[-0.03em]">
+                DM conversations
+              </span>{" "}
+              into confirmed orders
+            </span>
+            <span className="block lg:whitespace-nowrap">
+              without the back-and-forth
+            </span>
           </>
         }
         subtitle={
           <>
-            OrderForm gives your customers a fast storefront, cart, and checkout that sends complete order details to WhatsApp.
-            <span className="text-foreground font-medium"> No app downloads, no messy DM back-and-forth.</span>
+            Launch a clean storefront, cart, and checkout in seconds.
+            <span className="text-foreground"> Every order lands in WhatsApp with complete customer details.</span>
           </>
         }
         ctaText="Create your store"
         ctaLink="/register"
         ctaTarget="_blank"
+        secondaryCtaText="See demo"
+        secondaryCtaLink="https://saitabau.orderform.store/"
+        secondaryCtaTarget="_blank"
         mockupImage={{
           src: "/images/dashboard-v2.png",
           alt: "OrderForm Dashboard Interface",
@@ -49,6 +61,7 @@ export default async function Home() {
       <AboutUs />
       <Features />
       <HowItWorks />
+      <DemoVideo />
       <MiniStorePreview />
       <Pricing />
       <FAQ />

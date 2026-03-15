@@ -71,14 +71,14 @@ const Hero = React.forwardRef<HTMLDivElement, HeroProps>(
         )}
 
         <h1
-          className="text-[1.7rem] sm:text-4xl md:text-4xl lg:text-5xl xl:text-6xl leading-[1.08] sm:leading-[1.05] md:leading-[1.05] lg:leading-[1.05] xl:leading-[1.05] text-center px-3 sm:px-4 w-full max-w-4xl mx-auto text-foreground font-heading font-normal animate-appear opacity-0 delay-100 tracking-[-0.03em] sm:tracking-[-0.04em] text-balance"
+          className="text-[2rem] sm:text-[2.45rem] md:text-[2.8rem] lg:text-[3rem] xl:text-[3.25rem] leading-[1.06] text-center px-3 sm:px-4 w-full max-w-[16.5ch] sm:max-w-[18ch] md:max-w-[22ch] lg:max-w-none mx-auto text-foreground font-heading font-normal animate-appear opacity-0 delay-100 tracking-[-0.045em] sm:tracking-[-0.05em] text-balance"
         >
           {title}
         </h1>
 
         {subtitle && (
           <p
-            className="text-[1rem] md:text-lg text-left font-sans px-4 sm:px-6 max-w-2xl md:max-w-3xl mx-auto mt-4 md:mt-5 mb-8 md:mb-10 leading-relaxed text-muted-foreground animate-appear opacity-0 delay-300"
+            className="text-[1rem] sm:text-[1.08rem] md:text-[1.26rem] text-center font-sans px-4 sm:px-6 max-w-2xl md:max-w-3xl mx-auto mt-5 md:mt-6 mb-8 md:mb-10 leading-relaxed text-muted-foreground animate-appear opacity-0 delay-300 text-balance"
           >
             {subtitle}
           </p>

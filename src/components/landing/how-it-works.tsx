@@ -43,7 +43,7 @@ export function HowItWorks() {
           {/* Left Column - Content */}
           <ScrollAnimation variant="fade-up" className="lg:sticky lg:top-28 self-start space-y-7 text-center lg:text-left">
             <div className="space-y-4">
-              <div className="inline-flex items-center px-2 py-0.5 rounded-none landing-section-tag border border-primary/20 text-primary text-[10px] font-medium mb-4 uppercase tracking-[0.12em]">
+              <div className="inline-flex items-center px-2 py-0.5 rounded-none landing-section-tag text-primary text-[10px] font-medium mb-4 uppercase tracking-[0.12em]">
                 How It Works
               </div>
               <h2 className="text-3xl md:text-4xl font-normal tracking-[-0.02em] font-heading leading-[1.06]">
