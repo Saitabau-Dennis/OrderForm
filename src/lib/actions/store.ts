@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import db from "@/lib/db";
 import { Prisma } from "@prisma/client";
-import { normalizeStoreSlug } from "@/lib/store-slug";
+import { normalizeStoreSlug } from "@/lib/slug-utils";
 
 interface StoreSettingsData {
   name: string;

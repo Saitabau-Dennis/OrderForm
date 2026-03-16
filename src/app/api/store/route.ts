@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import db from "@/lib/db";
-import { normalizeStoreSlug } from "@/lib/store-slug";
+import { normalizeStoreSlug } from "@/lib/slug-utils";
 
 // Returns the current merchant store profile and related delivery zones.
 export async function GET() {

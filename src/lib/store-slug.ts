@@ -1,8 +1,5 @@
 import db from "@/lib/db";
-
-export function normalizeStoreSlug(value: string) {
-  return value.trim().toLowerCase();
-}
+import { normalizeStoreSlug } from "@/lib/slug-utils";
 
 export async function findStoreBySlug(storeSlug: string) {
   const normalizedSlug = normalizeStoreSlug(storeSlug);
