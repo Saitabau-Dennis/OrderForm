@@ -56,7 +56,7 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
               className="inline-flex min-w-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
               title={store.name}
             >
-              <span className="block max-w-[min(76vw,260px)] break-words text-center [font-family:var(--font-adcure)] text-[clamp(18px,7vw,24px)] leading-[0.88] tracking-tight text-[#111111] line-clamp-2">
+              <span className="block max-w-[min(76vw,280px)] break-words text-center [font-family:var(--font-adcure)] text-[clamp(21px,7.5vw,28px)] leading-[0.88] tracking-tight text-[#111111] line-clamp-2">
                 {store.name}
               </span>
             </Link>
@@ -103,7 +103,7 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
             className="relative inline-flex min-w-0 shrink-0 rounded-sm pt-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2 lg:pr-8"
             title={store.name}
           >
-            <span className="block max-w-[320px] [font-family:var(--font-adcure)] text-[38px] leading-[0.82] tracking-tight text-[#111111]">
+            <span className="block max-w-[360px] [font-family:var(--font-adcure)] text-[44px] leading-[0.82] tracking-tight text-[#111111]">
               {store.name}
             </span>
           </Link>
