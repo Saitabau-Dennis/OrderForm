@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 import Image from "next/image"
 import db from "@/lib/db"
 import { findStoreBySlug } from "@/lib/store-slug"
+import { storefrontPath } from "@/lib/storefront-path"
 import { formatOrderId } from "@/lib/utils"
 import { StoreNavbar } from "../../components/store-navbar"
 import { StoreFooter } from "../../components/store-footer"
@@ -95,9 +96,9 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
         <div className="mx-auto w-full max-w-[1240px]">
           <StoreBreadcrumbs
             items={[
-              { label: "Home", href: `/${store.slug}` },
-              { label: "Cart", href: `/${store.slug}/cart` },
-              { label: "Checkout", href: `/${store.slug}/checkout` },
+              { label: "Home", href: storefrontPath(store.slug) },
+              { label: "Cart", href: storefrontPath(store.slug, "/cart") },
+              { label: "Checkout", href: storefrontPath(store.slug, "/checkout") },
               { label: "Payment" },
             ]}
             className="mb-4"

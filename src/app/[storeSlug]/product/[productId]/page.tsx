@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation"
+import { storefrontPath } from "@/lib/storefront-path"
 
 export default async function LegacyProductPage({
   params,
@@ -6,5 +7,5 @@ export default async function LegacyProductPage({
   params: Promise<{ storeSlug: string; productId: string }>
 }) {
   const { storeSlug, productId } = await params
-  redirect(`/${storeSlug}/catalog/${productId}`)
+  redirect(storefrontPath(storeSlug, `/catalog/${productId}`))
 }

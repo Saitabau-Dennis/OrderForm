@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { storefrontPath } from "@/lib/storefront-path"
 import { useStore } from "../../components/store-provider"
 
 type PaymentActionsProps = {
@@ -26,7 +27,7 @@ export function PaymentActions({ storeSlug, method }: PaymentActionsProps) {
     clearCart()
     localStorage.removeItem(`orderform_checkout_draft:${storeSlug}`)
     toast.success("Payment confirmed. Your order is complete.")
-    router.push(`/${storeSlug}`)
+    router.push(storefrontPath(storeSlug))
   }
 
   if (method === "mpesa") {

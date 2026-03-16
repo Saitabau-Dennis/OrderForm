@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
+import { storefrontPath } from "@/lib/storefront-path"
 import { useStore } from "./store-provider"
 import { Heart, ArrowLeft, Trash2 } from "lucide-react"
 
@@ -46,7 +47,7 @@ export function WishlistClient({ storeSlug, currency, allProducts }: WishlistCli
           Save items you love by clicking the heart icon on any product page.
         </p>
         <Link
-          href={`/${storeSlug}`}
+          href={storefrontPath(storeSlug)}
           className="inline-flex items-center gap-2 h-12 px-6 bg-[#1A1A1A] text-white font-medium text-sm transition-opacity hover:opacity-90"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -62,7 +63,7 @@ export function WishlistClient({ storeSlug, currency, allProducts }: WishlistCli
         {savedProducts.map((product) => (
           <article key={product.id} className="border border-[#E8E8E5] p-3">
             <div className="flex items-start gap-3">
-              <Link href={`/${storeSlug}/catalog/${product.id}`} className="block">
+              <Link href={storefrontPath(storeSlug, `/catalog/${product.id}`)} className="block">
                 <div className="relative h-16 w-16 overflow-hidden rounded-none bg-[#EEECEA]">
                   {product.imageUrl ? (
                     <Image
@@ -81,7 +82,7 @@ export function WishlistClient({ storeSlug, currency, allProducts }: WishlistCli
               </Link>
               <div className="min-w-0 flex-1">
                 <Link
-                  href={`/${storeSlug}/catalog/${product.id}`}
+                  href={storefrontPath(storeSlug, `/catalog/${product.id}`)}
                   className="line-clamp-2 text-sm font-medium text-[#1A1A1A] transition hover:underline"
                 >
                   {product.name}
@@ -117,7 +118,7 @@ export function WishlistClient({ storeSlug, currency, allProducts }: WishlistCli
             {savedProducts.map((product) => (
               <tr key={product.id} className="border-b border-[#EFEFEA] last:border-b-0">
                 <td className="px-4 py-3">
-                  <Link href={`/${storeSlug}/catalog/${product.id}`} className="block">
+                  <Link href={storefrontPath(storeSlug, `/catalog/${product.id}`)} className="block">
                     <div className="relative h-16 w-16 overflow-hidden rounded-none bg-[#EEECEA]">
                       {product.imageUrl ? (
                         <Image
@@ -137,7 +138,7 @@ export function WishlistClient({ storeSlug, currency, allProducts }: WishlistCli
                 </td>
                 <td className="px-4 py-3">
                   <Link
-                    href={`/${storeSlug}/catalog/${product.id}`}
+                    href={storefrontPath(storeSlug, `/catalog/${product.id}`)}
                     className="text-sm font-medium text-[#1A1A1A] transition hover:underline"
                   >
                     {product.name}

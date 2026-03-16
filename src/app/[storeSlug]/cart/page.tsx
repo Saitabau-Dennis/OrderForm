@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 import Link from "next/link"
 import db from "@/lib/db"
 import { findStoreBySlug } from "@/lib/store-slug"
+import { storefrontPath } from "@/lib/storefront-path"
 import { StoreNavbar } from "../components/store-navbar"
 import { StoreFooter } from "../components/store-footer"
 import { StoreBreadcrumbs } from "../components/store-breadcrumbs"
@@ -58,7 +59,7 @@ export default async function CartPage({
         <div className="mx-auto w-full max-w-[1500px]">
           <StoreBreadcrumbs
             items={[
-              { label: "Home", href: `/${store.slug}` },
+              { label: "Home", href: storefrontPath(store.slug) },
               { label: "Cart" },
             ]}
           />
@@ -66,7 +67,7 @@ export default async function CartPage({
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <h1 className="text-[30px] font-medium tracking-wide text-[#111111] md:text-[36px]">Your cart</h1>
             <Link
-              href={`/${store.slug}/catalog`}
+              href={storefrontPath(store.slug, "/catalog")}
               className="text-base underline underline-offset-4 text-[#1A1A1A] hover:text-[#000000] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2 md:text-lg"
             >
               Continue shopping

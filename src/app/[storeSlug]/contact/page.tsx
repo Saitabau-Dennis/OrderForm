@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import db from "@/lib/db"
 import { findStoreBySlug } from "@/lib/store-slug"
+import { storefrontPath } from "@/lib/storefront-path"
 import { StoreNavbar } from "../components/store-navbar"
 import { StoreFooter } from "../components/store-footer"
 import { StoreBreadcrumbs } from "../components/store-breadcrumbs"
@@ -54,7 +55,7 @@ export default async function ContactPage({
         <div className="mx-auto w-full max-w-[1500px]">
           <StoreBreadcrumbs
             items={[
-              { label: "Home", href: `/${store.slug}` },
+              { label: "Home", href: storefrontPath(store.slug) },
               { label: "Contact" },
             ]}
           />

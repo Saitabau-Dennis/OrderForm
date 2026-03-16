@@ -6,6 +6,7 @@ import Link from "next/link"
 import { toast } from "sonner"
 import { useStore } from "./store-provider"
 import { createOrder } from "@/lib/actions/orders"
+import { storefrontPath } from "@/lib/storefront-path"
 import {
   Loader2,
   ArrowLeft,
@@ -235,7 +236,7 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
         method: paymentMethod,
         orderId: orderResult.id,
       })
-      const targetUrl = `/${storeSlug}/checkout/payment?${query.toString()}`
+      const targetUrl = `${storefrontPath(storeSlug, "/checkout/payment")}?${query.toString()}`
 
       // Clear local draft once order is successfully created.
       localStorage.removeItem(checkoutDraftStorageKey)
@@ -264,7 +265,7 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
           It looks like you haven&apos;t added any products to your cart yet.
         </p>
         <Link
-          href={`/${storeSlug}`}
+          href={storefrontPath(storeSlug)}
           className="inline-flex h-12 items-center gap-2 rounded-none px-6 text-sm font-medium text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
           style={{ backgroundColor: "var(--store-brand, #1A1A1A)" }}
         >

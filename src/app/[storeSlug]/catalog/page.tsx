@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 import db from "@/lib/db"
 import { hasProductOptions } from "@/lib/has-product-options"
 import { findStoreBySlug } from "@/lib/store-slug"
+import { storefrontPath } from "@/lib/storefront-path"
 import { StoreNavbar } from "../components/store-navbar"
 import { StoreFooter } from "../components/store-footer"
 import { ProductGrid } from "../components/product-grid"
@@ -68,7 +69,7 @@ export default async function AllProductsPage({
         <div className="mx-auto w-full max-w-[1500px]">
           <StoreBreadcrumbs
             items={[
-              { label: "Home", href: `/${store.slug}` },
+              { label: "Home", href: storefrontPath(store.slug) },
               { label: "Catalog" },
             ]}
           />

@@ -5,6 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Check, X } from "lucide-react"
+import { storefrontPath } from "@/lib/storefront-path"
 import { useStore } from "./store-provider"
 
 const ACTION_MODAL_AUTO_CLOSE_SECONDS = 8
@@ -53,7 +54,9 @@ export function StoreActionModal({ storeSlug }: { storeSlug: string }) {
   if (!actionModal) return null
 
   const isCartAction = actionModal.type === "cart"
-  const primaryHref = isCartAction ? `/${storeSlug}/cart` : `/${storeSlug}/wishlist`
+  const primaryHref = isCartAction
+    ? storefrontPath(storeSlug, "/cart")
+    : storefrontPath(storeSlug, "/wishlist")
   const primaryLabel = isCartAction
     ? `View cart (${cartCount})`
     : `View wishlist (${wishlist.length})`

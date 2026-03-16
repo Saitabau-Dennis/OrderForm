@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Trash2 } from "lucide-react";
+import { storefrontPath } from "@/lib/storefront-path";
 import { useStore } from "./store-provider";
 
 type CartClientProps = {
@@ -76,7 +77,7 @@ export function CartClient({
           Start shopping to add items to your cart.
         </p>
         <Link
-          href={`/${storeSlug}`}
+          href={storefrontPath(storeSlug)}
           className="inline-flex items-center gap-2 h-12 px-6 bg-[#1A1A1A] text-white font-medium text-sm transition-opacity hover:opacity-90"
         >
           Continue Shopping
@@ -105,7 +106,7 @@ export function CartClient({
             >
               <div className="flex min-w-0 gap-4">
                 <Link
-                  href={`/${storeSlug}/catalog/${item.productId}`}
+                  href={storefrontPath(storeSlug, `/catalog/${item.productId}`)}
                   className="relative h-28 w-24 shrink-0 overflow-hidden rounded-none bg-[#ECECE8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
                 >
                   {item.imageUrl ? (
@@ -219,7 +220,7 @@ export function CartClient({
               Taxes, discounts and shipping calculated at checkout.
             </p>
             <Link
-              href={`/${storeSlug}/checkout`}
+              href={storefrontPath(storeSlug, "/checkout")}
               className="mt-7 inline-flex h-[50px] w-full items-center justify-center rounded-none bg-[#0C0D10] px-6 text-lg font-medium tracking-wide text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
             >
               Check out
