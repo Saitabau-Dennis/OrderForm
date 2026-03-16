@@ -18,23 +18,20 @@ const PROTECTED_PATH_REGEX =
   /^\/(dashboard|settings|products|orders|onboarding|overview|customers)(\/|$)/;
 const APP_PATHS_TO_SKIP_REWRITE = ["/login", "/register", "/forgot-password", "/reset-password"];
 
+function canInferTenantFromHost(host: string) {
+  if (!host) return false;
+  if (host === "localhost") return false;
+  if (/^\d{1,3}(\.\d{1,3}){3}$/.test(host)) return false;
+  if (host.endsWith(".vercel.app")) return false;
+  return host.split(".").length >= 3;
+}
+
 export default auth((req) => {
   const { pathname } = req.nextUrl;
   const isLoggedIn = !!req.auth;
-
-  // Multitenant rewrites only run when a root domain is configured.
-  if (!ROOT_DOMAIN) {
-    // Fallback: enforce auth locally when no root domain is set.
-    if (PROTECTED_PATH_REGEX.test(pathname) && !isLoggedIn) {
-      const loginUrl = new URL("/login", req.url);
-      loginUrl.searchParams.set("callbackUrl", req.nextUrl.pathname);
-      return Response.redirect(loginUrl);
-    }
-    return NextResponse.next();
-  }
-
   const hostHeader = req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? "";
   const host = hostHeader.split(":")[0].toLowerCase();
+
   const rootHost = ROOT_DOMAIN;
   const wwwHost = `www.${ROOT_DOMAIN}`;
   const appHost = `app.${ROOT_DOMAIN}`;
@@ -57,15 +54,27 @@ export default auth((req) => {
         tenantSubdomain = candidate;
       }
     }
+  } else if (!ROOT_DOMAIN && canInferTenantFromHost(host)) {
+    const candidate = host.split(".")[0];
+    if (candidate && !RESERVED_SUBDOMAINS.has(candidate)) {
+      tenantSubdomain = candidate;
+    }
   }
 
   if (tenantSubdomain) {
     const tenantPrefix = `/${tenantSubdomain}`;
+    const normalizedPathname = pathname.toLowerCase();
     // Canonicalize tenant URLs: `slug.root/slug/...` -> `slug.root/...`.
     // Internal rewrite below maps clean path back to `/{slug}/...`.
-    if (pathname === tenantPrefix || pathname.startsWith(`${tenantPrefix}/`)) {
+    if (normalizedPathname === tenantPrefix || normalizedPathname.startsWith(`${tenantPrefix}/`)) {
+      const pathParts = pathname.split("/");
+      const firstSegment = pathParts[1] ?? "";
+      const canonicalPath =
+        firstSegment.toLowerCase() === tenantSubdomain
+          ? `/${pathParts.slice(2).join("/")}`.replace(/\/+$/, "") || "/"
+          : pathname;
       const canonicalUrl = req.nextUrl.clone();
-      canonicalUrl.pathname = pathname.slice(tenantPrefix.length) || "/";
+      canonicalUrl.pathname = canonicalPath;
       return NextResponse.redirect(canonicalUrl);
     }
 
@@ -73,6 +82,16 @@ export default auth((req) => {
     const rewrittenUrl = req.nextUrl.clone();
     rewrittenUrl.pathname = pathname === "/" ? tenantPrefix : `${tenantPrefix}${pathname}`;
     return NextResponse.rewrite(rewrittenUrl);
+  }
+
+  // Without root domain config, keep local auth behavior and skip app/root host redirects.
+  if (!ROOT_DOMAIN) {
+    if (PROTECTED_PATH_REGEX.test(pathname) && !isLoggedIn) {
+      const loginUrl = new URL("/login", req.url);
+      loginUrl.searchParams.set("callbackUrl", req.nextUrl.pathname);
+      return Response.redirect(loginUrl);
+    }
+    return NextResponse.next();
   }
 
   // app.{domain}: enforce auth for dashboard, redirect root → /dashboard.
