@@ -83,10 +83,10 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
                     width={661}
                     height={377}
                     priority
-                    className="h-[16px] w-[16px] object-cover scale-[3]"
+                    className="h-[14px] w-[14px] object-cover scale-[2.8]"
                 />
             </span>
-            <span className="[font-family:var(--font-goodly)] text-[1.32rem] md:text-[1.56rem] font-semibold text-foreground tracking-tight mt-1">
+            <span className="[font-family:var(--font-goodly)] text-[1.42rem] md:text-[1.68rem] font-semibold text-foreground tracking-tight mt-1">
               Orderform
             </span>
         </Link>
