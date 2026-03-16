@@ -17,6 +17,7 @@ const RESERVED_SUBDOMAINS = new Set(["www", "app"]);
 const PROTECTED_PATH_REGEX =
   /^\/(dashboard|settings|products|orders|onboarding|overview|customers)(\/|$)/;
 const APP_PATHS_TO_SKIP_REWRITE = ["/login", "/register", "/forgot-password", "/reset-password"];
+const PUBLIC_ASSET_PATH_REGEX = /\/[^/]+\.[a-z0-9]+$/i;
 
 function canInferTenantFromHost(host: string) {
   if (!host) return false;
@@ -31,6 +32,12 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth;
   const hostHeader = req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? "";
   const host = hostHeader.split(":")[0].toLowerCase();
+
+  // Never rewrite public/static asset requests to tenant paths.
+  // Example: `/images/mpesa.jpg` must stay unchanged on subdomains.
+  if (PUBLIC_ASSET_PATH_REGEX.test(pathname)) {
+    return NextResponse.next();
+  }
 
   const rootHost = ROOT_DOMAIN;
   const wwwHost = `www.${ROOT_DOMAIN}`;
