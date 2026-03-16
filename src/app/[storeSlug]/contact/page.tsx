@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation"
 import db from "@/lib/db"
+import { findStoreBySlug } from "@/lib/store-slug"
 import { StoreNavbar } from "../components/store-navbar"
 import { StoreFooter } from "../components/store-footer"
 import { StoreBreadcrumbs } from "../components/store-breadcrumbs"
@@ -11,9 +12,7 @@ export default async function ContactPage({
 }) {
   const { storeSlug } = await params
 
-  const store = await db.store.findUnique({
-    where: { slug: storeSlug },
-  })
+  const store = await findStoreBySlug(storeSlug)
 
   if (!store) {
     notFound()

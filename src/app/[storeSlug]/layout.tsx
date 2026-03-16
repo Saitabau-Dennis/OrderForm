@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import type { CSSProperties } from "react";
-import db from "@/lib/db";
 import { hasProductOptions } from "@/lib/has-product-options";
+import db from "@/lib/db";
+import { findStoreBySlug } from "@/lib/store-slug";
 
 import { StoreProvider } from "./components/store-provider";
 import { StoreActionModal } from "./components/store-action-modal";
@@ -15,9 +16,7 @@ export default async function StoreRootLayout({
 }) {
   const { storeSlug } = await params;
 
-  const store = await db.store.findUnique({
-    where: { slug: storeSlug },
-  });
+  const store = await findStoreBySlug(storeSlug);
 
   if (!store) {
     notFound();

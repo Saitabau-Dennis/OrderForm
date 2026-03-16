@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import db from "@/lib/db";
 import { Prisma } from "@prisma/client";
+import { normalizeStoreSlug } from "@/lib/store-slug";
 
 interface StoreSettingsData {
   name: string;
@@ -36,6 +37,11 @@ export async function updateStoreSettings(data: StoreSettingsData) {
     const existingStore = await db.store.findFirst({
       where: { userId: session.user.id }
     });
+    const normalizedSlug = normalizeStoreSlug(data.slug);
+
+    if (!normalizedSlug) {
+      return { error: "Store slug is required." };
+    }
 
     const previousSlug = existingStore?.slug ?? null;
 
@@ -45,7 +51,7 @@ export async function updateStoreSettings(data: StoreSettingsData) {
         data: {
           userId: session.user.id,
           name: data.name,
-          slug: data.slug,
+          slug: normalizedSlug,
           description: data.description,
           whatsappNumber: data.whatsappNumber,
           contactEmail: data.contactEmail || null,
@@ -70,7 +76,7 @@ export async function updateStoreSettings(data: StoreSettingsData) {
         where: { id: existingStore.id },
         data: {
           name: data.name,
-          slug: data.slug,
+          slug: normalizedSlug,
           description: data.description,
           whatsappNumber: data.whatsappNumber,
           contactEmail: data.contactEmail || null,
@@ -100,8 +106,8 @@ export async function updateStoreSettings(data: StoreSettingsData) {
     if (previousSlug) {
       revalidatePath(`/${previousSlug}`);
     }
-    if (data.slug && data.slug !== previousSlug) {
-      revalidatePath(`/${data.slug}`);
+    if (normalizedSlug && normalizedSlug !== previousSlug) {
+      revalidatePath(`/${normalizedSlug}`);
     }
 
     return { success: true };

@@ -170,14 +170,15 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
   const onSubmit = async (data: SettingsValues) => {
     try {
       setLoading(true);
-      const result = await updateStoreSettings(data);
+      const normalizedSlug = data.slug.trim().toLowerCase();
+      const result = await updateStoreSettings({ ...data, slug: normalizedSlug });
 
       if (result.error) {
         toast.error(result.error);
         return;
       }
 
-      form.reset(data);
+      form.reset({ ...data, slug: normalizedSlug });
       toast.success("Settings updated successfully");
     } catch {
       toast.error("Something went wrong");

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import db from "@/lib/db"
 import { hasProductOptions } from "@/lib/has-product-options"
+import { findStoreBySlug } from "@/lib/store-slug"
 import { StoreNavbar } from "../components/store-navbar"
 import { StoreFooter } from "../components/store-footer"
 import { StoreBreadcrumbs } from "../components/store-breadcrumbs"
@@ -14,9 +15,7 @@ export default async function WishlistPage({
   const { storeSlug } = await params
 
   // 1. Find store
-  const store = await db.store.findUnique({
-    where: { slug: storeSlug },
-  })
+  const store = await findStoreBySlug(storeSlug)
 
   if (!store) {
     notFound()

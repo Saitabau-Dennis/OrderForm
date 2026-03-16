@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import db from "@/lib/db";
+import { normalizeStoreSlug } from "@/lib/store-slug";
 
 // Returns the current merchant store profile and related delivery zones.
-export async function GET(req: Request) {
+export async function GET() {
   try {
     const session = await auth();
 
@@ -54,6 +55,11 @@ export async function PUT(req: Request) {
       deliveryZones,
       isActive,
     } = body;
+    const normalizedSlug = normalizeStoreSlug(String(slug ?? ""));
+
+    if (!normalizedSlug) {
+      return new NextResponse("Store slug is required", { status: 400 });
+    }
 
     const existingStore = await db.store.findFirst({
         where: { userId: session.user.id }
@@ -67,7 +73,7 @@ export async function PUT(req: Request) {
       where: { id: existingStore.id },
       data: {
         name,
-        slug,
+        slug: normalizedSlug,
         whatsappNumber,
         contactEmail,
         contactPhone,

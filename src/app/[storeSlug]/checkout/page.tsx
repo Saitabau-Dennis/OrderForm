@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation"
 import db from "@/lib/db"
+import { normalizeStoreSlug } from "@/lib/store-slug"
 import { StoreNavbar } from "../components/store-navbar"
 import { StoreFooter } from "../components/store-footer"
 import { StoreBreadcrumbs } from "../components/store-breadcrumbs"
@@ -12,8 +13,13 @@ export default async function CheckoutPage({
 }) {
   const { storeSlug } = await params
 
-  const store = await db.store.findUnique({
-    where: { slug: storeSlug },
+  const store = await db.store.findFirst({
+    where: {
+      slug: {
+        equals: normalizeStoreSlug(storeSlug),
+        mode: "insensitive",
+      },
+    },
     include: {
       deliveryZones: true,
     }

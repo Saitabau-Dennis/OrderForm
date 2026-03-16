@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import db from "@/lib/db"
 import { hasProductOptions } from "@/lib/has-product-options"
+import { findStoreBySlug } from "@/lib/store-slug"
 import { StoreNavbar } from "../components/store-navbar"
 import { StoreFooter } from "../components/store-footer"
 import { ProductGrid } from "../components/product-grid"
@@ -14,9 +15,7 @@ export default async function AllProductsPage({
   const { storeSlug } = await params
   const referenceTime = new Date().toISOString()
 
-  const store = await db.store.findUnique({
-    where: { slug: storeSlug },
-  })
+  const store = await findStoreBySlug(storeSlug)
 
   if (!store) {
     notFound()

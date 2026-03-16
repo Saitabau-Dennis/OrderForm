@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import Image from "next/image"
 import db from "@/lib/db"
+import { findStoreBySlug } from "@/lib/store-slug"
 import { formatOrderId } from "@/lib/utils"
 import { StoreNavbar } from "../../components/store-navbar"
 import { StoreFooter } from "../../components/store-footer"
@@ -22,9 +23,7 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
   const { storeSlug } = await params
   const { method, orderId, orderReference, total, date } = await searchParams
 
-  const store = await db.store.findUnique({
-    where: { slug: storeSlug },
-  })
+  const store = await findStoreBySlug(storeSlug)
 
   if (!store) {
     notFound()
