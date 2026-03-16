@@ -4,7 +4,6 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { LandingButton } from "@/components/landing/landing-button"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   Sheet,
   SheetContent,
@@ -13,7 +12,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { useEffect, useState } from "react"
-import { Menu, ChevronRight } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 
 type NavbarProps = {
@@ -88,7 +86,7 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
                     className="h-[16px] w-[16px] object-cover scale-[3]"
                 />
             </span>
-            <span className="[font-family:var(--font-goodly)] text-[1.18rem] md:text-[1.36rem] font-semibold text-foreground tracking-tight mt-1">
+            <span className="[font-family:var(--font-goodly)] text-[1.32rem] md:text-[1.56rem] font-semibold text-foreground tracking-tight mt-1">
               Orderform
             </span>
         </Link>
@@ -129,57 +127,47 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
             <SheetTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="md:hidden relative z-50 h-10 rounded-full border border-border/70 bg-white/90 px-3 text-foreground shadow-sm hover:bg-white"
+                  className="md:hidden relative z-50 h-11 w-11 rounded-none bg-background p-0 text-foreground shadow-none hover:bg-background"
                 >
-                   <Menu className="h-4 w-4" />
-                   <span className="ml-1 text-sm font-medium">Menu</span>
+                  <span className="inline-flex flex-col items-center justify-center gap-1">
+                    <span className="h-[2px] w-5 bg-foreground" />
+                    <span className="h-[2px] w-3.5 bg-foreground" />
+                    <span className="h-[2px] w-5 bg-foreground" />
+                  </span>
+                  <span className="sr-only">Open menu</span>
                 </Button>
             </SheetTrigger>
             <SheetContent
-                side="right"
-                className="w-1/2 max-w-none p-0 flex flex-col border-l border-border/70 bg-gradient-to-b from-[#f7fbf9] via-white to-white shadow-[-16px_0_40px_rgba(0,0,0,0.12)] [&>button]:right-4 [&>button]:top-4 [&>button]:h-8 [&>button]:w-8 [&>button]:rounded-full [&>button]:p-2 [&>button]:text-foreground/40 [&>button]:hover:text-foreground [&>button]:hover:bg-muted/70"
+                side="left"
+                className="theme-landing font-sans w-[86vw] max-w-[360px] p-0 flex flex-col bg-background shadow-[18px_0_40px_rgba(0,0,0,0.22)] [&>button]:right-4 [&>button]:top-4 [&>button]:h-7 [&>button]:w-7 [&>button]:rounded-none [&>button]:border-0 [&>button]:p-1 [&>button]:text-foreground/55 [&>button]:hover:bg-transparent [&>button]:hover:text-primary"
             >
-                <SheetHeader className="px-6 pt-7 pb-4 text-left border-b border-border/60 bg-white/80 backdrop-blur">
-                  <div className="pt-1.5">
-                    <div className="flex items-center gap-2">
-                      <span className="relative inline-flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-primary/10 ring-1 ring-primary/10 shrink-0">
-                        <Image
-                          src="/images/logo-of.png"
-                          alt="OrderForm logo"
-                          width={661}
-                          height={377}
-                          className="h-4 w-4 object-cover scale-[3]"
-                        />
-                      </span>
-                      <SheetTitle className="[font-family:var(--font-goodly)] tracking-tight text-[1.5rem] leading-none mb-0 font-semibold text-primary mt-1">
-                        OrderForm
-                      </SheetTitle>
-                    </div>
-                    <p className="max-w-[17rem] text-[0.95rem] leading-snug text-foreground/65 mt-2">
-                      Turn social traffic into clean WhatsApp orders.
-                    </p>
+                <SheetHeader className="px-7 pt-8 pb-6 text-left bg-primary/[0.03]">
+                  <div className="pr-8">
+                    <SheetTitle className="[font-family:var(--font-goodly)] tracking-tight text-[2.1rem] leading-none mb-0 font-semibold text-foreground">
+                      Orderform
+                    </SheetTitle>
                   </div>
                 </SheetHeader>
 
-                <ScrollArea className="flex-1 px-6 py-5">
-                <div className="space-y-2">
+                <div className="flex-1 px-7 py-9">
+                <div className="space-y-7">
                     <MobileNavLink href="#about" onClick={(e) => handleScroll(e, "#about")}>About</MobileNavLink>
                     <MobileNavLink href="#features" onClick={(e) => handleScroll(e, "#features")}>Features</MobileNavLink>
                     <MobileNavLink href="#pricing" onClick={(e) => handleScroll(e, "#pricing")}>Pricing</MobileNavLink>
                     <MobileNavLink href="#faq" onClick={(e) => handleScroll(e, "#faq")}>FAQ</MobileNavLink>
                 </div>
-                </ScrollArea>
+                </div>
 
-                <div className="p-6 mt-auto border-t border-border/70 bg-white/90 backdrop-blur">
+                <div className="p-7 pt-5 mt-auto bg-primary/[0.02]">
                     <div className="flex flex-col gap-3">
-                    <LandingButton asChild size="lg" className="w-full">
-                        <Link href={isAuthenticated ? "/dashboard" : "/register"} target="_blank" onClick={() => setIsMobileMenuOpen(false)}>
-                        Get Started
+                    <LandingButton asChild tone="outline" size="lg" className="w-full rounded-xl">
+                        <Link href={isAuthenticated ? "/dashboard" : "/login"} onClick={() => setIsMobileMenuOpen(false)}>
+                        Signin
                         </Link>
                     </LandingButton>
-                    <LandingButton asChild tone="outline" size="lg" className="w-full font-medium">
-                        <Link href={isAuthenticated ? "/dashboard" : "/login"} target="_blank" onClick={() => setIsMobileMenuOpen(false)}>
-                        Log in
+                    <LandingButton asChild size="lg" className="w-full rounded-xl">
+                        <Link href={isAuthenticated ? "/dashboard" : "/register"} onClick={() => setIsMobileMenuOpen(false)}>
+                        Get Started
                         </Link>
                     </LandingButton>
                     </div>
@@ -210,10 +198,9 @@ function MobileNavLink({ href, onClick, children }: { href: string, onClick: (e:
       <a
         href={href}
         onClick={onClick}
-        className="group flex items-center justify-between rounded-lg px-1 py-3.5 transition-colors cursor-pointer hover:text-primary"
+        className="block font-sans text-[1.15rem] leading-none tracking-[-0.01em] text-foreground/90 transition-colors cursor-pointer hover:text-primary"
       >
-        <span className="text-[1.03rem] font-medium text-foreground/90 group-hover:text-primary transition-colors">{children}</span>
-        <ChevronRight className="w-4 h-4 text-foreground/35 group-hover:text-primary/70 transition-colors" />
+        {children}
       </a>
     )
   }

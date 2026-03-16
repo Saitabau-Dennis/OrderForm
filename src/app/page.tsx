@@ -20,28 +20,44 @@ export default async function Home() {
       <Navbar isAuthenticated={!!session} />
 
       <Hero
-        className="pt-24 pb-4 md:pt-28 md:pb-8"
+        className="pt-[4.65rem] pb-4 sm:pt-24 md:pt-28 md:pb-8"
         badge={
           <AnimatedBadge text="Built for Social Sellers" />
         }
         title={
           <>
-            <span className="block lg:whitespace-nowrap">
+            <span className="block whitespace-nowrap sm:hidden">
+              Turn{" "}
+              <span className="[font-family:var(--font-sora)] italic text-[#334155] font-normal tracking-[-0.03em]">
+                DMs
+              </span>{" "}
+              into orders
+            </span>
+            <span className="block whitespace-nowrap sm:hidden">
+              without back-and-forth
+            </span>
+
+            <span className="hidden sm:block lg:whitespace-nowrap">
               Turn{" "}
               <span className="[font-family:var(--font-sora)] italic text-[#334155] font-normal tracking-[-0.03em]">
                 DM conversations
               </span>{" "}
               into confirmed orders
             </span>
-            <span className="block lg:whitespace-nowrap">
+            <span className="hidden sm:block lg:whitespace-nowrap">
               without the back-and-forth
             </span>
           </>
         }
         subtitle={
           <>
-            Launch a clean storefront, cart, and checkout in seconds.
-            <span className="text-foreground"> Every order lands in WhatsApp with complete customer details.</span>
+            <span className="sm:hidden">
+              Launch a clean storefront and checkout in seconds. Every order lands in WhatsApp with full customer details.
+            </span>
+            <span className="hidden sm:inline">
+              Launch a clean storefront, cart, and checkout in seconds.
+              <span className="text-foreground"> Every order lands in WhatsApp with complete customer details.</span>
+            </span>
           </>
         }
         ctaText="Create your store"
