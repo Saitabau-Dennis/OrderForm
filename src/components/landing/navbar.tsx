@@ -73,21 +73,18 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
       >
         <Link
             href="/"
-            className="flex items-center gap-1 relative z-10 shrink-0"
+            className="flex items-center relative z-10 shrink-0"
             onClick={() => setIsMobileMenuOpen(false)}
         >
-            <span className="relative inline-flex h-7 w-7 items-center justify-center overflow-hidden">
+            <span className="relative inline-flex h-9 w-9 md:h-10 md:w-10 items-center justify-center overflow-hidden">
                 <Image
                     src="/images/logo-of.png"
                     alt="OrderForm logo"
                     width={661}
                     height={377}
                     priority
-                    className="h-[14px] w-[14px] object-cover scale-[2.8]"
+                    className="h-[16px] w-[16px] object-cover scale-[2.8]"
                 />
-            </span>
-            <span className="[font-family:var(--font-goodly)] text-[1.42rem] md:text-[1.68rem] font-semibold text-foreground tracking-tight mt-1">
-              Orderform
             </span>
         </Link>
 
@@ -143,8 +140,16 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
             >
                 <SheetHeader className="px-7 pt-8 pb-6 text-left bg-primary/[0.03]">
                   <div className="pr-8">
-                    <SheetTitle className="[font-family:var(--font-goodly)] tracking-tight text-[2.1rem] leading-none mb-0 font-semibold text-foreground">
-                      Orderform
+                    <SheetTitle className="mb-0">
+                      <span className="relative inline-flex h-10 w-10 items-center justify-center overflow-hidden">
+                        <Image
+                          src="/images/logo-of.png"
+                          alt="OrderForm logo"
+                          width={661}
+                          height={377}
+                          className="h-[16px] w-[16px] object-cover scale-[2.8]"
+                        />
+                      </span>
                     </SheetTitle>
                   </div>
                 </SheetHeader>
