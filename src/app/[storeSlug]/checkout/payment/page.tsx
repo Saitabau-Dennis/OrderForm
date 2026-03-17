@@ -133,8 +133,7 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
                 Proceed to secure card checkout and complete payment using Visa, Mastercard, Amex, Apple Pay or M-PESA card channels.
               </p>
 
-              <div className="mt-5 rounded border border-[#DDDDD8] bg-white/80 p-3 sm:p-4">
-                <p className="mb-2 text-center text-xs font-semibold text-[#1D2D73] sm:text-sm">Secured by paystack</p>
+              <div className="mt-5 rounded border border-[#DDDDD8] p-3 sm:p-4">
                 <Image
                   src="/images/paystack-ke.png"
                   alt="Card payment options"

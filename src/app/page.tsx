@@ -4,7 +4,6 @@ import { Hero } from "@/components/ui/hero"
 import { AboutUs } from "@/components/landing/about-us"
 import { Features } from "@/components/landing/features"
 import { HowItWorks } from "@/components/landing/how-it-works"
-import { DemoVideo } from "@/components/landing/demo-video"
 import { MiniStorePreview } from "@/components/landing/mini-store-preview"
 import { Pricing } from "@/components/landing/pricing"
 import { FAQ } from "@/components/landing/faq"
@@ -64,8 +63,8 @@ export default async function Home() {
         ctaLink="/register"
         ctaTarget="_blank"
         secondaryCtaText="See demo"
-        secondaryCtaLink="https://saitabau.orderform.store/"
-        secondaryCtaTarget="_blank"
+        secondaryCtaOpensVideoModal
+        demoVideoUrl={process.env.NEXT_PUBLIC_YOUTUBE_DEMO_URL}
         mockupImage={{
           src: "/images/dashboard-v2.png",
           alt: "OrderForm Dashboard Interface",
@@ -77,7 +76,6 @@ export default async function Home() {
       <AboutUs />
       <Features />
       <HowItWorks />
-      <DemoVideo />
       <MiniStorePreview />
       <Pricing />
       <FAQ />

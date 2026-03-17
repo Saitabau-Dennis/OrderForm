@@ -3,7 +3,7 @@
 import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ChevronRight } from "lucide-react"
+import { ChevronRight, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { LandingButton } from "@/components/landing/landing-button"
 
@@ -18,12 +18,48 @@ interface HeroProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> 
   secondaryCtaText?: string
   secondaryCtaLink?: string
   secondaryCtaTarget?: string
+  secondaryCtaOpensVideoModal?: boolean
+  demoVideoUrl?: string
   mockupImage?: {
     src: string
     alt: string
     width: number
     height: number
   }
+}
+
+function getYouTubeVideoId(source: string | undefined): string | null {
+  const trimmedSource = source?.trim()
+  const videoIdPattern = /^[a-zA-Z0-9_-]{11}$/
+
+  if (!trimmedSource) return null
+  if (videoIdPattern.test(trimmedSource)) return trimmedSource
+
+  try {
+    const url = new URL(trimmedSource)
+    const hostname = url.hostname.replace("www.", "")
+
+    if (hostname === "youtu.be") {
+      const videoId = url.pathname.split("/").filter(Boolean)[0]
+      if (videoIdPattern.test(videoId)) return videoId
+    }
+
+    if (hostname === "youtube.com" || hostname === "m.youtube.com" || hostname === "youtube-nocookie.com") {
+      const fromQuery = url.searchParams.get("v")
+      if (fromQuery && videoIdPattern.test(fromQuery)) return fromQuery
+
+      const pathSegments = url.pathname.split("/").filter(Boolean)
+      const embedIndex = pathSegments.indexOf("embed")
+      if (embedIndex >= 0) {
+        const embedId = pathSegments[embedIndex + 1]
+        if (embedId && videoIdPattern.test(embedId)) return embedId
+      }
+    }
+  } catch {
+    return null
+  }
+
+  return null
 }
 
 const Hero = React.forwardRef<HTMLDivElement, HeroProps>(
@@ -40,11 +76,31 @@ const Hero = React.forwardRef<HTMLDivElement, HeroProps>(
       secondaryCtaText,
       secondaryCtaLink,
       secondaryCtaTarget,
+      secondaryCtaOpensVideoModal = false,
+      demoVideoUrl,
       mockupImage,
       ...props
     },
     ref
   ) => {
+    const [isDemoModalOpen, setIsDemoModalOpen] = React.useState(false)
+    const demoVideoId = getYouTubeVideoId(demoVideoUrl)
+    const demoVideoEmbedUrl = demoVideoId
+      ? `https://www.youtube-nocookie.com/embed/${demoVideoId}?rel=0&autoplay=1`
+      : null
+    const showSecondaryCta = Boolean(secondaryCtaText && (secondaryCtaLink || (secondaryCtaOpensVideoModal && demoVideoEmbedUrl)))
+
+    React.useEffect(() => {
+      if (!isDemoModalOpen) return
+
+      const previousOverflow = document.body.style.overflow
+      document.body.style.overflow = "hidden"
+
+      return () => {
+        document.body.style.overflow = previousOverflow
+      }
+    }, [isDemoModalOpen])
+
     return (
       <div
         ref={ref}
@@ -84,7 +140,7 @@ const Hero = React.forwardRef<HTMLDivElement, HeroProps>(
           </p>
         )}
 
-        {(ctaText && ctaLink) || (secondaryCtaText && secondaryCtaLink) ? (
+        {(ctaText && ctaLink) || showSecondaryCta ? (
           <div className="flex flex-row items-center justify-center gap-2 sm:gap-3 animate-appear opacity-0 delay-500 w-full sm:w-auto max-w-[20rem] sm:max-w-none px-5">
             {ctaText && ctaLink && (
                  <LandingButton asChild size="lg" className="h-9.5 sm:h-10.5 md:h-11 min-w-[9.2rem] sm:min-w-0 flex-none rounded-xl px-3.5 sm:px-7 text-[0.9rem] sm:text-[0.98rem] font-semibold">
@@ -94,14 +150,27 @@ const Hero = React.forwardRef<HTMLDivElement, HeroProps>(
                  </LandingButton>
             )}
 
-            {secondaryCtaText && secondaryCtaLink && (
-                <LandingButton asChild tone="outline" size="lg" className="h-9.5 sm:h-10.5 md:h-11 min-w-[8rem] sm:min-w-0 flex-none rounded-xl px-3.5 sm:px-7 text-[0.9rem] sm:text-[0.98rem] font-semibold group">
-                  <Link href={secondaryCtaLink} target={secondaryCtaTarget} rel={secondaryCtaTarget === "_blank" ? "noopener noreferrer" : undefined}>
-                  <span>{secondaryCtaText}</span>
-                  <ChevronRight className="h-4 w-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
-                  </Link>
-                </LandingButton>
-            )}
+            {showSecondaryCta && secondaryCtaText ? (
+                secondaryCtaOpensVideoModal && demoVideoEmbedUrl ? (
+                  <LandingButton
+                    type="button"
+                    onClick={() => setIsDemoModalOpen(true)}
+                    tone="outline"
+                    size="lg"
+                    className="h-9.5 sm:h-10.5 md:h-11 min-w-[8rem] sm:min-w-0 flex-none rounded-xl px-3.5 sm:px-7 text-[0.9rem] sm:text-[0.98rem] font-semibold group"
+                  >
+                    <span>{secondaryCtaText}</span>
+                    <ChevronRight className="h-4 w-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
+                  </LandingButton>
+                ) : (
+                  <LandingButton asChild tone="outline" size="lg" className="h-9.5 sm:h-10.5 md:h-11 min-w-[8rem] sm:min-w-0 flex-none rounded-xl px-3.5 sm:px-7 text-[0.9rem] sm:text-[0.98rem] font-semibold group">
+                    <Link href={secondaryCtaLink!} target={secondaryCtaTarget} rel={secondaryCtaTarget === "_blank" ? "noopener noreferrer" : undefined}>
+                      <span>{secondaryCtaText}</span>
+                      <ChevronRight className="h-4 w-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
+                    </Link>
+                  </LandingButton>
+                )
+            ) : null}
           </div>
         ) : null}
 
@@ -123,6 +192,38 @@ const Hero = React.forwardRef<HTMLDivElement, HeroProps>(
             </div>
           </div>
         )}
+
+        {isDemoModalOpen && demoVideoEmbedUrl ? (
+          <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/70 px-4 py-6" role="dialog" aria-modal="true" aria-label="Demo video">
+            <button
+              type="button"
+              className="absolute inset-0 h-full w-full cursor-default"
+              aria-label="Close demo video"
+              onClick={() => setIsDemoModalOpen(false)}
+            />
+            <div className="relative z-10 w-full max-w-4xl overflow-hidden rounded-2xl border border-white/20 bg-black shadow-2xl">
+              <button
+                type="button"
+                onClick={() => setIsDemoModalOpen(false)}
+                className="absolute right-3 top-3 z-20 inline-flex h-9 w-9 items-center justify-center rounded-full bg-black/55 text-white transition hover:bg-black/75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                aria-label="Close"
+              >
+                <X className="h-5 w-5" />
+              </button>
+              <div className="aspect-video w-full bg-black">
+                <iframe
+                  src={demoVideoEmbedUrl}
+                  title="Orderform Demo Video"
+                  className="h-full w-full"
+                  loading="eager"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+          </div>
+        ) : null}
       </div>
     )
   }
