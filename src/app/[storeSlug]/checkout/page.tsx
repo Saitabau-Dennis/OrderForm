@@ -83,6 +83,9 @@ export default async function CheckoutPage({
             currency={store.currency}
             deliveryZones={serializedZones}
             brandColor={store.brandColor}
+            enableDelivery={store.enableDelivery}
+            enableShopPickup={store.enableShopPickup}
+            shopPickupInstructions={store.shopPickupInstructions}
           />
         </div>
       </main>

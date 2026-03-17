@@ -54,6 +54,9 @@ export async function PUT(req: Request) {
       description,
       deliveryZones,
       isActive,
+      enableDelivery,
+      enableShopPickup,
+      shopPickupInstructions,
     } = body;
     const normalizedSlug = normalizeStoreSlug(String(slug ?? ""));
 
@@ -87,6 +90,9 @@ export async function PUT(req: Request) {
         theme,
         description,
         isActive,
+        enableDelivery,
+        enableShopPickup,
+        shopPickupInstructions,
         deliveryZones: {
             // Replace zones with the latest submitted list from settings UI.
             deleteMany: {},

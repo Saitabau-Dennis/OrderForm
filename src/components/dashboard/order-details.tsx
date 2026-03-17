@@ -110,6 +110,12 @@ export function OrderDetails({
           <span className="text-muted-foreground">Phone</span>
           <span className="text-foreground">{order.customerPhone}</span>
         </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-muted-foreground">Fulfillment</span>
+          <span className="text-foreground">
+            {order.fulfillmentMethod === "SHOP_PICKUP" ? "Shop Pickup" : "Delivery"}
+          </span>
+        </div>
         {order.deliveryAddress && (
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground shrink-0">Address</span>

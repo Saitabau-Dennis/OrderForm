@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/dashboard/dashboard-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
@@ -49,6 +50,9 @@ const settingsSchema = z.object({
   secondaryColor: z.string().default("#A6CFF2"),
   theme: z.string().default("Butter & Twilight"),
   isActive: z.boolean().default(true),
+  enableDelivery: z.boolean().default(true),
+  enableShopPickup: z.boolean().default(false),
+  shopPickupInstructions: z.string().default(""),
   deliveryZones: z.array(
     z.object({
       name: z.string().min(1, "Zone name is required"),
@@ -82,6 +86,9 @@ interface InitialStoreData {
   secondaryColor?: string | null;
   theme?: string | null;
   isActive?: boolean | null;
+  enableDelivery?: boolean | null;
+  enableShopPickup?: boolean | null;
+  shopPickupInstructions?: string | null;
   deliveryZones?: InitialDeliveryZone[];
 }
 
@@ -123,6 +130,9 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
       secondaryColor: initialData?.secondaryColor || "#A6CFF2",
       theme: initialData?.theme || "Butter & Twilight",
       isActive: initialData?.isActive ?? true,
+      enableDelivery: initialData?.enableDelivery ?? true,
+      enableShopPickup: initialData?.enableShopPickup ?? false,
+      shopPickupInstructions: initialData?.shopPickupInstructions || "",
       deliveryZones:
         initialData?.deliveryZones?.map((zone: InitialDeliveryZone) => ({
           name: zone.name,
@@ -470,6 +480,54 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
                       {...form.register("xUrl")}
                       className="h-11 rounded-xl"
                       placeholder="https://x.com/yourstore"
+                    />
+                  </FieldGroup>
+                </div>
+              </ConfigSection>
+
+              <ConfigSection
+                title="Fulfillment Options"
+                description="Choose how customers can receive orders."
+              >
+                <div className="space-y-5">
+                  <div className="space-y-4 rounded-2xl border border-border bg-background/60 p-4">
+                    <Controller
+                      control={form.control}
+                      name="enableDelivery"
+                      render={({ field }) => (
+                        <div className="flex items-center justify-between gap-4">
+                          <div>
+                            <p className="text-sm font-medium text-foreground">Custom Shipping (Delivery Zones)</p>
+                            <p className="text-xs text-muted-foreground">
+                              Let customers choose a delivery zone and pay the configured fee.
+                            </p>
+                          </div>
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
+                        </div>
+                      )}
+                    />
+                    <Controller
+                      control={form.control}
+                      name="enableShopPickup"
+                      render={({ field }) => (
+                        <div className="flex items-center justify-between gap-4">
+                          <div>
+                            <p className="text-sm font-medium text-foreground">Shop Pickup</p>
+                            <p className="text-xs text-muted-foreground">
+                              Allow customers to place orders and collect from your shop.
+                            </p>
+                          </div>
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
+                        </div>
+                      )}
+                    />
+                  </div>
+
+                  <FieldGroup label="Shop Pickup Instructions">
+                    <Input
+                      {...form.register("shopPickupInstructions")}
+                      className="h-11 rounded-xl"
+                      placeholder="e.g. Pickup from Moi Avenue branch, 9am - 6pm."
                     />
                   </FieldGroup>
                 </div>

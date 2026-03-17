@@ -24,11 +24,15 @@ type CheckoutClientProps = {
   currency: string
   deliveryZones: DeliveryZone[]
   brandColor: string
+  enableDelivery: boolean
+  enableShopPickup: boolean
+  shopPickupInstructions?: string | null
 }
 
 type CheckoutFormData = {
   name: string
   phone: string
+  deliveryMethod: "delivery" | "shop_pickup"
   deliveryAddress: string
   zoneId: string
 }
@@ -49,6 +53,7 @@ function normalizePhone(value: string): string {
 // Client-side validation mirrors server expectations for faster feedback.
 function validateCheckout(formData: CheckoutFormData, requiresZone: boolean): CheckoutFieldErrors {
   const errors: CheckoutFieldErrors = {}
+  const isDelivery = formData.deliveryMethod === "delivery"
 
   if (!formData.name.trim() || formData.name.trim().length < 2) {
     errors.name = "Please enter your full name."
@@ -59,11 +64,11 @@ function validateCheckout(formData: CheckoutFormData, requiresZone: boolean): Ch
     errors.phone = "Enter a valid phone number (e.g. 0712345678)."
   }
 
-  if (!formData.deliveryAddress.trim() || formData.deliveryAddress.trim().length < 8) {
+  if (isDelivery && (!formData.deliveryAddress.trim() || formData.deliveryAddress.trim().length < 8)) {
     errors.deliveryAddress = "Please provide a complete delivery location."
   }
 
-  if (requiresZone && !formData.zoneId) {
+  if (isDelivery && requiresZone && !formData.zoneId) {
     errors.zoneId = "Please select your delivery zone."
   }
 
@@ -80,7 +85,16 @@ function getFieldClass(hasError: boolean): string {
   return `${base} border border-[#E8E8E5] bg-transparent focus:border-[#1A1A1A]`
 }
 
-export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, brandColor }: CheckoutClientProps) {
+export function CheckoutClient({
+  storeId,
+  storeSlug,
+  currency,
+  deliveryZones,
+  brandColor,
+  enableDelivery,
+  enableShopPickup,
+  shopPickupInstructions,
+}: CheckoutClientProps) {
   const checkoutDraftStorageKey = useMemo(() => getCheckoutDraftStorageKey(storeSlug), [storeSlug])
   const { cart, cartTotal } = useStore()
 
@@ -95,6 +109,7 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
   const [formData, setFormData] = useState<CheckoutFormData>({
     name: "",
     phone: "",
+    deliveryMethod: enableDelivery ? "delivery" : "shop_pickup",
     deliveryAddress: "",
     zoneId: "",
   })
@@ -121,11 +136,12 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
     },
   ]
 
-  const selectedZone = useMemo(
-    () => deliveryZones.find((zone) => zone.id === formData.zoneId),
-    [deliveryZones, formData.zoneId]
-  )
-  const deliveryFee = selectedZone ? selectedZone.price : 0
+  const hasAnyShippingMethod = enableDelivery || enableShopPickup
+  const selectedZone = useMemo(() => {
+    if (formData.deliveryMethod !== "delivery") return undefined
+    return deliveryZones.find((zone) => zone.id === formData.zoneId)
+  }, [deliveryZones, formData.deliveryMethod, formData.zoneId])
+  const deliveryFee = formData.deliveryMethod === "delivery" && selectedZone ? selectedZone.price : 0
   const grandTotal = cartTotal + deliveryFee
   const [firstNamePart = "", ...otherNameParts] = formData.name.trim().split(/\s+/)
   const lastNamePart = otherNameParts.join(" ")
@@ -140,6 +156,10 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
       setFormData((previous) => ({
         name: typeof parsedDraft.name === "string" ? parsedDraft.name : previous.name,
         phone: typeof parsedDraft.phone === "string" ? parsedDraft.phone : previous.phone,
+        deliveryMethod:
+          parsedDraft.deliveryMethod === "shop_pickup" || parsedDraft.deliveryMethod === "delivery"
+            ? parsedDraft.deliveryMethod
+            : previous.deliveryMethod,
         deliveryAddress:
           typeof parsedDraft.deliveryAddress === "string"
             ? parsedDraft.deliveryAddress
@@ -154,10 +174,26 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
   }, [checkoutDraftStorageKey])
 
   useEffect(() => {
+    if (formData.deliveryMethod === "delivery" && !enableDelivery) {
+      setFormData((previous) => ({ ...previous, deliveryMethod: "shop_pickup", zoneId: "" }))
+      return
+    }
+
+    if (formData.deliveryMethod === "shop_pickup" && !enableShopPickup) {
+      setFormData((previous) => ({ ...previous, deliveryMethod: "delivery" }))
+    }
+  }, [enableDelivery, enableShopPickup, formData.deliveryMethod])
+
+  useEffect(() => {
     if (!hasHydratedDraft) return
 
     // Persist only non-empty drafts so old data does not linger indefinitely.
-    const hasAnyDraftValue = Object.values(formData).some((value) => value.trim() !== "")
+    const hasAnyDraftValue = Boolean(
+      formData.name.trim() ||
+      formData.phone.trim() ||
+      formData.deliveryAddress.trim() ||
+      formData.zoneId.trim()
+    )
 
     try {
       if (!hasAnyDraftValue) {
@@ -181,12 +217,29 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
   }
 
   const setFieldValue = (field: keyof CheckoutFormData, value: string) => {
-    setFormData((previous) => ({ ...previous, [field]: value }))
+    setFormData((previous) => {
+      if (field === "deliveryMethod") {
+        const nextMethod = value as CheckoutFormData["deliveryMethod"]
+        if (nextMethod === "shop_pickup") {
+          return { ...previous, deliveryMethod: nextMethod, zoneId: "" }
+        }
+      }
+      return { ...previous, [field]: value }
+    })
 
     if (fieldErrors[field]) {
       setFieldErrors((previous) => {
         const next = { ...previous }
         delete next[field]
+        return next
+      })
+    }
+
+    if (field === "deliveryMethod") {
+      setFieldErrors((previous) => {
+        const next = { ...previous }
+        delete next.deliveryAddress
+        delete next.zoneId
         return next
       })
     }
@@ -199,7 +252,15 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
     }
 
     // Final totals and discount validation still happen server-side in `createOrder`.
-    const errors = validateCheckout(formData, deliveryZones.length > 0)
+    if (!hasAnyShippingMethod) {
+      toast.error("This store has not enabled any shipping method yet.")
+      return
+    }
+
+    const errors = validateCheckout(
+      formData,
+      formData.deliveryMethod === "delivery" && deliveryZones.length > 0
+    )
     setFieldErrors(errors)
 
     if (Object.keys(errors).length > 0) {
@@ -214,9 +275,10 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
         storeId,
         customerName: formData.name.trim(),
         customerPhone: formData.phone.trim(),
-        deliveryAddress: formData.deliveryAddress.trim(),
-        deliveryZone: selectedZone?.name,
-        deliveryFee,
+        fulfillmentMethod: formData.deliveryMethod,
+        deliveryAddress:
+          formData.deliveryMethod === "delivery" ? formData.deliveryAddress.trim() : undefined,
+        deliveryZoneId: formData.deliveryMethod === "delivery" ? formData.zoneId || undefined : undefined,
         notes: orderNotes.trim() || undefined,
         items: cart.map((item) => ({
           productId: item.productId,
@@ -253,6 +315,13 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
     event.preventDefault()
     await submitOrder()
   }
+
+  const shippingMethodLabel =
+    formData.deliveryMethod === "shop_pickup"
+      ? "Shop Pickup"
+      : selectedZone
+      ? selectedZone.name
+      : "Delivery"
 
   if (cart.length === 0) {
     return (
@@ -333,62 +402,108 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
                 <p className="text-[24px] font-semibold leading-none tracking-tight text-[#1A1A1A] sm:text-[28px] lg:text-[30px]">Kenya</p>
               </div>
 
-              <div className="space-y-1.5">
-                <label htmlFor="deliveryAddress" className="text-[13px] font-medium text-[#1A1A1A]">
-                  Street address <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="deliveryAddress"
-                  type="text"
-                  value={formData.deliveryAddress}
-                  onChange={(event) => setFieldValue("deliveryAddress", event.target.value)}
-                  placeholder="House number and street name"
-                  className={`${getFieldClass(Boolean(fieldErrors.deliveryAddress))} h-11 px-3`}
-                  aria-invalid={Boolean(fieldErrors.deliveryAddress)}
-                  aria-describedby={fieldErrors.deliveryAddress ? "checkout-address-error" : undefined}
-                />
-                <input
-                  id="deliveryAddress-2"
-                  type="text"
-                  value={addressLineTwo}
-                  onChange={(event) => setAddressLineTwo(event.target.value)}
-                  placeholder="Apartment, suite, unit, etc. (optional)"
-                  className="h-11 w-full rounded-none border border-[#E8E8E5] bg-transparent px-3 text-sm text-[#1A1A1A] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]"
-                />
-                {fieldErrors.deliveryAddress ? (
-                  <p id="checkout-address-error" className="text-xs text-red-600" role="alert">
-                    {fieldErrors.deliveryAddress}
+              {hasAnyShippingMethod ? (
+                <div className="space-y-2">
+                  <p className="text-[13px] font-medium text-[#1A1A1A]">
+                    Shipping Method <span className="text-red-500">*</span>
                   </p>
-                ) : null}
-              </div>
-
-              {deliveryZones.length > 0 ? (
-                <div className="space-y-1.5">
-                  <label htmlFor="zone" className="text-[13px] font-medium text-[#1A1A1A]">
-                    Town / City <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    id="zone"
-                    value={formData.zoneId}
-                    onChange={(event) => setFieldValue("zoneId", event.target.value)}
-                    className={`${getFieldClass(Boolean(fieldErrors.zoneId))} h-11 px-3`}
-                    aria-invalid={Boolean(fieldErrors.zoneId)}
-                    aria-describedby={fieldErrors.zoneId ? "checkout-zone-error" : undefined}
-                  >
-                    <option value="">Select city</option>
-                    {deliveryZones.map((zone) => (
-                      <option key={zone.id} value={zone.id}>
-                        {zone.name} — {formatPrice(zone.price)}
-                      </option>
-                    ))}
-                  </select>
-                  {fieldErrors.zoneId ? (
-                    <p id="checkout-zone-error" className="text-xs text-red-600" role="alert">
-                      {fieldErrors.zoneId}
-                    </p>
-                  ) : null}
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {enableDelivery ? (
+                      <label className="flex cursor-pointer items-center gap-2 rounded-none border border-[#DADAD5] px-3 py-2">
+                        <input
+                          type="radio"
+                          name="delivery-method"
+                          checked={formData.deliveryMethod === "delivery"}
+                          onChange={() => setFieldValue("deliveryMethod", "delivery")}
+                          className="h-4 w-4 accent-[#1A1A1A]"
+                        />
+                        <span className="text-sm text-[#1A1A1A]">Delivery</span>
+                      </label>
+                    ) : null}
+                    {enableShopPickup ? (
+                      <label className="flex cursor-pointer items-center gap-2 rounded-none border border-[#DADAD5] px-3 py-2">
+                        <input
+                          type="radio"
+                          name="delivery-method"
+                          checked={formData.deliveryMethod === "shop_pickup"}
+                          onChange={() => setFieldValue("deliveryMethod", "shop_pickup")}
+                          className="h-4 w-4 accent-[#1A1A1A]"
+                        />
+                        <span className="text-sm text-[#1A1A1A]">Shop Pickup (Free)</span>
+                      </label>
+                    ) : null}
+                  </div>
                 </div>
-              ) : null}
+              ) : (
+                <div className="rounded-none border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">
+                  This store has no shipping method enabled. Please contact the store owner.
+                </div>
+              )}
+
+              {formData.deliveryMethod === "delivery" ? (
+                <>
+                  <div className="space-y-1.5">
+                    <label htmlFor="deliveryAddress" className="text-[13px] font-medium text-[#1A1A1A]">
+                      Street address <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      id="deliveryAddress"
+                      type="text"
+                      value={formData.deliveryAddress}
+                      onChange={(event) => setFieldValue("deliveryAddress", event.target.value)}
+                      placeholder="House number and street name"
+                      className={`${getFieldClass(Boolean(fieldErrors.deliveryAddress))} h-11 px-3`}
+                      aria-invalid={Boolean(fieldErrors.deliveryAddress)}
+                      aria-describedby={fieldErrors.deliveryAddress ? "checkout-address-error" : undefined}
+                    />
+                    <input
+                      id="deliveryAddress-2"
+                      type="text"
+                      value={addressLineTwo}
+                      onChange={(event) => setAddressLineTwo(event.target.value)}
+                      placeholder="Apartment, suite, unit, etc. (optional)"
+                      className="h-11 w-full rounded-none border border-[#E8E8E5] bg-transparent px-3 text-sm text-[#1A1A1A] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]"
+                    />
+                    {fieldErrors.deliveryAddress ? (
+                      <p id="checkout-address-error" className="text-xs text-red-600" role="alert">
+                        {fieldErrors.deliveryAddress}
+                      </p>
+                    ) : null}
+                  </div>
+
+                  {deliveryZones.length > 0 ? (
+                    <div className="space-y-1.5">
+                      <label htmlFor="zone" className="text-[13px] font-medium text-[#1A1A1A]">
+                        Town / City <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        id="zone"
+                        value={formData.zoneId}
+                        onChange={(event) => setFieldValue("zoneId", event.target.value)}
+                        className={`${getFieldClass(Boolean(fieldErrors.zoneId))} h-11 px-3`}
+                        aria-invalid={Boolean(fieldErrors.zoneId)}
+                        aria-describedby={fieldErrors.zoneId ? "checkout-zone-error" : undefined}
+                      >
+                        <option value="">Select city</option>
+                        {deliveryZones.map((zone) => (
+                          <option key={zone.id} value={zone.id}>
+                            {zone.name} — {formatPrice(zone.price)}
+                          </option>
+                        ))}
+                      </select>
+                      {fieldErrors.zoneId ? (
+                        <p id="checkout-zone-error" className="text-xs text-red-600" role="alert">
+                          {fieldErrors.zoneId}
+                        </p>
+                      ) : null}
+                    </div>
+                  ) : null}
+                </>
+              ) : (
+                <div className="rounded-none border border-[#DADAD5] bg-[#F8F8F6] px-3 py-2 text-sm text-[#4B4B46]">
+                  {shopPickupInstructions?.trim() || "You can pick up your order from the shop after confirmation."}
+                </div>
+              )}
 
               <div className="space-y-1.5">
                 <label htmlFor="phone" className="text-[13px] font-medium text-[#1A1A1A]">
@@ -489,7 +604,7 @@ export function CheckoutClient({ storeId, storeSlug, currency, deliveryZones, br
               </div>
               <div className="grid grid-cols-[minmax(0,1fr)_auto] border-t border-[#E8E8E5] py-4 text-[15px] text-[#4E4E49]">
                 <span className="font-semibold">Shipment</span>
-                <span className="font-semibold">{selectedZone ? selectedZone.name : "Custom Rate"}</span>
+                <span className="font-semibold">{shippingMethodLabel}</span>
               </div>
               <div className="grid grid-cols-[minmax(0,1fr)_auto] border-t border-[#DADAD5] py-4">
                 <span className="text-xl font-semibold text-[#1A1A1A]">Total</span>

@@ -22,6 +22,9 @@ interface StoreSettingsData {
   brandColor: string;
   secondaryColor?: string;
   theme: string;
+  enableDelivery: boolean;
+  enableShopPickup: boolean;
+  shopPickupInstructions?: string;
   deliveryZones: { name: string; price: number }[];
 }
 
@@ -65,6 +68,9 @@ export async function updateStoreSettings(data: StoreSettingsData) {
           brandColor: data.brandColor,
           secondaryColor: data.secondaryColor || "#95D5B2",
           theme: data.theme,
+          enableDelivery: data.enableDelivery,
+          enableShopPickup: data.enableShopPickup,
+          shopPickupInstructions: data.shopPickupInstructions || null,
           deliveryZones: {
             create: data.deliveryZones || []
           }
@@ -90,6 +96,9 @@ export async function updateStoreSettings(data: StoreSettingsData) {
           brandColor: data.brandColor,
           secondaryColor: data.secondaryColor || "#95D5B2",
           theme: data.theme,
+          enableDelivery: data.enableDelivery,
+          enableShopPickup: data.enableShopPickup,
+          shopPickupInstructions: data.shopPickupInstructions || null,
           deliveryZones: {
             deleteMany: {},
             create: data.deliveryZones || []

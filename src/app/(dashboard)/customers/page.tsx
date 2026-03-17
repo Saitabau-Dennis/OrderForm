@@ -63,7 +63,7 @@ export default async function CustomersPage() {
           update: {
             name: order.customerName,
             phone: order.customerPhone,
-            defaultAddress: order.deliveryAddress,
+            ...(order.deliveryAddress ? { defaultAddress: order.deliveryAddress } : {}),
           },
           create: {
             storeId: store.id,

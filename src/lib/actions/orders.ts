@@ -20,9 +20,9 @@ const CreateOrderSchema = z.object({
   storeId: z.string(),
   customerName: z.string().min(1, "Name is required"),
   customerPhone: z.string().min(7, "Phone is required"),
-  deliveryAddress: z.string().min(1, "Address is required"),
-  deliveryZone: z.string().optional(),
-  deliveryFee: z.number().min(0).optional(),
+  fulfillmentMethod: z.enum(["delivery", "shop_pickup"]).default("delivery"),
+  deliveryAddress: z.string().optional(),
+  deliveryZoneId: z.string().optional(),
   items: z.array(z.object({
     productId: z.string(),
     name: z.string(),
@@ -70,7 +70,20 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
 
     // Store name contributes a recognizable prefix (e.g. "NIK-XXXXXX").
     const store = await db.store.findUnique({
-      where: { id: validatedData.storeId }
+      where: { id: validatedData.storeId },
+      select: {
+        id: true,
+        name: true,
+        enableDelivery: true,
+        enableShopPickup: true,
+        deliveryZones: {
+          select: {
+            id: true,
+            name: true,
+            price: true,
+          },
+        },
+      },
     });
 
     if (!store) {
@@ -185,7 +198,37 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
       discountAmount = roundMoney((subtotal * safePercent) / 100);
     }
 
-    const deliveryFee = roundMoney(Math.max(0, validatedData.deliveryFee ?? 0));
+    const isDelivery = validatedData.fulfillmentMethod === "delivery";
+    const deliveryAddress = validatedData.deliveryAddress?.trim() || null;
+    const selectedZone = validatedData.deliveryZoneId
+      ? store.deliveryZones.find((zone) => zone.id === validatedData.deliveryZoneId)
+      : undefined;
+
+    if (isDelivery && !store.enableDelivery) {
+      return { error: "Delivery is currently unavailable for this store." };
+    }
+
+    if (!isDelivery && !store.enableShopPickup) {
+      return { error: "Shop pickup is currently unavailable for this store." };
+    }
+
+    if (isDelivery && (!deliveryAddress || deliveryAddress.length < 8)) {
+      return { error: "Address is required for delivery." };
+    }
+
+    if (isDelivery && store.deliveryZones.length > 0 && !validatedData.deliveryZoneId) {
+      return { error: "Please select a valid delivery zone." };
+    }
+
+    if (isDelivery && validatedData.deliveryZoneId && !selectedZone) {
+      return { error: "Selected delivery zone is invalid." };
+    }
+
+    const deliveryZoneName = isDelivery ? selectedZone?.name : null;
+    const deliveryZoneId = isDelivery ? selectedZone?.id ?? null : null;
+    const deliveryFee = roundMoney(
+      isDelivery && selectedZone ? Number(selectedZone.price) : 0
+    );
     const totalAmount = roundMoney(Math.max(0, subtotal - discountAmount + deliveryFee));
 
     const order = await db.$transaction(async (tx) => {
@@ -251,14 +294,14 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
         update: {
           name: validatedData.customerName,
           phone: validatedData.customerPhone.trim(),
-          defaultAddress: validatedData.deliveryAddress,
+          ...(deliveryAddress ? { defaultAddress: deliveryAddress } : {}),
         },
         create: {
           storeId: validatedData.storeId,
           name: validatedData.customerName,
           phone: validatedData.customerPhone.trim(),
           phoneNormalized: normalizedPhone,
-          defaultAddress: validatedData.deliveryAddress,
+          defaultAddress: deliveryAddress,
         },
         select: { id: true },
       });
@@ -269,8 +312,10 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
           customerId: customer.id,
           customerName: validatedData.customerName,
           customerPhone: validatedData.customerPhone,
-          deliveryAddress: validatedData.deliveryAddress,
-          deliveryZone: validatedData.deliveryZone,
+          fulfillmentMethod: isDelivery ? "DELIVERY" : "SHOP_PICKUP",
+          deliveryAddress,
+          deliveryZoneId,
+          deliveryZone: deliveryZoneName,
           deliveryFee,
           totalAmount,
           subtotal,

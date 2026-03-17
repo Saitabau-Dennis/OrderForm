@@ -52,6 +52,11 @@ enum PaymentTransactionStatus {
   CANCELLED
 }
 
+enum FulfillmentMethod {
+  DELIVERY
+  SHOP_PICKUP
+}
+
 // --- NextAuth Models ---
 
 model VerificationToken {
@@ -108,6 +113,9 @@ model Store {
   // Business Logic
   subscriptionPlan String  @default("free") // "free" | "pro"
   isActive         Boolean @default(true)
+  enableDelivery   Boolean @default(true)
+  enableShopPickup Boolean @default(false)
+  shopPickupInstructions String?
 
   // Relations
   userId              String
@@ -192,7 +200,9 @@ model Order {
 
   customerName    String
   customerPhone   String
-  deliveryAddress String
+  fulfillmentMethod FulfillmentMethod @default(DELIVERY)
+  deliveryAddress String?
+  deliveryZoneId   String?
   deliveryZone    String?
 
   subtotal    Decimal
