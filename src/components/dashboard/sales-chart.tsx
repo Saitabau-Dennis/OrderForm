@@ -1,9 +1,8 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
-import { TrendingUp } from "lucide-react";
 
 interface SalesChartProps {
   className?: string;
@@ -11,7 +10,7 @@ interface SalesChartProps {
   rangeLabel?: string;
 }
 
-export function SalesChart({ className, data: propData, rangeLabel = "Last 7 Days" }: SalesChartProps) {
+export function SalesChart({ className, data: propData }: SalesChartProps) {
   // Default empty/zero data if none provided
   const data = propData || [
     { label: "Sun", value: 0 },
@@ -55,7 +54,7 @@ export function SalesChart({ className, data: propData, rangeLabel = "Last 7 Day
       <CardContent className="p-7">
         <div className="h-[400px] w-full pt-4 relative pl-12">
             {/* Y-axis labels */}
-            <div className="absolute inset-y-0 left-0 flex flex-col justify-between text-[10px] font-medium text-primary/20 h-[90%] w-12 pr-4 text-right">
+            <div className="absolute inset-y-0 left-0 flex flex-col justify-between text-xs font-medium text-muted-foreground h-[90%] w-12 pr-4 text-right">
                 <span>{maxValue}</span>
                 <span>{Math.round(maxValue * 0.75)}</span>
                 <span>{Math.round(maxValue * 0.5)}</span>
@@ -74,17 +73,11 @@ export function SalesChart({ className, data: propData, rangeLabel = "Last 7 Day
 
                 {/* SVG Chart */}
                 <svg className="w-full h-[90%] overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    <defs>
-                        <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stopColor="#00311F" stopOpacity="0.8" />
-                            <stop offset="100%" stopColor="#00311F" stopOpacity="0.2" />
-                        </linearGradient>
-                    </defs>
-
                     {/* Area */}
                     <motion.path
                         d={areaD}
-                        fill="url(#gradient)"
+                        fill="#006641"
+                        fillOpacity="0.35"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5 }}
@@ -105,7 +98,7 @@ export function SalesChart({ className, data: propData, rangeLabel = "Last 7 Day
                 </svg>
 
                 {/* X-axis labels */}
-                <div className="flex justify-between mt-6 text-[10px] font-medium text-primary/40 uppercase tracking-wider px-2">
+                <div className="flex justify-between mt-6 text-xs font-medium text-muted-foreground uppercase tracking-wider px-2">
                     {data.map((d) => (
                         <span key={d.label}>{d.label}</span>
                     ))}
