@@ -1,10 +1,9 @@
 import { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { DollarSign, Package, ShoppingBag, TrendingUp, Users, ArrowUpRight, CalendarRange, ChevronDown } from "lucide-react";
+import { DollarSign, Package, ShoppingBag, Users, CalendarRange, ChevronDown } from "lucide-react";
 import { startOfMonth, subMonths, startOfDay, subDays, format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { OrdersClient } from "@/components/dashboard/orders-client";
 import { SalesChart } from "@/components/dashboard/sales-chart";
 import {
   DropdownMenu,
@@ -202,10 +201,10 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <div className="h-24 w-24 bg-primary/5 rounded-3xl flex items-center justify-center mb-6 border-2 border-primary/10">
           <ShoppingBag className="w-10 h-10 text-primary opacity-20" />
         </div>
-        <h2 className="text-2xl md:text-3xl font-bold text-primary font-poppins tracking-tight mb-3">
+        <h2 className="text-xl md:text-2xl font-bold text-primary font-poppins tracking-tight mb-3">
           We're having trouble reaching your store.
         </h2>
-        <p className="text-muted-foreground max-w-md mx-auto text-lg leading-relaxed mb-8 font-poppins">
+        <p className="text-muted-foreground max-w-md mx-auto text-base leading-relaxed mb-8 font-poppins">
           Our systems are currently taking a moment to catch up. Your data is safe—please try refreshing the page in a few seconds.
         </p>
         <a
@@ -261,7 +260,6 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const isStoreConfigured = Boolean(store?.whatsappNumber?.trim());
   const hasFirstProduct = productsCount > 0;
   const onboardingComplete = isStoreConfigured && hasFirstProduct;
-
   return (
     <div className="flex-1 space-y-4 p-8 pt-0 animate-appear">
       {!onboardingComplete && (
@@ -279,14 +277,14 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           {/* Stats Grid */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 pt-4">
             {stats.map((stat) => (
-              <Card key={stat.title} className="overflow-hidden border-2 border-border shadow-none rounded-xl bg-card relative">
-                <CardContent className="p-6 flex flex-col gap-1">
+                <Card key={stat.title} className="overflow-hidden border-2 border-border shadow-none rounded-xl bg-card relative">
+                  <CardContent className="p-6 flex flex-col gap-1">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-normal text-muted-foreground">{stat.title}</p>
                     <stat.icon className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div className="mt-2">
-                    <h3 className="text-3xl font-normal text-foreground tracking-tight">{stat.value}</h3>
+                    <h3 className="text-2xl font-normal text-foreground tracking-tight">{stat.value}</h3>
                   </div>
                 </CardContent>
               </Card>
@@ -299,7 +297,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                 <div className="rounded-xl border-2 border-border bg-card overflow-hidden h-full">
                     <div className="px-7 pt-7 flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <h3 className="text-2xl font-medium text-primary">Sales</h3>
+                        <h3 className="text-xl font-medium text-primary">Sales</h3>
                       </div>
 
                       <DropdownMenu>
@@ -334,37 +332,53 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             {/* Top Selling Products */}
             <div className="lg:col-span-2">
                 <Card className="h-full border-2 border-border shadow-none rounded-xl bg-card overflow-hidden">
-                    <CardHeader className="p-7 pb-2">
-                        <CardTitle className="text-lg font-medium flex items-center gap-2">
-                            Best Sellers
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-7">
-                        <div className="space-y-6 mt-2">
-                            {topProducts.length > 0 ? topProducts.map((product, i) => (
-                                <div key={i} className="flex items-center justify-between group">
-                                    <div className="flex items-center gap-4">
-                                        <div className="h-10 w-10 rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-center text-primary font-medium text-xs">
-                                            {i + 1}
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="font-medium text-sm text-primary truncate max-w-[120px]">
-                                                {product.name}
-                                            </span>
-                                            <span className="text-[10px] text-primary/40 uppercase tracking-wider font-medium">
-                                                {product.sales} sold
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <ArrowUpRight className="h-4 w-4 text-primary/20 group-hover:text-primary transition-colors" />
-                                </div>
-                            )) : (
-                                <div className="flex flex-col items-center justify-center py-10 text-center opacity-40">
-                                    <Package className="h-10 w-10 mb-2" />
-                                    <p className="text-xs font-medium uppercase tracking-widest">No sales yet</p>
-                                </div>
-                            )}
+                    <CardHeader className="px-6 pt-6 pb-4 border-b border-border/70">
+                        <div className="flex items-center justify-between gap-3">
+                          <CardTitle className="text-base font-medium text-foreground">
+                              Best Sellers
+                          </CardTitle>
+                          <span className="inline-flex items-center rounded-full border border-border bg-muted/30 px-2.5 py-1 text-[11px] font-normal text-muted-foreground">
+                            {topProducts.length > 0 ? `${topProducts.length} items` : "No data"}
+                          </span>
                         </div>
+                        <p className="text-xs text-muted-foreground mt-1">Top products by units sold</p>
+                    </CardHeader>
+                    <CardContent className="px-6 py-5">
+                        {topProducts.length > 0 ? (
+                          <div className="space-y-3">
+                            {topProducts.map((product, i) => {
+                              const sales = Number(product.sales || 0);
+
+                              return (
+                                <div
+                                  key={i}
+                                  className="flex items-center justify-between gap-3 py-2.5 border-b border-border/50 last:border-b-0"
+                                >
+                                  <div className="flex min-w-0 items-center gap-3">
+                                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-muted text-xs font-normal text-foreground">
+                                      {i + 1}
+                                    </div>
+                                    <p className="truncate text-sm font-normal text-foreground">
+                                      {product.name}
+                                    </p>
+                                  </div>
+
+                                  <p className="shrink-0 text-xs font-normal uppercase tracking-wide text-muted-foreground">
+                                    {sales} sold
+                                  </p>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-12 text-center">
+                            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-muted/50">
+                              <Package className="h-6 w-6 text-muted-foreground" />
+                            </div>
+                            <p className="text-sm font-medium text-foreground">No sales yet</p>
+                            <p className="mt-1 text-xs text-muted-foreground">Your top products will appear here.</p>
+                          </div>
+                        )}
                     </CardContent>
                 </Card>
             </div>
