@@ -307,7 +307,7 @@ export function DashboardShell({ children, user, store }: DashboardShellProps) {
               <input
                 type="text"
                 placeholder="Search..."
-                className="w-[260px] h-9 pl-9 pr-3 text-sm font-normal border rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary/30 transition-all placeholder:text-muted-foreground/40"
+                className="w-[260px] h-9 pl-9 pr-3 text-sm font-normal border rounded-xl bg-transparent focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary/30 transition-all placeholder:text-muted-foreground/40"
               />
             </div>
 
@@ -316,7 +316,7 @@ export function DashboardShell({ children, user, store }: DashboardShellProps) {
                 href={publicStoreUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 h-9 px-4 text-sm font-normal border rounded-md hover:bg-muted/50 transition-colors text-foreground"
+                className="inline-flex items-center gap-2 h-9 px-4 text-sm font-normal border rounded-xl hover:bg-muted/50 transition-colors text-foreground"
               >
                 View Store
                 <Store className="h-4 w-4 text-muted-foreground" />
