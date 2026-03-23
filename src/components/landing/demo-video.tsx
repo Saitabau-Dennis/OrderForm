@@ -62,7 +62,7 @@ export function DemoVideo() {
         <ScrollAnimation variant="fade-up" delay={0.05}>
           <div className="mx-auto max-w-5xl">
             <div className="relative mx-auto w-full rounded-[2rem] border border-[#e3e3df] bg-[#efefed] p-3 shadow-[0_12px_28px_rgba(20,20,20,0.06)] md:p-4">
-              <div className="relative overflow-hidden rounded-[1.65rem] border border-[#dcdcd8] bg-white ring-1 ring-[#ecece9]">
+              <div className="relative overflow-hidden rounded-[1.65rem] border border-[#dcdcd8] bg-card ring-1 ring-[#ecece9]">
                 <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-10 bg-gradient-to-b from-white/45 to-transparent" />
                 <div className="aspect-video bg-black">
                   <iframe

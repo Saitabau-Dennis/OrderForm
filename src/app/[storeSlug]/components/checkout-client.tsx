@@ -500,7 +500,7 @@ export function CheckoutClient({
                   ) : null}
                 </>
               ) : (
-                <div className="rounded-none border border-[#DADAD5] bg-[#F8F8F6] px-3 py-2 text-sm text-[#4B4B46]">
+                <div className="rounded-none border border-[#DADAD5] bg-[#EEF2EC] px-3 py-2 text-sm text-[#4B4B46]">
                   {shopPickupInstructions?.trim() || "You can pick up your order from the shop after confirmation."}
                 </div>
               )}
@@ -650,7 +650,7 @@ export function CheckoutClient({
                     ) : null}
 
                     {option.id === "card" ? (
-                      <div className="ml-7 mt-2 rounded border border-[#DDDDD8] bg-white px-3 py-3">
+                      <div className="ml-7 mt-2 rounded border border-[#DDDDD8] bg-card px-3 py-3">
                         <div className="flex items-center justify-center">
                           <Image
                             src="/images/paystack-ke.png"

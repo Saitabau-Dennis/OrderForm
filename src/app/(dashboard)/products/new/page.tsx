@@ -30,10 +30,10 @@ export default async function NewProductPage() {
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
             <Settings className="h-6 w-6 text-primary" />
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
             Configure your store first
           </h1>
-          <p className="mx-auto mt-2 max-w-lg text-sm text-muted-foreground">
+          <p className="mx-auto mt-2 max-w-lg text-xs text-muted-foreground">
             Before adding products, finish your store setup in settings so your products are ready for customers.
           </p>
           <div className="mt-6 flex items-center justify-center gap-2">

@@ -29,8 +29,8 @@ export function CustomersTable({ data }: CustomersTableProps) {
           <Users className="h-8 w-8 text-muted-foreground/40" />
         </div>
         <div className="text-center space-y-1">
-          <h3 className="text-sm font-medium text-foreground font-poppins">No customers yet</h3>
-          <p className="text-sm text-muted-foreground font-poppins">
+          <h3 className="text-xs font-medium text-foreground font-poppins">No customers yet</h3>
+          <p className="text-xs text-muted-foreground font-poppins">
             Customers will appear here once they place an order.
           </p>
         </div>
@@ -53,13 +53,13 @@ export function CustomersTable({ data }: CustomersTableProps) {
           </Button>
         );
       },
-      cell: ({ row }) => <div className="text-base text-muted-foreground">{row.getValue("name")}</div>,
+      cell: ({ row }) => <div className="text-sm text-muted-foreground">{row.getValue("name")}</div>,
     },
     {
       accessorKey: "phone",
       header: "Phone",
       cell: ({ row }) => (
-        <div className="text-muted-foreground text-base">
+        <div className="text-muted-foreground text-sm">
           {row.getValue("phone")}
         </div>
       ),
@@ -68,7 +68,7 @@ export function CustomersTable({ data }: CustomersTableProps) {
       accessorKey: "address",
       header: "Address",
       cell: ({ row }) => (
-        <div className="text-muted-foreground text-base truncate max-w-[200px]">
+        <div className="text-muted-foreground text-sm truncate max-w-[200px]">
           <span className="truncate">{row.getValue("address")}</span>
         </div>
       ),
@@ -88,7 +88,7 @@ export function CustomersTable({ data }: CustomersTableProps) {
         );
       },
       cell: ({ row }) => (
-        <div className="pl-4 text-base text-muted-foreground">
+        <div className="pl-4 text-sm text-muted-foreground">
           {row.getValue("totalOrders")}
         </div>
       ),
@@ -108,7 +108,7 @@ export function CustomersTable({ data }: CustomersTableProps) {
         );
       },
       cell: ({ row }) => (
-        <div className="pl-4 text-base text-muted-foreground">
+        <div className="pl-4 text-sm text-muted-foreground">
           {row.getValue("totalSpent")}
         </div>
       ),
@@ -119,7 +119,7 @@ export function CustomersTable({ data }: CustomersTableProps) {
       cell: ({ row }) => {
         const date = row.getValue("lastOrderDate") as string;
         return (
-          <div className="text-muted-foreground text-base">
+          <div className="text-muted-foreground text-sm">
             {date}
           </div>
         );

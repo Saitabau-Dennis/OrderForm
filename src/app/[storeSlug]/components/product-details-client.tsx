@@ -231,7 +231,7 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
     <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 items-start gap-9 pb-36 lg:grid-cols-[minmax(0,56%)_minmax(0,44%)] lg:gap-8 lg:pb-0">
       <div className="space-y-3 lg:sticky lg:top-20 lg:self-start">
         <div className="mx-auto w-full max-w-[620px]">
-          <div className="relative aspect-[3/4] w-full overflow-hidden border border-[#DADAD4] bg-white">
+          <div className="relative aspect-[3/4] w-full overflow-hidden border border-[#DADAD4] bg-card">
           {activeImage ? (
             <Image
               src={activeImage}
@@ -253,7 +253,7 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
                 type="button"
                 onClick={handlePrevImage}
                 aria-label="Show previous image"
-                className="absolute left-3 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-[#1A1A1A] shadow-sm transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+                className="absolute left-3 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-card/90 text-[#1A1A1A] shadow-sm transition hover:bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
@@ -261,7 +261,7 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
                 type="button"
                 onClick={handleNextImage}
                 aria-label="Show next image"
-                className="absolute right-3 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-[#1A1A1A] shadow-sm transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
+                className="absolute right-3 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-card/90 text-[#1A1A1A] shadow-sm transition hover:bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
               >
                 <ChevronRight className="h-4 w-4" />
               </button>
@@ -351,7 +351,7 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
                         className={`inline-flex h-9 items-center border px-2.5 text-sm font-medium transition-colors ${
                           isSelected
                             ? "border-[#1A1A1A] bg-[#1A1A1A] text-white"
-                            : "border-[#D9D9D4] bg-white text-[#1A1A1A] hover:border-[#1A1A1A]"
+                            : "border-[#D9D9D4] bg-card text-[#1A1A1A] hover:border-[#1A1A1A]"
                         } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2`}
                       >
                         {option}
@@ -365,7 +365,7 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
         ) : null}
 
         <div className="mt-5 flex flex-wrap items-center gap-3 border-b border-[#DEDED8] pb-6">
-          <div className="inline-flex h-10 items-center border border-[#D9D9D4] bg-white px-2">
+          <div className="inline-flex h-10 items-center border border-[#D9D9D4] bg-card px-2">
             <button
               type="button"
               aria-label="Decrease quantity"
@@ -420,7 +420,7 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
             className={`inline-flex h-10 w-full items-center justify-center gap-2 border px-4 text-sm font-medium transition-colors sm:w-auto ${
               isWishlisted
                 ? "border-[#1A1A1A] bg-[#1A1A1A] text-white"
-                : "border-[#D9D9D4] bg-white text-[#1A1A1A] hover:border-[#1A1A1A]"
+                : "border-[#D9D9D4] bg-card text-[#1A1A1A] hover:border-[#1A1A1A]"
             } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2`}
           >
             <Heart className={`h-4 w-4 ${isWishlisted ? "fill-white" : ""}`} />
@@ -431,7 +431,7 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
         <div className="mt-6 space-y-6" />
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#DEDED8] bg-white/95 p-3 backdrop-blur-sm md:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#DEDED8] bg-card/95 p-3 backdrop-blur-sm md:hidden">
         <div className="flex w-full items-center gap-3">
           <div className="min-w-0">
             <p className="text-xs text-[#6F6F69]">{selectedVariantLabel || "Selected item"}</p>

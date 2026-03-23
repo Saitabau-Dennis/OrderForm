@@ -109,15 +109,15 @@ export function OrdersClient({ initialOrders, stats, standalone = true, storeNam
         <div className="min-w-0 space-y-4">
           <div className="grid max-w-[960px] grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             <div className="flex h-[238px] flex-col rounded-xl border bg-white px-6 py-6">
-              <p className="text-sm font-normal leading-none text-foreground/80">Completed Order</p>
-              <p className="mt-5 text-[50px] font-normal leading-none text-foreground">{stats.completed}</p>
+              <p className="text-xs font-normal leading-none text-foreground/80">Completed Order</p>
+              <p className="mt-5 text-[44px] font-normal leading-none text-foreground">{stats.completed}</p>
             </div>
 
             <div className="flex h-[238px] flex-col rounded-xl border bg-white px-6 py-6">
-              <p className="text-sm font-normal leading-none text-foreground/80">This Week</p>
-              <p className="mt-5 text-[50px] font-normal leading-none text-foreground">KSH {stats.thisWeek.toLocaleString()}</p>
+              <p className="text-xs font-normal leading-none text-foreground/80">This Week</p>
+              <p className="mt-5 text-[44px] font-normal leading-none text-foreground">KSH {stats.thisWeek.toLocaleString()}</p>
               <div className="mt-auto">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   From <span className="font-normal text-foreground">{stats.thisWeekOrders}</span> orders in last week
                 </p>
                 <div className="mt-5 h-3 w-full overflow-hidden rounded-full bg-muted/30">
@@ -127,10 +127,10 @@ export function OrdersClient({ initialOrders, stats, standalone = true, storeNam
             </div>
 
             <div className="flex h-[238px] flex-col rounded-xl border bg-white px-6 py-6">
-              <p className="text-sm font-normal leading-none text-foreground/80">This Month</p>
-              <p className="mt-5 text-[50px] font-normal leading-none text-foreground">KSH {stats.thisMonth.toLocaleString()}</p>
+              <p className="text-xs font-normal leading-none text-foreground/80">This Month</p>
+              <p className="mt-5 text-[44px] font-normal leading-none text-foreground">KSH {stats.thisMonth.toLocaleString()}</p>
               <div className="mt-auto">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   From <span className="font-normal text-foreground">{stats.thisMonthOrders}</span> orders this month
                 </p>
                 <div className="mt-5 h-3 w-full overflow-hidden rounded-full bg-muted/30">
@@ -141,13 +141,13 @@ export function OrdersClient({ initialOrders, stats, standalone = true, storeNam
           </div>
 
           {/* Orders Table Card */}
-          <div className="max-w-[960px] rounded-xl bg-white border overflow-hidden">
+          <div className="max-w-[960px] rounded-xl border overflow-hidden">
             {/* Table Header */}
             <div className="p-5 pb-4">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h3 className="text-xl font-normal text-foreground">Orders</h3>
-                  <p className="text-sm text-muted-foreground mt-0.5">Recent orders from your store.</p>
+                  <h3 className="text-lg font-normal text-foreground">Orders</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">Recent orders from your store.</p>
                 </div>
                 <div className="flex items-center gap-2">
                   {/* Filter */}
@@ -203,14 +203,14 @@ export function OrdersClient({ initialOrders, stats, standalone = true, storeNam
                 placeholder="Filter Order Number..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full sm:w-[280px] h-9 px-3 text-sm border rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary/20 transition-all placeholder:text-muted-foreground/50"
+                className="w-full sm:w-[280px] h-9 px-3 text-xs border rounded-md bg-transparent focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary/20 transition-all placeholder:text-muted-foreground/50"
               />
             </div>
 
             {/* Table */}
             {filteredOrders.length === 0 ? (
               <div className="p-10 text-center">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   {searchQuery ? "No orders match your search" : statusFilter !== "all" ? `No ${statusFilter} orders` : "No orders yet"}
                 </p>
               </div>
@@ -227,7 +227,7 @@ export function OrdersClient({ initialOrders, stats, standalone = true, storeNam
 
         {/* Right column — Detail Panel (full height) */}
         <div className="w-full shrink-0 self-start xl:mt-0 xl:w-[390px] xl:self-start">
-          <div className="rounded-xl bg-white border overflow-hidden">
+          <div className="rounded-xl border overflow-hidden">
             {selectedOrder ? (
               <OrderDetails
                 order={selectedOrder}

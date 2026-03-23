@@ -114,7 +114,7 @@ export default async function ProductPage({
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F7F7F5]">
+    <div className="min-h-screen flex flex-col bg-background">
       <StoreNavbar store={safeStore} />
 
       <main className="flex-1 w-full px-3 py-10 sm:px-5 lg:px-7 md:py-16">

@@ -46,11 +46,11 @@ export function OrdersTable({ orders, onView, selectedOrderId, onUpdateStatus }:
             <td className="px-5 py-3.5">
               <div className="flex items-center gap-1.5">
                 <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", STATUS_DOT[order.status] || STATUS_DOT.pending)} />
-                <span className="font-normal text-foreground capitalize text-sm">{order.status}</span>
+                <span className="font-normal text-foreground capitalize text-xs">{order.status}</span>
               </div>
             </td>
             <td className="px-5 py-3.5">
-              <span className="font-normal text-muted-foreground text-sm">
+              <span className="font-normal text-muted-foreground text-xs">
                 {format(new Date(order.createdAt), "MMM d, yyyy")}
               </span>
             </td>

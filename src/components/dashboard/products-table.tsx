@@ -45,8 +45,8 @@ export function ProductsTable({ products, onEdit, onDelete }: ProductsTableProps
           <Package className="h-8 w-8 text-muted-foreground/40" />
         </div>
         <div className="text-center space-y-1">
-          <h3 className="text-sm font-medium text-foreground font-poppins">No products yet</h3>
-          <p className="text-sm text-muted-foreground font-poppins">
+          <h3 className="text-xs font-medium text-foreground font-poppins">No products yet</h3>
+          <p className="text-xs text-muted-foreground font-poppins">
             Get started by adding your first product.
           </p>
         </div>
@@ -64,11 +64,11 @@ export function ProductsTable({ products, onEdit, onDelete }: ProductsTableProps
           <div className="flex items-center gap-4">
             <Avatar className="h-24 w-24 rounded-none border border-border/60 shrink-0">
               <AvatarImage src={product.imageUrl} alt={product.name} className="object-cover" />
-              <AvatarFallback className="rounded-xl bg-muted text-muted-foreground text-sm font-medium">
+              <AvatarFallback className="rounded-xl bg-muted text-muted-foreground text-xs font-medium">
                 {product.imageUrl ? <ImageOff className="h-6 w-6 opacity-40" /> : product.name.substring(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <span className="font-normal text-foreground text-base">
+            <span className="font-normal text-foreground text-sm">
               {product.name}
             </span>
           </div>
@@ -97,7 +97,7 @@ export function ProductsTable({ products, onEdit, onDelete }: ProductsTableProps
       accessorKey: "price",
       header: "Price",
       cell: ({ row }) => (
-        <span className="text-sm text-muted-foreground tabular-nums">
+        <span className="text-xs text-muted-foreground tabular-nums">
           KES {Number(row.getValue("price")).toLocaleString()}
         </span>
       ),
@@ -109,7 +109,7 @@ export function ProductsTable({ products, onEdit, onDelete }: ProductsTableProps
         const product = row.original;
         const sales = product._count?.orderItems ?? 0;
         return (
-          <span className="text-sm text-muted-foreground tabular-nums">
+          <span className="text-xs text-muted-foreground tabular-nums">
             {sales}
           </span>
         );
@@ -120,9 +120,9 @@ export function ProductsTable({ products, onEdit, onDelete }: ProductsTableProps
       header: "Created at",
       cell: ({ row }) => {
         const createdAt = row.getValue("createdAt") as string;
-        if (!createdAt) return <span className="text-sm text-muted-foreground">—</span>;
+        if (!createdAt) return <span className="text-xs text-muted-foreground">—</span>;
         return (
-          <span className="text-sm text-muted-foreground">
+          <span className="text-xs text-muted-foreground">
             {format(new Date(createdAt), "MMM d, yyyy")}
           </span>
         );
@@ -177,7 +177,7 @@ export function ProductsTable({ products, onEdit, onDelete }: ProductsTableProps
         placeholder="Search products..."
         title="Products"
         disableHover
-        titleClassName="text-3xl font-medium"
+        titleClassName="text-2xl font-medium"
     />
   );
 }

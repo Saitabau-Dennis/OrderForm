@@ -45,12 +45,12 @@ export function SetupChecklist({
     <section className="mx-auto w-full max-w-2xl py-1">
       <div className="mb-5 text-center">
         <div className="flex items-center justify-start gap-2">
-          <h2 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+          <h2 className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
             {displayName}'s Store
           </h2>
-          <span className="text-2xl text-[#1A1A1A]">🛒</span>
+          <span className="text-xl text-[#1A1A1A]">🛒</span>
         </div>
-          <p className="mt-2 text-sm text-muted-foreground md:text-base">
+          <p className="mt-2 text-xs text-muted-foreground md:text-sm">
           Complete the <span className="text-emerald-600">{displayName}</span>{" "}
           store setup and start selling your awesome products in no time.
         </p>
@@ -100,7 +100,7 @@ function SetupItem({
       </div>
       <div className="min-w-0">
         <div className="flex items-center gap-2">
-          <p className="text-base font-medium text-foreground">{title}</p>
+          <p className="text-sm font-medium text-foreground">{title}</p>
           {completed ? <CheckCircle2 className="h-5 w-5 text-emerald-500" /> : null}
         </div>
         <p className="mt-1 text-xs text-muted-foreground">{description}</p>
@@ -114,7 +114,7 @@ function SetupItem({
             type="button"
             size="sm"
             disabled
-            className="h-9 w-[120px] rounded-lg border border-primary/20 bg-primary/10 text-sm text-primary/50"
+            className="h-9 w-[120px] rounded-lg border border-primary/20 bg-primary/10 text-xs text-primary/50"
           >
             {actionLabel}
           </Button>
@@ -122,7 +122,7 @@ function SetupItem({
           <Button
             asChild
             size="sm"
-            className="h-9 w-[120px] rounded-lg bg-primary text-sm text-primary-foreground hover:bg-primary/90"
+            className="h-9 w-[120px] rounded-lg bg-primary text-xs text-primary-foreground hover:bg-primary/90"
           >
             <Link href={href}>{actionLabel}</Link>
           </Button>

@@ -50,7 +50,7 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
   }
 
   return (
-    <header className="z-40 bg-[#F7F7F5]">
+    <header className="z-40 bg-background">
       <StoreTopBar socialLinks={store.socialLinks} />
 
       <div>
@@ -178,7 +178,7 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
             className="absolute inset-0 h-full w-full cursor-default"
           />
 
-          <div className="relative h-full w-[min(88vw,430px)] bg-[#F5F5F3] shadow-[6px_0_22px_rgba(0,0,0,0.12)]">
+          <div className="relative h-full w-[min(88vw,430px)] bg-[#E6EAE3] shadow-[6px_0_22px_rgba(0,0,0,0.12)]">
             <nav>
               <div className="grid grid-cols-[minmax(0,1fr)_44px] border-b border-[#D8D8D3]">
                 <Link
@@ -295,7 +295,7 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
             </Link>
 
             <div className="absolute left-0 top-full z-50 hidden w-[240px] pt-3 group-hover:block group-focus-within:block sm:left-1/2 sm:-translate-x-1/2">
-              <div className="border border-[#D8D8D3] bg-[#F7F7F5] p-2 shadow-[0_10px_24px_rgba(20,20,18,0.08)]">
+              <div className="border border-[#D8D8D3] bg-background p-2 shadow-[0_10px_24px_rgba(20,20,18,0.08)]">
                 <Link
                   href={catalogHref}
                   className="block px-3 py-2 text-sm font-semibold text-[#1A1A1A] hover:bg-[#ECECE7]"

@@ -30,7 +30,7 @@ export function LoginToast() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
 
-          <p className="text-sm font-normal">Logged in successfully</p>
+          <p className="text-xs font-normal">Logged in successfully</p>
 
           <Button
             onClick={() => toast.dismiss(id)}

@@ -27,7 +27,7 @@ const toneClasses: Record<LandingButtonTone, string> = {
   primary:
     "bg-[#00311F] text-white shadow-[0_4px_14px_rgba(0,49,31,0.25)] hover:bg-[#00311F]/90 hover:shadow-[0_8px_18px_rgba(0,49,31,0.32)]",
   outline:
-    "border-border/80 bg-white text-foreground/80 shadow-none hover:bg-muted/50 hover:text-foreground",
+    "border-border/80 bg-card text-foreground/80 shadow-none hover:bg-muted/50 hover:text-foreground",
   ghost:
     "border-transparent bg-transparent text-foreground/70 shadow-none hover:bg-black/[0.04] hover:text-foreground",
 }

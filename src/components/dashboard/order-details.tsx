@@ -25,7 +25,7 @@ export function OrderDetails({
         <h2 className="text-[30px] font-normal leading-tight text-foreground">
           Order ID: {formatOrderId(order.displayId || order.orderNumber || order.id)}
         </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-1 text-xs text-muted-foreground">
           {format(new Date(order.createdAt), "MMM d, yyyy · h:mm a")}
         </p>
         {onClose && (
@@ -50,13 +50,13 @@ export function OrderDetails({
           {order.items?.map((item: any, i: number) => (
             <div key={i} className="flex justify-between items-start gap-4">
               <div className="min-w-0">
-                <p className="text-sm text-foreground">
+                <p className="text-xs text-foreground">
                   {item.name}
                   {item.variant && <span className="text-muted-foreground"> ({item.variant})</span>}
                 </p>
                 <p className="text-[11px] text-muted-foreground">Qty: {item.quantity} × Ksh {Number(item.price).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
               </div>
-              <span className="text-sm text-foreground shrink-0">
+              <span className="text-xs text-foreground shrink-0">
                 Ksh {Number(item.price * item.quantity).toLocaleString(undefined, { minimumFractionDigits: 2 })}
               </span>
             </div>
@@ -69,17 +69,17 @@ export function OrderDetails({
 
       {/* Totals */}
       <div className="px-6 py-4 space-y-1.5">
-        <div className="flex justify-between text-sm">
+        <div className="flex justify-between text-xs">
           <span className="text-muted-foreground">Subtotal</span>
           <span className="text-foreground">Ksh {Number(order.subtotal || order.totalAmount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
         </div>
         {Number(order.deliveryFee) > 0 && (
-          <div className="flex justify-between text-sm">
+          <div className="flex justify-between text-xs">
             <span className="text-muted-foreground">Delivery</span>
             <span className="text-foreground">Ksh {Number(order.deliveryFee).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
           </div>
         )}
-        <div className="flex justify-between text-sm">
+        <div className="flex justify-between text-xs">
           <span className="text-muted-foreground">Tax</span>
           <span className="text-foreground">Ksh 0.00</span>
         </div>
@@ -90,7 +90,7 @@ export function OrderDetails({
 
       {/* Grand Total */}
       <div className="px-6 py-4">
-        <div className="flex justify-between text-base">
+        <div className="flex justify-between text-sm">
           <span className="font-medium text-foreground">Total</span>
           <span className="font-medium text-foreground">Ksh {Number(order.totalAmount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
         </div>
@@ -102,28 +102,28 @@ export function OrderDetails({
       {/* Customer Info */}
       <div className="px-6 py-4 space-y-1.5">
         <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Customer Information</p>
-        <div className="flex justify-between text-sm">
+        <div className="flex justify-between text-xs">
           <span className="text-muted-foreground">Customer</span>
           <span className="text-foreground">{order.customerName}</span>
         </div>
-        <div className="flex justify-between text-sm">
+        <div className="flex justify-between text-xs">
           <span className="text-muted-foreground">Phone</span>
           <span className="text-foreground">{order.customerPhone}</span>
         </div>
-        <div className="flex justify-between text-sm">
+        <div className="flex justify-between text-xs">
           <span className="text-muted-foreground">Fulfillment</span>
           <span className="text-foreground">
             {order.fulfillmentMethod === "SHOP_PICKUP" ? "Shop Pickup" : "Delivery"}
           </span>
         </div>
         {order.deliveryAddress && (
-          <div className="flex justify-between text-sm">
+          <div className="flex justify-between text-xs">
             <span className="text-muted-foreground shrink-0">Address</span>
             <span className="text-foreground text-right max-w-[200px]">{order.deliveryAddress}</span>
           </div>
         )}
         {order.deliveryZone && (
-          <div className="flex justify-between text-sm">
+          <div className="flex justify-between text-xs">
             <span className="text-muted-foreground">Zone</span>
             <span className="text-foreground">{order.deliveryZone}</span>
           </div>
@@ -136,7 +136,7 @@ export function OrderDetails({
           <div className="mx-5 border-t border-dashed" />
           <div className="px-6 py-4">
             <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Notes</p>
-            <p className="text-sm text-muted-foreground italic">&ldquo;{order.notes}&rdquo;</p>
+            <p className="text-xs text-muted-foreground italic">&ldquo;{order.notes}&rdquo;</p>
           </div>
         </>
       )}

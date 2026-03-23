@@ -227,10 +227,10 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
   return (
     <div className="w-full pb-14">
       <div className="border-b border-border/70 pb-5">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">
           Settings
         </h1>
-        <p className="mt-1.5 text-sm text-muted-foreground">
+        <p className="mt-1.5 text-xs text-muted-foreground">
           Manage your store identity, ordering details, and delivery setup.
         </p>
 
@@ -240,7 +240,7 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
             variant={activeTab === "config" ? "default" : "ghost"}
             onClick={() => setActiveTab("config")}
             className={cn(
-              "rounded-none h-9 px-4 py-2 text-sm font-normal transition-colors shadow-none hover:translate-y-0",
+              "rounded-none h-9 px-4 py-2 text-xs font-normal transition-colors shadow-none hover:translate-y-0",
               activeTab !== "config" && "text-muted-foreground hover:text-foreground hover:bg-muted/50"
             )}
           >
@@ -251,7 +251,7 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
             variant={activeTab === "account" ? "default" : "ghost"}
             onClick={() => setActiveTab("account")}
             className={cn(
-              "rounded-none h-9 px-4 py-2 text-sm font-normal transition-colors shadow-none hover:translate-y-0",
+              "rounded-none h-9 px-4 py-2 text-xs font-normal transition-colors shadow-none hover:translate-y-0",
               activeTab !== "account" && "text-muted-foreground hover:text-foreground hover:bg-muted/50"
             )}
           >
@@ -497,7 +497,7 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
                       render={({ field }) => (
                         <div className="flex items-center justify-between gap-4">
                           <div>
-                            <p className="text-sm font-medium text-foreground">Custom Shipping (Delivery Zones)</p>
+                            <p className="text-xs font-medium text-foreground">Custom Shipping (Delivery Zones)</p>
                             <p className="text-xs text-muted-foreground">
                               Let customers choose a delivery zone and pay the configured fee.
                             </p>
@@ -512,7 +512,7 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
                       render={({ field }) => (
                         <div className="flex items-center justify-between gap-4">
                           <div>
-                            <p className="text-sm font-medium text-foreground">Shop Pickup</p>
+                            <p className="text-xs font-medium text-foreground">Shop Pickup</p>
                             <p className="text-xs text-muted-foreground">
                               Allow customers to place orders and collect from your shop.
                             </p>
@@ -550,7 +550,7 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
               >
                 {fields.length === 0 ? (
                   <div className="rounded-2xl border border-dashed border-border bg-muted/20 p-8 text-center">
-                    <p className="text-sm font-medium text-foreground">No zones added yet</p>
+                    <p className="text-xs font-medium text-foreground">No zones added yet</p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       Add your first delivery zone to start charging delivery fees.
                     </p>
@@ -632,20 +632,20 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
                 <div className="h-20 w-20 overflow-hidden rounded-none border border-border bg-muted/20">
                   <Avatar className="h-20 w-20 rounded-none">
                     <AvatarImage src={diceAvatarSrc} alt="Profile" className="rounded-none object-cover" />
-                    <AvatarFallback className="rounded-none bg-muted/20 text-xl font-semibold text-primary/60">
+                    <AvatarFallback className="rounded-none bg-muted/20 text-lg font-semibold text-primary/60">
                       {userData?.name?.charAt(0).toUpperCase() || "U"}
                     </AvatarFallback>
                   </Avatar>
                 </div>
 
                 <div>
-                  <p className="text-base font-medium text-foreground">{userData?.name || "Store Owner"}</p>
-                  <p className="text-sm text-muted-foreground">{userData?.email || "No email available"}</p>
+                  <p className="text-sm font-medium text-foreground">{userData?.name || "Store Owner"}</p>
+                  <p className="text-xs text-muted-foreground">{userData?.email || "No email available"}</p>
                 </div>
               </div>
 
               <div className="rounded-none border border-dashed border-border px-4 py-3">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   Password, notification, and security controls are coming soon.
                 </p>
               </div>
@@ -672,8 +672,8 @@ function SectionBlock({
     <section className="rounded-xl border border-border bg-card">
       <div className="flex flex-col gap-3 border-b border-border/70 px-5 py-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h2 className="text-base font-medium tracking-tight text-foreground">{title}</h2>
-          {description ? <p className="mt-1 text-sm text-muted-foreground">{description}</p> : null}
+          <h2 className="text-sm font-medium tracking-tight text-foreground">{title}</h2>
+          {description ? <p className="mt-1 text-xs text-muted-foreground">{description}</p> : null}
         </div>
         {action ? <div className="shrink-0">{action}</div> : null}
       </div>
@@ -697,8 +697,8 @@ function ConfigSection({
     <section className="px-6 py-6 sm:px-7">
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h2 className="text-base font-medium tracking-tight text-foreground">{title}</h2>
-          {description ? <p className="mt-1 text-sm text-muted-foreground">{description}</p> : null}
+          <h2 className="text-sm font-medium tracking-tight text-foreground">{title}</h2>
+          {description ? <p className="mt-1 text-xs text-muted-foreground">{description}</p> : null}
         </div>
         {action ? <div className="shrink-0">{action}</div> : null}
       </div>
@@ -718,7 +718,7 @@ function FieldGroup({
 }) {
   return (
     <div className="space-y-2">
-      <Label className="text-sm font-normal text-muted-foreground">{label}</Label>
+      <Label className="text-xs font-normal text-muted-foreground">{label}</Label>
       {children}
       {error ? <p className="text-xs text-destructive">{error}</p> : null}
     </div>

@@ -39,7 +39,7 @@ export function WishlistClient({ storeSlug, currency, allProducts }: WishlistCli
   if (savedProducts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-none border border-[#CECEC9] py-24 text-center">
-        <div className="h-16 w-16 mb-4 rounded-full bg-[#F7F7F5] flex items-center justify-center">
+        <div className="h-16 w-16 mb-4 rounded-full bg-background flex items-center justify-center">
           <Heart className="w-7 h-7 text-[#1A1A1A] fill-transparent" strokeWidth={1.5} />
         </div>
         <h2 className="text-xl font-semibold text-[#1A1A1A] mb-2">Your wishlist is empty</h2>

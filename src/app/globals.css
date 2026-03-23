@@ -154,7 +154,7 @@ html::-webkit-scrollbar {
   --font-instrument-serif: var(--font-montserrat);
   --font-instrument-sans: var(--font-montserrat);
   --font-geist-sans: var(--font-montserrat);
-  --background: #FFFFFF;
+  --background: #F2F4EF;
   --foreground: #000000;
   --primary: #00311F;
   --primary-foreground: #FFFFFF;
@@ -163,9 +163,9 @@ html::-webkit-scrollbar {
   --border: #E5E5E5;
   --input: #F5F5F5;
   --ring: #00311F;
-  --card: #FFFFFF;
+  --card: #F4F6F2;
   --card-foreground: #000000;
-  --popover: #FFFFFF;
+  --popover: #F4F6F2;
   --popover-foreground: #000000;
   --secondary: #00311F;
   --secondary-foreground: #FFFFFF;

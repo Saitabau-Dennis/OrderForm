@@ -129,10 +129,10 @@ export function ProductsClient({ initialProducts, canAddProduct }: ProductsClien
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         {/* Left: Title & Description */}
         <div className="space-y-1">
-          <h2 className="text-3xl font-medium tracking-tight text-foreground font-poppins">
+          <h2 className="text-2xl font-medium tracking-tight text-foreground font-poppins">
             Overview
           </h2>
-          <p className="text-sm text-muted-foreground font-poppins">
+          <p className="text-xs text-muted-foreground font-poppins">
             Manage your products and view their sales performance.
           </p>
         </div>
@@ -220,10 +220,10 @@ export function ProductsClient({ initialProducts, canAddProduct }: ProductsClien
                 <SheetHeader>
                 <div className="flex items-start justify-between gap-4 pr-10">
                   <div>
-                    <SheetTitle className="text-2xl font-semibold tracking-tight text-foreground">
+                    <SheetTitle className="text-xl font-semibold tracking-tight text-foreground">
                         Edit Product
                     </SheetTitle>
-                    <SheetDescription className="mt-1 text-sm text-muted-foreground">
+                    <SheetDescription className="mt-1 text-xs text-muted-foreground">
                         Update product information, media, and availability without leaving the catalog.
                     </SheetDescription>
                   </div>

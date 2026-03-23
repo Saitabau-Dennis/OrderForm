@@ -106,7 +106,7 @@ export default async function StorePage({ params }: { params: Promise<{ storeSlu
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F7F7F5]">
+    <div className="min-h-screen flex flex-col bg-background">
       <StoreNavbar store={safeStore} />
       <main className="flex-1 w-full px-3 sm:px-5 lg:px-7 py-10 md:py-14">
         <div className="mx-auto w-full max-w-[1500px]">

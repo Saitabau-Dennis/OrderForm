@@ -86,7 +86,7 @@ export function CategoryCarousel({
             type="button"
             onClick={goPrevious}
             disabled={!hasMultipleCategories}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#D8D8D2] bg-white text-[#44443F] transition hover:bg-[#F1F1ED] disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#D8D8D2] bg-card text-[#44443F] transition hover:bg-[#F1F1ED] disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Scroll categories left"
           >
             <ChevronLeft className="h-4 w-4" />
@@ -95,7 +95,7 @@ export function CategoryCarousel({
             type="button"
             onClick={goNext}
             disabled={!hasMultipleCategories}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#D8D8D2] bg-white text-[#44443F] transition hover:bg-[#F1F1ED] disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#D8D8D2] bg-card text-[#44443F] transition hover:bg-[#F1F1ED] disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Scroll categories right"
           >
             <ChevronRight className="h-4 w-4" />
@@ -127,7 +127,7 @@ export function CategoryCarousel({
               <div className="absolute inset-0 bg-gradient-to-br from-[#EFEDE4] to-[#DBD7CC]" />
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-transparent" />
-            <span className="absolute bottom-4 left-4 inline-flex items-center rounded-md bg-white/95 px-4 py-2 text-sm font-medium text-[#1A1A1A]">
+            <span className="absolute bottom-4 left-4 inline-flex items-center rounded-md bg-card/95 px-4 py-2 text-sm font-medium text-[#1A1A1A]">
               {category.name}
             </span>
           </Link>

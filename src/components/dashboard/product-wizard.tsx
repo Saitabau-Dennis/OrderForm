@@ -369,8 +369,8 @@ export function ProductWizard({ onSuccess, freshToken }: ProductWizardProps) {
   return (
     <div className="mx-auto flex min-h-[620px] max-w-[1200px] flex-col rounded-xl border border-border bg-card p-6 sm:p-8">
       <div>
-        <p className="text-base font-medium text-foreground">New Product Wizard</p>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="text-sm font-medium text-foreground">New Product Wizard</p>
+        <p className="mt-1 text-xs text-muted-foreground">
           Complete the steps below to publish your product.
         </p>
       </div>
@@ -395,7 +395,7 @@ export function ProductWizard({ onSuccess, freshToken }: ProductWizardProps) {
                     : "text-muted-foreground hover:text-foreground",
                 )}
               >
-                <span className={cn("text-sm font-medium", isActive ? "text-foreground" : "text-inherit")}>
+                <span className={cn("text-xs font-medium", isActive ? "text-foreground" : "text-inherit")}>
                   {step.label}
                   {isDone && <span className="ml-1.5 text-primary">✓</span>}
                 </span>
@@ -413,7 +413,7 @@ export function ProductWizard({ onSuccess, freshToken }: ProductWizardProps) {
           {currentStep === 0 && (
             <div className="grid gap-5 md:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="name" className="text-sm text-muted-foreground">
+                <Label htmlFor="name" className="text-xs text-muted-foreground">
                   Product Name
                 </Label>
                 <Input
@@ -428,7 +428,7 @@ export function ProductWizard({ onSuccess, freshToken }: ProductWizardProps) {
               </div>
 
               <div className="relative space-y-1.5" ref={categoryWrapperRef}>
-                <Label className="text-sm text-muted-foreground">Category</Label>
+                <Label className="text-xs text-muted-foreground">Category</Label>
                 <Input
                   id="category"
                   placeholder="e.g. Vintage Apparel"
@@ -459,7 +459,7 @@ export function ProductWizard({ onSuccess, freshToken }: ProductWizardProps) {
                             });
                             setIsCategoryDropdownOpen(false);
                           }}
-                          className="cursor-pointer rounded-sm p-2 text-sm transition-colors hover:bg-muted"
+                          className="cursor-pointer rounded-sm p-2 text-xs transition-colors hover:bg-muted"
                         >
                           {cat}
                         </div>
@@ -473,7 +473,7 @@ export function ProductWizard({ onSuccess, freshToken }: ProductWizardProps) {
               </div>
 
               <div className="space-y-1.5 md:col-span-2">
-                <Label htmlFor="description" className="text-sm text-muted-foreground">
+                <Label htmlFor="description" className="text-xs text-muted-foreground">
                   Description
                 </Label>
                 <Controller
@@ -500,7 +500,7 @@ export function ProductWizard({ onSuccess, freshToken }: ProductWizardProps) {
             <div className="space-y-6">
               <div className="grid gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(300px,1fr)]">
                 <div>
-                  <Label className="text-base font-semibold text-foreground">
+                  <Label className="text-sm font-semibold text-foreground">
                     Main Product Image <span className="text-red-500">*</span>
                   </Label>
                   <div className="mt-3 h-[340px]">
@@ -523,7 +523,7 @@ export function ProductWizard({ onSuccess, freshToken }: ProductWizardProps) {
                 </div>
 
                 <div>
-                  <Label className="text-base font-semibold text-foreground">
+                  <Label className="text-sm font-semibold text-foreground">
                     Product Gallery <span className="font-normal text-muted-foreground">(Optional)</span>
                   </Label>
                   <div className="mt-3 grid grid-cols-2 gap-3">
@@ -546,8 +546,8 @@ export function ProductWizard({ onSuccess, freshToken }: ProductWizardProps) {
                 <div className="flex items-start gap-2">
                   <Info className="mt-0.5 h-4 w-4 text-yellow-700" />
                   <div>
-                    <p className="text-sm font-medium text-yellow-900">Image Guidelines</p>
-                    <ul className="mt-1 list-disc space-y-0.5 pl-4 text-sm text-yellow-800">
+                    <p className="text-xs font-medium text-yellow-900">Image Guidelines</p>
+                    <ul className="mt-1 list-disc space-y-0.5 pl-4 text-xs text-yellow-800">
                       <li>Use high-resolution images (min 1000x1000px)</li>
                       <li>White or transparent background preferred</li>
                       <li>Show product from multiple angles</li>
@@ -561,7 +561,7 @@ export function ProductWizard({ onSuccess, freshToken }: ProductWizardProps) {
           {currentStep === 2 && (
             <div className="grid gap-5 md:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="price" className="text-sm text-muted-foreground">
+                <Label htmlFor="price" className="text-xs text-muted-foreground">
                   Price
                 </Label>
                 <div className="relative">
@@ -582,7 +582,7 @@ export function ProductWizard({ onSuccess, freshToken }: ProductWizardProps) {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="stock" className="text-sm text-muted-foreground">
+                <Label htmlFor="stock" className="text-xs text-muted-foreground">
                   Available Stock (Optional)
                 </Label>
                 <Input
@@ -603,7 +603,7 @@ export function ProductWizard({ onSuccess, freshToken }: ProductWizardProps) {
               <div className="rounded-md border border-border bg-muted/20 px-3 py-4 md:col-span-2">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-foreground">Inventory Status</p>
+                    <p className="text-xs text-foreground">Inventory Status</p>
                     <p className="text-xs text-muted-foreground">
                       Mark whether this product can be purchased now.
                     </p>
@@ -627,7 +627,7 @@ export function ProductWizard({ onSuccess, freshToken }: ProductWizardProps) {
                 <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-background">
                   <Layers3 className="h-6 w-6 text-muted-foreground" />
                 </div>
-                <h3 className="mt-4 text-2xl font-semibold text-foreground">Product Variants</h3>
+                <h3 className="mt-4 text-xl font-semibold text-foreground">Product Variants</h3>
                 <p className="mx-auto mt-2 max-w-xl text-muted-foreground">
                   Add clothing sizes, shoe numbers, or any custom variant like color/material.
                 </p>
@@ -742,7 +742,7 @@ export function ProductWizard({ onSuccess, freshToken }: ProductWizardProps) {
 
               {selectedVariants.length > 0 ? (
                 <div className="rounded-lg border border-border bg-background p-4">
-                  <p className="text-sm font-medium text-foreground">Stock by Option (Optional)</p>
+                  <p className="text-xs font-medium text-foreground">Stock by Option (Optional)</p>
                   <p className="mt-1 text-xs text-muted-foreground">
                     Set quantity per size/variant value. Leave empty for unlimited.
                   </p>
@@ -799,13 +799,13 @@ export function ProductWizard({ onSuccess, freshToken }: ProductWizardProps) {
                 </div>
 
                 <div className="mt-3 space-y-1.5">
-                  <p className="truncate text-sm font-medium text-foreground">
+                  <p className="truncate text-xs font-medium text-foreground">
                     {formData.name || "Untitled product"}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {formData.category || "No category selected"}
                   </p>
-                  <p className="text-sm text-foreground">
+                  <p className="text-xs text-foreground">
                     KES {Number(formData.price || 0).toLocaleString()}
                   </p>
                   <p className="text-xs text-muted-foreground">
@@ -826,7 +826,7 @@ export function ProductWizard({ onSuccess, freshToken }: ProductWizardProps) {
 
               <div className="overflow-hidden rounded-md border border-border">
                 <div className="border-b border-border bg-muted/20 px-4 py-3">
-                  <p className="text-sm font-medium text-foreground">Review Summary</p>
+                  <p className="text-xs font-medium text-foreground">Review Summary</p>
                   <p className="mt-0.5 text-xs text-muted-foreground">
                     Confirm details, then click Create Product.
                   </p>
@@ -890,11 +890,11 @@ export function ProductWizard({ onSuccess, freshToken }: ProductWizardProps) {
                     key={item.label}
                     className="grid grid-cols-[130px_minmax(0,1fr)_64px] items-start border-b border-border last:border-b-0"
                   >
-                    <div className="bg-muted/10 px-3 py-2.5 text-sm text-muted-foreground">
+                    <div className="bg-muted/10 px-3 py-2.5 text-xs text-muted-foreground">
                       {item.label}
                     </div>
                     <div className="min-w-0 px-3 py-2.5">
-                      <p className="break-words text-sm text-foreground">{item.value}</p>
+                      <p className="break-words text-xs text-foreground">{item.value}</p>
                     </div>
                     <div className="px-2 py-2.5">
                       <Button

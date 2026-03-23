@@ -67,7 +67,7 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
   }
 
   return (
-    <div className="fixed top-0 left-0 w-full z-50 flex justify-center px-4 py-2.5 md:py-3 bg-white/70 backdrop-blur-lg">
+    <div className="fixed top-0 left-0 z-50 flex w-full justify-center bg-background px-4 py-2.5 md:py-3">
       <nav
         className="flex items-center justify-between w-full max-w-7xl py-1 px-2"
       >

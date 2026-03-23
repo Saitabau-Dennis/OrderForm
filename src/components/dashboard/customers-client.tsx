@@ -49,10 +49,10 @@ export function CustomersClient({ data }: CustomersClientProps) {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         {/* Left: Title & Description */}
         <div className="space-y-1">
-          <h2 className="text-3xl font-medium tracking-tight text-foreground font-poppins">
+          <h2 className="text-2xl font-medium tracking-tight text-foreground font-poppins">
             Overview
           </h2>
-          <p className="text-sm text-muted-foreground font-poppins">
+          <p className="text-xs text-muted-foreground font-poppins">
             Monitor your customers to increase your sales.
           </p>
         </div>
@@ -63,7 +63,7 @@ export function CustomersClient({ data }: CustomersClientProps) {
             onClick={handleExport}
             variant="outline"
             size="sm"
-            className="rounded-xl h-9 px-3 text-sm border-border bg-background hover:bg-accent transition-colors font-normal"
+            className="rounded-xl h-9 px-3 text-xs border-border bg-background hover:bg-accent transition-colors font-normal"
           >
             <FileText className="mr-1.5 h-3.5 w-3.5" />
             Export

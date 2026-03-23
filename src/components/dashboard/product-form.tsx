@@ -129,7 +129,7 @@ export function ProductForm({ initialData, onSuccess, onCancel, layout = "defaul
         <section className="rounded-xl border border-border bg-white px-5 py-5 sm:px-6">
           <div className="mb-4 space-y-1">
             <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">{title}</h3>
-            {description && <p className="text-sm text-muted-foreground">{description}</p>}
+            {description && <p className="text-xs text-muted-foreground">{description}</p>}
           </div>
           <div className="space-y-5">{children}</div>
         </section>
@@ -140,7 +140,7 @@ export function ProductForm({ initialData, onSuccess, onCancel, layout = "defaul
       <div className="rounded-2xl border-2 border-border bg-white overflow-hidden">
         <div className="flex items-center gap-4 p-6 border-b border-border">
           <div className="flex flex-col space-y-0.5">
-            <h3 className="font-medium text-lg text-foreground">{title}</h3>
+            <h3 className="font-medium text-base text-foreground">{title}</h3>
             {description && <p className="text-xs text-muted-foreground">{description}</p>}
           </div>
         </div>
@@ -160,13 +160,13 @@ export function ProductForm({ initialData, onSuccess, onCancel, layout = "defaul
 
             <SectionWrapper title="Product Information" description="Essential details">
                 <div className="space-y-2">
-                  <Label htmlFor="name" className="text-sm font-normal text-muted-foreground">Product Name <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="name" className="text-xs font-normal text-muted-foreground">Product Name <span className="text-red-500">*</span></Label>
                   <Input
                     id="name"
                     placeholder="e.g. Vintage Denim Jacket"
                     {...form.register("name")}
                     className={cn(
-                      "h-10 transition-all font-normal text-sm",
+                      "h-10 transition-all font-normal text-xs",
                       isSheet
                         ? "rounded-md border-border bg-background focus:bg-background focus:border-primary/30"
                         : "rounded-3xl border-border bg-secondary/50 focus:bg-card focus:border-primary/30 placeholder:text-muted-foreground/50"
@@ -181,7 +181,7 @@ export function ProductForm({ initialData, onSuccess, onCancel, layout = "defaul
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="description" className="text-sm font-normal text-muted-foreground">Description <span className="text-red-500">*</span></Label>
+                    <Label htmlFor="description" className="text-xs font-normal text-muted-foreground">Description <span className="text-red-500">*</span></Label>
                   </div>
                   <Controller
                     control={form.control}
@@ -193,7 +193,7 @@ export function ProductForm({ initialData, onSuccess, onCancel, layout = "defaul
                         placeholder="Tell your customers about this product..."
                         toolbar="advanced"
                         className={cn(
-                          "transition-all text-sm",
+                          "transition-all text-xs",
                           isSheet ? "min-h-[170px]" : "min-h-[190px]"
                         )}
                       />
@@ -210,17 +210,17 @@ export function ProductForm({ initialData, onSuccess, onCancel, layout = "defaul
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="price" className="text-sm font-normal text-muted-foreground">Price <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="price" className="text-xs font-normal text-muted-foreground">Price <span className="text-red-500">*</span></Label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <span className="text-primary font-medium font-poppins text-sm">KES</span>
+                      <span className="text-primary font-medium font-poppins text-xs">KES</span>
                     </div>
                     <Input
                       type="number"
                       id="price"
                       placeholder="0.00"
                       className={cn(
-                        "pl-12 h-10 transition-all font-medium font-poppins text-sm tabular-nums",
+                        "pl-12 h-10 transition-all font-medium font-poppins text-xs tabular-nums",
                         isSheet
                           ? "rounded-md border-border bg-background focus:bg-background focus:border-primary/30"
                           : "rounded-3xl border-border bg-secondary/50 focus:bg-card focus:border-primary/30"
@@ -236,14 +236,14 @@ export function ProductForm({ initialData, onSuccess, onCancel, layout = "defaul
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="stock" className="text-sm font-normal text-muted-foreground">Available Stock <span className="text-xs">(optional)</span></Label>
+                  <Label htmlFor="stock" className="text-xs font-normal text-muted-foreground">Available Stock <span className="text-xs">(optional)</span></Label>
                   <Input
                     type="number"
                     id="stock"
                     min={0}
                     placeholder="e.g. 300 (leave empty to use option stock only)"
                     className={cn(
-                      "h-10 transition-all font-medium text-sm tabular-nums",
+                      "h-10 transition-all font-medium text-xs tabular-nums",
                       isSheet
                         ? "rounded-md border-border bg-background focus:bg-background focus:border-primary/30"
                         : "rounded-3xl border-border bg-secondary/50 focus:bg-card focus:border-primary/30"
@@ -286,7 +286,7 @@ export function ProductForm({ initialData, onSuccess, onCancel, layout = "defaul
 
                 <div className="space-y-2 pt-3">
                   <div className="flex items-center justify-between">
-                    <Label className="text-sm font-normal text-muted-foreground">Additional images</Label>
+                    <Label className="text-xs font-normal text-muted-foreground">Additional images</Label>
                     <Button
                       type="button"
                       variant="outline"
@@ -339,7 +339,7 @@ export function ProductForm({ initialData, onSuccess, onCancel, layout = "defaul
 
             <SectionWrapper title="Organization" description="Categorization & Stock">
                 <div className="space-y-2 relative" ref={categoryWrapperRef}>
-                  <Label htmlFor="category" className="text-sm font-normal text-muted-foreground">Category <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="category" className="text-xs font-normal text-muted-foreground">Category <span className="text-red-500">*</span></Label>
                   <Input
                     id="category"
                     placeholder="e.g. Vintage Apparel"
@@ -347,7 +347,7 @@ export function ProductForm({ initialData, onSuccess, onCancel, layout = "defaul
                     {...form.register("category")}
                     onFocus={() => setIsCategoryDropdownOpen(true)}
                     className={cn(
-                      "h-10 transition-all font-normal text-sm w-full",
+                      "h-10 transition-all font-normal text-xs w-full",
                       isSheet
                         ? "rounded-md border-border bg-background focus:bg-background focus:border-primary/30"
                         : "rounded-3xl border-border bg-secondary/50 focus:bg-card focus:border-primary/30 placeholder:text-muted-foreground/50"
@@ -357,7 +357,7 @@ export function ProductForm({ initialData, onSuccess, onCancel, layout = "defaul
                   {isCategoryDropdownOpen && (
                     <div className="absolute left-0 top-[calc(100%+8px)] z-50 max-h-[220px] w-full overflow-y-auto rounded-2xl border border-border bg-card px-2 py-2 text-foreground shadow-[0_18px_40px_rgba(0,0,0,0.08)] animate-in fade-in zoom-in-95 slide-in-from-top-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                        {categories
-                        // Optional simple text-based filter based on what they are currently typing:
+                        // Optional simple text-smd filter based on what they are currently typing:
                         .filter(cat => {
                            const currentInput = form.watch("category") || "";
                            return currentInput.trim() === "" || cat.toLowerCase().includes(currentInput.toLowerCase());
@@ -373,7 +373,7 @@ export function ProductForm({ initialData, onSuccess, onCancel, layout = "defaul
                               form.setValue("category", cat, { shouldDirty: true, shouldValidate: true });
                               setIsCategoryDropdownOpen(false);
                             }}
-                            className="flex cursor-pointer items-center rounded-xl px-3 py-2.5 text-sm font-normal text-foreground transition-colors hover:bg-primary/5 hover:text-primary"
+                            className="flex cursor-pointer items-center rounded-xl px-3 py-2.5 text-xs font-normal text-foreground transition-colors hover:bg-primary/5 hover:text-primary"
                           >
                            {cat}
                           </div>
@@ -382,7 +382,7 @@ export function ProductForm({ initialData, onSuccess, onCancel, layout = "defaul
                            const currentInput = form.watch("category") || "";
                            return currentInput.trim() === "" || cat.toLowerCase().includes(currentInput.toLowerCase());
                       }).length === 0 && (
-                        <div className="p-2 text-center text-sm text-muted-foreground">
+                        <div className="p-2 text-center text-xs text-muted-foreground">
                            Press enter to create &quot;{form.watch("category")}&quot;
                         </div>
                       )}
@@ -397,7 +397,7 @@ export function ProductForm({ initialData, onSuccess, onCancel, layout = "defaul
                 </div>
 
                 <div className="space-y-2 pt-1">
-                  <Label className="text-sm font-normal text-muted-foreground">
+                  <Label className="text-xs font-normal text-muted-foreground">
                       Sizes / Variants
                   </Label>
                   <div className="flex flex-wrap gap-1.5 mb-1.5">
@@ -433,7 +433,7 @@ export function ProductForm({ initialData, onSuccess, onCancel, layout = "defaul
                     placeholder="Custom sizes (e.g. 40, 41, 42)"
                     {...form.register("sizes")}
                     className={cn(
-                      "h-10 border-border text-sm",
+                      "h-10 border-border text-xs",
                       isSheet ? "rounded-md bg-background" : "rounded-3xl bg-secondary/50"
                     )}
                   />
@@ -446,7 +446,7 @@ export function ProductForm({ initialData, onSuccess, onCancel, layout = "defaul
 
                 {form.watch("sizes")?.trim() ? (
                   <div className="space-y-2 pt-1">
-                    <Label className="text-sm font-normal text-muted-foreground">
+                    <Label className="text-xs font-normal text-muted-foreground">
                       Stock by Size/Option <span className="text-xs">(optional)</span>
                     </Label>
                     <div className="grid gap-3 sm:grid-cols-2">
@@ -466,7 +466,7 @@ export function ProductForm({ initialData, onSuccess, onCancel, layout = "defaul
                             min={0}
                             placeholder="0"
                             className={cn(
-                              "h-9 border-border text-sm",
+                              "h-9 border-border text-xs",
                               isSheet ? "rounded-md bg-background" : "rounded-3xl bg-secondary/50"
                             )}
                             value={String((form.watch("optionStocks")?.[option] ?? ""))}
@@ -495,7 +495,7 @@ export function ProductForm({ initialData, onSuccess, onCancel, layout = "defaul
                       isSheet ? "rounded-md bg-muted/20" : "rounded-3xl bg-primary/5"
                     )}>
                         <div className="space-y-0.5">
-                            <Label htmlFor="isAvailable" className={cn("text-sm font-medium", isSheet ? "text-foreground" : "text-primary")}>In Stock</Label>
+                            <Label htmlFor="isAvailable" className={cn("text-xs font-medium", isSheet ? "text-foreground" : "text-primary")}>In Stock</Label>
                             <p className="text-[10px] text-muted-foreground">Available for purchase</p>
                         </div>
                         <Switch

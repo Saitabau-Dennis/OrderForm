@@ -89,7 +89,7 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
   }).format(Number.isFinite(parsedTotal) ? parsedTotal : 0)
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F7F7F5]">
+    <div className="min-h-screen flex flex-col bg-background">
       <StoreNavbar store={safeStore} />
 
       <main className="flex-1 w-full px-3 py-7 sm:px-5 md:py-10 lg:px-7">

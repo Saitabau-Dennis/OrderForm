@@ -89,13 +89,13 @@ export function DataTable<TData, TValue>({
         {layout === 'nested' ? (
           <div className={cn(
             "p-8 space-y-6", // Increased outer padding
-            standalone && "rounded-xl border border-border bg-card"
+            standalone && "rounded-xl border border-border"
           )}>
             {/* Header Area (Title + Search) */}
             {(title || searchKey) && (
               <div className="flex flex-col gap-4 items-start w-full">
                 {title && (
-                  <h3 className={cn("text-3xl font-medium text-foreground font-poppins", titleClassName)}>{title}</h3>
+                  <h3 className={cn("text-2xl font-medium text-foreground font-poppins", titleClassName)}>{title}</h3>
                 )}
                 {searchKey && (
                   <div className="relative w-full max-w-sm">
@@ -106,7 +106,7 @@ export function DataTable<TData, TValue>({
                       onChange={(event) =>
                         table.getColumn(searchKey)?.setFilterValue(event.target.value)
                       }
-                      className="pl-10 h-10 w-full rounded-lg bg-background border-border text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
+                      className="pl-10 h-10 w-full rounded-lg bg-transparent border-border text-xs focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
                     />
                   </div>
                 )}
@@ -114,7 +114,7 @@ export function DataTable<TData, TValue>({
             )}
 
             {/* Inner Card (Table) */}
-            <div className="rounded-xl border border-border bg-background/50 overflow-hidden">
+            <div className="rounded-none border border-border overflow-hidden">
                <Table>
                 <TableHeader>
                   {table.getHeaderGroups().map((headerGroup) => (
@@ -146,7 +146,7 @@ export function DataTable<TData, TValue>({
                         )}
                       >
                         {row.getVisibleCells().map((cell) => (
-                          <TableCell key={cell.id} className="py-3.5 px-5 text-sm">
+                          <TableCell key={cell.id} className="py-3.5 px-5 text-xs">
                             {flexRender(
                               cell.column.columnDef.cell,
                               cell.getContext()
@@ -159,7 +159,7 @@ export function DataTable<TData, TValue>({
                     <TableRow>
                       <TableCell
                         colSpan={columns.length}
-                        className="h-24 text-center text-sm text-muted-foreground font-poppins"
+                        className="h-24 text-center text-xs text-muted-foreground font-poppins"
                       >
                         No results found.
                       </TableCell>
@@ -173,13 +173,13 @@ export function DataTable<TData, TValue>({
           /* Default Layout */
           <div className={cn(
             "overflow-hidden",
-            standalone && "rounded-xl border border-border bg-card"
+            standalone && "rounded-xl border border-border"
           )}>
             {/* Title bar with search */}
             {(title || searchKey) && (
               <div className="flex items-center justify-between px-8 py-5">
                 {title && (
-                  <h3 className={cn("text-base font-semibold text-foreground font-poppins", titleClassName)}>{title}</h3>
+                  <h3 className={cn("text-sm font-semibold text-foreground font-poppins", titleClassName)}>{title}</h3>
                 )}
                 {searchKey && (
                   <div className="relative w-full max-w-[220px]">
@@ -190,7 +190,7 @@ export function DataTable<TData, TValue>({
                       onChange={(event) =>
                         table.getColumn(searchKey)?.setFilterValue(event.target.value)
                       }
-                      className="pl-9 h-8 rounded-lg bg-background border-border text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
+                      className="pl-9 h-8 rounded-lg bg-transparent border-border text-xs focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
                     />
                   </div>
                 )}
@@ -227,7 +227,7 @@ export function DataTable<TData, TValue>({
                       )}
                     >
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} className="py-3.5 px-8 text-sm">
+                        <TableCell key={cell.id} className="py-3.5 px-8 text-xs">
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()
@@ -240,7 +240,7 @@ export function DataTable<TData, TValue>({
                   <TableRow>
                     <TableCell
                       colSpan={columns.length}
-                      className="h-24 text-center text-sm text-muted-foreground font-poppins"
+                      className="h-24 text-center text-xs text-muted-foreground font-poppins"
                     >
                       No results found.
                     </TableCell>
