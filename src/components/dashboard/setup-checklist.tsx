@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { CheckCircle2, Package, ShoppingCart, Store } from "lucide-react";
+import { CheckCircle2, Package, Store } from "lucide-react";
 
 import { Button } from "@/components/dashboard/dashboard-button";
 
@@ -46,7 +46,7 @@ export function SetupChecklist({
       <div className="mb-5 text-center">
         <div className="flex items-center justify-start gap-2">
           <h2 className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
-            {displayName}'s Store
+            {displayName}&apos;s Store
           </h2>
           <span className="text-xl text-[#1A1A1A]">🛒</span>
         </div>

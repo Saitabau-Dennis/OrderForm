@@ -18,10 +18,18 @@ import { updateOrderStatus } from "@/lib/actions/orders";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { formatOrderId } from "@/lib/utils";
+import { DashboardOrder, OrdersStats } from "./order-types";
 
-export function OrdersClient({ initialOrders, stats, standalone = true, storeName }: any) {
+interface OrdersClientProps {
+  initialOrders: DashboardOrder[];
+  stats: OrdersStats;
+  standalone?: boolean;
+  storeName: string;
+}
+
+export function OrdersClient({ initialOrders, stats, standalone = true, storeName }: OrdersClientProps) {
   const [orders, setOrders] = useState(initialOrders);
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [selectedOrder, setSelectedOrder] = useState<DashboardOrder | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const router = useRouter();
@@ -32,11 +40,11 @@ export function OrdersClient({ initialOrders, stats, standalone = true, storeNam
       toast.error(result.error);
     } else {
       toast.success("Order status updated");
-      setOrders((prev: any[]) =>
-        prev.map((o: any) => (o.id === orderId ? { ...o, status } : o))
+      setOrders((prev: DashboardOrder[]) =>
+        prev.map((o) => (o.id === orderId ? { ...o, status } : o))
       );
       if (selectedOrder?.id === orderId) {
-        setSelectedOrder((prev: any) => ({ ...prev, status }));
+        setSelectedOrder((prev) => (prev ? { ...prev, status } : prev));
       }
       router.refresh();
     }
@@ -45,13 +53,13 @@ export function OrdersClient({ initialOrders, stats, standalone = true, storeNam
   const filteredOrders = useMemo(() => {
     let result = orders;
     if (statusFilter !== "all") {
-      result = result.filter((o: any) => o.status === statusFilter);
+      result = result.filter((o) => o.status === statusFilter);
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       const normalizedQuery = q.replace(/[^a-z0-9]/g, "");
       result = result.filter(
-        (o: any) => {
+        (o) => {
           const formattedOrderId = formatOrderId(o.displayId || o.orderNumber || o.id).toLowerCase();
           const normalizedOrderId = formattedOrderId.replace(/[^a-z0-9]/g, "");
           return (
@@ -70,7 +78,7 @@ export function OrdersClient({ initialOrders, stats, standalone = true, storeNam
   const handleExport = () => {
     const csv = [
       ["Order No", "Customer", "Phone", "Status", "Date", "Total Amount"].join(","),
-      ...filteredOrders.map((o: any) =>
+      ...filteredOrders.map((o) =>
         [
           formatOrderId(o.displayId || o.orderNumber || o.id),
           o.customerName,
@@ -95,7 +103,6 @@ export function OrdersClient({ initialOrders, stats, standalone = true, storeNam
       <OrdersTable
         orders={initialOrders}
         onView={setSelectedOrder}
-        onUpdateStatus={handleUpdateStatus}
       />
     );
   }
@@ -219,7 +226,6 @@ export function OrdersClient({ initialOrders, stats, standalone = true, storeNam
                 orders={filteredOrders}
                 selectedOrderId={selectedOrder?.id}
                 onView={setSelectedOrder}
-                onUpdateStatus={handleUpdateStatus}
               />
             )}
           </div>

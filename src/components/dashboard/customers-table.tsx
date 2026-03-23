@@ -1,8 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { formatDistanceToNow } from "date-fns";
-import { ArrowUpDown, Mail, Package, Users } from "lucide-react";
+import { ArrowUpDown, Users } from "lucide-react";
 
 import { Button } from "@/components/dashboard/dashboard-button";
 import { DataTable } from "@/components/dashboard/dashboard-data-table";

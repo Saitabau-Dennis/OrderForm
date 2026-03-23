@@ -18,7 +18,7 @@ export default async function PrivacyPage() {
               Effective Date: {new Date().toLocaleDateString()}
             </p>
             <p className="text-muted-foreground mt-4">
-              At OrderForm ("we," "our," or "us"), we value your privacy and are committed to protecting your personal information. This Privacy Policy outlines how we collect, use, disclose, and safeguard your data when you visit our website or use our services.
+              At OrderForm (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;), we value your privacy and are committed to protecting your personal information. This Privacy Policy outlines how we collect, use, disclose, and safeguard your data when you visit our website or use our services.
             </p>
           </section>
 

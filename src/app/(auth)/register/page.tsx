@@ -17,7 +17,6 @@ export default function RegisterPage() {
   const [redirecting, setRedirecting] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [success, setSuccess] = useState(false)
   const [formData, setFormData] = useState({
     storeName: "",
     email: "",
@@ -127,39 +126,6 @@ export default function RegisterPage() {
           <p className="font-sans text-muted-foreground text-sm">
             Redirecting you to verify your email...
           </p>
-        </div>
-      </div>
-    )
-  }
-
-  if (success) {
-    return (
-      <div className="min-h-screen flex items-center justify-center  p-4">
-        <div className="bg-background p-8 md:p-12 rounded-3xl shadow-xl max-w-md w-full text-center space-y-6 border border-border">
-          <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <div className="space-y-2">
-            <h2 className="font-heading text-2xl font-normal tracking-tight text-foreground">Registration Successful!</h2>
-            <p className="font-sans text-muted-foreground text-lg leading-relaxed">
-              We&apos;ve sent a verification link to <strong className="text-foreground">{formData.email}</strong>.
-              Please check your inbox to activate your account.
-            </p>
-          </div>
-
-          <div className="space-y-3 pt-4 border-t border-border">
-            <Button
-              asChild
-              size="lg"
-              className="w-full h-14 text-base font-semibold"
-            >
-              <Link href="/login">
-                Go to Login
-              </Link>
-            </Button>
-          </div>
         </div>
       </div>
     )
