@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils";
 import { formatOrderId } from "@/lib/utils";
 import { format } from "date-fns";
+import { DashboardOrder } from "./order-types";
 
 const STATUS_DOT: Record<string, string> = {
   pending: "bg-muted-foreground/40",
@@ -11,7 +12,13 @@ const STATUS_DOT: Record<string, string> = {
   cancelled: "bg-destructive/60",
 };
 
-export function OrdersTable({ orders, onView, selectedOrderId, onUpdateStatus }: any) {
+interface OrdersTableProps {
+  orders: DashboardOrder[];
+  onView?: (order: DashboardOrder) => void;
+  selectedOrderId?: string;
+}
+
+export function OrdersTable({ orders, onView, selectedOrderId }: OrdersTableProps) {
   return (
     <table className="w-full text-left">
       <thead>
@@ -24,7 +31,7 @@ export function OrdersTable({ orders, onView, selectedOrderId, onUpdateStatus }:
         </tr>
       </thead>
       <tbody>
-        {orders.map((order: any) => (
+        {orders.map((order) => (
           <tr
             key={order.id}
             onClick={() => onView?.(order)}

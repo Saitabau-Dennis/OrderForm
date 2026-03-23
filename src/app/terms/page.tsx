@@ -18,7 +18,7 @@ export default async function TermsPage() {
               Effective Date: {new Date().toLocaleDateString()}
             </p>
             <p className="text-muted-foreground mt-4">
-              Welcome to OrderForm. By accessing or using our website and services, you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, please do not use our services.
+              Welcome to OrderForm. By accessing or using our website and services, you agree to be bound by these Terms of Service (&quot;Terms&quot;). If you do not agree to these Terms, please do not use our services.
             </p>
           </section>
 
@@ -67,7 +67,7 @@ export default async function TermsPage() {
           <section>
             <h2 className="text-2xl font-heading font-medium mb-4">5. Disclaimer of Warranties</h2>
             <p className="text-muted-foreground">
-              The service is provided on an "as-is" and "as available" basis. We make no warranties, express or implied, regarding the reliability, accuracy, or availability of the service.
+              The service is provided on an &quot;as-is&quot; and &quot;as available&quot; basis. We make no warranties, express or implied, regarding the reliability, accuracy, or availability of the service.
             </p>
           </section>
 

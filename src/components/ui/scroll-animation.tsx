@@ -1,7 +1,6 @@
 "use client"
 
-import { motion, useInView, UseInViewOptions, Variant } from "motion/react"
-import { useRef, useMemo } from "react"
+import { motion, UseInViewOptions, Variant } from "motion/react"
 import { cn } from "@/lib/utils"
 
 type AnimationVariant = "fade-up" | "fade-in" | "fade-left" | "fade-right" | "scale-up"
@@ -13,7 +12,7 @@ interface ScrollAnimationProps {
   delay?: number
   duration?: number
   viewport?: UseInViewOptions
-  as?: React.ElementType
+  as?: "div" | "section" | "article" | "aside" | "span"
 }
 
 const variants: Record<AnimationVariant, { hidden: Variant; visible: Variant }> = {
@@ -48,23 +47,29 @@ export function ScrollAnimation({
   viewport = { once: true, margin: "-80px" },
   as: Component = "div",
 }: ScrollAnimationProps) {
-  const MotionComponent = useMemo(() => motion.create(Component as any), [Component])
+  const easing: [number, number, number, number] = [0.21, 0.47, 0.32, 0.98]
+
+  const animationProps = {
+    initial: "hidden" as const,
+    whileInView: "visible" as const,
+    viewport,
+    variants: variants[variant],
+    transition: {
+      duration,
+      delay,
+      ease: easing,
+    },
+    className: cn(className),
+    children,
+  }
+
+  if (Component === "section") return <motion.section {...animationProps} />
+  if (Component === "article") return <motion.article {...animationProps} />
+  if (Component === "aside") return <motion.aside {...animationProps} />
+  if (Component === "span") return <motion.span {...animationProps} />
 
   return (
-    <MotionComponent
-      initial="hidden"
-      whileInView="visible"
-      viewport={viewport}
-      variants={variants[variant]}
-      transition={{
-        duration,
-        delay,
-        ease: [0.21, 0.47, 0.32, 0.98], // Custom ease-out curve
-      }}
-      className={cn(className)}
-    >
-      {children}
-    </MotionComponent>
+    <motion.div {...animationProps} />
   )
 }
 ScrollAnimation.displayName = "ScrollAnimation"

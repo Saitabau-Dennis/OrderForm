@@ -26,6 +26,18 @@ interface DashboardPageProps {
   searchParams: Promise<{ range?: string }>;
 }
 
+interface DashboardStore {
+  id: string;
+  name: string;
+  slug: string;
+  whatsappNumber?: string | null;
+}
+
+interface TopProduct {
+  name: string;
+  sales: number;
+}
+
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
   const session = await auth();
   const { range = "7d" } = await searchParams;
@@ -34,7 +46,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     redirect("/login");
   }
 
-  let store: { id: string; name: string; slug: string; [key: string]: any } | null = null;
+  let store: DashboardStore | null = null;
   let totalRevenue = 0;
   let revenueChange = 0;
   let ordersCount = 0;
@@ -42,9 +54,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   let productsCount = 0;
   let activeProductsCount = 0;
   let customersCount = 0;
-  let recentOrders: any[] = [];
   let salesData: { label: string; value: number }[] = [];
-  let topProducts: any[] = [];
+  let topProducts: TopProduct[] = [];
 
   const rangeLabels: Record<string, string> = {
     "7d": "Last 7 Days",
@@ -185,14 +196,6 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           sales: item._sum.quantity || 0
       }));
 
-      // Batch 3: Recent Data
-      const orders = await db.order.findMany({
-          where: { storeId: store.id },
-          orderBy: { createdAt: 'desc' },
-          take: 5,
-          include: { items: true }
-      });
-      recentOrders = JSON.parse(JSON.stringify(orders));
     }
   } catch (error) {
     console.error("Dashboard DB Error:", error);
@@ -202,17 +205,17 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <ShoppingBag className="w-10 h-10 text-primary opacity-20" />
         </div>
         <h2 className="text-xl md:text-2xl font-bold text-primary font-poppins tracking-tight mb-3">
-          We're having trouble reaching your store.
+          We&apos;re having trouble reaching your store.
         </h2>
         <p className="text-muted-foreground max-w-md mx-auto text-base leading-relaxed mb-8 font-poppins">
           Our systems are currently taking a moment to catch up. Your data is safe—please try refreshing the page in a few seconds.
         </p>
-        <a
+        <Link
           href="/dashboard"
           className="bg-primary text-primary-foreground px-8 py-3 rounded-3xl font-bold uppercase tracking-widest text-xs shadow-none transition-all hover:scale-[1.02] active:scale-[0.98]"
         >
           Refresh Page
-        </a>
+        </Link>
       </div>
     );
   }

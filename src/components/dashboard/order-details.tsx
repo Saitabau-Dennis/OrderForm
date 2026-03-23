@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/dashboard/dashboard-button";
 import { Printer, X } from "lucide-react";
 import { formatOrderId } from "@/lib/utils";
+import { DashboardOrder, DashboardOrderItem } from "./order-types";
 
 export function OrderDetails({
   order,
@@ -12,7 +13,7 @@ export function OrderDetails({
   onUpdateStatus,
   onClose,
 }: {
-  order: any;
+  order: DashboardOrder;
   storeName: string;
   onUpdateStatus: (orderId: string, status: string) => void;
   onClose?: () => void;
@@ -47,7 +48,7 @@ export function OrderDetails({
       <div className="px-6 py-4">
         <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">Order Details</p>
         <div className="space-y-2.5">
-          {order.items?.map((item: any, i: number) => (
+          {order.items?.map((item: DashboardOrderItem, i: number) => (
             <div key={i} className="flex justify-between items-start gap-4">
               <div className="min-w-0">
                 <p className="text-xs text-foreground">
@@ -57,7 +58,7 @@ export function OrderDetails({
                 <p className="text-[11px] text-muted-foreground">Qty: {item.quantity} × Ksh {Number(item.price).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
               </div>
               <span className="text-xs text-foreground shrink-0">
-                Ksh {Number(item.price * item.quantity).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                Ksh {(Number(item.price) * item.quantity).toLocaleString(undefined, { minimumFractionDigits: 2 })}
               </span>
             </div>
           ))}

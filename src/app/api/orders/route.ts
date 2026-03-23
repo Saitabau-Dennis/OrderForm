@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import db from "@/lib/db";
 
 // Lists orders (with items) for the authenticated merchant.
-export async function GET(req: Request) {
+export async function GET() {
   try {
     const session = await auth();
 
