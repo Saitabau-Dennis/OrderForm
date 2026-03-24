@@ -89,7 +89,7 @@ export function Features() {
 
                 <div className="mx-auto border-4 border-dotted border-primary/20 overflow-hidden">
                     <div className="grid lg:grid-cols-2">
-                        {featureItems.map((item) => (
+                        {featureItems.map((item, index) => (
                             <FeatureCard key={item.title} className={item.cardClassName}>
                                 <CardHeading
                                     title={item.title}
@@ -102,6 +102,7 @@ export function Features() {
                                         alt={item.alt}
                                         width={item.width}
                                         height={item.height}
+                                        priority={index === 0}
                                         className={item.imageClassName}
                                     />
                                 </div>
@@ -146,15 +147,18 @@ interface DualModeImageProps {
     alt: string
     width: number
     height: number
+    priority?: boolean
     className?: string
 }
 
-const DualModeImage = ({ src, alt, width, height, className }: DualModeImageProps) => (
+const DualModeImage = ({ src, alt, width, height, priority = false, className }: DualModeImageProps) => (
     <Image
         src={src}
         alt={alt}
         width={width}
         height={height}
+        priority={priority}
+        loading={priority ? "eager" : undefined}
         className={cn(
             "block h-auto w-full rounded-lg border border-border/60 bg-background",
             className

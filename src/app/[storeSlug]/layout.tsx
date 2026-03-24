@@ -57,7 +57,7 @@ export default async function StoreRootLayout({
 
   return (
     <div
-      className="min-h-screen bg-background theme-store font-clash-display antialiased"
+      className="min-h-screen bg-background theme-store antialiased"
       style={storefrontThemeVars}
     >
       <StoreProvider storeSlug={store.slug} availableProductIds={serializedProducts.map((product) => product.id)}>

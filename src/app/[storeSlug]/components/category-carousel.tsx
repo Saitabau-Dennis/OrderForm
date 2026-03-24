@@ -106,7 +106,7 @@ export function CategoryCarousel({
         ref={scrollerRef}
         className="relative flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:gap-5 lg:grid lg:grid-cols-3 lg:gap-5 lg:overflow-visible"
       >
-        {categories.map((category) => (
+        {categories.map((category, index) => (
           <Link
             key={category.name}
             href={category.href}
@@ -119,6 +119,7 @@ export function CategoryCarousel({
                     src={category.imageUrl}
                     alt={category.name}
                     fill
+                    priority={index === 0}
                     className="object-cover object-center"
                     sizes="(max-width: 640px) 84vw, (max-width: 1024px) 58vw, 31vw"
                   />

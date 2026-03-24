@@ -297,7 +297,7 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#6E6E68]">{product.category}</p>
           ) : null}
 
-          <h1 className="font-serif text-2xl font-medium leading-tight tracking-tight text-[#171715] sm:text-3xl md:text-5xl">
+          <h1 className="text-2xl font-medium leading-tight tracking-tight text-[#171715] sm:text-3xl md:text-5xl">
             {product.name}
           </h1>
 
