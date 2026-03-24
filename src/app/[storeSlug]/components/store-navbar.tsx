@@ -1,8 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
-import { usePathname, useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { ShoppingBag, Heart, Search, Menu, X, ChevronDown } from "lucide-react"
 import { storefrontPath } from "@/lib/storefront-path"
 import { useStore } from "./store-provider"
@@ -26,6 +26,7 @@ type StoreNavbarProps = {
 export function StoreNavbar({ store }: StoreNavbarProps) {
   const router = useRouter()
   const pathname = usePathname()
+  const urlSearchParams = useSearchParams()
   const { cartCount, wishlist } = useStore()
   const [searchQuery, setSearchQuery] = useState("")
 
@@ -38,15 +39,45 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
   const isHomeActive = pathname === homeHref || pathname === "/"
   const isCatalogActive = pathname.startsWith(catalogHref) || pathname.startsWith("/catalog")
   const isContactActive = pathname === contactHref || pathname === "/contact"
+  const activeCategory = (urlSearchParams.get("category") ?? "").trim()
+  const activeQuery = (urlSearchParams.get("query") ?? "").trim()
+  const activeAvailability = (urlSearchParams.get("availability") ?? "").trim()
+  const activePrice = (urlSearchParams.get("price") ?? "").trim()
+  const activeSort = (urlSearchParams.get("sort") ?? "").trim()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mobileCatalogOpen, setMobileCatalogOpen] = useState(false)
+
+  useEffect(() => {
+    setSearchQuery(activeQuery)
+  }, [activeQuery])
+
+  const buildCatalogHref = (category: string, query: string) => {
+    const params = new URLSearchParams()
+    const trimmedCategory = category.trim()
+    const trimmedQuery = query.trim()
+    const trimmedAvailability = activeAvailability.trim()
+    const trimmedPrice = activePrice.trim()
+    const trimmedSort = activeSort.trim()
+
+    if (trimmedCategory) params.set("category", trimmedCategory)
+    if (trimmedQuery) params.set("query", trimmedQuery)
+    if (trimmedAvailability) params.set("availability", trimmedAvailability)
+    if (trimmedPrice) params.set("price", trimmedPrice)
+    if (trimmedSort) params.set("sort", trimmedSort)
+
+    const paramString = params.toString()
+    return `${catalogHref}${paramString ? `?${paramString}` : ""}`
+  }
 
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     // Search is handled by catalog page query param routing.
-    const query = searchQuery.trim()
-    const searchParams = query ? `?query=${encodeURIComponent(query)}` : ""
-    router.push(`${catalogHref}${searchParams}`)
+    router.push(buildCatalogHref(activeCategory, searchQuery))
+  }
+
+  const getCategoryLinkClass = (category: string, baseClass: string, activeClass: string) => {
+    const isActive = activeCategory.toLocaleLowerCase() === category.trim().toLocaleLowerCase()
+    return isActive ? `${baseClass} ${activeClass}` : baseClass
   }
 
   return (
@@ -224,13 +255,13 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
                 {mobileCatalogOpen ? (
                   <div>
                     <Link
-                      href={catalogHref}
+                      href={buildCatalogHref("", activeQuery)}
                       onClick={() => {
                         setMobileMenuOpen(false)
                         setMobileCatalogOpen(false)
                       }}
                       className={`block border-t border-[#E3E3DE] px-6 py-4 text-sm ${
-                        isCatalogActive ? "font-semibold text-[#111111]" : "text-[#2A2A26]"
+                        isCatalogActive && !activeCategory ? "font-semibold text-[#111111]" : "text-[#2A2A26]"
                       }`}
                     >
                       All products
@@ -239,12 +270,16 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
                       categories.map((category) => (
                         <Link
                           key={category}
-                          href={`${catalogHref}?category=${encodeURIComponent(category)}`}
+                          href={buildCatalogHref(category, activeQuery)}
                           onClick={() => {
                             setMobileMenuOpen(false)
                             setMobileCatalogOpen(false)
                           }}
-                          className="block border-t border-[#E3E3DE] px-6 py-4 text-sm text-[#2A2A26]"
+                          className={getCategoryLinkClass(
+                            category,
+                            "block border-t border-[#E3E3DE] px-6 py-4 text-sm text-[#2A2A26]",
+                            "font-semibold text-[#111111]"
+                          )}
                         >
                           {category}
                         </Link>
@@ -297,7 +332,7 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
             <div className="absolute left-0 top-full z-50 hidden w-[240px] pt-3 group-hover:block group-focus-within:block sm:left-1/2 sm:-translate-x-1/2">
               <div className="border border-[#D8D8D3] bg-background p-2 shadow-[0_10px_24px_rgba(20,20,18,0.08)]">
                 <Link
-                  href={catalogHref}
+                  href={buildCatalogHref("", activeQuery)}
                   className="block px-3 py-2 text-sm font-semibold text-[#1A1A1A] hover:bg-[#ECECE7]"
                 >
                   All products
@@ -306,8 +341,12 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
                   categories.map((category) => (
                     <Link
                       key={category}
-                      href={`${catalogHref}?category=${encodeURIComponent(category)}`}
-                      className="block px-3 py-2 text-sm text-[#2A2A26] hover:bg-[#ECECE7]"
+                      href={buildCatalogHref(category, activeQuery)}
+                      className={getCategoryLinkClass(
+                        category,
+                        "block px-3 py-2 text-sm text-[#2A2A26] hover:bg-[#ECECE7]",
+                        "font-semibold text-[#111111]"
+                      )}
                     >
                       {category}
                     </Link>

@@ -7,13 +7,20 @@ import { StoreNavbar } from "../components/store-navbar"
 import { StoreFooter } from "../components/store-footer"
 import { ProductGrid } from "../components/product-grid"
 import { StoreBreadcrumbs } from "../components/store-breadcrumbs"
+import { CatalogFilters } from "../components/catalog-filters"
 
 export default async function AllProductsPage({
   params,
   searchParams,
 }: {
   params: Promise<{ storeSlug: string }>
-  searchParams?: Promise<{ category?: string; query?: string }>
+  searchParams?: Promise<{
+    category?: string
+    query?: string
+    availability?: string
+    price?: string
+    sort?: string
+  }>
 }) {
   const { storeSlug } = await params
   const resolvedSearchParams = (await searchParams) ?? {}
@@ -27,46 +34,96 @@ export default async function AllProductsPage({
 
   const selectedCategory = (resolvedSearchParams.category ?? "").trim()
   const selectedQuery = (resolvedSearchParams.query ?? "").trim()
+  const selectedAvailability = ["available", "unavailable", "all"].includes((resolvedSearchParams.availability ?? "").trim())
+    ? (resolvedSearchParams.availability ?? "").trim()
+    : "available"
+  const selectedPrice = ["all", "under-1000", "1000-5000", "above-5000"].includes((resolvedSearchParams.price ?? "").trim())
+    ? (resolvedSearchParams.price ?? "").trim()
+    : "all"
+  const selectedSort = ["alpha-asc", "alpha-desc", "price-asc", "price-desc", "newest"].includes((resolvedSearchParams.sort ?? "").trim())
+    ? (resolvedSearchParams.sort ?? "").trim()
+    : "alpha-asc"
 
-  const products = await db.product.findMany({
-    where: {
-      storeId: store.id,
-      isAvailable: true,
-      ...(selectedCategory
-        ? {
-            category: {
-              equals: selectedCategory,
-              mode: "insensitive",
-            },
-          }
-        : {}),
-      ...(selectedQuery
-        ? {
-            OR: [
-              {
-                name: {
-                  contains: selectedQuery,
-                  mode: "insensitive",
-                },
+  const priceFilter =
+    selectedPrice === "under-1000"
+      ? { lt: 1000 }
+      : selectedPrice === "1000-5000"
+        ? { gte: 1000, lte: 5000 }
+        : selectedPrice === "above-5000"
+          ? { gt: 5000 }
+          : undefined
+
+  const orderBy =
+    selectedSort === "alpha-desc"
+      ? { name: "desc" as const }
+      : selectedSort === "price-asc"
+        ? { price: "asc" as const }
+        : selectedSort === "price-desc"
+          ? { price: "desc" as const }
+          : selectedSort === "newest"
+            ? { createdAt: "desc" as const }
+            : { name: "asc" as const }
+
+  const [products, categoryRows] = await Promise.all([
+    db.product.findMany({
+      where: {
+        storeId: store.id,
+        ...(selectedAvailability === "all"
+          ? {}
+          : {
+              isAvailable: selectedAvailability === "available",
+            }),
+        ...(selectedCategory
+          ? {
+              category: {
+                equals: selectedCategory,
+                mode: "insensitive",
               },
-              {
-                description: {
-                  contains: selectedQuery,
-                  mode: "insensitive",
+            }
+          : {}),
+        ...(selectedQuery
+          ? {
+              OR: [
+                {
+                  name: {
+                    contains: selectedQuery,
+                    mode: "insensitive",
+                  },
                 },
-              },
-              {
-                category: {
-                  contains: selectedQuery,
-                  mode: "insensitive",
+                {
+                  description: {
+                    contains: selectedQuery,
+                    mode: "insensitive",
+                  },
                 },
-              },
-            ],
-          }
-        : {}),
-    },
-    orderBy: { createdAt: "desc" },
-  })
+                {
+                  category: {
+                    contains: selectedQuery,
+                    mode: "insensitive",
+                  },
+                },
+              ],
+            }
+          : {}),
+        ...(priceFilter ? { price: priceFilter } : {}),
+      },
+      orderBy,
+    }),
+    db.product.findMany({
+      where: {
+        storeId: store.id,
+        ...(selectedAvailability === "all"
+          ? {}
+          : {
+              isAvailable: selectedAvailability === "available",
+            }),
+        category: { not: null },
+      },
+      select: { category: true },
+      distinct: ["category"],
+      orderBy: { category: "asc" },
+    }),
+  ])
 
   const serializedProducts = products.map((product) => ({
     id: product.id,
@@ -82,8 +139,8 @@ export default async function AllProductsPage({
 
   const categories = Array.from(
     new Set(
-      products
-        .map((product) => product.category?.trim() || "")
+      categoryRows
+        .map((row) => row.category?.trim() || "")
         .filter(Boolean)
     )
   ).sort((a, b) => a.localeCompare(b))
@@ -125,9 +182,19 @@ export default async function AllProductsPage({
                 ? `Showing ${selectedCategory} products from ${store.name}.`
                 : `Browse the full catalog from ${store.name}.`}{" "}
               {serializedProducts.length} item
-              {serializedProducts.length === 1 ? "" : "s"} available.
+              {serializedProducts.length === 1 ? "" : "s"} found.
             </p>
           </div>
+
+          <CatalogFilters
+            storeSlug={safeStore.slug}
+            productCount={serializedProducts.length}
+            selectedCategory={selectedCategory}
+            selectedQuery={selectedQuery}
+            selectedAvailability={selectedAvailability}
+            selectedPrice={selectedPrice}
+            selectedSort={selectedSort}
+          />
 
           <ProductGrid
             products={serializedProducts}
