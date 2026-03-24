@@ -10,10 +10,13 @@ import { StoreBreadcrumbs } from "../components/store-breadcrumbs"
 
 export default async function AllProductsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ storeSlug: string }>
+  searchParams?: Promise<{ category?: string; query?: string }>
 }) {
   const { storeSlug } = await params
+  const resolvedSearchParams = (await searchParams) ?? {}
   const referenceTime = new Date().toISOString()
 
   const store = await findStoreBySlug(storeSlug)
@@ -22,8 +25,46 @@ export default async function AllProductsPage({
     notFound()
   }
 
+  const selectedCategory = (resolvedSearchParams.category ?? "").trim()
+  const selectedQuery = (resolvedSearchParams.query ?? "").trim()
+
   const products = await db.product.findMany({
-    where: { storeId: store.id, isAvailable: true },
+    where: {
+      storeId: store.id,
+      isAvailable: true,
+      ...(selectedCategory
+        ? {
+            category: {
+              equals: selectedCategory,
+              mode: "insensitive",
+            },
+          }
+        : {}),
+      ...(selectedQuery
+        ? {
+            OR: [
+              {
+                name: {
+                  contains: selectedQuery,
+                  mode: "insensitive",
+                },
+              },
+              {
+                description: {
+                  contains: selectedQuery,
+                  mode: "insensitive",
+                },
+              },
+              {
+                category: {
+                  contains: selectedQuery,
+                  mode: "insensitive",
+                },
+              },
+            ],
+          }
+        : {}),
+    },
     orderBy: { createdAt: "desc" },
   })
 
@@ -70,14 +111,20 @@ export default async function AllProductsPage({
           <StoreBreadcrumbs
             items={[
               { label: "Home", href: storefrontPath(store.slug) },
-              { label: "Catalog" },
+              { label: "Catalog", href: storefrontPath(store.slug, "/catalog") },
+              ...(selectedCategory ? [{ label: selectedCategory }] : []),
             ]}
           />
 
           <div className="mb-6">
-            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#1A1A1A]">All Products</h1>
+            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#1A1A1A]">
+              {selectedCategory ? `${selectedCategory} Products` : "All Products"}
+            </h1>
             <p className="mt-1 text-sm text-[#6D6D67]">
-              Browse the full catalog from {store.name}. {serializedProducts.length} item
+              {selectedCategory
+                ? `Showing ${selectedCategory} products from ${store.name}.`
+                : `Browse the full catalog from ${store.name}.`}{" "}
+              {serializedProducts.length} item
               {serializedProducts.length === 1 ? "" : "s"} available.
             </p>
           </div>

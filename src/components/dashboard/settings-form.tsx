@@ -8,6 +8,7 @@ import { Check, Copy, Loader2, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/dashboard/dashboard-button";
+import { ImageUpload } from "@/components/ui/image-upload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -21,7 +22,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { updateStoreSettings } from "@/lib/actions/store";
+import {
+  deleteStoreCategoryImage,
+  getStoreCategoryImageSettings,
+  updateStoreSettings,
+  upsertStoreCategoryImage,
+} from "@/lib/actions/store";
 
 const ROOT_DOMAIN = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || "")
   .replace(/^https?:\/\//i, "")
@@ -101,11 +107,26 @@ interface SettingsFormProps {
   };
 }
 
+interface CategoryImageRecord {
+  id: string;
+  categoryName: string;
+  imageUrl: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export function SettingsForm({ initialData, userData }: SettingsFormProps) {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"config" | "account">("config");
   const [runtimeOrigin, setRuntimeOrigin] = useState("");
   const [copiedStoreUrl, setCopiedStoreUrl] = useState(false);
+  const [categorySettingsLoading, setCategorySettingsLoading] = useState(true);
+  const [categoryImageSaving, setCategoryImageSaving] = useState(false);
+  const [categoryImageDeleting, setCategoryImageDeleting] = useState(false);
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+  const [categoryImages, setCategoryImages] = useState<CategoryImageRecord[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [draftCategoryImageUrl, setDraftCategoryImageUrl] = useState("");
   const avatarSeed = userData?.name || "User";
   const diceAvatarSrc = `https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=${encodeURIComponent(
     avatarSeed
@@ -167,6 +188,48 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
   }, []);
 
   useEffect(() => {
+    let isMounted = true;
+
+    const loadCategorySettings = async () => {
+      try {
+        setCategorySettingsLoading(true);
+        const result = await getStoreCategoryImageSettings();
+
+        if (!isMounted) return;
+
+        if (result.error) {
+          toast.error(result.error);
+          return;
+        }
+
+        const categories = result.categories || [];
+        setAvailableCategories(categories);
+        setCategoryImages(result.categoryImages || []);
+        setSelectedCategory((currentValue) => {
+          if (currentValue && categories.includes(currentValue)) {
+            return currentValue;
+          }
+          return categories[0] || "";
+        });
+      } catch {
+        if (isMounted) {
+          toast.error("Failed to load category image settings");
+        }
+      } finally {
+        if (isMounted) {
+          setCategorySettingsLoading(false);
+        }
+      }
+    };
+
+    loadCategorySettings();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
     // Auto-generate slug only during first-time setup; never overwrite existing stores.
     if (!initialData && name) {
       const slug = name
@@ -176,6 +239,13 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
       form.setValue("slug", slug);
     }
   }, [name, initialData, form]);
+
+  const selectedCategoryImage =
+    categoryImages.find((entry) => entry.categoryName === selectedCategory) || null;
+
+  useEffect(() => {
+    setDraftCategoryImageUrl(selectedCategoryImage?.imageUrl || "");
+  }, [selectedCategory, selectedCategoryImage?.imageUrl]);
 
   const onSubmit = async (data: SettingsValues) => {
     try {
@@ -221,6 +291,71 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
       window.setTimeout(() => setCopiedStoreUrl(false), 1500);
     } catch {
       toast.error("Failed to copy URL");
+    }
+  };
+
+  const handleSaveCategoryImage = async () => {
+    if (!selectedCategory) {
+      toast.error("Select a category first");
+      return;
+    }
+
+    if (!draftCategoryImageUrl) {
+      toast.error("Upload an image before saving");
+      return;
+    }
+
+    try {
+      setCategoryImageSaving(true);
+      const result = await upsertStoreCategoryImage({
+        categoryName: selectedCategory,
+        imageUrl: draftCategoryImageUrl,
+      });
+
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+
+      if (result.categoryImage) {
+        setCategoryImages((current) => {
+          const next = current.filter((entry) => entry.categoryName !== result.categoryImage.categoryName);
+          return [...next, result.categoryImage].sort((a, b) => a.categoryName.localeCompare(b.categoryName));
+        });
+      }
+
+      toast.success("Category image saved");
+    } catch {
+      toast.error("Failed to save category image");
+    } finally {
+      setCategoryImageSaving(false);
+    }
+  };
+
+  const handleRemoveCategoryImage = async () => {
+    if (!selectedCategoryImage) {
+      setDraftCategoryImageUrl("");
+      return;
+    }
+
+    try {
+      setCategoryImageDeleting(true);
+      const result = await deleteStoreCategoryImage({ categoryName: selectedCategory });
+
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+
+      setCategoryImages((current) =>
+        current.filter((entry) => entry.categoryName !== selectedCategory)
+      );
+      setDraftCategoryImageUrl("");
+      toast.success("Category image removed");
+    } catch {
+      toast.error("Failed to remove category image");
+    } finally {
+      setCategoryImageDeleting(false);
     }
   };
 
@@ -483,6 +618,106 @@ export function SettingsForm({ initialData, userData }: SettingsFormProps) {
                     />
                   </FieldGroup>
                 </div>
+              </ConfigSection>
+
+              <ConfigSection
+                title="Category Images"
+                description="Upload dedicated images for storefront categories."
+              >
+                {categorySettingsLoading ? (
+                  <div className="flex min-h-[220px] items-center justify-center rounded-2xl border border-dashed border-border bg-muted/20">
+                    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                  </div>
+                ) : availableCategories.length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-border bg-muted/20 p-8 text-center">
+                    <p className="text-xs font-medium text-foreground">No categories available yet</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Add products with categories first, then return here to upload storefront category images.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid gap-5 lg:grid-cols-[250px_minmax(0,1fr)]">
+                    <div className="space-y-4 rounded-xl border border-border bg-muted/20 p-4">
+                      <FieldGroup label="Select Category">
+                        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                          <SelectTrigger className="h-10 rounded-lg bg-background">
+                            <SelectValue placeholder="Choose category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {availableCategories.map((category) => (
+                              <SelectItem key={category} value={category}>
+                                {category}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FieldGroup>
+
+                      <div className="rounded-lg border border-border bg-background px-3 py-2">
+                        <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                          Status
+                        </p>
+                        <p className="mt-1 text-xs font-medium text-foreground">
+                          {selectedCategoryImage ? "Image saved" : "No image saved"}
+                        </p>
+                      </div>
+
+                      <p className="text-xs text-muted-foreground">
+                        Recommended: portrait image for a cleaner storefront crop.
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl border border-border bg-background p-4">
+                      <div className="mb-4 flex items-center justify-between gap-3">
+                        <p className="text-sm font-medium text-foreground">
+                          {selectedCategory}
+                        </p>
+                        <span className="text-[11px] text-muted-foreground">
+                          PNG, JPG up to 4MB
+                        </span>
+                      </div>
+
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                        <div className="w-full max-w-[220px]">
+                          <div className="h-[170px] rounded-lg border border-dashed border-border bg-muted/20 p-2">
+                            <ImageUpload
+                              className="h-full"
+                              value={draftCategoryImageUrl}
+                              onChange={(url) => setDraftCategoryImageUrl(url)}
+                              endpoint="productImage"
+                              label="Upload image"
+                              helperText="Click to upload"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="h-9 rounded-lg px-3"
+                            disabled={categoryImageDeleting || categoryImageSaving || !draftCategoryImageUrl}
+                            onClick={handleRemoveCategoryImage}
+                          >
+                            {categoryImageDeleting ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              "Remove"
+                            )}
+                          </Button>
+                          <Button
+                            type="button"
+                            className="h-9 rounded-lg px-3"
+                            disabled={categoryImageSaving || categoryImageDeleting || !draftCategoryImageUrl}
+                            onClick={handleSaveCategoryImage}
+                          >
+                            {categoryImageSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </ConfigSection>
 
               <ConfigSection
