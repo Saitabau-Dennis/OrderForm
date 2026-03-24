@@ -89,13 +89,14 @@ export function ProductGrid({
         </div>
       ) : (
         <div className={`grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 md:gap-5 ${isRelatedMode ? "lg:grid-cols-4 lg:gap-5" : "lg:grid-cols-3 lg:gap-6 xl:grid-cols-4"}`}>
-          {products.map((product) => (
+          {products.map((product, index) => (
             <ProductCard
               key={product.id}
               product={product}
               currency={currency}
               storeSlug={storeSlug}
               referenceTime={referenceTime}
+              prioritizeImage={index === 0}
             />
           ))}
         </div>
@@ -109,11 +110,13 @@ function ProductCard({
   currency,
   storeSlug,
   referenceTime,
+  prioritizeImage,
 }: {
   product: Product
   currency: string
   storeSlug: string
   referenceTime: string
+  prioritizeImage: boolean
 }) {
   const description = formatCardDescription(product.description)
   const showNewBadge = isNewProduct(referenceTime, product.createdAt)
@@ -135,6 +138,7 @@ function ProductCard({
               src={product.imageUrl}
               alt={product.name}
               fill
+              loading={prioritizeImage ? "eager" : "lazy"}
               className="object-cover object-center"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1400px) 33vw, 25vw"
             />

@@ -106,7 +106,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning translate="no" className="notranslate">
+    <html lang="en" suppressHydrationWarning translate="no" data-scroll-behavior="smooth" className="notranslate">
       <body className={`${inter.variable} ${sora.variable} ${outfit.variable} ${signika.variable} ${dmSans.variable} ${instrumentSerif.variable} ${poppins.variable} ${jakarta.variable} ${bungee.variable} ${montserrat.variable} ${azeretMono.variable} ${GeistSans.variable} ${clashDisplay.variable} ${adcure.variable} ${goodly.variable} notranslate font-sans antialiased`}>
         <Providers>
           {children}
