@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react"
 import Image from "next/image"
-import { ChevronLeft, ChevronRight, Heart, Minus, Plus } from "lucide-react"
+import { ChevronLeft, ChevronRight, Heart, Minus, Plus, Share2 } from "lucide-react"
+import { toast } from "sonner"
 import { useStore } from "./store-provider"
 import { storefrontPath } from "@/lib/storefront-path"
 import { createQuickCheckoutPayload, getQuickCheckoutStorageKey } from "./quick-checkout-storage"
@@ -252,6 +253,33 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
     }
   }
 
+  const handleShareProduct = async () => {
+    const productPath = storefrontPath(store.slug, `/catalog/${product.id}`)
+    const productUrl = new URL(productPath, window.location.origin).toString()
+    const shareData = {
+      title: product.name,
+      text: `Check out this product from ${store.name}`,
+      url: productUrl,
+    }
+
+    try {
+      if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+        await navigator.share(shareData)
+        return
+      }
+
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(productUrl)
+        toast.success("Product link copied")
+        return
+      }
+
+      toast.error("Sharing is not available on this device")
+    } catch {
+      toast.error("Could not share this product")
+    }
+  }
+
   return (
     <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 items-start gap-9 pb-36 lg:grid-cols-[minmax(0,56%)_minmax(0,44%)] lg:gap-8 lg:pb-0">
       <div className="space-y-3 lg:sticky lg:top-20 lg:self-start">
@@ -451,6 +479,15 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
           >
             <Heart className={`h-4 w-4 ${isWishlisted ? "fill-white" : ""}`} />
             <span>{isWishlisted ? "Added to wishlist" : "Add to wishlist"}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleShareProduct}
+            className="inline-flex h-10 w-full items-center justify-center gap-2 border border-[#D9D9D4] bg-card px-4 text-sm font-medium text-[#1A1A1A] transition-colors hover:border-[#1A1A1A] hover:bg-[#F7F7F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2 sm:w-auto"
+          >
+            <Share2 className="h-4 w-4" />
+            <span>Share product</span>
           </button>
         </div>
 
