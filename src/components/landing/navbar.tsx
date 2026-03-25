@@ -83,6 +83,7 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
                     width={661}
                     height={377}
                     priority
+                    loading="eager"
                     className="h-[16px] w-[16px] object-cover scale-[2.8]"
                 />
             </span>

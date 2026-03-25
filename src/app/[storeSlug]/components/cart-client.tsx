@@ -16,6 +16,8 @@ type CartClientProps = {
   }>;
 };
 
+const ABOVE_FOLD_CART_IMAGE_COUNT = 2;
+
 // Store-scoped key for optional checkout instructions entered in cart.
 function getCartNoteStorageKey(storeSlug: string) {
   return `orderform_cart_note:${storeSlug}`;
@@ -114,7 +116,8 @@ export function CartClient({
                       src={item.imageUrl}
                       alt={item.name}
                       fill
-                      loading={index === 0 ? "eager" : "lazy"}
+                      priority={index < ABOVE_FOLD_CART_IMAGE_COUNT}
+                      loading={index < ABOVE_FOLD_CART_IMAGE_COUNT ? "eager" : "lazy"}
                       className="object-cover"
                     />
                   ) : null}

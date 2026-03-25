@@ -26,6 +26,7 @@ type ProductGridProps = {
 }
 
 const NEW_PRODUCT_WINDOW_DAYS = 7
+const ABOVE_FOLD_PRODUCT_IMAGE_COUNT = 4
 
 function formatPrice(price: number, currency: string): string {
   try {
@@ -96,7 +97,7 @@ export function ProductGrid({
               currency={currency}
               storeSlug={storeSlug}
               referenceTime={referenceTime}
-              prioritizeImage={index === 0}
+              prioritizeImage={index < ABOVE_FOLD_PRODUCT_IMAGE_COUNT}
             />
           ))}
         </div>
@@ -138,6 +139,7 @@ function ProductCard({
               src={product.imageUrl}
               alt={product.name}
               fill
+              priority={prioritizeImage}
               loading={prioritizeImage ? "eager" : "lazy"}
               className="object-cover object-center"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1400px) 33vw, 25vw"

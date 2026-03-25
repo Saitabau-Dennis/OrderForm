@@ -22,6 +22,8 @@ type WishlistClientProps = {
   allProducts: ProductInfo[]
 }
 
+const ABOVE_FOLD_WISHLIST_IMAGE_COUNT = 2
+
 export function WishlistClient({ storeSlug, currency, allProducts }: WishlistClientProps) {
   const { wishlist, toggleWishlist } = useStore()
 
@@ -70,7 +72,8 @@ export function WishlistClient({ storeSlug, currency, allProducts }: WishlistCli
                       src={product.imageUrl}
                       alt={product.name}
                       fill
-                      loading={index === 0 ? "eager" : "lazy"}
+                      priority={index < ABOVE_FOLD_WISHLIST_IMAGE_COUNT}
+                      loading={index < ABOVE_FOLD_WISHLIST_IMAGE_COUNT ? "eager" : "lazy"}
                       className="object-cover object-center"
                       sizes="64px"
                     />
@@ -126,7 +129,8 @@ export function WishlistClient({ storeSlug, currency, allProducts }: WishlistCli
                           src={product.imageUrl}
                           alt={product.name}
                           fill
-                          loading={index === 0 ? "eager" : "lazy"}
+                          priority={index < ABOVE_FOLD_WISHLIST_IMAGE_COUNT}
+                          loading={index < ABOVE_FOLD_WISHLIST_IMAGE_COUNT ? "eager" : "lazy"}
                           className="object-cover object-center"
                           sizes="64px"
                         />

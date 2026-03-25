@@ -135,6 +135,7 @@ export default function NotFound() {
                 className="w-20 h-20 md:w-[120px] md:h-[120px] object-contain select-none opacity-80"
                 draggable="false"
                 priority
+                loading="eager"
               />
             </motion.div>
             <motion.span 

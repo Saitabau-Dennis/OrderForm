@@ -186,6 +186,7 @@ const Hero = React.forwardRef<HTMLDivElement, HeroProps>(
                   height={mockupImage.height}
                   className="w-full brightness-[0.99] saturate-[0.82] contrast-[0.98]"
                   priority
+                  loading="eager"
                 />
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-44 bg-gradient-to-b from-transparent via-[#f7f7f5]/72 to-[#f7f7f5]" />
               </div>

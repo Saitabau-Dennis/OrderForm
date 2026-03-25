@@ -16,6 +16,8 @@ type CategoryCarouselProps = {
   categories: CategoryItem[];
 };
 
+const ABOVE_FOLD_CATEGORY_IMAGE_COUNT = 3;
+
 export function CategoryCarousel({
   storeSlug,
   categories,
@@ -119,8 +121,8 @@ export function CategoryCarousel({
                     src={category.imageUrl}
                     alt={category.name}
                     fill
-                    priority={index === 0}
-                    loading={index === 0 ? "eager" : undefined}
+                    priority={index < ABOVE_FOLD_CATEGORY_IMAGE_COUNT}
+                    loading={index < ABOVE_FOLD_CATEGORY_IMAGE_COUNT ? "eager" : undefined}
                     className="object-cover object-center"
                     sizes="(max-width: 640px) 84vw, (max-width: 1024px) 58vw, 31vw"
                   />

@@ -684,6 +684,7 @@ export function CheckoutClient({
                           alt={option.imageAlt}
                           width={64}
                           height={24}
+                          style={{ width: "auto" }}
                           className="h-6 w-auto object-contain"
                         />
                       ) : null}
