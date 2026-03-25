@@ -95,7 +95,7 @@ export function CartClient({
       </div>
 
       <div className="divide-y divide-[#DCDCD7] border-b border-[#DCDCD7]">
-        {cart.map((item) => {
+        {cart.map((item, index) => {
           const category =
             productCategoryMap.get(item.productId)?.trim() || "Featured";
 
@@ -114,6 +114,7 @@ export function CartClient({
                       src={item.imageUrl}
                       alt={item.name}
                       fill
+                      loading={index === 0 ? "eager" : "lazy"}
                       className="object-cover"
                     />
                   ) : null}

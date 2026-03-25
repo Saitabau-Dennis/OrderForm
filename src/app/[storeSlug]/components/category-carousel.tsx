@@ -120,6 +120,7 @@ export function CategoryCarousel({
                     alt={category.name}
                     fill
                     priority={index === 0}
+                    loading={index === 0 ? "eager" : undefined}
                     className="object-cover object-center"
                     sizes="(max-width: 640px) 84vw, (max-width: 1024px) 58vw, 31vw"
                   />

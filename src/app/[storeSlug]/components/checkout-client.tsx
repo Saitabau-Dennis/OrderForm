@@ -3,10 +3,12 @@
 import { useEffect, useMemo, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 import { useStore } from "./store-provider"
 import { createOrder } from "@/lib/actions/orders"
 import { storefrontPath } from "@/lib/storefront-path"
+import { getQuickCheckoutStorageKey, parseQuickCheckoutPayload } from "./quick-checkout-storage"
 import {
   Loader2,
   ArrowLeft,
@@ -95,8 +97,13 @@ export function CheckoutClient({
   enableShopPickup,
   shopPickupInstructions,
 }: CheckoutClientProps) {
+  const searchParams = useSearchParams()
+  const isQuickCheckoutRequested = searchParams.get("quick") === "1"
   const checkoutDraftStorageKey = useMemo(() => getCheckoutDraftStorageKey(storeSlug), [storeSlug])
-  const { cart, cartTotal } = useStore()
+  const quickCheckoutStorageKey = useMemo(() => getQuickCheckoutStorageKey(storeSlug), [storeSlug])
+  const { cart } = useStore()
+  const [quickCheckoutItem, setQuickCheckoutItem] = useState<ReturnType<typeof parseQuickCheckoutPayload>>(null)
+  const [hasHydratedQuickCheckout, setHasHydratedQuickCheckout] = useState(false)
 
   const [isLoading, setIsLoading] = useState(false)
   const [hasHydratedDraft, setHasHydratedDraft] = useState(false)
@@ -137,14 +144,43 @@ export function CheckoutClient({
   ]
 
   const hasAnyShippingMethod = enableDelivery || enableShopPickup
+  const checkoutItems = useMemo(() => {
+    if (!isQuickCheckoutRequested) return cart
+    if (!hasHydratedQuickCheckout) return []
+    return quickCheckoutItem ? [quickCheckoutItem] : []
+  }, [cart, hasHydratedQuickCheckout, isQuickCheckoutRequested, quickCheckoutItem])
+  const checkoutSubtotal = useMemo(
+    () => checkoutItems.reduce((total, item) => total + (item.price * item.quantity), 0),
+    [checkoutItems]
+  )
   const selectedZone = useMemo(() => {
     if (formData.deliveryMethod !== "delivery") return undefined
     return deliveryZones.find((zone) => zone.id === formData.zoneId)
   }, [deliveryZones, formData.deliveryMethod, formData.zoneId])
   const deliveryFee = formData.deliveryMethod === "delivery" && selectedZone ? selectedZone.price : 0
-  const grandTotal = cartTotal + deliveryFee
+  const grandTotal = checkoutSubtotal + deliveryFee
   const [firstNamePart = "", ...otherNameParts] = formData.name.trim().split(/\s+/)
   const lastNamePart = otherNameParts.join(" ")
+
+  useEffect(() => {
+    setHasHydratedQuickCheckout(false)
+
+    if (!isQuickCheckoutRequested) {
+      setQuickCheckoutItem(null)
+      setHasHydratedQuickCheckout(true)
+      return
+    }
+
+    try {
+      const rawQuickPayload = localStorage.getItem(quickCheckoutStorageKey)
+      setQuickCheckoutItem(parseQuickCheckoutPayload(rawQuickPayload, storeSlug))
+    } catch (error) {
+      console.error("Failed to restore quick checkout payload", error)
+      setQuickCheckoutItem(null)
+    } finally {
+      setHasHydratedQuickCheckout(true)
+    }
+  }, [isQuickCheckoutRequested, quickCheckoutStorageKey, storeSlug])
 
   useEffect(() => {
     // Restore previous in-progress checkout details from localStorage.
@@ -246,7 +282,7 @@ export function CheckoutClient({
   }
 
   const submitOrder = async () => {
-    if (cart.length === 0) {
+    if (checkoutItems.length === 0) {
       toast.error("Your cart is empty")
       return
     }
@@ -280,7 +316,7 @@ export function CheckoutClient({
           formData.deliveryMethod === "delivery" ? formData.deliveryAddress.trim() : undefined,
         deliveryZoneId: formData.deliveryMethod === "delivery" ? formData.zoneId || undefined : undefined,
         notes: orderNotes.trim() || undefined,
-        items: cart.map((item) => ({
+        items: checkoutItems.map((item) => ({
           productId: item.productId,
           name: item.name,
           quantity: item.quantity,
@@ -302,6 +338,9 @@ export function CheckoutClient({
 
       // Clear local draft once order is successfully created.
       localStorage.removeItem(checkoutDraftStorageKey)
+      if (isQuickCheckoutRequested) {
+        localStorage.removeItem(quickCheckoutStorageKey)
+      }
       window.location.assign(targetUrl)
     } catch (error) {
       console.error(error)
@@ -323,7 +362,15 @@ export function CheckoutClient({
       ? selectedZone.name
       : "Delivery"
 
-  if (cart.length === 0) {
+  if (isQuickCheckoutRequested && !hasHydratedQuickCheckout) {
+    return (
+      <div className="flex flex-col items-center justify-center rounded-none border border-[#E8E8E5] py-20 text-center">
+        <p className="text-sm text-[#737373]">Preparing checkout...</p>
+      </div>
+    )
+  }
+
+  if (checkoutItems.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-none border border-[#E8E8E5] py-20 text-center">
         <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-none">
@@ -586,7 +633,7 @@ export function CheckoutClient({
             </div>
 
             <div className="divide-y divide-[#E8E8E5]">
-              {cart.map((item) => (
+              {checkoutItems.map((item) => (
                 <div key={`checkout-item-${item.productId}-${item.variant || "default"}`} className="grid grid-cols-[minmax(0,1fr)_auto] gap-4 py-4 text-sm">
                   <p className="min-w-0 text-[#4A4A45]">
                     <span className="line-clamp-1">{item.name}</span>
@@ -600,7 +647,7 @@ export function CheckoutClient({
             <div className="space-y-0 border-t border-[#DADAD5]">
               <div className="grid grid-cols-[minmax(0,1fr)_auto] py-4 text-[29px] font-semibold text-[#1A1A1A]">
                 <span className="text-[17px]">Subtotal</span>
-                <span className="text-[17px]">{formatPrice(cartTotal)}</span>
+                <span className="text-[17px]">{formatPrice(checkoutSubtotal)}</span>
               </div>
               <div className="grid grid-cols-[minmax(0,1fr)_auto] border-t border-[#E8E8E5] py-4 text-[15px] text-[#4E4E49]">
                 <span className="font-semibold">Shipment</span>

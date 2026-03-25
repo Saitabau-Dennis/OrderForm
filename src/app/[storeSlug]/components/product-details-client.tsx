@@ -4,6 +4,8 @@ import { useMemo, useState } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight, Heart, Minus, Plus } from "lucide-react"
 import { useStore } from "./store-provider"
+import { storefrontPath } from "@/lib/storefront-path"
+import { createQuickCheckoutPayload, getQuickCheckoutStorageKey } from "./quick-checkout-storage"
 
 type VariantGroup = {
   name: string
@@ -28,6 +30,7 @@ type StoreInfo = {
   name: string
   brandColor: string
   currency: string
+  slug: string
 }
 
 // Parses flexible variant JSON from DB/editor into a UI-safe structure.
@@ -211,7 +214,29 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
   }
 
   const handleAddToCart = () => addItemToCart()
-  const handleBuyNow = () => addItemToCart()
+  const handleBuyNow = () => {
+    if (!canPurchase) return
+
+    try {
+      const quickCheckoutPayload = createQuickCheckoutPayload(store.slug, {
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.imageUrl,
+        variant: selectedVariantLabel || null,
+        quantity,
+      })
+
+      localStorage.setItem(
+        getQuickCheckoutStorageKey(store.slug),
+        JSON.stringify(quickCheckoutPayload)
+      )
+    } catch (error) {
+      console.error("Failed to prepare quick checkout payload", error)
+    }
+
+    window.location.assign(`${storefrontPath(store.slug, "/checkout")}?quick=1`)
+  }
 
   const handleToggleWishlist = () => {
     const nextIsWishlisted = !isWishlisted
@@ -238,6 +263,7 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
               alt={product.name}
               fill
               priority
+              loading="eager"
               className="object-cover object-center"
               sizes="(max-width: 1024px) 100vw, 56vw"
             />
