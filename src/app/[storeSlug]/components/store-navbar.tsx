@@ -1,9 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useTransition } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { ShoppingBag, Heart, Search, Menu, X, ChevronDown } from "lucide-react"
+import { ShoppingBag, Heart, Search, Menu, X, ChevronDown, Loader2 } from "lucide-react"
 import { storefrontPath } from "@/lib/storefront-path"
 import { useStore } from "./store-provider"
 import { StoreTopBar } from "./store-top-bar"
@@ -29,6 +29,7 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
   const urlSearchParams = useSearchParams()
   const { cartCount, wishlist } = useStore()
   const [searchQuery, setSearchQuery] = useState("")
+  const [isSearching, startSearchTransition] = useTransition()
 
   const categories = (store.categories ?? []).filter(Boolean)
   const homeHref = storefrontPath(store.slug)
@@ -72,7 +73,9 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     // Search is handled by catalog page query param routing.
-    router.push(buildCatalogHref(activeCategory, searchQuery))
+    startSearchTransition(() => {
+      router.push(buildCatalogHref(activeCategory, searchQuery))
+    })
   }
 
   const getCategoryLinkClass = (category: string, baseClass: string, activeClass: string) => {
@@ -84,7 +87,7 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
     <header className="z-40 bg-background">
       <StoreTopBar socialLinks={store.socialLinks} />
 
-      <div>
+      <div className="mt-4 sm:mt-6">
         <div className="mx-auto w-full max-w-[1460px] px-4 py-5 sm:px-6 sm:py-6 lg:hidden">
           <div className="relative flex items-center justify-center pb-6 pt-2">
             <Link
@@ -150,14 +153,16 @@ export function StoreNavbar({ store }: StoreNavbarProps) {
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
               placeholder="Enter key to search"
+              disabled={isSearching}
               className="h-[48px] w-full border border-[#CECEC9] bg-transparent pl-4 pr-12 text-sm text-[#1A1A1A] placeholder:text-[#7C7C75] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-0"
             />
             <button
               type="submit"
-              aria-label="Search products"
+              aria-label={isSearching ? "Searching products" : "Search products"}
+              disabled={isSearching}
               className="absolute right-0 top-0 inline-flex h-[48px] w-[48px] items-center justify-center text-[#33332F] hover:bg-[#ECECE7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]"
             >
-              <Search className="h-5 w-5" />
+              {isSearching ? <Loader2 className="h-5 w-5 animate-spin" /> : <Search className="h-5 w-5" />}
             </button>
           </form>
 

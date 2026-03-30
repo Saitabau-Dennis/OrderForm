@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { randomInt } from "crypto";
 import db from "@/lib/db";
 import { z } from "zod";
+import { extractVariantOptionValues, normalizeToken, variantLabelToStockKey } from "@/lib/inventory";
 
 const rewardPercentFromEnv = Number(process.env.REVIEW_REWARD_PERCENT_OFF || "10");
 const DEFAULT_PERCENT_OFF =
@@ -49,21 +50,6 @@ const generateDisplayIdSuffix = () =>
     DISPLAY_ID_ALPHABET[randomInt(0, DISPLAY_ID_ALPHABET.length)]
   ).join("");
 
-const extractVariantOptionValues = (variant?: string) => {
-  if (!variant) return [];
-
-  return variant
-    .split("/")
-    .map((segment) => segment.trim())
-    .filter(Boolean)
-    .map((segment) => {
-      const separatorIndex = segment.indexOf(":");
-      if (separatorIndex === -1) return segment.trim();
-      return segment.slice(separatorIndex + 1).trim();
-    })
-    .filter(Boolean);
-};
-
 export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
   try {
     const validatedData = CreateOrderSchema.parse(data);
@@ -103,6 +89,7 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
       },
       select: {
         id: true,
+        slug: true,
         name: true,
         price: true,
         stock: true,
@@ -125,6 +112,19 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
       if (!product.isAvailable) {
         throw new Error(`Product unavailable: ${product.name}`);
       }
+      if (product.optionStocks.length > 0) {
+        const optionStockMap = new Map(
+          product.optionStocks.map((row) => [normalizeToken(row.optionValue), row.stock])
+        );
+        const exactVariantKey = variantLabelToStockKey(item.variant);
+        const normalizedRequestedOptions = extractVariantOptionValues(item.variant);
+        const hasKnownOption =
+          (exactVariantKey ? optionStockMap.has(exactVariantKey) : false) ||
+          normalizedRequestedOptions.some((value) => optionStockMap.has(value));
+        if (!hasKnownOption) {
+          throw new Error(`Please select a valid product option for ${product.name}`);
+        }
+      }
 
       const unitPrice = Number(product.price);
       return {
@@ -143,10 +143,15 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
     }, new Map<string, number>());
     const requestedQuantityByProductOption = lineItems.reduce((acc, item) => {
       const productOptions = acc.get(item.productId) || new Map<string, number>();
-      for (const optionValue of extractVariantOptionValues(item.variant)) {
-        const normalized = optionValue.trim().toLowerCase();
-        if (!normalized) continue;
-        productOptions.set(normalized, (productOptions.get(normalized) || 0) + item.quantity);
+      const exactVariantKey = variantLabelToStockKey(item.variant);
+      if (exactVariantKey) {
+        productOptions.set(exactVariantKey, (productOptions.get(exactVariantKey) || 0) + item.quantity);
+      } else {
+        for (const optionValue of extractVariantOptionValues(item.variant)) {
+          const normalized = normalizeToken(optionValue);
+          if (!normalized) continue;
+          productOptions.set(normalized, (productOptions.get(normalized) || 0) + item.quantity);
+        }
       }
       acc.set(item.productId, productOptions);
       return acc;
@@ -238,7 +243,7 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
           throw new Error(`Product not found: ${productId}`);
         }
         const optionStocksMap = new Map(
-          product.optionStocks.map((row) => [row.optionValue.trim().toLowerCase(), row.stock])
+          product.optionStocks.map((row) => [normalizeToken(row.optionValue), row.stock])
         );
         const requestedOptionQuantities = requestedQuantityByProductOption.get(productId) || new Map<string, number>();
 
@@ -388,6 +393,9 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
       return updatedOrder;
     });
 
+    revalidatePath(`/${store.slug}`);
+    revalidatePath(`/${store.slug}/catalog`);
+
     return {
       success: true,
       orderId: order.displayId || order.orderNumber,
@@ -405,6 +413,9 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
       return { error: error.message };
     }
     if (error instanceof Error && error.message.includes("Product unavailable")) {
+      return { error: error.message };
+    }
+    if (error instanceof Error && error.message.includes("Please select a valid product option")) {
       return { error: error.message };
     }
     if (error instanceof Error && error.message.includes("Discount code is no longer available")) {

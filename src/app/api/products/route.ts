@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import db from "@/lib/db";
+import { getDeclaredOptionStockKeys, normalizeToken } from "@/lib/inventory";
 
 // Lists products for the authenticated store owner.
 export async function GET() {
@@ -53,6 +54,10 @@ export async function POST(req: Request) {
       return new NextResponse("Name and price are required", { status: 400 });
     }
 
+    if (stock === "" || stock === undefined || stock === null || !Number.isFinite(Number(stock)) || Number(stock) < 0) {
+      return new NextResponse("Stock is required and must be 0 or greater.", { status: 400 });
+    }
+
     const store = await db.store.findFirst({
         where: { userId: session.user.id }
     });
@@ -71,10 +76,22 @@ export async function POST(req: Request) {
       optionStocks && typeof optionStocks === "object" ? optionStocks as Record<string, unknown> : {}
     )
       .map(([optionValue, qty]) => ({
-        optionValue: optionValue.trim().toLowerCase(),
+        optionValue: normalizeToken(optionValue),
         stock: Math.max(0, Math.trunc(Number(qty))),
       }))
       .filter((row) => row.optionValue.length > 0 && Number.isFinite(row.stock));
+    const declaredOptions = new Set(getDeclaredOptionStockKeys(typeof sizes === "string" ? sizes : null, variants));
+    const hasUndeclaredOptionStocks = normalizedOptionStocks.some(
+      (row) => !declaredOptions.has(row.optionValue)
+    );
+    if (hasUndeclaredOptionStocks) {
+      return new NextResponse("Option stock values must match configured sizes/variants.", { status: 400 });
+    }
+    const normalizedOptionStockKeys = new Set(normalizedOptionStocks.map((row) => row.optionValue));
+    const missingOptionStocks = Array.from(declaredOptions).filter((option) => !normalizedOptionStockKeys.has(option));
+    if (missingOptionStocks.length > 0) {
+      return new NextResponse(`Set stock for all size/variant options: ${missingOptionStocks.join(", ")}`, { status: 400 });
+    }
 
     const product = await db.$transaction(async (tx) => {
       const created = await tx.product.create({
@@ -82,9 +99,7 @@ export async function POST(req: Request) {
           storeId: store.id,
           name,
           price: parseFloat(price),
-          stock: stock === "" || stock === undefined || stock === null
-            ? null
-            : (Number.isFinite(Number(stock)) ? Math.max(0, Math.trunc(Number(stock))) : null),
+          stock: Math.max(0, Math.trunc(Number(stock))),
           category,
           description,
           imageUrl,

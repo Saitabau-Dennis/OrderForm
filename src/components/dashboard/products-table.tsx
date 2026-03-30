@@ -23,6 +23,7 @@ interface Product {
   price: number;
   imageUrl?: string;
   isAvailable: boolean;
+  status?: "active" | "out_of_stock" | "draft";
   category?: string;
   sizes?: string;
   createdAt?: string;
@@ -76,18 +77,20 @@ export function ProductsTable({ products, onEdit, onDelete }: ProductsTableProps
       },
     },
     {
-      accessorKey: "isAvailable",
+      accessorKey: "status",
       header: "Status",
       cell: ({ row }) => {
-        const isAvailable = row.getValue("isAvailable") as boolean;
+        const status = (row.getValue("status") as Product["status"]) ?? (row.original.isAvailable ? "active" : "draft");
         return (
           <span className={cn(
             "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
-            isAvailable
+            status === "active"
               ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400"
-              : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+              : status === "out_of_stock"
+                ? "bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-400"
+                : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
           )}>
-            {isAvailable ? "Active" : "Draft"}
+            {status === "active" ? "Active" : status === "out_of_stock" ? "Out of stock" : "Draft"}
           </span>
         );
       },

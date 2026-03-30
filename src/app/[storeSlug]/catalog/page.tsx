@@ -34,6 +34,10 @@ export default async function AllProductsPage({
 
   const selectedCategory = (resolvedSearchParams.category ?? "").trim()
   const selectedQuery = (resolvedSearchParams.query ?? "").trim()
+  const queryTerms = selectedQuery
+    .split(/\s+/)
+    .map((term) => term.trim())
+    .filter(Boolean)
   const selectedAvailability = ["available", "unavailable", "all"].includes((resolvedSearchParams.availability ?? "").trim())
     ? (resolvedSearchParams.availability ?? "").trim()
     : "available"
@@ -83,26 +87,28 @@ export default async function AllProductsPage({
           : {}),
         ...(selectedQuery
           ? {
-              OR: [
-                {
-                  name: {
-                    contains: selectedQuery,
-                    mode: "insensitive",
+              AND: queryTerms.map((term) => ({
+                OR: [
+                  {
+                    name: {
+                      contains: term,
+                      mode: "insensitive",
+                    },
                   },
-                },
-                {
-                  description: {
-                    contains: selectedQuery,
-                    mode: "insensitive",
+                  {
+                    description: {
+                      contains: term,
+                      mode: "insensitive",
+                    },
                   },
-                },
-                {
-                  category: {
-                    contains: selectedQuery,
-                    mode: "insensitive",
+                  {
+                    category: {
+                      contains: term,
+                      mode: "insensitive",
+                    },
                   },
-                },
-              ],
+                ],
+              })),
             }
           : {}),
         ...(priceFilter ? { price: priceFilter } : {}),

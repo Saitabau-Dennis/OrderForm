@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import { useStore } from "./store-provider"
 import { storefrontPath } from "@/lib/storefront-path"
 import { createQuickCheckoutPayload, getQuickCheckoutStorageKey } from "./quick-checkout-storage"
+import { normalizeToken, variantLabelToStockKey } from "@/lib/inventory"
 
 type VariantGroup = {
   name: string
@@ -18,6 +19,7 @@ type ProductInfo = {
   name: string
   description: string | null
   price: number
+  isAvailable?: boolean
   stock?: number | null
   optionStocks?: Array<{ optionValue: string; stock: number }>
   imageUrl: string | null
@@ -161,16 +163,38 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
   const optionStockMap = useMemo(
     () =>
       new Map(
-        (product.optionStocks || []).map((row) => [row.optionValue.trim().toLowerCase(), row.stock])
+        (product.optionStocks || []).map((row) => [normalizeToken(row.optionValue), row.stock])
       ),
     [product.optionStocks]
   )
+  const selectedVariantStockKey = variantLabelToStockKey(selectedVariantLabel)
   const selectedOptionStockValues = Object.values(selectedOptions)
-    .map((value) => optionStockMap.get(value.trim().toLowerCase()))
+    .map((value) => optionStockMap.get(normalizeToken(value)))
     .filter((value): value is number => typeof value === "number" && Number.isFinite(value))
-  const selectedOptionStock = selectedOptionStockValues.length > 0 ? Math.min(...selectedOptionStockValues) : null
+  const selectedCombinationStock =
+    selectedVariantStockKey && optionStockMap.has(selectedVariantStockKey)
+      ? optionStockMap.get(selectedVariantStockKey)
+      : null
+  const selectedOptionStock =
+    typeof selectedCombinationStock === "number"
+      ? selectedCombinationStock
+      : selectedOptionStockValues.length > 0
+        ? Math.min(...selectedOptionStockValues)
+        : null
   const effectiveStock = selectedOptionStock ?? globalStock
-  const canPurchase = effectiveStock === null ? true : effectiveStock > 0
+  const isProductAvailable = product.isAvailable !== false
+  const hasStock = effectiveStock === null ? true : effectiveStock > 0
+  const canPurchase = isProductAvailable && hasStock
+  const stockStatusText = !isProductAvailable
+    ? "Currently unavailable"
+    : selectedOptionStock !== null
+      ? (selectedOptionStock > 0
+          ? `${selectedOptionStock.toLocaleString()} available for selected option`
+          : "Out of stock")
+      : globalStock !== null
+        ? (canPurchase ? `${globalStock.toLocaleString()} in stock` : "Out of stock")
+        : "Available"
+  const isStockAlert = stockStatusText === "Out of stock" || stockStatusText === "Currently unavailable"
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-KE", {
       style: "currency",
@@ -373,12 +397,8 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
           <div className="mt-4 flex items-center gap-3">
             <p className="text-2xl font-medium text-[#1A1A1A]">{formatPrice(product.price)}</p>
           </div>
-          <p className="mt-2 text-sm text-[#696963]">
-            {selectedOptionStock !== null
-              ? `${selectedOptionStock.toLocaleString()} available for selected option`
-              : globalStock !== null
-                ? (canPurchase ? `${globalStock.toLocaleString()} in stock` : "Out of stock")
-                : "Available"}
+          <p className={`mt-2 text-sm ${isStockAlert ? "text-red-600" : "text-[#696963]"}`}>
+            {stockStatusText}
           </p>
         </div>
 

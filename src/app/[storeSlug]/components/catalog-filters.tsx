@@ -1,7 +1,8 @@
 "use client"
 
-import Link from "next/link"
-import { ChevronDown } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useTransition } from "react"
+import { ChevronDown, Loader2 } from "lucide-react"
 import { storefrontPath } from "@/lib/storefront-path"
 import {
   DropdownMenu,
@@ -60,6 +61,8 @@ export function CatalogFilters({
   selectedPrice,
   selectedSort,
 }: CatalogFiltersProps) {
+  const router = useRouter()
+  const [isApplyingFilters, startApplyFiltersTransition] = useTransition()
   const catalogHref = storefrontPath(storeSlug, "/catalog")
 
   const buildCatalogHref = ({
@@ -99,33 +102,65 @@ export function CatalogFilters({
     selectedPrice !== "all" ||
     selectedSort !== "alpha-asc"
 
+  const applyFilters = ({
+    category,
+    query,
+    availability,
+    price,
+    sort,
+  }: {
+    category: string
+    query: string
+    availability: string
+    price: string
+    sort: string
+  }) => {
+    startApplyFiltersTransition(() => {
+      router.replace(
+        buildCatalogHref({
+          category,
+          query,
+          availability,
+          price,
+          sort,
+        }),
+        { scroll: false }
+      )
+    })
+  }
+
   return (
     <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-y border-[#E5E5E0] py-3 font-sans text-[#1A1A1A]">
       <div className="flex flex-wrap items-center gap-3">
-        <span className="text-sm font-medium">Filter:</span>
+        <span className="inline-flex items-center gap-2 text-sm font-medium">
+          Filter:
+          {isApplyingFilters ? <Loader2 className="h-3.5 w-3.5 animate-spin text-[#6D6D67]" /> : null}
+        </span>
         <DropdownMenu>
           <DropdownMenuTrigger className="inline-flex items-center gap-1.5 font-sans text-sm text-[#1F1F1C] hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2">
             {availabilityLabel}
             <ChevronDown className="h-4 w-4" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-52 font-sans">
+          <DropdownMenuContent align="start" className="w-52 [font-family:var(--font-geist-mono)]">
             {AVAILABILITY_OPTIONS.map((option) => (
-              <DropdownMenuItem key={option.value} asChild className="font-sans">
-                <Link
-                  href={buildCatalogHref({
+              <DropdownMenuItem
+                key={option.value}
+                onSelect={() =>
+                  applyFilters({
                     category: selectedCategory,
                     query: selectedQuery,
                     availability: option.value,
                     price: selectedPrice,
                     sort: selectedSort,
-                  })}
-                  className={cn(
-                    "w-full",
-                    selectedAvailability === option.value && "font-semibold text-[#111111]"
-                  )}
-                >
-                  {option.label}
-                </Link>
+                  })
+                }
+                disabled={isApplyingFilters}
+                className={cn(
+                  "[font-family:var(--font-geist-mono)]",
+                  selectedAvailability === option.value && "font-semibold text-[#111111]"
+                )}
+              >
+                {option.label}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
@@ -136,36 +171,48 @@ export function CatalogFilters({
             {priceLabel}
             <ChevronDown className="h-4 w-4" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-52 font-sans">
+          <DropdownMenuContent align="start" className="w-52 [font-family:var(--font-geist-mono)]">
             {PRICE_OPTIONS.map((option) => (
-              <DropdownMenuItem key={option.value} asChild className="font-sans">
-                <Link
-                  href={buildCatalogHref({
+              <DropdownMenuItem
+                key={option.value}
+                onSelect={() =>
+                  applyFilters({
                     category: selectedCategory,
                     query: selectedQuery,
                     availability: selectedAvailability,
                     price: option.value,
                     sort: selectedSort,
-                  })}
-                  className={cn(
-                    "w-full",
-                    selectedPrice === option.value && "font-semibold text-[#111111]"
-                  )}
-                >
-                  {option.label}
-                </Link>
+                  })
+                }
+                disabled={isApplyingFilters}
+                className={cn(
+                  "[font-family:var(--font-geist-mono)]",
+                  selectedPrice === option.value && "font-semibold text-[#111111]"
+                )}
+              >
+                {option.label}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
 
         {hasActiveFilters ? (
-          <Link
-            href={catalogHref}
+          <button
+            type="button"
+            onClick={() => {
+              applyFilters({
+                category: "",
+                query: "",
+                availability: "available",
+                price: "all",
+                sort: "alpha-asc",
+              })
+            }}
+            disabled={isApplyingFilters}
             className="text-sm font-medium text-[#6D6D67] underline decoration-[#BDBDB6] underline-offset-4 hover:text-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2"
           >
-            Clear filters
-          </Link>
+            {isApplyingFilters ? "Applying..." : "Clear filters"}
+          </button>
         ) : null}
       </div>
 
@@ -177,24 +224,26 @@ export function CatalogFilters({
               {sortLabel}
               <ChevronDown className="h-4 w-4" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 font-sans">
+            <DropdownMenuContent align="end" className="w-56 [font-family:var(--font-geist-mono)]">
               {SORT_OPTIONS.map((option) => (
-                <DropdownMenuItem key={option.value} asChild className="font-sans">
-                  <Link
-                    href={buildCatalogHref({
+                <DropdownMenuItem
+                  key={option.value}
+                  onSelect={() =>
+                    applyFilters({
                       category: selectedCategory,
                       query: selectedQuery,
                       availability: selectedAvailability,
                       price: selectedPrice,
                       sort: option.value,
-                    })}
-                    className={cn(
-                      "w-full",
-                      selectedSort === option.value && "font-semibold text-[#111111]"
-                    )}
-                  >
-                    {option.label}
-                  </Link>
+                    })
+                  }
+                  disabled={isApplyingFilters}
+                  className={cn(
+                    "[font-family:var(--font-geist-mono)]",
+                    selectedSort === option.value && "font-semibold text-[#111111]"
+                  )}
+                >
+                  {option.label}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>

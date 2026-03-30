@@ -41,10 +41,13 @@ interface ProductRecord {
   category?: string | null;
   description?: string | null;
   sizes?: string;
+  variants?: unknown;
   createdAt?: string;
   galleryImages?: string[];
   _count?: { orderItems?: number };
 }
+
+type ProductStatus = "active" | "out_of_stock" | "draft";
 
 type TableProduct = ComponentProps<typeof ProductsTable>["products"][number];
 type ProductFormInitialData = NonNullable<ComponentProps<typeof ProductForm>["initialData"]>;
@@ -64,6 +67,19 @@ export function ProductsClient({ initialProducts, canAddProduct }: ProductsClien
   // Delete State
   const [deleteProductData, setDeleteProductData] = useState<TableProduct | null>(null);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+
+  const getProductStatus = (product: ProductRecord): ProductStatus => {
+    if (!product.isAvailable) return "draft";
+
+    const hasOptionStocks = Array.isArray(product.optionStocks) && product.optionStocks.length > 0;
+    if (hasOptionStocks) {
+      const hasAnyOptionInStock = product.optionStocks!.some((row) => Number(row.stock) > 0);
+      return hasAnyOptionInStock ? "active" : "out_of_stock";
+    }
+
+    const globalStock = typeof product.stock === "number" ? product.stock : 0;
+    return globalStock > 0 ? "active" : "out_of_stock";
+  };
 
   const handleEdit = (product: TableProduct) => {
     const rawProduct = initialProducts.find((item) => item.id === product.id);
@@ -114,14 +130,45 @@ export function ProductsClient({ initialProducts, canAddProduct }: ProductsClien
   // Filter products by status
   const filteredProducts = initialProducts.filter((product) => {
     if (statusFilter === "all") return true;
-    if (statusFilter === "active") return product.isAvailable === true;
-    if (statusFilter === "draft") return product.isAvailable === false;
-    return true;
+    return getProductStatus(product) === statusFilter;
   });
-  const tableProducts = filteredProducts.map(toTableProduct);
+  const tableProducts = filteredProducts.map((product) => toTableProduct(product, getProductStatus(product)));
 
-  const activeCount = initialProducts.filter((p) => p.isAvailable).length;
-  const draftCount = initialProducts.filter((p) => !p.isAvailable).length;
+  const activeCount = initialProducts.filter((p) => getProductStatus(p) === "active").length;
+  const outOfStockCount = initialProducts.filter((p) => getProductStatus(p) === "out_of_stock").length;
+  const draftCount = initialProducts.filter((p) => getProductStatus(p) === "draft").length;
+
+  const getStatusLabel = (status: ProductStatus) => {
+    if (status === "active") return "Active";
+    if (status === "out_of_stock") return "Out of stock";
+    return "Draft";
+  };
+
+  const selectedProductStatus = selectedProduct
+    ? getProductStatus({
+        id: selectedProduct.id,
+        name: selectedProduct.name,
+        imageUrl: selectedProduct.imageUrl,
+        price: selectedProduct.price,
+        stock: typeof selectedProduct.stock === "number" ? selectedProduct.stock : 0,
+        optionStocks: Object.entries(selectedProduct.optionStocks || {}).map(([optionValue, stock]) => ({
+          optionValue,
+          stock,
+        })),
+        isAvailable: selectedProduct.isAvailable,
+        category: selectedProduct.category,
+        description: selectedProduct.description,
+        sizes: selectedProduct.sizes,
+      })
+    : null;
+
+  const tableStatusFilter = statusFilter;
+  const statusFilterOptions: Array<{ value: string; label: string; count: number }> = [
+    { value: "all", label: "All Products", count: initialProducts.length },
+    { value: "active", label: "Active", count: activeCount },
+    { value: "out_of_stock", label: "Out of stock", count: outOfStockCount },
+    { value: "draft", label: "Draft", count: draftCount },
+  ];
 
   return (
     <div className="space-y-6">
@@ -150,30 +197,19 @@ export function ProductsClient({ initialProducts, canAddProduct }: ProductsClien
                 Filter
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => setStatusFilter("all")}
-                className={cn(statusFilter === "all" && "bg-primary/5 text-primary")}
-              >
-                All Products
-                <span className="ml-auto rounded-md bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">{initialProducts.length}</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setStatusFilter("active")}
-                className={cn(statusFilter === "active" && "bg-primary/5 text-primary")}
-              >
-                Active
-                <span className="ml-auto rounded-md bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">{activeCount}</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setStatusFilter("draft")}
-                className={cn(statusFilter === "draft" && "bg-primary/5 text-primary")}
-              >
-                Draft
-                <span className="ml-auto rounded-md bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">{draftCount}</span>
-              </DropdownMenuItem>
+              {statusFilterOptions.map((option) => (
+                <DropdownMenuItem
+                  key={option.value}
+                  onClick={() => setStatusFilter(option.value)}
+                  className={cn(tableStatusFilter === option.value && "bg-primary/5 text-primary")}
+                >
+                  {option.label}
+                  <span className="ml-auto rounded-md bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">{option.count}</span>
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -229,7 +265,7 @@ export function ProductsClient({ initialProducts, canAddProduct }: ProductsClien
                   </div>
                   {selectedProduct ? (
                     <div className="rounded-full border border-border/70 bg-background/80 px-3 py-1.5 text-xs font-medium text-foreground">
-                      {selectedProduct.isAvailable ? "Active" : "Draft"}
+                      {selectedProductStatus ? getStatusLabel(selectedProductStatus) : "Draft"}
                     </div>
                   ) : null}
                 </div>
@@ -265,13 +301,14 @@ export function ProductsClient({ initialProducts, canAddProduct }: ProductsClien
   );
 }
 
-function toTableProduct(product: ProductRecord): TableProduct {
+function toTableProduct(product: ProductRecord, status: ProductStatus): TableProduct {
   return {
     id: product.id,
     name: product.name,
     price: Number(product.price ?? 0),
     imageUrl: product.imageUrl ?? undefined,
     isAvailable: product.isAvailable,
+    status,
     category: product.category ?? undefined,
     sizes: product.sizes ?? undefined,
     createdAt: product.createdAt,
@@ -285,7 +322,7 @@ function toProductFormInitialData(product: ProductRecord): ProductFormInitialDat
     name: product.name,
     description: product.description ?? "",
     price: Number(product.price ?? 0),
-    stock: typeof product.stock === "number" ? product.stock : "",
+    stock: typeof product.stock === "number" ? product.stock : 0,
     optionStocks: Array.isArray(product.optionStocks)
       ? Object.fromEntries(
           product.optionStocks.map((row) => [row.optionValue, Math.max(0, Math.trunc(Number(row.stock)))])
@@ -298,5 +335,6 @@ function toProductFormInitialData(product: ProductRecord): ProductFormInitialDat
       ? product.galleryImages.filter((value): value is string => typeof value === "string" && value.trim().length > 0)
       : [],
     sizes: product.sizes ?? "",
+    variants: product.variants ?? [],
   };
 }

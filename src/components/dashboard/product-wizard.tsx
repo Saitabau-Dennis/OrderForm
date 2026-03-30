@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Switch } from "@/components/ui/switch";
 import { createProduct } from "@/lib/actions/products";
+import { buildVariantStockKey } from "@/lib/inventory";
 import { cn } from "@/lib/utils";
 
 interface ProductWizardProps {
@@ -26,6 +27,11 @@ interface ProductWizardProps {
 type StoredVariant = {
   name: string;
   options: string[];
+};
+
+type VariantStockEntry = {
+  key: string;
+  label: string;
 };
 
 type VariantDraft = StoredVariant & {
@@ -71,6 +77,39 @@ const createVariantDraft = (name = "", options: string[] = []): VariantDraft => 
   options,
   valueInput: "",
 });
+
+function buildVariantStockEntries(variants: StoredVariant[]): VariantStockEntry[] {
+  if (variants.length === 0) return [];
+
+  if (variants.length === 1) {
+    return variants[0].options.map((option) => ({
+      key: option.trim().toLowerCase(),
+      label: option,
+    }));
+  }
+
+  const combine = (
+    index: number,
+    current: Array<{ name: string; value: string }>
+  ): VariantStockEntry[] => {
+    if (index >= variants.length) {
+      const key = buildVariantStockKey(current);
+      const label = current.map((part) => `${part.name}: ${part.value}`).join(" / ");
+      return [{ key, label }];
+    }
+
+    const group = variants[index];
+    const entries: VariantStockEntry[] = [];
+    for (const option of group.options) {
+      entries.push(
+        ...combine(index + 1, [...current, { name: group.name, value: option }])
+      );
+    }
+    return entries;
+  };
+
+  return combine(0, []);
+}
 
 const STEPS = [
   {
@@ -128,7 +167,7 @@ export function ProductWizard({ onSuccess, freshToken }: ProductWizardProps) {
       name: "",
       description: "",
       price: 0,
-      stock: "",
+      stock: 0,
       category: "",
       isAvailable: true,
       imageUrl: "",
@@ -208,6 +247,10 @@ export function ProductWizard({ onSuccess, freshToken }: ProductWizardProps) {
         }))
         .filter((variant) => variant.name.length > 0 && variant.options.length > 0),
     [variantDrafts],
+  );
+  const variantStockEntries = useMemo(
+    () => buildVariantStockEntries(selectedVariants),
+    [selectedVariants]
   );
 
   useEffect(() => {
@@ -583,7 +626,7 @@ export function ProductWizard({ onSuccess, freshToken }: ProductWizardProps) {
 
               <div className="space-y-1.5">
                 <Label htmlFor="stock" className="text-xs text-muted-foreground">
-                  Available Stock (Optional)
+                  Available Stock
                 </Label>
                 <Input
                   id="stock"
@@ -592,7 +635,7 @@ export function ProductWizard({ onSuccess, freshToken }: ProductWizardProps) {
                   placeholder="e.g. 300"
                   className="h-10 rounded-md"
                   {...form.register("stock", {
-                    setValueAs: (value) => (value === "" ? "" : Number(value)),
+                    setValueAs: (value) => Number(value),
                   })}
                 />
                 {form.formState.errors.stock && (
@@ -742,26 +785,26 @@ export function ProductWizard({ onSuccess, freshToken }: ProductWizardProps) {
 
               {selectedVariants.length > 0 ? (
                 <div className="rounded-lg border border-border bg-background p-4">
-                  <p className="text-xs font-medium text-foreground">Stock by Option (Optional)</p>
+                  <p className="text-xs font-medium text-foreground">Stock by Option</p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Set quantity per size/variant value. Leave empty for unlimited.
+                    Set quantity for every size/variant value.
                   </p>
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                    {Array.from(new Set(selectedVariants.flatMap((variant) => variant.options))).map((option) => (
-                      <div key={`wizard-option-stock-${option}`} className="space-y-1.5">
-                        <Label className="text-xs text-muted-foreground">{option}</Label>
+                    {variantStockEntries.map((entry) => (
+                      <div key={`wizard-option-stock-${entry.key}`} className="space-y-1.5">
+                        <Label className="text-xs text-muted-foreground">{entry.label}</Label>
                         <Input
                           type="number"
                           min={0}
                           placeholder="0"
                           className="h-9 rounded-md"
-                          value={String((formData.optionStocks?.[option] ?? ""))}
+                          value={String((formData.optionStocks?.[entry.key] ?? ""))}
                           onChange={(event) => {
                             const current = { ...(form.getValues("optionStocks") || {}) };
                             if (event.target.value === "") {
-                              delete current[option];
+                              delete current[entry.key];
                             } else {
-                              current[option] = Math.max(0, Math.trunc(Number(event.target.value)));
+                              current[entry.key] = Math.max(0, Math.trunc(Number(event.target.value)));
                             }
                             form.setValue("optionStocks", current, { shouldDirty: true });
                           }}
@@ -774,6 +817,9 @@ export function ProductWizard({ onSuccess, freshToken }: ProductWizardProps) {
 
               {form.formState.errors.sizes && (
                 <p className="text-xs text-red-500">{form.formState.errors.sizes.message}</p>
+              )}
+              {form.formState.errors.optionStocks && (
+                <p className="text-xs text-red-500">{form.formState.errors.optionStocks.message as string}</p>
               )}
             </div>
           )}
@@ -851,10 +897,7 @@ export function ProductWizard({ onSuccess, freshToken }: ProductWizardProps) {
                   },
                   {
                     label: "Stock Qty",
-                    value:
-                      formData.stock === "" || formData.stock === undefined
-                        ? "Not set"
-                        : Number(formData.stock).toLocaleString(),
+                    value: Number(formData.stock).toLocaleString(),
                     step: 2,
                   },
                   {

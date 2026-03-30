@@ -34,7 +34,7 @@ export default async function ProductPage({
   }
 
   let product = await db.product.findFirst({
-    where: { id: productId, storeId: store.id },
+    where: { id: productId, storeId: store.id, isAvailable: true },
     include: { optionStocks: true },
   })
 
@@ -50,7 +50,7 @@ export default async function ProductPage({
     const matched = productsForSlugMatch.find((item) => slugify(item.name) === requestedSlug)
     if (matched) {
       product = await db.product.findFirst({
-        where: { id: matched.id, storeId: store.id },
+        where: { id: matched.id, storeId: store.id, isAvailable: true },
         include: { optionStocks: true },
       })
     }
