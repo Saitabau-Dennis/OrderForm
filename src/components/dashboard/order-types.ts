@@ -17,6 +17,15 @@ export interface DashboardOrder {
   subtotal?: number | string | null
   deliveryFee?: number | string | null
   fulfillmentMethod?: "SHOP_PICKUP" | "DELIVERY" | string
+  shipToDifferentAddress?: boolean
+  billingAddressLine1?: string | null
+  billingAddressLine2?: string | null
+  billingZoneId?: string | null
+  shippingRecipientName?: string | null
+  shippingRecipientPhone?: string | null
+  shippingAddressLine1?: string | null
+  shippingAddressLine2?: string | null
+  shippingZoneId?: string | null
   deliveryAddress?: string | null
   deliveryZone?: string | null
   notes?: string | null

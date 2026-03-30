@@ -216,6 +216,15 @@ model Order {
 
   customerName    String
   customerPhone   String
+  shipToDifferentAddress Boolean @default(false)
+  billingAddressLine1    String?
+  billingAddressLine2    String?
+  billingZoneId          String?
+  shippingRecipientName  String?
+  shippingRecipientPhone String?
+  shippingAddressLine1   String?
+  shippingAddressLine2   String?
+  shippingZoneId         String?
   fulfillmentMethod FulfillmentMethod @default(DELIVERY)
   deliveryAddress String?
   deliveryZoneId   String?

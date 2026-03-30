@@ -25,9 +25,10 @@ interface OrdersClientProps {
   stats: OrdersStats;
   standalone?: boolean;
   storeName: string;
+  storePhone?: string | null;
 }
 
-export function OrdersClient({ initialOrders, stats, standalone = true, storeName }: OrdersClientProps) {
+export function OrdersClient({ initialOrders, stats, standalone = true, storeName, storePhone }: OrdersClientProps) {
   const [orders, setOrders] = useState(initialOrders);
   const [selectedOrder, setSelectedOrder] = useState<DashboardOrder | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -238,6 +239,7 @@ export function OrdersClient({ initialOrders, stats, standalone = true, storeNam
               <OrderDetails
                 order={selectedOrder}
                 storeName={storeName}
+                storePhone={storePhone}
                 onUpdateStatus={handleUpdateStatus}
                 onClose={() => setSelectedOrder(null)}
               />

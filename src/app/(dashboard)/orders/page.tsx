@@ -61,6 +61,7 @@ export default async function OrdersPage() {
         initialOrders={JSON.parse(JSON.stringify(orders))}
         stats={stats}
         storeName={store?.name || "Your store"}
+        storePhone={store?.whatsappNumber || null}
       />
     </div>
   );
