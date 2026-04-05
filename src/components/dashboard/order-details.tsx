@@ -1,7 +1,6 @@
 "use client";
 
 import { format } from "date-fns";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/dashboard/dashboard-button";
 import { Printer, X } from "lucide-react";
 import { formatOrderId } from "@/lib/utils";
@@ -11,13 +10,11 @@ export function OrderDetails({
   order,
   storeName,
   storePhone,
-  onUpdateStatus,
   onClose,
 }: {
   order: DashboardOrder;
   storeName: string;
   storePhone?: string | null;
-  onUpdateStatus: (orderId: string, status: string) => void;
   onClose?: () => void;
 }) {
   return (
@@ -122,17 +119,9 @@ export function OrderDetails({
 
       {/* Actions bar — hidden on print */}
       <div className="border-t p-4 flex items-center gap-2 no-print">
-        <Select defaultValue={order.status} onValueChange={(val) => onUpdateStatus(order.id, val)}>
-          <SelectTrigger className="h-8 flex-1 text-xs">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="processing">Processing</SelectItem>
-            <SelectItem value="completed">Completed</SelectItem>
-            <SelectItem value="cancelled">Cancelled</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="h-8 flex-1 rounded-md border px-3 text-xs flex items-center capitalize text-muted-foreground">
+          Status: {order.status}
+        </div>
         <Button
           onClick={() => window.print()}
           variant="outline"

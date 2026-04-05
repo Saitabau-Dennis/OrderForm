@@ -10,6 +10,7 @@ const STATUS_DOT: Record<string, string> = {
   processing: "bg-primary/60",
   completed: "bg-primary",
   cancelled: "bg-destructive/60",
+  abandoned: "bg-amber-500/80",
 };
 
 interface OrdersTableProps {

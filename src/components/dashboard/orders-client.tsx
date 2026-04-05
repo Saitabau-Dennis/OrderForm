@@ -14,9 +14,6 @@ import {
 import { cn } from "@/lib/utils";
 import { OrdersTable } from "./orders-table";
 import { OrderDetails } from "./order-details";
-import { updateOrderStatus } from "@/lib/actions/orders";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { formatOrderId } from "@/lib/utils";
 import { DashboardOrder, OrdersStats } from "./order-types";
 
@@ -29,27 +26,10 @@ interface OrdersClientProps {
 }
 
 export function OrdersClient({ initialOrders, stats, standalone = true, storeName, storePhone }: OrdersClientProps) {
-  const [orders, setOrders] = useState(initialOrders);
+  const [orders] = useState(initialOrders);
   const [selectedOrder, setSelectedOrder] = useState<DashboardOrder | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const router = useRouter();
-
-  const handleUpdateStatus = async (orderId: string, status: string) => {
-    const result = await updateOrderStatus(orderId, status);
-    if (result.error) {
-      toast.error(result.error);
-    } else {
-      toast.success("Order status updated");
-      setOrders((prev: DashboardOrder[]) =>
-        prev.map((o) => (o.id === orderId ? { ...o, status } : o))
-      );
-      if (selectedOrder?.id === orderId) {
-        setSelectedOrder((prev) => (prev ? { ...prev, status } : prev));
-      }
-      router.refresh();
-    }
-  };
 
   const filteredOrders = useMemo(() => {
     let result = orders;
@@ -176,7 +156,7 @@ export function OrdersClient({ initialOrders, stats, standalone = true, storeNam
                     <DropdownMenuContent align="end" className="w-44">
                       <DropdownMenuLabel>Filter Orders</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      {["all", "pending", "processing", "completed", "cancelled"].map((s) => (
+                      {["all", "pending", "processing", "completed", "cancelled", "abandoned"].map((s) => (
                         <DropdownMenuItem
                           key={s}
                           onClick={() => setStatusFilter(s)}
@@ -240,7 +220,6 @@ export function OrdersClient({ initialOrders, stats, standalone = true, storeNam
                 order={selectedOrder}
                 storeName={storeName}
                 storePhone={storePhone}
-                onUpdateStatus={handleUpdateStatus}
                 onClose={() => setSelectedOrder(null)}
               />
             ) : (
