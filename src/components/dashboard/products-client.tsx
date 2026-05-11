@@ -147,7 +147,7 @@ export function ProductsClient({ initialProducts, canAddProduct }: ProductsClien
   const selectedProductStatus = selectedProduct
     ? getProductStatus({
         id: selectedProduct.id,
-        name: selectedProduct.name,
+        name: selectedProduct.name ?? "",
         imageUrl: selectedProduct.imageUrl,
         price: selectedProduct.price,
         stock: typeof selectedProduct.stock === "number" ? selectedProduct.stock : 0,
@@ -155,7 +155,7 @@ export function ProductsClient({ initialProducts, canAddProduct }: ProductsClien
           optionValue,
           stock,
         })),
-        isAvailable: selectedProduct.isAvailable,
+        isAvailable: selectedProduct.isAvailable ?? true,
         category: selectedProduct.category,
         description: selectedProduct.description,
         sizes: selectedProduct.sizes,
