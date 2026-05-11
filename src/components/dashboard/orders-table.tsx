@@ -10,6 +10,7 @@ const STATUS_DOT: Record<string, string> = {
   processing: "bg-primary/60",
   completed: "bg-primary",
   cancelled: "bg-destructive/60",
+  abandoned: "bg-amber-500/80",
 };
 
 interface OrdersTableProps {
@@ -19,56 +20,65 @@ interface OrdersTableProps {
 }
 
 export function OrdersTable({ orders, onView, selectedOrderId }: OrdersTableProps) {
+  const shouldScroll = orders.length > 6;
+
   return (
-    <table className="w-full text-left">
-      <thead>
-        <tr className="border-t border-b text-xs uppercase tracking-wider text-muted-foreground">
-          <th className="px-5 py-3 font-medium">Order No</th>
-          <th className="px-5 py-3 font-medium">Customer</th>
-          <th className="px-5 py-3 font-medium">Status</th>
-          <th className="px-5 py-3 font-medium">Date</th>
-          <th className="px-5 py-3 font-medium text-right">Total Amount</th>
-        </tr>
-      </thead>
-      <tbody>
-        {orders.map((order) => (
-          <tr
-            key={order.id}
-            onClick={() => onView?.(order)}
-            className={cn(
-              "cursor-pointer transition-colors text-[15px]",
-              selectedOrderId === order.id
-                ? "bg-muted/40"
-                : "hover:bg-muted/20"
-            )}
-          >
-            <td className="px-5 py-4">
-              <span className="font-normal text-foreground">
-                {formatOrderId(order.displayId || order.orderNumber || order.id)}
-              </span>
-            </td>
-            <td className="px-5 py-4">
-              <span className="font-normal text-foreground">{order.customerName}</span>
-            </td>
-            <td className="px-5 py-3.5">
-              <div className="flex items-center gap-1.5">
-                <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", STATUS_DOT[order.status] || STATUS_DOT.pending)} />
-                <span className="font-normal text-foreground capitalize text-xs">{order.status}</span>
-              </div>
-            </td>
-            <td className="px-5 py-3.5">
-              <span className="font-normal text-muted-foreground text-xs">
-                {format(new Date(order.createdAt), "MMM d, yyyy")}
-              </span>
-            </td>
-            <td className="px-5 py-3.5 text-right">
-              <span className="font-normal text-foreground">
-                KSH {Number(order.totalAmount).toLocaleString()}
-              </span>
-            </td>
+    <div
+      className={cn(
+        shouldScroll &&
+          "no-scrollbar max-h-[430px] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+      )}
+    >
+      <table className="w-full text-left">
+        <thead>
+          <tr className="border-t border-b text-xs uppercase tracking-wider text-muted-foreground">
+            <th className="px-5 py-3 font-medium">Order No</th>
+            <th className="px-5 py-3 font-medium">Customer</th>
+            <th className="px-5 py-3 font-medium">Status</th>
+            <th className="px-5 py-3 font-medium">Date</th>
+            <th className="px-5 py-3 font-medium text-right">Total Amount</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {orders.map((order) => (
+            <tr
+              key={order.id}
+              onClick={() => onView?.(order)}
+              className={cn(
+                "cursor-pointer transition-colors text-[15px]",
+                selectedOrderId === order.id
+                  ? "bg-muted/40"
+                  : "hover:bg-muted/20"
+              )}
+            >
+              <td className="px-5 py-4">
+                <span className="font-normal text-foreground">
+                  {formatOrderId(order.displayId || order.orderNumber || order.id)}
+                </span>
+              </td>
+              <td className="px-5 py-4">
+                <span className="font-normal text-foreground">{order.customerName}</span>
+              </td>
+              <td className="px-5 py-3.5">
+                <div className="flex items-center gap-1.5">
+                  <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", STATUS_DOT[order.status] || STATUS_DOT.pending)} />
+                  <span className="font-normal text-foreground capitalize text-xs">{order.status}</span>
+                </div>
+              </td>
+              <td className="px-5 py-3.5">
+                <span className="font-normal text-muted-foreground text-xs">
+                  {format(new Date(order.createdAt), "MMM d, yyyy")}
+                </span>
+              </td>
+              <td className="px-5 py-3.5 text-right">
+                <span className="font-normal text-foreground">
+                  KSH {Number(order.totalAmount).toLocaleString()}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }

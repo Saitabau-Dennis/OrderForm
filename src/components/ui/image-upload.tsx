@@ -168,6 +168,7 @@ export function ImageUpload({
             alt="Preview"
             fill
             unoptimized
+            loading="eager"
             className={`object-cover transition-transform group-hover:scale-[1.02] ${isUploading ? "opacity-50" : ""}`}
           />
           {isUploading && (

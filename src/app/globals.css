@@ -180,9 +180,9 @@ html::-webkit-scrollbar {
 }
 
 .theme-store {
-  font-family: var(--font-jakarta), sans-serif;
-  --font-sans: var(--font-jakarta);
-  --font-heading: var(--font-sora);
+  font-family: var(--font-azeret-mono), monospace;
+  --font-sans: var(--font-azeret-mono);
+  --font-heading: var(--font-azeret-mono);
   --background: #F7F7F5;
   --foreground: #1A1A1A;
   --muted-foreground: #737373;
@@ -191,11 +191,11 @@ html::-webkit-scrollbar {
 }
 
 .theme-store :is(button, input, textarea, select) {
-  font-family: var(--font-jakarta), sans-serif;
+  font-family: var(--font-azeret-mono), monospace;
 }
 
 .theme-store :is(h1, h2, h3, h4, h5, h6) {
-  font-family: var(--font-sora), sans-serif;
+  font-family: var(--font-azeret-mono), monospace;
 }
 
 @layer base {
@@ -211,6 +211,15 @@ html::-webkit-scrollbar {
 @layer utilities {
   .font-logo {
     font-family: var(--font-brand-display), var(--font-sans), sans-serif;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }
 

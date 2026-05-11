@@ -121,10 +121,10 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
                 <li>If there is <strong>NO PROMPT</strong> on your phone, the M-PESA balance could be insufficient, top up the M-PESA account and try again.</li>
                 <li>Enter your <strong>M-PESA PIN</strong> and the amount specified on the notification will be deducted from your M-PESA account when you press send.</li>
                 <li>When you enter the pin and click on send, you will receive an M-PESA payment confirmation message on your mobile phone.</li>
-                <li>After receiving the confirmation message please click <strong>Complete Order</strong> below to finish your order.</li>
+                <li>The order is marked as completed automatically once payment confirmation is received.</li>
               </ol>
 
-              <PaymentActions storeSlug={store.slug} method="mpesa" />
+              <PaymentActions storeSlug={store.slug} orderId={orderId || null} method="mpesa" />
             </section>
           ) : (
             <section className="pt-6">
@@ -143,7 +143,7 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
                 />
               </div>
 
-              <PaymentActions storeSlug={store.slug} method="card" />
+              <PaymentActions storeSlug={store.slug} orderId={orderId || null} method="card" />
             </section>
           )}
         </div>

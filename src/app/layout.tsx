@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Sora, Outfit, Signika, DM_Sans, Instrument_Serif, Poppins, Plus_Jakarta_Sans, Bungee, Montserrat } from "next/font/google";
+import { Inter, Sora, Outfit, Signika, DM_Sans, Instrument_Serif, Poppins, Plus_Jakarta_Sans, Bungee, Montserrat, Azeret_Mono } from "next/font/google";
 import { GeistSans } from "geist/font/sans";
 import { Analytics } from "@vercel/analytics/next";
 import localFont from "next/font/local";
@@ -29,6 +29,10 @@ const montserrat = Montserrat({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
   variable: "--font-montserrat",
+});
+const azeretMono = Azeret_Mono({
+  subsets: ["latin"],
+  variable: "--font-azeret-mono",
 });
 const instrumentSerif = Instrument_Serif({
   weight: "400",
@@ -102,8 +106,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning translate="no" className="notranslate">
-      <body className={`${inter.variable} ${sora.variable} ${outfit.variable} ${signika.variable} ${dmSans.variable} ${instrumentSerif.variable} ${poppins.variable} ${jakarta.variable} ${bungee.variable} ${montserrat.variable} ${GeistSans.variable} ${clashDisplay.variable} ${adcure.variable} ${goodly.variable} notranslate font-sans antialiased`}>
+    <html lang="en" suppressHydrationWarning translate="no" data-scroll-behavior="smooth" className="notranslate">
+      <body className={`${inter.variable} ${sora.variable} ${outfit.variable} ${signika.variable} ${dmSans.variable} ${instrumentSerif.variable} ${poppins.variable} ${jakarta.variable} ${bungee.variable} ${montserrat.variable} ${azeretMono.variable} ${GeistSans.variable} ${clashDisplay.variable} ${adcure.variable} ${goodly.variable} notranslate font-sans antialiased`}>
         <Providers>
           {children}
         </Providers>

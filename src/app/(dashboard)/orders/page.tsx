@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { OrdersClient } from "@/components/dashboard/orders-client";
 import db from "@/lib/db";
+import { reconcileStaleMockPayments } from "@/lib/actions/mock-payments";
 
 export const metadata: Metadata = {
   title: "Orders",
@@ -15,6 +16,10 @@ export default async function OrdersPage() {
   const store = await db.store.findFirst({
     where: { userId: session.user.id }
   });
+
+  if (store?.slug) {
+    await reconcileStaleMockPayments({ storeSlug: store.slug });
+  }
 
   const orders = store
     ? await db.order.findMany({
@@ -61,6 +66,7 @@ export default async function OrdersPage() {
         initialOrders={JSON.parse(JSON.stringify(orders))}
         stats={stats}
         storeName={store?.name || "Your store"}
+        storePhone={store?.whatsappNumber || null}
       />
     </div>
   );

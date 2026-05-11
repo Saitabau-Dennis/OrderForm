@@ -4,15 +4,13 @@ import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import db from "@/lib/db";
 import { z } from "zod";
+import { getDeclaredOptionStockKeys, normalizeToken } from "@/lib/inventory";
 
 const ProductInputSchema = z.object({
   name: z.string().min(1, "Product name is required"),
   description: z.string().optional().nullable(),
   price: z.coerce.number().positive("Price must be greater than 0"),
-  stock: z.preprocess(
-    (value) => (value === "" || value === undefined ? null : value),
-    z.coerce.number().int().min(0).nullable()
-  ),
+  stock: z.coerce.number().int().min(0, "Stock is required"),
   optionStocks: z.record(z.string(), z.coerce.number().int().min(0)).optional().default({}),
   imageUrl: z.string().optional().nullable(),
   galleryImages: z.array(z.string()).optional().default([]),
@@ -35,7 +33,7 @@ const normalizeGallery = (images: string[] | undefined) =>
 const normalizeOptionStocks = (optionStocks: Record<string, number> | undefined) =>
   Object.entries(optionStocks ?? {})
     .map(([optionValue, stock]) => ({
-      optionValue: optionValue.trim().toLowerCase(),
+      optionValue: normalizeToken(optionValue),
       stock: Math.max(0, Math.trunc(Number(stock))),
     }))
     .filter((row) => row.optionValue.length > 0);
@@ -64,6 +62,18 @@ export async function createProduct(data: unknown) {
     }
 
     const normalizedOptionStocks = normalizeOptionStocks(payload.optionStocks);
+    const declaredOptions = new Set(getDeclaredOptionStockKeys(payload.sizes, payload.variants));
+    const hasUndeclaredOptionStocks = normalizedOptionStocks.some(
+      (row) => !declaredOptions.has(row.optionValue)
+    );
+    if (hasUndeclaredOptionStocks) {
+      return { error: "Option stock values must match your configured sizes/variants." };
+    }
+    const normalizedOptionStockKeys = new Set(normalizedOptionStocks.map((row) => row.optionValue));
+    const missingOptionStocks = Array.from(declaredOptions).filter((option) => !normalizedOptionStockKeys.has(option));
+    if (missingOptionStocks.length > 0) {
+      return { error: `Set stock for all size/variant options: ${missingOptionStocks.join(", ")}` };
+    }
     const product = await db.$transaction(async (tx) => {
       const createdProduct = await tx.product.create({
         data: {
@@ -71,7 +81,7 @@ export async function createProduct(data: unknown) {
           name: payload.name,
           description: payload.description ?? null,
           price: payload.price,
-          stock: payload.stock ?? null,
+          stock: payload.stock,
           imageUrl: payload.imageUrl ?? null,
           galleryImages: normalizeGallery(payload.galleryImages),
           category: payload.category ?? null,
@@ -132,6 +142,18 @@ export async function updateProduct(id: string, data: unknown) {
     }
 
     const normalizedOptionStocks = normalizeOptionStocks(payload.optionStocks);
+    const declaredOptions = new Set(getDeclaredOptionStockKeys(payload.sizes, payload.variants));
+    const hasUndeclaredOptionStocks = normalizedOptionStocks.some(
+      (row) => !declaredOptions.has(row.optionValue)
+    );
+    if (hasUndeclaredOptionStocks) {
+      return { error: "Option stock values must match your configured sizes/variants." };
+    }
+    const normalizedOptionStockKeys = new Set(normalizedOptionStocks.map((row) => row.optionValue));
+    const missingOptionStocks = Array.from(declaredOptions).filter((option) => !normalizedOptionStockKeys.has(option));
+    if (missingOptionStocks.length > 0) {
+      return { error: `Set stock for all size/variant options: ${missingOptionStocks.join(", ")}` };
+    }
     const updatedProduct = await db.$transaction(async (tx) => {
       const nextProduct = await tx.product.update({
         where: { id: id },
@@ -139,7 +161,7 @@ export async function updateProduct(id: string, data: unknown) {
           name: payload.name,
           description: payload.description ?? null,
           price: payload.price,
-          stock: payload.stock ?? null,
+          stock: payload.stock,
           imageUrl: payload.imageUrl ?? null,
           galleryImages: normalizeGallery(payload.galleryImages),
           category: payload.category ?? null,

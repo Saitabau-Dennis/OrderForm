@@ -2,8 +2,12 @@
 
 import { useMemo, useState } from "react"
 import Image from "next/image"
-import { ChevronLeft, ChevronRight, Heart, Minus, Plus } from "lucide-react"
+import { ChevronLeft, ChevronRight, Heart, Minus, Plus, Share2 } from "lucide-react"
+import { toast } from "sonner"
 import { useStore } from "./store-provider"
+import { storefrontPath } from "@/lib/storefront-path"
+import { createQuickCheckoutPayload, getQuickCheckoutStorageKey } from "./quick-checkout-storage"
+import { normalizeToken, variantLabelToStockKey } from "@/lib/inventory"
 
 type VariantGroup = {
   name: string
@@ -15,6 +19,7 @@ type ProductInfo = {
   name: string
   description: string | null
   price: number
+  isAvailable?: boolean
   stock?: number | null
   optionStocks?: Array<{ optionValue: string; stock: number }>
   imageUrl: string | null
@@ -28,6 +33,7 @@ type StoreInfo = {
   name: string
   brandColor: string
   currency: string
+  slug: string
 }
 
 // Parses flexible variant JSON from DB/editor into a UI-safe structure.
@@ -157,16 +163,38 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
   const optionStockMap = useMemo(
     () =>
       new Map(
-        (product.optionStocks || []).map((row) => [row.optionValue.trim().toLowerCase(), row.stock])
+        (product.optionStocks || []).map((row) => [normalizeToken(row.optionValue), row.stock])
       ),
     [product.optionStocks]
   )
+  const selectedVariantStockKey = variantLabelToStockKey(selectedVariantLabel)
   const selectedOptionStockValues = Object.values(selectedOptions)
-    .map((value) => optionStockMap.get(value.trim().toLowerCase()))
+    .map((value) => optionStockMap.get(normalizeToken(value)))
     .filter((value): value is number => typeof value === "number" && Number.isFinite(value))
-  const selectedOptionStock = selectedOptionStockValues.length > 0 ? Math.min(...selectedOptionStockValues) : null
+  const selectedCombinationStock =
+    selectedVariantStockKey && optionStockMap.has(selectedVariantStockKey)
+      ? optionStockMap.get(selectedVariantStockKey)
+      : null
+  const selectedOptionStock =
+    typeof selectedCombinationStock === "number"
+      ? selectedCombinationStock
+      : selectedOptionStockValues.length > 0
+        ? Math.min(...selectedOptionStockValues)
+        : null
   const effectiveStock = selectedOptionStock ?? globalStock
-  const canPurchase = effectiveStock === null ? true : effectiveStock > 0
+  const isProductAvailable = product.isAvailable !== false
+  const hasStock = effectiveStock === null ? true : effectiveStock > 0
+  const canPurchase = isProductAvailable && hasStock
+  const stockStatusText = !isProductAvailable
+    ? "Currently unavailable"
+    : selectedOptionStock !== null
+      ? (selectedOptionStock > 0
+          ? `${selectedOptionStock.toLocaleString()} available for selected option`
+          : "Out of stock")
+      : globalStock !== null
+        ? (canPurchase ? `${globalStock.toLocaleString()} in stock` : "Out of stock")
+        : "Available"
+  const isStockAlert = stockStatusText === "Out of stock" || stockStatusText === "Currently unavailable"
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-KE", {
       style: "currency",
@@ -211,7 +239,29 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
   }
 
   const handleAddToCart = () => addItemToCart()
-  const handleBuyNow = () => addItemToCart()
+  const handleBuyNow = () => {
+    if (!canPurchase) return
+
+    try {
+      const quickCheckoutPayload = createQuickCheckoutPayload(store.slug, {
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.imageUrl,
+        variant: selectedVariantLabel || null,
+        quantity,
+      })
+
+      localStorage.setItem(
+        getQuickCheckoutStorageKey(store.slug),
+        JSON.stringify(quickCheckoutPayload)
+      )
+    } catch (error) {
+      console.error("Failed to prepare quick checkout payload", error)
+    }
+
+    window.location.assign(`${storefrontPath(store.slug, "/checkout")}?quick=1`)
+  }
 
   const handleToggleWishlist = () => {
     const nextIsWishlisted = !isWishlisted
@@ -227,6 +277,33 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
     }
   }
 
+  const handleShareProduct = async () => {
+    const productPath = storefrontPath(store.slug, `/catalog/${product.id}`)
+    const productUrl = new URL(productPath, window.location.origin).toString()
+    const shareData = {
+      title: product.name,
+      text: `Check out this product from ${store.name}`,
+      url: productUrl,
+    }
+
+    try {
+      if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+        await navigator.share(shareData)
+        return
+      }
+
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(productUrl)
+        toast.success("Product link copied")
+        return
+      }
+
+      toast.error("Sharing is not available on this device")
+    } catch {
+      toast.error("Could not share this product")
+    }
+  }
+
   return (
     <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 items-start gap-9 pb-36 lg:grid-cols-[minmax(0,56%)_minmax(0,44%)] lg:gap-8 lg:pb-0">
       <div className="space-y-3 lg:sticky lg:top-20 lg:self-start">
@@ -238,6 +315,7 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
               alt={product.name}
               fill
               priority
+              loading="eager"
               className="object-cover object-center"
               sizes="(max-width: 1024px) 100vw, 56vw"
             />
@@ -297,7 +375,7 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#6E6E68]">{product.category}</p>
           ) : null}
 
-          <h1 className="font-serif text-2xl font-medium leading-tight tracking-tight text-[#171715] sm:text-3xl md:text-5xl">
+          <h1 className="text-2xl font-medium leading-tight tracking-tight text-[#171715] sm:text-3xl md:text-5xl">
             {product.name}
           </h1>
 
@@ -319,12 +397,8 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
           <div className="mt-4 flex items-center gap-3">
             <p className="text-2xl font-medium text-[#1A1A1A]">{formatPrice(product.price)}</p>
           </div>
-          <p className="mt-2 text-sm text-[#696963]">
-            {selectedOptionStock !== null
-              ? `${selectedOptionStock.toLocaleString()} available for selected option`
-              : globalStock !== null
-                ? (canPurchase ? `${globalStock.toLocaleString()} in stock` : "Out of stock")
-                : "Available"}
+          <p className={`mt-2 text-sm ${isStockAlert ? "text-red-600" : "text-[#696963]"}`}>
+            {stockStatusText}
           </p>
         </div>
 
@@ -425,6 +499,15 @@ export function ProductDetailsClient({ product, store }: { product: ProductInfo;
           >
             <Heart className={`h-4 w-4 ${isWishlisted ? "fill-white" : ""}`} />
             <span>{isWishlisted ? "Added to wishlist" : "Add to wishlist"}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleShareProduct}
+            className="inline-flex h-10 w-full items-center justify-center gap-2 border border-[#D9D9D4] bg-card px-4 text-sm font-medium text-[#1A1A1A] transition-colors hover:border-[#1A1A1A] hover:bg-[#F7F7F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2 sm:w-auto"
+          >
+            <Share2 className="h-4 w-4" />
+            <span>Share product</span>
           </button>
         </div>
 

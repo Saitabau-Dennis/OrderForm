@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { createProduct, getStoreCategories, updateProduct } from "@/lib/actions/products";
+import { buildVariantStockKey, getDeclaredOptionStockKeys, parseVariantGroups } from "@/lib/inventory";
 import { cn } from "@/lib/utils";
 
 // Converts rich-text HTML into plain text for "required description" checks.
@@ -29,14 +30,34 @@ export const productSchema = z.object({
   description: z.string().refine((value) => stripRichText(value).length > 0, {
     message: "Description is required",
   }),
-  price: z.coerce.number().min(0, "Price must be positive"),
-  stock: z.union([z.literal(""), z.coerce.number().int().min(0)]).optional().default(""),
+  price: z.coerce.number().positive("Price must be greater than 0"),
+  stock: z.coerce.number().int().min(0, "Stock is required"),
   optionStocks: z.record(z.string(), z.coerce.number().int().min(0)).optional().default({}),
   category: z.string().min(1, "Category is required"),
   isAvailable: z.boolean().default(true),
   imageUrl: z.string().min(1, "Product image is required"),
   galleryImages: z.array(z.string()).default([]),
   sizes: z.string().min(1, "At least one size/variant is required"),
+  variants: z.unknown().optional().default([]),
+}).superRefine((values, ctx) => {
+  const declaredOptions = getDeclaredOptionStockKeys(values.sizes, values.variants);
+
+  if (declaredOptions.length === 0) return;
+
+  const normalizedOptionStocks = new Set(
+    Object.keys(values.optionStocks || {})
+      .map((key) => key.trim().toLowerCase())
+      .filter(Boolean)
+  );
+
+  const missing = declaredOptions.filter((option) => !normalizedOptionStocks.has(option));
+  if (missing.length > 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["optionStocks"],
+      message: `Set stock for all size/variant options: ${missing.join(", ")}`,
+    });
+  }
 });
 
 type ProductFormInput = z.input<typeof productSchema>;
@@ -92,6 +113,50 @@ export function ProductForm({ initialData, onSuccess, onCancel, layout = "defaul
     resolver: zodResolver(productSchema),
     defaultValues: buildDefaultValues(initialData),
   });
+  const variantGroups = parseVariantGroups(form.watch("variants"));
+  const declaredOptionStockEntries = (() => {
+    if (variantGroups.length > 0) {
+      if (variantGroups.length === 1) {
+        return variantGroups[0].options.map((option) => ({
+          key: option.trim().toLowerCase(),
+          label: option,
+        }));
+      }
+
+      const combine = (
+        index: number,
+        current: Array<{ name: string; value: string }>
+      ): Array<{ key: string; label: string }> => {
+        if (index >= variantGroups.length) {
+          return [{
+            key: buildVariantStockKey(current),
+            label: current.map((part) => `${part.name}: ${part.value}`).join(" / "),
+          }];
+        }
+
+        const group = variantGroups[index];
+        const results: Array<{ key: string; label: string }> = [];
+        for (const option of group.options) {
+          results.push(...combine(index + 1, [...current, { name: group.name, value: option }]));
+        }
+        return results;
+      };
+
+      return combine(0, []);
+    }
+
+    return Array.from(
+      new Set(
+        (form.watch("sizes") || "")
+          .split(",")
+          .map((value) => value.trim())
+          .filter(Boolean)
+      )
+    ).map((option) => ({
+      key: option.trim().toLowerCase(),
+      label: option,
+    }));
+  })();
 
   useEffect(() => {
     // Keep form values in sync when editing a different product in the same mounted sheet.
@@ -236,12 +301,12 @@ export function ProductForm({ initialData, onSuccess, onCancel, layout = "defaul
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="stock" className="text-xs font-normal text-muted-foreground">Available Stock <span className="text-xs">(optional)</span></Label>
+                  <Label htmlFor="stock" className="text-xs font-normal text-muted-foreground">Available Stock <span className="text-red-500">*</span></Label>
                   <Input
                     type="number"
                     id="stock"
                     min={0}
-                    placeholder="e.g. 300 (leave empty to use option stock only)"
+                    placeholder="e.g. 300"
                     className={cn(
                       "h-10 transition-all font-medium text-xs tabular-nums",
                       isSheet
@@ -249,7 +314,7 @@ export function ProductForm({ initialData, onSuccess, onCancel, layout = "defaul
                         : "rounded-3xl border-border bg-secondary/50 focus:bg-card focus:border-primary/30"
                     )}
                     {...form.register("stock", {
-                      setValueAs: (value) => (value === "" ? "" : Number(value)),
+                      setValueAs: (value) => Number(value),
                     })}
                   />
                   {form.formState.errors.stock && (
@@ -444,23 +509,15 @@ export function ProductForm({ initialData, onSuccess, onCancel, layout = "defaul
                   )}
                 </div>
 
-                {form.watch("sizes")?.trim() ? (
+                {declaredOptionStockEntries.length > 0 ? (
                   <div className="space-y-2 pt-1">
                     <Label className="text-xs font-normal text-muted-foreground">
-                      Stock by Size/Option <span className="text-xs">(optional)</span>
+                      Stock by Size/Option <span className="text-red-500">*</span>
                     </Label>
                     <div className="grid gap-3 sm:grid-cols-2">
-                      {Array.from(
-                        new Set(
-                          form
-                            .watch("sizes")
-                            ?.split(",")
-                            .map((value) => value.trim())
-                            .filter(Boolean) || []
-                        )
-                      ).map((option) => (
-                        <div key={`option-stock-${option}`} className="space-y-1.5">
-                          <Label className="text-xs text-muted-foreground">{option}</Label>
+                      {declaredOptionStockEntries.map((entry) => (
+                        <div key={`option-stock-${entry.key}`} className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground">{entry.label}</Label>
                           <Input
                             type="number"
                             min={0}
@@ -469,13 +526,13 @@ export function ProductForm({ initialData, onSuccess, onCancel, layout = "defaul
                               "h-9 border-border text-xs",
                               isSheet ? "rounded-md bg-background" : "rounded-3xl bg-secondary/50"
                             )}
-                            value={String((form.watch("optionStocks")?.[option] ?? ""))}
+                            value={String((form.watch("optionStocks")?.[entry.key] ?? ""))}
                             onChange={(event) => {
                               const current = { ...(form.getValues("optionStocks") || {}) };
                               if (event.target.value === "") {
-                                delete current[option];
+                                delete current[entry.key];
                               } else {
-                                current[option] = Math.max(0, Math.trunc(Number(event.target.value)));
+                                current[entry.key] = Math.max(0, Math.trunc(Number(event.target.value)));
                               }
                               form.setValue("optionStocks", current, { shouldDirty: true });
                             }}
@@ -484,8 +541,13 @@ export function ProductForm({ initialData, onSuccess, onCancel, layout = "defaul
                       ))}
                     </div>
                     <p className="text-[11px] text-muted-foreground">
-                      Set stock per option (e.g. shoe sizes 37-40, clothing sizes S-XL). Leave blank for unlimited per option.
+                      Set stock for every option (e.g. shoe sizes 37-40, clothing sizes S-XL).
                     </p>
+                    {form.formState.errors.optionStocks && (
+                      <p className="text-xs text-red-500">
+                        {form.formState.errors.optionStocks.message as string}
+                      </p>
+                    )}
                   </div>
                 ) : null}
 
@@ -579,12 +641,13 @@ function buildDefaultValues(initialData?: ProductInitialData | null): ProductVal
     name: initialData?.name || "",
     description: initialData?.description || "",
     price: initialData?.price ? Number(initialData.price) : 0,
-    stock: typeof initialData?.stock === "number" ? initialData.stock : "",
+    stock: typeof initialData?.stock === "number" ? initialData.stock : 0,
     optionStocks: normalizedOptionStocks,
     category: initialData?.category || "",
     isAvailable: initialData?.isAvailable ?? true,
     imageUrl: initialData?.imageUrl || "",
     galleryImages: normalizeGalleryImages((initialData as { galleryImages?: unknown } | undefined)?.galleryImages),
     sizes: initialData?.sizes || "",
+    variants: (initialData as { variants?: unknown } | undefined)?.variants ?? [],
   };
 }

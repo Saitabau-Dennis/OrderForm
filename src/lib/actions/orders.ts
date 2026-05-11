@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { randomInt } from "crypto";
 import db from "@/lib/db";
 import { z } from "zod";
+import { extractVariantOptionValues, normalizeToken, variantLabelToStockKey } from "@/lib/inventory";
 
 const rewardPercentFromEnv = Number(process.env.REVIEW_REWARD_PERCENT_OFF || "10");
 const DEFAULT_PERCENT_OFF =
@@ -21,6 +22,16 @@ const CreateOrderSchema = z.object({
   customerName: z.string().min(1, "Name is required"),
   customerPhone: z.string().min(7, "Phone is required"),
   fulfillmentMethod: z.enum(["delivery", "shop_pickup"]).default("delivery"),
+  shipToDifferentAddress: z.boolean().default(false),
+  billingAddressLine1: z.string().optional(),
+  billingAddressLine2: z.string().optional(),
+  billingZoneId: z.string().optional(),
+  shippingRecipientName: z.string().optional(),
+  shippingRecipientPhone: z.string().optional(),
+  shippingAddressLine1: z.string().optional(),
+  shippingAddressLine2: z.string().optional(),
+  shippingZoneId: z.string().optional(),
+  // Legacy fields kept to support older clients until they are fully rolled out.
   deliveryAddress: z.string().optional(),
   deliveryZoneId: z.string().optional(),
   items: z.array(z.object({
@@ -49,21 +60,6 @@ const generateDisplayIdSuffix = () =>
     DISPLAY_ID_ALPHABET[randomInt(0, DISPLAY_ID_ALPHABET.length)]
   ).join("");
 
-const extractVariantOptionValues = (variant?: string) => {
-  if (!variant) return [];
-
-  return variant
-    .split("/")
-    .map((segment) => segment.trim())
-    .filter(Boolean)
-    .map((segment) => {
-      const separatorIndex = segment.indexOf(":");
-      if (separatorIndex === -1) return segment.trim();
-      return segment.slice(separatorIndex + 1).trim();
-    })
-    .filter(Boolean);
-};
-
 export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
   try {
     const validatedData = CreateOrderSchema.parse(data);
@@ -73,6 +69,7 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
       where: { id: validatedData.storeId },
       select: {
         id: true,
+        slug: true,
         name: true,
         enableDelivery: true,
         enableShopPickup: true,
@@ -125,6 +122,19 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
       if (!product.isAvailable) {
         throw new Error(`Product unavailable: ${product.name}`);
       }
+      if (product.optionStocks.length > 0) {
+        const optionStockMap = new Map(
+          product.optionStocks.map((row) => [normalizeToken(row.optionValue), row.stock])
+        );
+        const exactVariantKey = variantLabelToStockKey(item.variant);
+        const normalizedRequestedOptions = extractVariantOptionValues(item.variant);
+        const hasKnownOption =
+          (exactVariantKey ? optionStockMap.has(exactVariantKey) : false) ||
+          normalizedRequestedOptions.some((value) => optionStockMap.has(value));
+        if (!hasKnownOption) {
+          throw new Error(`Please select a valid product option for ${product.name}`);
+        }
+      }
 
       const unitPrice = Number(product.price);
       return {
@@ -143,10 +153,15 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
     }, new Map<string, number>());
     const requestedQuantityByProductOption = lineItems.reduce((acc, item) => {
       const productOptions = acc.get(item.productId) || new Map<string, number>();
-      for (const optionValue of extractVariantOptionValues(item.variant)) {
-        const normalized = optionValue.trim().toLowerCase();
-        if (!normalized) continue;
-        productOptions.set(normalized, (productOptions.get(normalized) || 0) + item.quantity);
+      const exactVariantKey = variantLabelToStockKey(item.variant);
+      if (exactVariantKey) {
+        productOptions.set(exactVariantKey, (productOptions.get(exactVariantKey) || 0) + item.quantity);
+      } else {
+        for (const optionValue of extractVariantOptionValues(item.variant)) {
+          const normalized = normalizeToken(optionValue);
+          if (!normalized) continue;
+          productOptions.set(normalized, (productOptions.get(normalized) || 0) + item.quantity);
+        }
       }
       acc.set(item.productId, productOptions);
       return acc;
@@ -199,10 +214,31 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
     }
 
     const isDelivery = validatedData.fulfillmentMethod === "delivery";
-    const deliveryAddress = validatedData.deliveryAddress?.trim() || null;
-    const selectedZone = validatedData.deliveryZoneId
-      ? store.deliveryZones.find((zone) => zone.id === validatedData.deliveryZoneId)
+    const shipToDifferentAddress = isDelivery ? validatedData.shipToDifferentAddress : false;
+    const billingAddressLine1 =
+      validatedData.billingAddressLine1?.trim() || validatedData.deliveryAddress?.trim() || null;
+    const billingAddressLine2 = validatedData.billingAddressLine2?.trim() || null;
+    const billingZoneId = validatedData.billingZoneId?.trim() || null;
+    const shippingRecipientName = shipToDifferentAddress
+      ? validatedData.shippingRecipientName?.trim() || null
+      : validatedData.customerName.trim();
+    const shippingRecipientPhone = shipToDifferentAddress
+      ? validatedData.shippingRecipientPhone?.trim() || null
+      : validatedData.customerPhone.trim();
+    const shippingAddressLine1 = shipToDifferentAddress
+      ? validatedData.shippingAddressLine1?.trim() || null
+      : billingAddressLine1;
+    const shippingAddressLine2 = shipToDifferentAddress
+      ? validatedData.shippingAddressLine2?.trim() || null
+      : billingAddressLine2;
+    const shippingZoneIdInput = shipToDifferentAddress
+      ? validatedData.shippingZoneId?.trim() || null
+      : billingZoneId || validatedData.deliveryZoneId?.trim() || null;
+    const selectedZone = shippingZoneIdInput
+      ? store.deliveryZones.find((zone) => zone.id === shippingZoneIdInput)
       : undefined;
+    const deliveryAddress = [shippingAddressLine1, shippingAddressLine2].filter(Boolean).join(", ") || null;
+    const billingAddress = [billingAddressLine1, billingAddressLine2].filter(Boolean).join(", ") || null;
 
     if (isDelivery && !store.enableDelivery) {
       return { error: "Delivery is currently unavailable for this store." };
@@ -212,15 +248,24 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
       return { error: "Shop pickup is currently unavailable for this store." };
     }
 
-    if (isDelivery && (!deliveryAddress || deliveryAddress.length < 8)) {
+    if (isDelivery && (!shippingAddressLine1 || shippingAddressLine1.length < 8)) {
       return { error: "Address is required for delivery." };
     }
+    if (isDelivery && (!shippingRecipientName || shippingRecipientName.length < 2)) {
+      return { error: "Recipient name is required for delivery." };
+    }
+    if (isDelivery) {
+      const recipientPhoneDigits = normalizePhone(shippingRecipientPhone || "");
+      if (recipientPhoneDigits.length < 10 || recipientPhoneDigits.length > 12) {
+        return { error: "Recipient phone is invalid." };
+      }
+    }
 
-    if (isDelivery && store.deliveryZones.length > 0 && !validatedData.deliveryZoneId) {
+    if (isDelivery && store.deliveryZones.length > 0 && !shippingZoneIdInput) {
       return { error: "Please select a valid delivery zone." };
     }
 
-    if (isDelivery && validatedData.deliveryZoneId && !selectedZone) {
+    if (isDelivery && shippingZoneIdInput && !selectedZone) {
       return { error: "Selected delivery zone is invalid." };
     }
 
@@ -238,7 +283,7 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
           throw new Error(`Product not found: ${productId}`);
         }
         const optionStocksMap = new Map(
-          product.optionStocks.map((row) => [row.optionValue.trim().toLowerCase(), row.stock])
+          product.optionStocks.map((row) => [normalizeToken(row.optionValue), row.stock])
         );
         const requestedOptionQuantities = requestedQuantityByProductOption.get(productId) || new Map<string, number>();
 
@@ -294,44 +339,58 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
         update: {
           name: validatedData.customerName,
           phone: validatedData.customerPhone.trim(),
-          ...(deliveryAddress ? { defaultAddress: deliveryAddress } : {}),
+          ...(billingAddress ? { defaultAddress: billingAddress } : {}),
         },
         create: {
           storeId: validatedData.storeId,
           name: validatedData.customerName,
           phone: validatedData.customerPhone.trim(),
           phoneNormalized: normalizedPhone,
-          defaultAddress: deliveryAddress,
+          defaultAddress: billingAddress,
         },
         select: { id: true },
       });
 
-      const createdOrder = await tx.order.create({
-        data: {
-          storeId: validatedData.storeId,
-          customerId: customer.id,
-          customerName: validatedData.customerName,
-          customerPhone: validatedData.customerPhone,
-          fulfillmentMethod: isDelivery ? "DELIVERY" : "SHOP_PICKUP",
-          deliveryAddress,
-          deliveryZoneId,
-          deliveryZone: deliveryZoneName,
-          deliveryFee,
-          totalAmount,
-          subtotal,
-          discountAmount,
-          discountCodeUsed: appliedDiscountCode?.code,
-          notes: validatedData.notes,
-          items: {
-            create: lineItems.map((item) => ({
-              productId: item.productId,
-              name: item.name,
-              quantity: item.quantity,
-              price: item.price,
-              variant: item.variant,
-            })),
-          },
+      const fulfillmentMethod: "DELIVERY" | "SHOP_PICKUP" = isDelivery ? "DELIVERY" : "SHOP_PICKUP";
+      const createOrderData = {
+        storeId: validatedData.storeId,
+        customerId: customer.id,
+        customerName: validatedData.customerName,
+        customerPhone: validatedData.customerPhone,
+        fulfillmentMethod,
+        shipToDifferentAddress,
+        billingAddressLine1,
+        billingAddressLine2,
+        billingZoneId,
+        shippingAddressLine1: isDelivery ? shippingAddressLine1 : null,
+        shippingAddressLine2: isDelivery ? shippingAddressLine2 : null,
+        shippingZoneId: isDelivery ? selectedZone?.id ?? null : null,
+        deliveryAddress,
+        deliveryZoneId,
+        deliveryZone: deliveryZoneName,
+        deliveryFee,
+        totalAmount,
+        subtotal,
+        discountAmount,
+        discountCodeUsed: appliedDiscountCode?.code,
+        notes: validatedData.notes,
+        items: {
+          create: lineItems.map((item) => ({
+            productId: item.productId,
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+            variant: item.variant,
+          })),
         },
+      };
+      // Added dynamically to keep compatibility with environments pinned to older Prisma client typings.
+      const createOrderDataWithRecipient = createOrderData as Record<string, unknown>;
+      createOrderDataWithRecipient.shippingRecipientName = isDelivery ? shippingRecipientName : null;
+      createOrderDataWithRecipient.shippingRecipientPhone = isDelivery ? shippingRecipientPhone : null;
+
+      const createdOrder = await tx.order.create({
+        data: createOrderData,
       });
 
       if (appliedDiscountCode) {
@@ -388,6 +447,9 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
       return updatedOrder;
     });
 
+    revalidatePath(`/${store.slug}`);
+    revalidatePath(`/${store.slug}/catalog`);
+
     return {
       success: true,
       orderId: order.displayId || order.orderNumber,
@@ -405,6 +467,9 @@ export async function createOrder(data: z.infer<typeof CreateOrderSchema>) {
       return { error: error.message };
     }
     if (error instanceof Error && error.message.includes("Product unavailable")) {
+      return { error: error.message };
+    }
+    if (error instanceof Error && error.message.includes("Please select a valid product option")) {
       return { error: error.message };
     }
     if (error instanceof Error && error.message.includes("Discount code is no longer available")) {

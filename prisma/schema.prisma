@@ -132,6 +132,7 @@ model Store {
   payments            Payment[]
   paymentEvents       PaymentEvent[]
   deliveryZones       DeliveryZone[]
+  categoryImages      StoreCategoryImage[]
 
   // Rewards (Json for flexibility)
   rewardConfig Json? // { isEnabled: boolean, couponCode: string, successMessage: string }
@@ -150,6 +151,21 @@ model DeliveryZone {
   price   Decimal
   storeId String
   store   Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+}
+
+model StoreCategoryImage {
+  id           String   @id @default(cuid())
+  categoryName String
+  imageUrl     String
+
+  storeId String
+  store   Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([storeId, categoryName])
+  @@index([storeId])
 }
 
 model Product {
@@ -200,6 +216,15 @@ model Order {
 
   customerName    String
   customerPhone   String
+  shipToDifferentAddress Boolean @default(false)
+  billingAddressLine1    String?
+  billingAddressLine2    String?
+  billingZoneId          String?
+  shippingRecipientName  String?
+  shippingRecipientPhone String?
+  shippingAddressLine1   String?
+  shippingAddressLine2   String?
+  shippingZoneId         String?
   fulfillmentMethod FulfillmentMethod @default(DELIVERY)
   deliveryAddress String?
   deliveryZoneId   String?

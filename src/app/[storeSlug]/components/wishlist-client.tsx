@@ -22,6 +22,8 @@ type WishlistClientProps = {
   allProducts: ProductInfo[]
 }
 
+const ABOVE_FOLD_WISHLIST_IMAGE_COUNT = 2
+
 export function WishlistClient({ storeSlug, currency, allProducts }: WishlistClientProps) {
   const { wishlist, toggleWishlist } = useStore()
 
@@ -60,7 +62,7 @@ export function WishlistClient({ storeSlug, currency, allProducts }: WishlistCli
   return (
     <div className="space-y-4">
       <div className="space-y-3 md:hidden">
-        {savedProducts.map((product) => (
+        {savedProducts.map((product, index) => (
           <article key={product.id} className="border border-[#E8E8E5] p-3">
             <div className="flex items-start gap-3">
               <Link href={storefrontPath(storeSlug, `/catalog/${product.id}`)} className="block">
@@ -70,6 +72,8 @@ export function WishlistClient({ storeSlug, currency, allProducts }: WishlistCli
                       src={product.imageUrl}
                       alt={product.name}
                       fill
+                      priority={index < ABOVE_FOLD_WISHLIST_IMAGE_COUNT}
+                      loading={index < ABOVE_FOLD_WISHLIST_IMAGE_COUNT ? "eager" : "lazy"}
                       className="object-cover object-center"
                       sizes="64px"
                     />
@@ -115,7 +119,7 @@ export function WishlistClient({ storeSlug, currency, allProducts }: WishlistCli
             </tr>
           </thead>
           <tbody>
-            {savedProducts.map((product) => (
+            {savedProducts.map((product, index) => (
               <tr key={product.id} className="border-b border-[#EFEFEA] last:border-b-0">
                 <td className="px-4 py-3">
                   <Link href={storefrontPath(storeSlug, `/catalog/${product.id}`)} className="block">
@@ -125,6 +129,8 @@ export function WishlistClient({ storeSlug, currency, allProducts }: WishlistCli
                           src={product.imageUrl}
                           alt={product.name}
                           fill
+                          priority={index < ABOVE_FOLD_WISHLIST_IMAGE_COUNT}
+                          loading={index < ABOVE_FOLD_WISHLIST_IMAGE_COUNT ? "eager" : "lazy"}
                           className="object-cover object-center"
                           sizes="64px"
                         />

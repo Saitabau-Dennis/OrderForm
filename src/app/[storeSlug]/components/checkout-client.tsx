@@ -1,89 +1,34 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import Image from "next/image"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 import { useStore } from "./store-provider"
 import { createOrder } from "@/lib/actions/orders"
 import { storefrontPath } from "@/lib/storefront-path"
+import { getQuickCheckoutStorageKey, parseQuickCheckoutPayload } from "./quick-checkout-storage"
+import { ArrowLeft } from "lucide-react"
+import { CheckoutBillingSection } from "./checkout-billing-section"
+import { CheckoutShippingSection } from "./checkout-shipping-section"
+import { CheckoutOrderSummary } from "./checkout-order-summary"
 import {
-  Loader2,
-  ArrowLeft,
-} from "lucide-react"
-
-type DeliveryZone = {
-  id: string
-  name: string
-  price: number
-}
-
-type CheckoutClientProps = {
-  storeId: string
-  storeSlug: string
-  currency: string
-  deliveryZones: DeliveryZone[]
-  brandColor: string
-  enableDelivery: boolean
-  enableShopPickup: boolean
-  shopPickupInstructions?: string | null
-}
-
-type CheckoutFormData = {
-  name: string
-  phone: string
-  deliveryMethod: "delivery" | "shop_pickup"
-  deliveryAddress: string
-  zoneId: string
-}
-
-type PaymentMethod = "mpesa" | "card"
-
-type CheckoutFieldErrors = Partial<Record<keyof CheckoutFormData, string>>
+  formatCheckoutPrice,
+  getFieldClass,
+  validateCheckout,
+} from "./checkout-validation"
+import type {
+  CheckoutClientProps,
+  CheckoutFieldErrors,
+  CheckoutFormData,
+  PaymentMethod,
+} from "./checkout-form-types"
 
 // Per-store draft key lets shoppers resume checkout without cross-store conflicts.
 function getCheckoutDraftStorageKey(storeSlug: string) {
   return `orderform_checkout_draft:${storeSlug}`
 }
 
-function normalizePhone(value: string): string {
-  return value.replace(/\D/g, "")
-}
-
-// Client-side validation mirrors server expectations for faster feedback.
-function validateCheckout(formData: CheckoutFormData, requiresZone: boolean): CheckoutFieldErrors {
-  const errors: CheckoutFieldErrors = {}
-  const isDelivery = formData.deliveryMethod === "delivery"
-
-  if (!formData.name.trim() || formData.name.trim().length < 2) {
-    errors.name = "Please enter your full name."
-  }
-
-  const phoneDigits = normalizePhone(formData.phone)
-  if (phoneDigits.length < 10 || phoneDigits.length > 12) {
-    errors.phone = "Enter a valid phone number (e.g. 0712345678)."
-  }
-
-  if (isDelivery && (!formData.deliveryAddress.trim() || formData.deliveryAddress.trim().length < 8)) {
-    errors.deliveryAddress = "Please provide a complete delivery location."
-  }
-
-  if (isDelivery && requiresZone && !formData.zoneId) {
-    errors.zoneId = "Please select your delivery zone."
-  }
-
-  return errors
-}
-
-function getFieldClass(hasError: boolean): string {
-  const base = "w-full rounded-none text-sm text-[#1A1A1A] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-0"
-
-  if (hasError) {
-    return `${base} border border-red-400 bg-transparent focus:border-red-500`
-  }
-
-  return `${base} border border-[#E8E8E5] bg-transparent focus:border-[#1A1A1A]`
-}
 
 export function CheckoutClient({
   storeId,
@@ -95,8 +40,13 @@ export function CheckoutClient({
   enableShopPickup,
   shopPickupInstructions,
 }: CheckoutClientProps) {
+  const searchParams = useSearchParams()
+  const isQuickCheckoutRequested = searchParams.get("quick") === "1"
   const checkoutDraftStorageKey = useMemo(() => getCheckoutDraftStorageKey(storeSlug), [storeSlug])
-  const { cart, cartTotal } = useStore()
+  const quickCheckoutStorageKey = useMemo(() => getQuickCheckoutStorageKey(storeSlug), [storeSlug])
+  const { cart } = useStore()
+  const [quickCheckoutItem, setQuickCheckoutItem] = useState<ReturnType<typeof parseQuickCheckoutPayload>>(null)
+  const [hasHydratedQuickCheckout, setHasHydratedQuickCheckout] = useState(false)
 
   const [isLoading, setIsLoading] = useState(false)
   const [hasHydratedDraft, setHasHydratedDraft] = useState(false)
@@ -105,7 +55,12 @@ export function CheckoutClient({
   const [orderNotes, setOrderNotes] = useState("")
   const [shipToDifferentAddress, setShipToDifferentAddress] = useState(false)
   const [emailAddress, setEmailAddress] = useState("")
-  const [addressLineTwo, setAddressLineTwo] = useState("")
+  const [billingAddressLineTwo, setBillingAddressLineTwo] = useState("")
+  const [shippingRecipientName, setShippingRecipientName] = useState("")
+  const [shippingRecipientPhone, setShippingRecipientPhone] = useState("")
+  const [shippingAddressLine1, setShippingAddressLine1] = useState("")
+  const [shippingAddressLine2, setShippingAddressLine2] = useState("")
+  const [shippingZoneId, setShippingZoneId] = useState("")
   const [formData, setFormData] = useState<CheckoutFormData>({
     name: "",
     phone: "",
@@ -113,38 +68,51 @@ export function CheckoutClient({
     deliveryAddress: "",
     zoneId: "",
   })
-  const paymentOptions: Array<{
-    id: PaymentMethod
-    label: string
-    description: string
-    imageSrc: string
-    imageAlt: string
-  }> = [
-    {
-      id: "mpesa",
-      label: "M-PESA",
-      description: "Pay with your phone number after placing the order.",
-      imageSrc: "/images/mpesa.jpg",
-      imageAlt: "M-PESA",
-    },
-    {
-      id: "card",
-      label: "Debit/Credit Cards",
-      description: "Visa, Mastercard and more via secure card checkout.",
-      imageSrc: "/images/paystack-ke.png",
-      imageAlt: "Card payment options",
-    },
-  ]
 
   const hasAnyShippingMethod = enableDelivery || enableShopPickup
+  const checkoutItems = useMemo(() => {
+    if (!isQuickCheckoutRequested) return cart
+    if (!hasHydratedQuickCheckout) return []
+    return quickCheckoutItem ? [quickCheckoutItem] : []
+  }, [cart, hasHydratedQuickCheckout, isQuickCheckoutRequested, quickCheckoutItem])
+  const checkoutSubtotal = useMemo(
+    () => checkoutItems.reduce((total, item) => total + (item.price * item.quantity), 0),
+    [checkoutItems]
+  )
+  const effectiveZoneId =
+    formData.deliveryMethod !== "delivery"
+      ? ""
+      : shipToDifferentAddress
+      ? shippingZoneId
+      : formData.zoneId
   const selectedZone = useMemo(() => {
     if (formData.deliveryMethod !== "delivery") return undefined
-    return deliveryZones.find((zone) => zone.id === formData.zoneId)
-  }, [deliveryZones, formData.deliveryMethod, formData.zoneId])
+    return deliveryZones.find((zone) => zone.id === effectiveZoneId)
+  }, [deliveryZones, effectiveZoneId, formData.deliveryMethod])
   const deliveryFee = formData.deliveryMethod === "delivery" && selectedZone ? selectedZone.price : 0
-  const grandTotal = cartTotal + deliveryFee
+  const grandTotal = checkoutSubtotal + deliveryFee
   const [firstNamePart = "", ...otherNameParts] = formData.name.trim().split(/\s+/)
   const lastNamePart = otherNameParts.join(" ")
+
+  useEffect(() => {
+    setHasHydratedQuickCheckout(false)
+
+    if (!isQuickCheckoutRequested) {
+      setQuickCheckoutItem(null)
+      setHasHydratedQuickCheckout(true)
+      return
+    }
+
+    try {
+      const rawQuickPayload = localStorage.getItem(quickCheckoutStorageKey)
+      setQuickCheckoutItem(parseQuickCheckoutPayload(rawQuickPayload, storeSlug))
+    } catch (error) {
+      console.error("Failed to restore quick checkout payload", error)
+      setQuickCheckoutItem(null)
+    } finally {
+      setHasHydratedQuickCheckout(true)
+    }
+  }, [isQuickCheckoutRequested, quickCheckoutStorageKey, storeSlug])
 
   useEffect(() => {
     // Restore previous in-progress checkout details from localStorage.
@@ -152,7 +120,17 @@ export function CheckoutClient({
       const rawDraft = localStorage.getItem(checkoutDraftStorageKey)
       if (!rawDraft) return
 
-      const parsedDraft = JSON.parse(rawDraft) as Partial<CheckoutFormData>
+      const parsedDraft = JSON.parse(rawDraft) as Partial<CheckoutFormData> & {
+        shipToDifferentAddress?: boolean
+        billingAddressLineTwo?: string
+        shippingRecipientName?: string
+        shippingRecipientPhone?: string
+        shippingAddressLine1?: string
+        shippingAddressLine2?: string
+        shippingZoneId?: string
+        orderNotes?: string
+        emailAddress?: string
+      }
       setFormData((previous) => ({
         name: typeof parsedDraft.name === "string" ? parsedDraft.name : previous.name,
         phone: typeof parsedDraft.phone === "string" ? parsedDraft.phone : previous.phone,
@@ -166,6 +144,33 @@ export function CheckoutClient({
             : previous.deliveryAddress,
         zoneId: typeof parsedDraft.zoneId === "string" ? parsedDraft.zoneId : previous.zoneId,
       }))
+      if (typeof parsedDraft.shipToDifferentAddress === "boolean") {
+        setShipToDifferentAddress(parsedDraft.shipToDifferentAddress)
+      }
+      if (typeof parsedDraft.billingAddressLineTwo === "string") {
+        setBillingAddressLineTwo(parsedDraft.billingAddressLineTwo)
+      }
+      if (typeof parsedDraft.shippingRecipientName === "string") {
+        setShippingRecipientName(parsedDraft.shippingRecipientName)
+      }
+      if (typeof parsedDraft.shippingRecipientPhone === "string") {
+        setShippingRecipientPhone(parsedDraft.shippingRecipientPhone)
+      }
+      if (typeof parsedDraft.shippingAddressLine1 === "string") {
+        setShippingAddressLine1(parsedDraft.shippingAddressLine1)
+      }
+      if (typeof parsedDraft.shippingAddressLine2 === "string") {
+        setShippingAddressLine2(parsedDraft.shippingAddressLine2)
+      }
+      if (typeof parsedDraft.shippingZoneId === "string") {
+        setShippingZoneId(parsedDraft.shippingZoneId)
+      }
+      if (typeof parsedDraft.orderNotes === "string") {
+        setOrderNotes(parsedDraft.orderNotes)
+      }
+      if (typeof parsedDraft.emailAddress === "string") {
+        setEmailAddress(parsedDraft.emailAddress)
+      }
     } catch (error) {
       console.error("Failed to restore checkout draft", error)
     } finally {
@@ -192,7 +197,15 @@ export function CheckoutClient({
       formData.name.trim() ||
       formData.phone.trim() ||
       formData.deliveryAddress.trim() ||
-      formData.zoneId.trim()
+      formData.zoneId.trim() ||
+      billingAddressLineTwo.trim() ||
+      shippingRecipientName.trim() ||
+      shippingRecipientPhone.trim() ||
+      shippingAddressLine1.trim() ||
+      shippingAddressLine2.trim() ||
+      shippingZoneId.trim() ||
+      orderNotes.trim() ||
+      emailAddress.trim()
     )
 
     try {
@@ -201,20 +214,40 @@ export function CheckoutClient({
         return
       }
 
-      localStorage.setItem(checkoutDraftStorageKey, JSON.stringify(formData))
+      localStorage.setItem(
+        checkoutDraftStorageKey,
+        JSON.stringify({
+          ...formData,
+          shipToDifferentAddress,
+          billingAddressLineTwo,
+          shippingRecipientName,
+          shippingRecipientPhone,
+          shippingAddressLine1,
+          shippingAddressLine2,
+          shippingZoneId,
+          orderNotes,
+          emailAddress,
+        })
+      )
     } catch (error) {
       console.error("Failed to save checkout draft", error)
     }
-  }, [checkoutDraftStorageKey, formData, hasHydratedDraft])
+  }, [
+    billingAddressLineTwo,
+    checkoutDraftStorageKey,
+    emailAddress,
+    formData,
+    hasHydratedDraft,
+    orderNotes,
+    shipToDifferentAddress,
+    shippingRecipientName,
+    shippingRecipientPhone,
+    shippingAddressLine1,
+    shippingAddressLine2,
+    shippingZoneId,
+  ])
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-KE", {
-      style: "currency",
-      currency,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    }).format(price)
-  }
+  const formatPrice = (price: number) => formatCheckoutPrice(currency, price)
 
   const setFieldValue = (field: keyof CheckoutFormData, value: string) => {
     setFormData((previous) => {
@@ -240,13 +273,46 @@ export function CheckoutClient({
         const next = { ...previous }
         delete next.deliveryAddress
         delete next.zoneId
+        delete next.shippingRecipientName
+        delete next.shippingRecipientPhone
+        delete next.shippingAddressLine1
+        delete next.shippingZoneId
         return next
       })
     }
   }
 
+  const clearFieldError = (field: keyof CheckoutFieldErrors) => {
+    setFieldErrors((previous) => {
+      if (!previous[field]) return previous
+      const next = { ...previous }
+      delete next[field]
+      return next
+    })
+  }
+
+  const handleShipToDifferentAddressChange = (checked: boolean) => {
+    setShipToDifferentAddress(checked)
+
+    if (checked) {
+      clearFieldError("deliveryAddress")
+      clearFieldError("zoneId")
+      setShippingRecipientName(formData.name)
+      setShippingRecipientPhone(formData.phone)
+      setShippingAddressLine1(formData.deliveryAddress)
+      setShippingAddressLine2(billingAddressLineTwo)
+      setShippingZoneId(formData.zoneId)
+      return
+    }
+
+    clearFieldError("shippingRecipientName")
+    clearFieldError("shippingRecipientPhone")
+    clearFieldError("shippingAddressLine1")
+    clearFieldError("shippingZoneId")
+  }
+
   const submitOrder = async () => {
-    if (cart.length === 0) {
+    if (checkoutItems.length === 0) {
       toast.error("Your cart is empty")
       return
     }
@@ -259,7 +325,12 @@ export function CheckoutClient({
 
     const errors = validateCheckout(
       formData,
-      formData.deliveryMethod === "delivery" && deliveryZones.length > 0
+      formData.deliveryMethod === "delivery" && deliveryZones.length > 0,
+      shipToDifferentAddress,
+      shippingRecipientName,
+      shippingRecipientPhone,
+      shippingAddressLine1,
+      shippingZoneId
     )
     setFieldErrors(errors)
 
@@ -271,16 +342,45 @@ export function CheckoutClient({
     setIsLoading(true)
 
     try {
+      const isDelivery = formData.deliveryMethod === "delivery"
+      const billingAddressLine1 = formData.deliveryAddress.trim()
+      const billingAddressLine2Trimmed = billingAddressLineTwo.trim()
+      const usesSeparateShipping = isDelivery && shipToDifferentAddress
+      const shippingAddressLine1Trimmed = usesSeparateShipping
+        ? shippingAddressLine1.trim()
+        : billingAddressLine1
+      const shippingAddressLine2Trimmed = usesSeparateShipping
+        ? shippingAddressLine2.trim()
+        : billingAddressLine2Trimmed
+      const shippingRecipientNameTrimmed = usesSeparateShipping
+        ? shippingRecipientName.trim()
+        : formData.name.trim()
+      const shippingRecipientPhoneTrimmed = usesSeparateShipping
+        ? shippingRecipientPhone.trim()
+        : formData.phone.trim()
+      const effectiveShippingZoneId = usesSeparateShipping ? shippingZoneId : formData.zoneId
+      const legacyDeliveryAddress = [shippingAddressLine1Trimmed, shippingAddressLine2Trimmed]
+        .filter(Boolean)
+        .join(", ")
+
       const orderResult = await createOrder({
         storeId,
         customerName: formData.name.trim(),
         customerPhone: formData.phone.trim(),
         fulfillmentMethod: formData.deliveryMethod,
-        deliveryAddress:
-          formData.deliveryMethod === "delivery" ? formData.deliveryAddress.trim() : undefined,
-        deliveryZoneId: formData.deliveryMethod === "delivery" ? formData.zoneId || undefined : undefined,
+        shipToDifferentAddress: usesSeparateShipping,
+        billingAddressLine1: isDelivery ? billingAddressLine1 || undefined : undefined,
+        billingAddressLine2: isDelivery ? billingAddressLine2Trimmed || undefined : undefined,
+        billingZoneId: isDelivery ? formData.zoneId || undefined : undefined,
+        shippingRecipientName: isDelivery ? shippingRecipientNameTrimmed || undefined : undefined,
+        shippingRecipientPhone: isDelivery ? shippingRecipientPhoneTrimmed || undefined : undefined,
+        shippingAddressLine1: isDelivery ? shippingAddressLine1Trimmed || undefined : undefined,
+        shippingAddressLine2: isDelivery ? shippingAddressLine2Trimmed || undefined : undefined,
+        shippingZoneId: isDelivery ? effectiveShippingZoneId || undefined : undefined,
+        deliveryAddress: isDelivery ? legacyDeliveryAddress || undefined : undefined,
+        deliveryZoneId: isDelivery ? effectiveShippingZoneId || undefined : undefined,
         notes: orderNotes.trim() || undefined,
-        items: cart.map((item) => ({
+        items: checkoutItems.map((item) => ({
           productId: item.productId,
           name: item.name,
           quantity: item.quantity,
@@ -302,6 +402,9 @@ export function CheckoutClient({
 
       // Clear local draft once order is successfully created.
       localStorage.removeItem(checkoutDraftStorageKey)
+      if (isQuickCheckoutRequested) {
+        localStorage.removeItem(quickCheckoutStorageKey)
+      }
       window.location.assign(targetUrl)
     } catch (error) {
       console.error(error)
@@ -323,7 +426,15 @@ export function CheckoutClient({
       ? selectedZone.name
       : "Delivery"
 
-  if (cart.length === 0) {
+  if (isQuickCheckoutRequested && !hasHydratedQuickCheckout) {
+    return (
+      <div className="flex flex-col items-center justify-center rounded-none border border-[#E8E8E5] py-20 text-center">
+        <p className="text-sm text-[#737373]">Preparing checkout...</p>
+      </div>
+    )
+  }
+
+  if (checkoutItems.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-none border border-[#E8E8E5] py-20 text-center">
         <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-none">
@@ -346,346 +457,80 @@ export function CheckoutClient({
   }
 
   return (
-    <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:gap-10">
-      <div className="lg:col-span-7">
+    <div className="grid grid-cols-1 items-start gap-8 xl:grid-cols-12 xl:gap-12">
+      <div className="xl:col-span-7">
         <form id="checkout-form" onSubmit={handleSubmit} className="space-y-7" noValidate>
-          <section className="grid items-start gap-7 lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_340px]">
-            <div className="space-y-5">
-              <h2 className="text-[30px] font-medium tracking-tight text-[#1A1A1A] sm:text-[36px] lg:text-[42px]">Billing Details</h2>
+          <section className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(360px,440px)]">
+            <CheckoutBillingSection
+              firstNamePart={firstNamePart}
+              lastNamePart={lastNamePart}
+              fieldErrors={fieldErrors}
+              formData={formData}
+              hasAnyShippingMethod={hasAnyShippingMethod}
+              enableDelivery={enableDelivery}
+              enableShopPickup={enableShopPickup}
+              shopPickupInstructions={shopPickupInstructions}
+              shipToDifferentAddress={shipToDifferentAddress}
+              deliveryZones={deliveryZones}
+              billingAddressLineTwo={billingAddressLineTwo}
+              emailAddress={emailAddress}
+              formatPrice={formatPrice}
+              getFieldClass={getFieldClass}
+              onNameChange={(nextName) => setFieldValue("name", nextName)}
+              onFieldValueChange={setFieldValue}
+              onBillingAddressLineTwoChange={setBillingAddressLineTwo}
+              onEmailAddressChange={setEmailAddress}
+            />
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-1.5">
-                  <label htmlFor="first-name" className="text-[13px] font-medium text-[#1A1A1A]">
-                    First name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    id="first-name"
-                    type="text"
-                    value={firstNamePart}
-                    onChange={(event) => {
-                      const nextName = [event.target.value, lastNamePart].filter(Boolean).join(" ")
-                      setFieldValue("name", nextName)
-                    }}
-                    className={`${getFieldClass(Boolean(fieldErrors.name))} h-11 px-3`}
-                    aria-invalid={Boolean(fieldErrors.name)}
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label htmlFor="last-name" className="text-[13px] font-medium text-[#1A1A1A]">
-                    Last name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    id="last-name"
-                    type="text"
-                    value={lastNamePart}
-                    onChange={(event) => {
-                      const nextName = [firstNamePart, event.target.value].filter(Boolean).join(" ")
-                      setFieldValue("name", nextName)
-                    }}
-                    className={`${getFieldClass(Boolean(fieldErrors.name))} h-11 px-3`}
-                    aria-invalid={Boolean(fieldErrors.name)}
-                  />
-                </div>
-              </div>
-
-              {fieldErrors.name ? (
-                <p id="checkout-name-error" className="text-xs text-red-600" role="alert">
-                  {fieldErrors.name}
-                </p>
-              ) : null}
-
-              <div className="space-y-1.5">
-                <p className="text-[13px] font-medium text-[#1A1A1A]">
-                  Country / Region <span className="text-red-500">*</span>
-                </p>
-                <p className="text-[24px] font-semibold leading-none tracking-tight text-[#1A1A1A] sm:text-[28px] lg:text-[30px]">Kenya</p>
-              </div>
-
-              {hasAnyShippingMethod ? (
-                <div className="space-y-2">
-                  <p className="text-[13px] font-medium text-[#1A1A1A]">
-                    Shipping Method <span className="text-red-500">*</span>
-                  </p>
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    {enableDelivery ? (
-                      <label className="flex cursor-pointer items-center gap-2 rounded-none border border-[#DADAD5] px-3 py-2">
-                        <input
-                          type="radio"
-                          name="delivery-method"
-                          checked={formData.deliveryMethod === "delivery"}
-                          onChange={() => setFieldValue("deliveryMethod", "delivery")}
-                          className="h-4 w-4 accent-[#1A1A1A]"
-                        />
-                        <span className="text-sm text-[#1A1A1A]">Delivery</span>
-                      </label>
-                    ) : null}
-                    {enableShopPickup ? (
-                      <label className="flex cursor-pointer items-center gap-2 rounded-none border border-[#DADAD5] px-3 py-2">
-                        <input
-                          type="radio"
-                          name="delivery-method"
-                          checked={formData.deliveryMethod === "shop_pickup"}
-                          onChange={() => setFieldValue("deliveryMethod", "shop_pickup")}
-                          className="h-4 w-4 accent-[#1A1A1A]"
-                        />
-                        <span className="text-sm text-[#1A1A1A]">Shop Pickup (Free)</span>
-                      </label>
-                    ) : null}
-                  </div>
-                </div>
-              ) : (
-                <div className="rounded-none border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">
-                  This store has no shipping method enabled. Please contact the store owner.
-                </div>
-              )}
-
-              {formData.deliveryMethod === "delivery" ? (
-                <>
-                  <div className="space-y-1.5">
-                    <label htmlFor="deliveryAddress" className="text-[13px] font-medium text-[#1A1A1A]">
-                      Street address <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      id="deliveryAddress"
-                      type="text"
-                      value={formData.deliveryAddress}
-                      onChange={(event) => setFieldValue("deliveryAddress", event.target.value)}
-                      placeholder="House number and street name"
-                      className={`${getFieldClass(Boolean(fieldErrors.deliveryAddress))} h-11 px-3`}
-                      aria-invalid={Boolean(fieldErrors.deliveryAddress)}
-                      aria-describedby={fieldErrors.deliveryAddress ? "checkout-address-error" : undefined}
-                    />
-                    <input
-                      id="deliveryAddress-2"
-                      type="text"
-                      value={addressLineTwo}
-                      onChange={(event) => setAddressLineTwo(event.target.value)}
-                      placeholder="Apartment, suite, unit, etc. (optional)"
-                      className="h-11 w-full rounded-none border border-[#E8E8E5] bg-transparent px-3 text-sm text-[#1A1A1A] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]"
-                    />
-                    {fieldErrors.deliveryAddress ? (
-                      <p id="checkout-address-error" className="text-xs text-red-600" role="alert">
-                        {fieldErrors.deliveryAddress}
-                      </p>
-                    ) : null}
-                  </div>
-
-                  {deliveryZones.length > 0 ? (
-                    <div className="space-y-1.5">
-                      <label htmlFor="zone" className="text-[13px] font-medium text-[#1A1A1A]">
-                        Town / City <span className="text-red-500">*</span>
-                      </label>
-                      <select
-                        id="zone"
-                        value={formData.zoneId}
-                        onChange={(event) => setFieldValue("zoneId", event.target.value)}
-                        className={`${getFieldClass(Boolean(fieldErrors.zoneId))} h-11 px-3`}
-                        aria-invalid={Boolean(fieldErrors.zoneId)}
-                        aria-describedby={fieldErrors.zoneId ? "checkout-zone-error" : undefined}
-                      >
-                        <option value="">Select city</option>
-                        {deliveryZones.map((zone) => (
-                          <option key={zone.id} value={zone.id}>
-                            {zone.name} — {formatPrice(zone.price)}
-                          </option>
-                        ))}
-                      </select>
-                      {fieldErrors.zoneId ? (
-                        <p id="checkout-zone-error" className="text-xs text-red-600" role="alert">
-                          {fieldErrors.zoneId}
-                        </p>
-                      ) : null}
-                    </div>
-                  ) : null}
-                </>
-              ) : (
-                <div className="rounded-none border border-[#DADAD5] bg-[#EEF2EC] px-3 py-2 text-sm text-[#4B4B46]">
-                  {shopPickupInstructions?.trim() || "You can pick up your order from the shop after confirmation."}
-                </div>
-              )}
-
-              <div className="space-y-1.5">
-                <label htmlFor="phone" className="text-[13px] font-medium text-[#1A1A1A]">
-                  Phone <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(event) => setFieldValue("phone", event.target.value)}
-                  placeholder="+254 712345678"
-                  className={`${getFieldClass(Boolean(fieldErrors.phone))} h-11 px-3`}
-                  aria-invalid={Boolean(fieldErrors.phone)}
-                  aria-describedby={fieldErrors.phone ? "checkout-phone-error" : undefined}
-                />
-                {fieldErrors.phone ? (
-                  <p id="checkout-phone-error" className="text-xs text-red-600" role="alert">
-                    {fieldErrors.phone}
-                  </p>
-                ) : null}
-              </div>
-
-              <div className="space-y-1.5">
-                <label htmlFor="email-address" className="text-[13px] font-medium text-[#1A1A1A]">
-                  Email address <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="email-address"
-                  type="email"
-                  value={emailAddress}
-                  onChange={(event) => setEmailAddress(event.target.value)}
-                  placeholder="you@example.com"
-                  className="h-11 w-full rounded-none border border-[#E8E8E5] bg-transparent px-3 text-sm text-[#1A1A1A] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <input
-                  id="ship-different-address"
-                  type="checkbox"
-                  checked={shipToDifferentAddress}
-                  onChange={(event) => setShipToDifferentAddress(event.target.checked)}
-                  className="h-4 w-4 rounded-none border-[#BEBEB8] text-[#1A1A1A] focus:ring-[#1A1A1A]"
-                />
-                <label htmlFor="ship-different-address" className="text-base font-semibold text-[#1A1A1A] sm:text-[19px]">
-                  Ship To A Different Address?
-                </label>
-              </div>
-
-              <div className="space-y-1.5">
-                <label htmlFor="order-notes" className="text-[13px] font-medium text-[#1A1A1A]">
-                  Order notes (optional)
-                </label>
-                <textarea
-                  id="order-notes"
-                  rows={6}
-                  value={orderNotes}
-                  onChange={(event) => setOrderNotes(event.target.value)}
-                  placeholder="Notes about your order, e.g. special notes for delivery."
-                  className="w-full resize-y rounded-none border border-[#D7D7D2] bg-transparent p-3 text-sm text-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]"
-                />
-              </div>
-            </div>
+            <CheckoutShippingSection
+              deliveryMethod={formData.deliveryMethod}
+              shipToDifferentAddress={shipToDifferentAddress}
+              shippingRecipientName={shippingRecipientName}
+              shippingRecipientPhone={shippingRecipientPhone}
+              shippingAddressLine1={shippingAddressLine1}
+              shippingAddressLine2={shippingAddressLine2}
+              shippingZoneId={shippingZoneId}
+              deliveryZones={deliveryZones}
+              orderNotes={orderNotes}
+              fieldErrors={fieldErrors}
+              formatPrice={formatPrice}
+              getFieldClass={getFieldClass}
+              onToggleShipToDifferentAddress={handleShipToDifferentAddressChange}
+              onShippingRecipientNameChange={(value) => {
+                setShippingRecipientName(value)
+                clearFieldError("shippingRecipientName")
+              }}
+              onShippingRecipientPhoneChange={(value) => {
+                setShippingRecipientPhone(value)
+                clearFieldError("shippingRecipientPhone")
+              }}
+              onShippingAddressLine1Change={(value) => {
+                setShippingAddressLine1(value)
+                clearFieldError("shippingAddressLine1")
+              }}
+              onShippingAddressLine2Change={setShippingAddressLine2}
+              onShippingZoneIdChange={(value) => {
+                setShippingZoneId(value)
+                clearFieldError("shippingZoneId")
+              }}
+              onOrderNotesChange={setOrderNotes}
+            />
           </section>
         </form>
       </div>
 
-      <div className="lg:col-span-5">
-        <div className="border border-[#DADAD5]">
-          <div className="border-b border-[#DADAD5] px-4 py-4 sm:px-6 sm:py-5">
-            <h2 className="text-[28px] font-semibold tracking-tight text-[#1A1A1A] sm:text-[32px] lg:text-[36px]">Your Order</h2>
-          </div>
-
-          <div className="px-4 py-4 sm:px-6">
-            <div className="grid grid-cols-[minmax(0,1fr)_auto] border-b border-[#E2E2DD] pb-3 text-[13px] font-semibold text-[#4E4E49]">
-              <span>Product</span>
-              <span>Subtotal</span>
-            </div>
-
-            <div className="divide-y divide-[#E8E8E5]">
-              {cart.map((item) => (
-                <div key={`checkout-item-${item.productId}-${item.variant || "default"}`} className="grid grid-cols-[minmax(0,1fr)_auto] gap-4 py-4 text-sm">
-                  <p className="min-w-0 text-[#4A4A45]">
-                    <span className="line-clamp-1">{item.name}</span>
-                    <span className="text-xs text-[#70706A]"> × {item.quantity}</span>
-                  </p>
-                  <span className="font-semibold text-[#1A1A1A]">{formatPrice(item.price * item.quantity)}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="space-y-0 border-t border-[#DADAD5]">
-              <div className="grid grid-cols-[minmax(0,1fr)_auto] py-4 text-[29px] font-semibold text-[#1A1A1A]">
-                <span className="text-[17px]">Subtotal</span>
-                <span className="text-[17px]">{formatPrice(cartTotal)}</span>
-              </div>
-              <div className="grid grid-cols-[minmax(0,1fr)_auto] border-t border-[#E8E8E5] py-4 text-[15px] text-[#4E4E49]">
-                <span className="font-semibold">Shipment</span>
-                <span className="font-semibold">{shippingMethodLabel}</span>
-              </div>
-              <div className="grid grid-cols-[minmax(0,1fr)_auto] border-t border-[#DADAD5] py-4">
-                <span className="text-xl font-semibold text-[#1A1A1A]">Total</span>
-                <span className="text-xl font-semibold text-[#1A1A1A]" style={{ color: brandColor || "#1A1A1A" }}>
-                  {formatPrice(grandTotal)}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-[#DADAD5] px-4 py-5 sm:px-6">
-            <div className="space-y-5">
-              {paymentOptions.map((option) => {
-                const isActive = paymentMethod === option.id
-                return (
-                  <label key={option.id} className="block cursor-pointer">
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="radio"
-                        name="payment-method"
-                        value={option.id}
-                        checked={isActive}
-                        onChange={() => setPaymentMethod(option.id)}
-                        className="h-4 w-4 accent-[#1A1A1A]"
-                      />
-                      <p className="text-base leading-none font-medium text-[#1A1A1A]">{option.label}</p>
-                      {option.id === "mpesa" ? (
-                        <Image
-                          src={option.imageSrc}
-                          alt={option.imageAlt}
-                          width={64}
-                          height={24}
-                          className="h-6 w-auto object-contain"
-                        />
-                      ) : null}
-                    </div>
-                    {isActive ? (
-                      <div className="ml-7 mt-2 bg-[#DAD5E1] px-3 py-2 text-sm text-[#4B4B46]">
-                        {option.id === "mpesa"
-                          ? "Place order and pay using M-PESA."
-                          : "Proceed to secure card checkout after placing order."}
-                      </div>
-                    ) : null}
-
-                    {option.id === "card" ? (
-                      <div className="ml-7 mt-2 rounded border border-[#DDDDD8] bg-card px-3 py-3">
-                        <div className="flex items-center justify-center">
-                          <Image
-                            src="/images/paystack-ke.png"
-                            alt="Visa, Mastercard, Amex, M-PESA and Apple Pay"
-                            width={520}
-                            height={92}
-                            className="h-auto w-full max-w-[520px] object-contain"
-                          />
-                        </div>
-                      </div>
-                    ) : null}
-                  </label>
-                )
-              })}
-            </div>
-          </div>
-
-          <div className="border-t border-[#DADAD5] px-4 py-5 sm:px-6 sm:py-6">
-            <p className="max-w-[520px] text-sm leading-relaxed text-[#666661] sm:text-[16px]">
-              Your personal data will be used to process your order, support your experience and for other purposes described in our privacy policy.
-            </p>
-            <div className="mt-5 flex justify-start sm:justify-end">
-              <button
-                type="button"
-                onClick={submitOrder}
-                disabled={isLoading}
-                className="inline-flex h-12 min-w-[170px] items-center justify-center border border-[#1A1A1A] bg-transparent px-6 text-lg font-medium text-[#1A1A1A] transition-colors hover:bg-[#1A1A1A] hover:text-white disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2 sm:text-xl"
-              >
-                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {isLoading ? "Processing..." : "Place Order"}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <CheckoutOrderSummary
+        checkoutItems={checkoutItems}
+        checkoutSubtotal={checkoutSubtotal}
+        shippingMethodLabel={shippingMethodLabel}
+        grandTotal={grandTotal}
+        brandColor={brandColor}
+        paymentMethod={paymentMethod}
+        isLoading={isLoading}
+        formatPrice={formatPrice}
+        onPaymentMethodChange={setPaymentMethod}
+        onSubmit={submitOrder}
+      />
     </div>
   )
 }

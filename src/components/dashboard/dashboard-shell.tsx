@@ -80,9 +80,15 @@ interface SidebarContentProps {
     hasFirstProduct: boolean;
   } | null;
   setIsMobileMenuOpen: (open: boolean) => void;
+  isCollapsed?: boolean;
 }
 
-const SidebarContent = ({ user, store, setIsMobileMenuOpen }: SidebarContentProps) => {
+const SidebarContent = ({
+  user,
+  store,
+  setIsMobileMenuOpen,
+  isCollapsed = false,
+}: SidebarContentProps) => {
   const pathname = usePathname();
 
   const routes = [
@@ -112,13 +118,17 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen }: SidebarContentProp
                   colors={["#264653", "#2a9d8f", "#e9c46a", "#f4a261", "#e76f51"]}
                 />
               </div>
-              <span className="flex-1 truncate text-left text-sm font-normal text-foreground">
-                {store?.name || "My Store"}
-              </span>
-              <div className="flex shrink-0 flex-col text-muted-foreground transition-colors group-hover:text-foreground">
-                <ChevronUp className="h-3 w-3 -mb-0.5" />
-                <ChevronDown className="h-3 w-3 -mt-0.5" />
-              </div>
+              {!isCollapsed ? (
+                <>
+                  <span className="flex-1 truncate text-left text-sm font-normal text-foreground">
+                    {store?.name || "My Store"}
+                  </span>
+                  <div className="flex shrink-0 flex-col text-muted-foreground transition-colors group-hover:text-foreground">
+                    <ChevronUp className="h-3 w-3 -mb-0.5" />
+                    <ChevronDown className="h-3 w-3 -mt-0.5" />
+                  </div>
+                </>
+              ) : null}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" sideOffset={4} className="w-[240px] font-poppins">
@@ -154,8 +164,10 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen }: SidebarContentProp
           <Link
             key={route.label}
             href={route.href}
+            title={isCollapsed ? route.label : undefined}
             className={cn(
-              "flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-normal transition-all duration-200 group relative",
+              "flex items-center rounded-xl px-3.5 py-2.5 text-sm font-normal transition-all duration-200 group relative",
+              isCollapsed ? "justify-center" : "gap-3",
               route.active
                 ? "bg-primary text-primary-foreground font-normal shadow-none"
                 : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground"
@@ -165,7 +177,7 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen }: SidebarContentProp
             }}
           >
             <route.icon className={cn("h-[22px] w-[22px]", route.active ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground")} />
-            <span className="font-poppins tracking-wide">{route.label}</span>
+            {!isCollapsed ? <span className="font-poppins tracking-wide">{route.label}</span> : null}
           </Link>
         ))}
       </nav>
@@ -187,11 +199,15 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen }: SidebarContentProp
                   {user.name?.charAt(0).toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
-              <div className="flex-1 overflow-hidden text-left">
-                <p className="truncate text-sm font-normal leading-tight text-foreground">{user.name || "User"}</p>
-                <p className="mt-0.5 truncate text-xs leading-tight text-muted-foreground">{user.email}</p>
-              </div>
-              <MoreHorizontal className="h-4 w-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground" />
+              {!isCollapsed ? (
+                <>
+                  <div className="flex-1 overflow-hidden text-left">
+                    <p className="truncate text-sm font-normal leading-tight text-foreground">{user.name || "User"}</p>
+                    <p className="mt-0.5 truncate text-xs leading-tight text-muted-foreground">{user.email}</p>
+                  </div>
+                  <MoreHorizontal className="h-4 w-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground" />
+                </>
+              ) : null}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -220,6 +236,7 @@ const SidebarContent = ({ user, store, setIsMobileMenuOpen }: SidebarContentProp
 export function DashboardShell({ children, user, store }: DashboardShellProps) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const publicStoreUrl = store?.slug ? getStoreUrl(store.slug, ROOT_DOMAIN) : null;
   const onboardingComplete = Boolean(store?.configured && store?.hasFirstProduct);
   const showSetupReminder =
@@ -266,15 +283,26 @@ export function DashboardShell({ children, user, store }: DashboardShellProps) {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground font-poppins">
-      <aside className="hidden w-72 border-r border-border bg-white md:block fixed inset-y-0 left-0 z-30">
+      <aside
+        className={cn(
+          "hidden border-r border-border bg-white md:block fixed inset-y-0 left-0 z-30 transition-all duration-300",
+          isSidebarCollapsed ? "w-20" : "w-72"
+        )}
+      >
         <SidebarContent
           user={user}
           store={store}
           setIsMobileMenuOpen={setIsMobileMenuOpen}
+          isCollapsed={isSidebarCollapsed}
         />
       </aside>
 
-      <div className="flex w-full flex-col md:pl-72 transition-all duration-300">
+      <div
+        className={cn(
+          "flex w-full flex-col transition-all duration-300",
+          isSidebarCollapsed ? "md:pl-20" : "md:pl-72"
+        )}
+      >
         <header className="sticky top-0 z-20 flex h-16 items-center justify-between bg-white px-6 md:px-8">
           {/* Left — Breadcrumb + mobile menu */}
           <div className="flex items-center gap-4">
@@ -289,9 +317,29 @@ export function DashboardShell({ children, user, store }: DashboardShellProps) {
                   user={user}
                   store={store}
                   setIsMobileMenuOpen={setIsMobileMenuOpen}
+                  isCollapsed={false}
                 />
               </SheetContent>
             </Sheet>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hidden md:inline-flex text-foreground hover:bg-foreground/10 rounded-xl"
+              onClick={() => setIsSidebarCollapsed((prev) => !prev)}
+              aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              <svg
+                className="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.8" />
+                <path d="M9 5V19" stroke="currentColor" strokeWidth="1.8" />
+              </svg>
+            </Button>
 
             <div className="flex items-center">
               {getBreadcrumb()}

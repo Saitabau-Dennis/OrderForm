@@ -21,7 +21,7 @@ export default async function StorePage({ params }: { params: Promise<{ storeSlu
     notFound();
   }
 
-  const [featuredProducts, categoryRows, categoryProducts] = await Promise.all([
+  const [featuredProducts, categoryRows, categoryImages] = await Promise.all([
     db.product.findMany({
       where: { storeId: store.id, isAvailable: true },
       orderBy: { createdAt: "desc" },
@@ -33,13 +33,12 @@ export default async function StorePage({ params }: { params: Promise<{ storeSlu
       distinct: ["category"],
       orderBy: { category: "asc" },
     }),
-    db.product.findMany({
-      where: { storeId: store.id, isAvailable: true, category: { not: null } },
+    db.storeCategoryImage.findMany({
+      where: { storeId: store.id },
       select: {
-        category: true,
+        categoryName: true,
         imageUrl: true,
       },
-      orderBy: [{ category: "asc" }, { createdAt: "desc" }],
     }),
   ]);
 
@@ -47,32 +46,14 @@ export default async function StorePage({ params }: { params: Promise<{ storeSlu
     .map((entry) => entry.category?.trim() || "")
     .filter(Boolean);
 
-  const categoryCards = new Map<string, { name: string; imageUrl: string | null }>();
-  for (const product of categoryProducts) {
-    const categoryName = product.category?.trim();
-    if (!categoryName) continue;
+  const categoryImageMap = new Map(
+    categoryImages.map((entry) => [entry.categoryName.trim(), entry.imageUrl] as const)
+  );
 
-    const existing = categoryCards.get(categoryName);
-    if (!existing) {
-      categoryCards.set(categoryName, {
-        name: categoryName,
-        imageUrl: product.imageUrl ?? null,
-      });
-      continue;
-    }
-
-    if (!existing.imageUrl && product.imageUrl) {
-      categoryCards.set(categoryName, {
-        ...existing,
-        imageUrl: product.imageUrl,
-      });
-    }
-  }
-
-  const serializedCategoryCards = Array.from(categoryCards.values()).map((category) => ({
-    name: category.name,
-    imageUrl: category.imageUrl,
-    href: `${storefrontPath(store.slug, "/catalog")}?category=${encodeURIComponent(category.name)}`,
+  const serializedCategoryCards = categories.map((categoryName) => ({
+    name: categoryName,
+    imageUrl: categoryImageMap.get(categoryName) || null,
+    href: `${storefrontPath(store.slug, "/catalog")}?category=${encodeURIComponent(categoryName)}`,
   }));
 
   // Serialize Decimal fields to plain numbers for the client component
@@ -113,7 +94,6 @@ export default async function StorePage({ params }: { params: Promise<{ storeSlu
           <CategoryCarousel
             storeSlug={safeStore.slug}
             categories={serializedCategoryCards}
-            autoScrollDelayMs={2000}
           />
 
           <div className="mb-5">

@@ -1,7 +1,6 @@
 "use client";
 
 import { format } from "date-fns";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/dashboard/dashboard-button";
 import { Printer, X } from "lucide-react";
 import { formatOrderId } from "@/lib/utils";
@@ -10,12 +9,12 @@ import { DashboardOrder, DashboardOrderItem } from "./order-types";
 export function OrderDetails({
   order,
   storeName,
-  onUpdateStatus,
+  storePhone,
   onClose,
 }: {
   order: DashboardOrder;
   storeName: string;
-  onUpdateStatus: (orderId: string, status: string) => void;
+  storePhone?: string | null;
   onClose?: () => void;
 }) {
   return (
@@ -97,40 +96,6 @@ export function OrderDetails({
         </div>
       </div>
 
-      {/* Dashed divider */}
-      <div className="mx-5 border-t border-dashed" />
-
-      {/* Customer Info */}
-      <div className="px-6 py-4 space-y-1.5">
-        <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Customer Information</p>
-        <div className="flex justify-between text-xs">
-          <span className="text-muted-foreground">Customer</span>
-          <span className="text-foreground">{order.customerName}</span>
-        </div>
-        <div className="flex justify-between text-xs">
-          <span className="text-muted-foreground">Phone</span>
-          <span className="text-foreground">{order.customerPhone}</span>
-        </div>
-        <div className="flex justify-between text-xs">
-          <span className="text-muted-foreground">Fulfillment</span>
-          <span className="text-foreground">
-            {order.fulfillmentMethod === "SHOP_PICKUP" ? "Shop Pickup" : "Delivery"}
-          </span>
-        </div>
-        {order.deliveryAddress && (
-          <div className="flex justify-between text-xs">
-            <span className="text-muted-foreground shrink-0">Address</span>
-            <span className="text-foreground text-right max-w-[200px]">{order.deliveryAddress}</span>
-          </div>
-        )}
-        {order.deliveryZone && (
-          <div className="flex justify-between text-xs">
-            <span className="text-muted-foreground">Zone</span>
-            <span className="text-foreground">{order.deliveryZone}</span>
-          </div>
-        )}
-      </div>
-
       {/* Notes */}
       {order.notes && (
         <>
@@ -148,21 +113,15 @@ export function OrderDetails({
       {/* Footer */}
       <div className="px-6 py-4 text-center">
         <p className="text-[10px] text-muted-foreground">Thank you for your order!</p>
+        <p className="mt-2 text-[10px] text-muted-foreground">{storeName}</p>
+        {storePhone ? <p className="mt-2 text-[10px] text-muted-foreground">{storePhone}</p> : null}
       </div>
 
       {/* Actions bar — hidden on print */}
       <div className="border-t p-4 flex items-center gap-2 no-print">
-        <Select defaultValue={order.status} onValueChange={(val) => onUpdateStatus(order.id, val)}>
-          <SelectTrigger className="h-8 flex-1 text-xs">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="processing">Processing</SelectItem>
-            <SelectItem value="completed">Completed</SelectItem>
-            <SelectItem value="cancelled">Cancelled</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="h-8 flex-1 rounded-md border px-3 text-xs flex items-center capitalize text-muted-foreground">
+          Status: {order.status}
+        </div>
         <Button
           onClick={() => window.print()}
           variant="outline"

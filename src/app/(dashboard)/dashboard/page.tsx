@@ -11,7 +11,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/dashboard/dashboard-button";
 import { SetupChecklist } from "@/components/dashboard/setup-checklist";
 import Link from "next/link";
 
@@ -304,16 +303,13 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                       </div>
 
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-10 rounded-xl border-border bg-card px-4 text-sm font-normal text-foreground hover:bg-muted hover:text-foreground"
-                          >
-                            <CalendarRange className="h-4 w-4 text-muted-foreground" />
-                            {rangeLabels[range]}
-                            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-                          </Button>
+                        <DropdownMenuTrigger
+                          type="button"
+                          className="inline-flex h-10 items-center gap-2 rounded-xl border border-border bg-card px-4 text-sm font-normal text-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        >
+                          <CalendarRange className="h-4 w-4 text-muted-foreground" />
+                          {rangeLabels[range]}
+                          <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-52">
                           <DropdownMenuItem asChild className="m-0">

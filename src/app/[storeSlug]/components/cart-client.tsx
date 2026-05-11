@@ -16,6 +16,8 @@ type CartClientProps = {
   }>;
 };
 
+const ABOVE_FOLD_CART_IMAGE_COUNT = 2;
+
 // Store-scoped key for optional checkout instructions entered in cart.
 function getCartNoteStorageKey(storeSlug: string) {
   return `orderform_cart_note:${storeSlug}`;
@@ -95,7 +97,7 @@ export function CartClient({
       </div>
 
       <div className="divide-y divide-[#DCDCD7] border-b border-[#DCDCD7]">
-        {cart.map((item) => {
+        {cart.map((item, index) => {
           const category =
             productCategoryMap.get(item.productId)?.trim() || "Featured";
 
@@ -114,6 +116,8 @@ export function CartClient({
                       src={item.imageUrl}
                       alt={item.name}
                       fill
+                      priority={index < ABOVE_FOLD_CART_IMAGE_COUNT}
+                      loading={index < ABOVE_FOLD_CART_IMAGE_COUNT ? "eager" : "lazy"}
                       className="object-cover"
                     />
                   ) : null}
